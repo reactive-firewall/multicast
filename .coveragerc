@@ -1,0 +1,24 @@
+[run]
+parallel = True
+
+[report]
+include = multicast*,tests*
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    except Exception
+    except BaseException:
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+    raise ImportError
+    except unittest.SkipTest
+    except IOError
+    except OSError
+
+    # Don't complain if non-runnable code isn't run:
+    if __name__ in '__main__':
+
+ignore_errors = True
+

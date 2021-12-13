@@ -1,0 +1,42 @@
+version = 1
+
+test_patterns = [
+    "tests/**,",
+    "tests/*.py",
+    ".circleci/**",
+    "testcases/**"
+]
+
+exclude_patterns = [
+    "__pycache__/",
+    "*.pyc",
+    "*$py.class",
+    "*~",
+    "htmlcov/",
+    ".tox/",
+    ".coverage",
+    ".coverage.*",
+    ".cache",
+    "nosetests.xml",
+    "coverage.xml",
+    ".coveralls.yml",
+    "codecov_env",
+    "*,cover",
+    ".hypothesis/"
+]
+
+[[analyzers]]
+name = "python"
+enabled = true
+dependency_file_paths = [
+  "requirements.txt",
+  "setup.py"
+]
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+  max_line_length = 100
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true

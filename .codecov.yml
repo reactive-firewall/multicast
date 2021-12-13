@@ -1,0 +1,17 @@
+coverage:
+  status:
+    project:
+      default: on
+        target: 95%
+        base: auto
+      tests:
+        target: 80%
+        flags: tests
+        paths:
+          - tests
+
+flags:
+  tests:
+    paths:
+      - tests
+    joined: false
