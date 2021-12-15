@@ -29,6 +29,10 @@ ifeq "$(MAKE)" ""
 	MAKE=make
 endif
 
+ifeq "$(PYTHON)" ""
+	PYTHON=export LC_CTYPE="en_US.utf-8" ; python3 -B
+endif
+
 ifeq "$(WAIT)" ""
 	WAIT=wait
 endif
@@ -58,18 +62,20 @@ endif
 PHONY: must_be_root cleanup
 
 build:
-	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
+	$(QUIET)$(ECHO) "INFO: No need to build. Try make -f Makefile install"
+	$(QUIET)$(PYTHON) ./setup.py build
+	$(QUIET)$(ECHO) "build DONE."
 
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)python3 -m pip uninstall multicast || true
+	$(QUITE)$(PYTHON) -m pip uninstall multicast || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -78,11 +84,13 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)python3 -m pip uninstall multicast && python -m pip uninstall multicast || true
+	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast || true
+	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
+	$(QUIET)rm -Rfd ./.eggs/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)coverage run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || python3 -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)coverage run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
 	$(QUIET)coverage report --include=multicast* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
@@ -93,7 +101,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)python3 -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
+	$(QUIET)$(PYTHON) -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
@@ -104,19 +112,24 @@ test-style: cleanup
 cleanup:
 	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f tests/*~ 2>/dev/null || true
-	$(QUIET)rm -Rf tests/__pycache__ 2>/dev/null || true
+	$(QUIET)rm -Rfd tests/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f multicast/*.pyc 2>/dev/null || true
-	$(QUIET)rm -Rf multicast/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -Rf multicast/*/__pycache__ 2>/dev/null || true
+	$(QUIET)rm -Rfd multicast/__pycache__ 2>/dev/null || true
+	$(QUIET)rm -Rfd multicast/*/__pycache__ 2>/dev/null || true
 	$(QUIET)rm -f multicast/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.pyc 2>/dev/null || true
 	$(QUIET)rm -f multicast/*/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f multicast/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
-	$(QUIET)rm -Rf .pytest_cache/ 2>/dev/null || true
+	$(QUIET)rm -f ./.DS_Store 2>/dev/null || true
+	$(QUIET)rm -Rfd .pytest_cache/ 2>/dev/null || true
 	$(QUIET)rmdir ./test-reports/ 2>/dev/null || true
 	$(QUIET)rm -f multicast/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f multicast/*/*.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f multicast/.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f multicast/*/.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f tests/.DS_Store 2>/dev/null || true
+	$(QUIET)rm -f tests/*/.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f multicast.egg-info/* 2>/dev/null || true
 	$(QUIET)rmdir multicast.egg-info 2>/dev/null || true
 	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
@@ -126,10 +139,11 @@ cleanup:
 	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
 	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
 	$(QUIET)rm -f ./.*~ 2>/dev/null || true
-	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
+	$(QUIET)rm -Rfd ./.tox/ 2>/dev/null || true
 
 clean: cleanup
 	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
+	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
