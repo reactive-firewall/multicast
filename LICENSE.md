@@ -4,7 +4,7 @@ Copyright (c) 2017-2022, Mr. Walls
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -24,17 +24,17 @@ copies or substantial portions of the Software.
 
 END MIT License
 
-Included Licences and aditional awknoledgemnt included with package:
+Included Licenses and additional Acknowledgments included with package:
 
 Files: `tests/context.py`, `tests/test_basic.py`, and `tests/test_usage.py`
 ..........................................
 Copyright (c) 2017-2022, Python Test Repo Template
-ALSO Licensed under MIT (the "License");
+ALSO Licensed under MIT
 You may obtain a copy of the License at
 http://www.github.com/reactive-firewall/python-repo/LICENSE.md
 ..........................................
 
-Third-party Acknowlegement:
+Third-party Acknowledgments:
 
 Files: `multicast/send.py` and `multicast/recv.py`
 ..........................................
