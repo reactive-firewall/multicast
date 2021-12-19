@@ -1,0 +1,50 @@
+version: 1.0.{build}
+branches:
+  only:
+  - master
+  - stable
+skip_tags: true
+max_jobs: 1
+image:
+- Visual Studio 2017
+- Visual Studio 2015
+clone_depth: 50
+init:
+- cmd: >-
+    choco install make || VER>NUL
+
+    choco install git || VER>NUL
+
+    choco install python --pre || VER>NUL
+
+    choco upgrade python --pre || VER>NUL
+
+    python -m pip install flake8 || VER>NUL
+
+    python -m pip install coverage || VER>NUL
+
+    choco install codecov || VER>NUL
+
+    dir
+build_script:
+- cmd: make clean
+test_script:
+- cmd: >-
+    make test || VER>NUL
+
+    dir
+
+    coverage combine || VER>NUL
+
+    dir
+
+    coverage xml || VER>NUL
+
+    dir
+
+    codecov || VER>NUL
+
+    dir
+
+    make test-style || VER>NUL
+deploy: off
