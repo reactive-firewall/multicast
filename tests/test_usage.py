@@ -119,6 +119,17 @@ def checkPythonErrors(args=None, stderr=None):
 	return theOutput
 
 
+def debugErrorInTest(err):
+	if err is None:
+		return False
+	print(str(""))
+	print(str(type(err)))
+	print(str(err))
+	print(str((err.args)))
+	print(str(""))
+	return True
+
+
 def debugBlob(blob=None):
 	"""In case you need it."""
 	try:
@@ -175,22 +186,21 @@ class BasicUsageTestSuite(unittest.TestCase):
 				theResult = False
 			theResult = True
 		except Exception as impErr:
-			print(str(type(impErr)))
-			print(str(impErr))
+			debugErrorInTest(impErr)
 			theResult = False
 		assert theResult
 
-	def test_template_case(self):
-		"""Test case template for: python -m multicast.* --version """
+	def test_version_has_value_case(self):
+		"""Test for result from --version argument: python -m multicast.* --version """
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
 			try:
-				for test_case in ["__main__"]:
+				for test_case in [".__main__", ""]:
 					args = [
 						str(thepython),
 						str("-m"),
-						str("multicast.{}").format(
+						str("multicast{}").format(
 							str(
 								test_case
 							)
@@ -209,11 +219,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				debugErrorInTest(err)
 				err = None
 				del err
 				theResult = False
@@ -225,11 +231,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 		thepython = getPythonCommand()
 		if (thepython is not None):
 			try:
-				for test_case in ["noop"]:
+				for test_case in ["NOOP", "SAY"]:
 					args = [
 						str(thepython),
 						str("-m"),
-						str("multicast.__main__"),
+						str("multicast"),
 						str("{}").format(
 							str(
 								test_case
@@ -247,11 +253,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				debugErrorInTest(err)
 				err = None
 				del err
 				theResult = False
@@ -268,7 +270,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					args = [
 						str(thepython),
 						str("-m"),
-						str("multicast.__main__"),
+						str("multicast"),
 						str("{}").format(
 							str(
 								test_case
@@ -286,11 +288,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				debugErrorInTest(err)
 				err = None
 				del err
 				theResult = False
@@ -307,7 +305,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					args = [
 						str(thepython),
 						str("-m"),
-						str("multicast.__main_"),
+						str("multicast"),
 						str("{}").format(
 							str(
 								test_case
@@ -325,11 +323,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				debugErrorInTest(err)
 				err = None
 				del err
 				theResult = False
