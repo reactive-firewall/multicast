@@ -16,8 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prolog__""",
 	"""__doc__""", """__MCAST_DEFAULT_PORT""", """recv""", """send"""
@@ -117,6 +115,22 @@ except Exception as err:
 
 
 try:
+	import socket
+	if socket.__name__ is None:
+		raise ImportError("FAIL: we could not import socket. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
+	import struct
+	if struct.__name__ is None:
+		raise ImportError("FAIL: we could not import struct. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
 	if 'multicast.recv' not in sys.modules:
 		from . import recv as recv
 	else:  # pragma: no branch
@@ -136,17 +150,18 @@ except Exception as importErr:
 	import multicast.recv as send
 
 
-if __name__ in u'__main__':
+if __name__ in '__main__':
 	try:
 		if 'multicast.__main__' not in sys.modules:
-			from . import pocket as pocket
+			from . import __main__ as __main__
 		else:  # pragma: no branch
 			__main__ = sys.modules["""multicast.__main__"""]
 	except Exception:
 		from . import __main__ as __main__
 
 if __name__ in '__main__':
+	__EXIT_CODE = 2
 	if __main__.__name__ is None:
 		raise ImportError(str("Failed to open multicast"))
-	__main__.main(sys.argv[1:])
-	exit(0)
+	__EXIT_CODE = __main__.main(sys.argv[1:])
+	exit(__EXIT_CODE)
