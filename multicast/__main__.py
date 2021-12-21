@@ -17,6 +17,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__package__ = """multicast"""
+
+
+__module__ = """multicast"""
+
+
+__file__ = """multicast/__main__.py"""
+
 
 __prog__ = str("""multicast""")
 """The name of this program is Python Multicast"""
@@ -33,6 +41,34 @@ __epilog__ = str(
 )
 """Contains the short epilog of the program CLI help text."""
 
+
+__doc__ = __description__ + """
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+		>>> multicast.__doc__ is not None
+		True
+		>>>
+
+		>>> multicast.__version__ is not None
+		True
+		>>>
+
+		Testcase 0: multicast.__main__ should have a doctests.
+
+		>>> import multicast.__main__
+		>>>
+
+		>>> multicast.__main__.__module__ is not None
+		True
+		>>>
+
+	"""
 
 try:
 	import sys
@@ -77,11 +113,37 @@ try:
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
 	del importErr
-	import multicast.recv as send
+	import multicast.send as send
 
 
 def NoOp(*args, **kwargs):
-	"""The meaning of Nothing."""
+	"""The meaning of Nothing. This function should be self-explanitory;
+	it does 'no operation' i.e. nothing.
+	
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+		Testcase 0: multicast.__main__ should have a doctests.
+
+		>>> import multicast.__main__
+		>>> multicast.__main__.__module__ is not None
+		True
+		>>>
+
+		Testcase 1: multicast.NoOp should return None.
+
+		>>> import multicast.__main__
+		>>> multicast.__main__.NoOp() is None
+		True
+		>>> multicast.__main__.NoOp() is not None
+		False
+		>>>
+
+	"""
 	return None
 
 
@@ -154,25 +216,25 @@ def __checkToolArgs(args):
 
 def useTool(tool, *arguments):
 	"""Handler for launching the functions."""
+	theResult = None
 	arguments = __checkToolArgs(arguments)
 	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
 		try:
 			# print(str("launching: " + tool))
-			TASK_OPTIONS[tool](*arguments)
+			theResult = TASK_OPTIONS[tool](*arguments)
 		except Exception:
 			raise NotImplementedError("""Not Implemented.""")
-	else:
-		return None
+	return theResult
 
 
 def main(*argv):
 	"""The Main Event."""
+	__EXIT_CODE = 0
 	try:
 		try:
 			args, extra = parseArgs(*argv)
 			service_cmd = args.some_task
-			#sub_args = args.extra
-			useTool(service_cmd, extra)
+			__EXIT_CODE = useTool(service_cmd, extra)
 		except Exception as inerr:
 			w = str("WARNING - An error occured while")
 			w += str(" handling the arguments.")
@@ -180,15 +242,17 @@ def main(*argv):
 			print(w)
 			print(str(inerr))
 			print(str(inerr.args()))
-			exit(2)
+			__EXIT_CODE = 2
 	except Exception:
 		e = str("CRITICAL - An error occured while handling")
 		e += str(" the cascading failure.")
 		print(e)
-		exit(3)
-	exit(0)
+		__EXIT_CODE = 3
+	return __EXIT_CODE
 
 
-if __name__ == '__main__':
+if __name__ in '__main__':
+	__EXIT_CODE = 2
 	if (sys.argv is not None) and (len(sys.argv) >= 1):
-		main(sys.argv[1:])
+		__EXIT_CODE = main(sys.argv[1:])
+	exit(__EXIT_CODE)
