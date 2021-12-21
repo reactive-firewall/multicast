@@ -33,6 +33,9 @@
 __all__ = ["""main""", """run""", """parseArgs""", """__module__""", """__name__""", """__doc__"""]
 
 
+__package__ = """multicast"""
+
+
 __module__ = """multicast"""
 
 
@@ -42,7 +45,7 @@ __file__ = """multicast/recv.py"""
 __name__ = """multicast.recv"""
 
 
-__proc__ = "multicast HEAR"
+__proc__ = """multicast HEAR"""
 
 
 __doc__ = """Python Multicast Reciver.
@@ -61,13 +64,13 @@ __doc__ = """Python Multicast Reciver.
 	>>>
 
 	Testcase 1: Recv should be automaticly imported.
-		A: Test that the __main__ component is initialized.
+		A: Test that the multicast component is initialized.
 		B: Test that the recv component is initialized.
 
 	>>> import multicast
 	>>>
 
-	>>> multicast.__main__ is not None
+	>>> multicast is not None
 	True
 	>>> multicast.recv is not None
 	True
@@ -76,11 +79,24 @@ __doc__ = """Python Multicast Reciver.
 
 """
 
-
-import sys
-import socket
-import struct
-import argparse
+try:
+	import sys
+	import socket
+	import struct
+	import argparse
+	depends = [
+		socket, struct, argparse
+	]
+	for unit in depends:
+		try:
+			if unit.__name__ is None:  # pragma: no branch
+				raise ImportError(
+					str("[CWE-440] module failed to import {}.").format(str(unit))
+				)
+		except Exception:  # pragma: no branch
+			raise ImportError(str("[CWE-758] Module failed completely."))
+except Exception as err:
+	raise ImportError(err)
 
 
 try:
@@ -93,7 +109,7 @@ except Exception as importErr:
 	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
 
 
-def parseArgs(arguments=None):
+def parseArgs(*arguments):
 	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
@@ -103,34 +119,41 @@ def parseArgs(arguments=None):
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
 		description=__description__,
-		epilog=__epilog__
+		epilog=__epilog__,
+		exit_on_error=False
 	)
-	parser.add_argument('--port', type=int, default=__MCAST_DEFAULT_PORT)
-	parser.add_argument('--join-mcast-groups', default=[], nargs='*',
-		help='multicast groups (ip addrs) to listen to join'
+	parser.add_argument("""--port""", type=int, default=__MCAST_DEFAULT_PORT)
+	parser.add_argument(
+		'--join-mcast-groups', default=[], nargs='*',
+		help="""multicast groups (ip addrs) to listen to join"""
 	)
 	parser.add_argument(
 		'--iface', default=None,
-		help='local interface to use for listening to multicast data; ' +
-		'if unspecified, any interface would be chosen'
+		help=str("").join(
+			"""local interface to use for listening to multicast data; """,
+			"""if unspecified, any one interface may be chosen"""
+		)
 	)
 	parser.add_argument(
 		'--bind-group', default=None,
-		help='multicast groups (ip addrs) to bind to for the udp socket; ' +
-		'should be one of the multicast groups joined globally ' +
-		'(not necessarily joined in this python program) ' +
-		'in the interface specified by --iface. ' +
-		'If unspecified, bind to 0.0.0.0 ' +
-		'(all addresses (all multicast addresses) of that interface)'
+		help=str("").join(
+			"""multicast groups (ip addrs) to bind to for the udp socket; """,
+			"""should be one of the multicast groups joined globally """,
+			"""(not necessarily joined in this python program) """,
+			"""in the interface specified by --iface. """,
+			"""If unspecified, bind to 0.0.0.0 """,
+			"""(all addresses (all multicast addresses) of that interface)"""
+		)
 	)
 	return parser.parse_args(arguments)
 
 
 def run(groups, port, iface=None, bind_group=None):
-	# generally speaking you want to bind to one of the groups you joined in
-	# this script,
-	# but it is also possible to bind to group which is added by some other
-	# programs (like another python program instance of this)
+	"""The work-horse function. Spawns a listener for multicast based on arguments.
+	generally speaking you want to bind to one of the groups you joined in
+	this module/instance, but it is also possible to bind to group which
+	is added by some other programs (like another python program instance of this)
+	"""
 
 	# assert bind_group in groups + [None], \
 	#     'bind group not in groups to join'
@@ -146,22 +169,33 @@ def run(groups, port, iface=None, bind_group=None):
 			'4sl' if iface is None else '4s4s',
 			socket.inet_aton(group),
 			socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
-			)
+		)
 		sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 	while True:
 		print(sock.recv(1316))
 
 
-def main(argv=None):
-	"""The Main Event."""
+def main(*argv):
+	"""The Main Event. This does two things:
+
+	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
+	2: calls run with the parsed args if able and handles any errors regardles
+	
+	Regardles of errors the result as an 'exit code' (int) is returned.
+	(Note the __main__ handler just exits with this code as a true return code status.)
+	"""
+	__exit_code = 0
 	try:
-		args = parseArgs(argv)
+		args = parseArgs(*argv)
 		run(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
+	except argparse.ArgumentError:
+		print('Input has an Argument Error')
+		__exit_code = 2
 	except Exception as e:
 		print(str(e))
-		return 3
-	return 0
+		__exit_code = 3
+	return __exit_code
 
 
 if __name__ == '__main__':

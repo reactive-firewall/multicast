@@ -79,7 +79,6 @@ __doc__ = """Python Multicast Broadcaster.
 
 import sys
 import socket
-import struct
 import argparse
 
 
@@ -93,7 +92,7 @@ except Exception as importErr:
 	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
 
 
-def parseArgs(arguments=None):
+def parseArgs(*arguments):
 	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
@@ -103,30 +102,36 @@ def parseArgs(arguments=None):
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
 		description=__description__,
-		epilog=__epilog__
+		epilog=__epilog__,
+		exit_on_error=False
 	)
 	parser.add_argument('--mcast-group', default='224.1.1.1')
 	parser.add_argument('--port', type=int, default=__MCAST_DEFAULT_PORT)
 	return parser.parse_args(arguments)
 
 
-def run(group, port):
+def run(group, port, data):
 	MULTICAST_TTL = 20
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
-	sock.sendto(b'from multicast_send.py: ' +
-		'group: {group}, port: {port}'.encode(), (group, port))
+	sock.sendto(data.encode('utf8'), (group, port))
 
 
-def main(argv=None):
+def main(*argv):
 	"""The Main Event."""
+	__exit_code = 1
 	try:
-		args = parseArgs(argv)
-		run(args.mcast_group, int(args.port))
+		args = parseArgs(*argv)
+		message = b'from multicast_send.py: group: {group}, port: {port}'
+		run(args.mcast_group, int(args.port), message)
+		__exit_code = 0
+	except argparse.ArgumentError:
+		print('Input has an Argument Error')
+		__exit_code = 2
 	except Exception as e:
 		print(str(e))
-		return 3
-	return 0
+		__exit_code = 3
+	return __exit_code
 
 
 if __name__ == '__main__':
