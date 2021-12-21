@@ -1,0 +1,16 @@
+*			text=auto
+*.cfg			text
+*.txt			text
+*.py			text working-tree-encoding=UTF-8 diff=python
+*.sh			text
+*.bash			text
+*.ini			text
+*.md			text
+*.yml			text
+*.jpg			-text
+*.png			-text
+*.conf			text
+*.bat			text
+*.rst			text
+tests/check_*	text
+Makefile		text diff=makefile
