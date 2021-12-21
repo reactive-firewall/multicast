@@ -17,136 +17,103 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
 
-import unittest
-import subprocess
-import sys as sys
-import tests.profiling as profiling
 
-
-def getPythonCommand():
-	"""Function for backend python command with cross-python coverage support."""
-	thepython = "exit 1 ; #"
+try:
 	try:
-		thepython = checkPythonCommand(["which", "coverage"])
-		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-			thepython = str("coverage run -p")
-		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
-			try:
-				import coverage
-				if coverage.__name__ is not None:
-					thepython = str("{} -m coverage run -p").format(str(sys.executable))
-				else:
-					thepython = str(sys.executable)
-			except Exception:
-				thepython = str(sys.executable)
-		else:
-			thepython = str(sys.executable)
-	except Exception:
-		thepython = "exit 1 ; #"
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import multicast
+		from context import unittest as unittest
+		from context import os as os
+		from context import subprocess as subprocess
+		from context import profiling as profiling
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
+
+
+class MulticastTestSuite(context.BasicUsageTestSuite):
+	"""Special Multicast Usage test cases."""
+
+	__module__ = """tests.test_usage"""
+
+	def test_multicast_insane_none(self):
+		"""Tests the imposible state for CLI tools given bad tools"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.useTool(JUNK) == error""")
 		try:
-			thepython = str(sys.executable)
-		except Exception:
-			thepython = "exit 1 ; #"
-	return str(thepython)
+			self.assertIsNone(multicast.__main__.useTool("NoSuchTool"))
+			self.assertIsNone(multicast.__main__.useTool(None))
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
 
+	def test_multicast_message_arg_main(self):
+		"""Tests the message argument for failure given future tools"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.useTool(SAY, message) == error""")
+		try:
+			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message"]))
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
 
-def buildPythonCommand(args=None):
-	"""Function for building backend subprocess command line"""
-	theArgs = args
-	# you need to change this to the name of your project
-	__project__ = str("multicast")
-	try:
-		if args is None or args is [None]:
-			theArgs = ["exit 1 ; #"]
-		else:
-			theArgs = args
-		if str("coverage ") in str(theArgs[0]):
-			if str("{} -m coverage ").format(str(sys.executable)) in str(theArgs[0]):
-				theArgs[0] = str(sys.executable)
-				theArgs.insert(1, str("-m"))
-				theArgs.insert(2, str("coverage"))
-				theArgs.insert(3, str("run"))
-				theArgs.insert(4, str("-p"))
-				theArgs.insert(4, str("--source={}").format(__project__))
-			else:
-				theArgs[0] = str("coverage")
-				theArgs.insert(1, str("run"))
-				theArgs.insert(2, str("-p"))
-				theArgs.insert(2, str("--source={}").format(__project__))
-	except Exception:
-		theArgs = ["exit 1 ; #"]
-	return theArgs
+	def test_multicast_hexdump_arg_main(self):
+		"""Tests the hexdump argument for failure given future tools"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.useTool(HEAR, hex) == error""")
+		try:
+			self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--hex"]))
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
 
+	def test_multicast_invalid_main(self):
+		"""Tests the NOOP state for multicast given bad input"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.main(NOOP) == empty""")
+		try:
+			self.assertIsNone(multicast.__main__.main(["NOOP"]))
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
 
-def checkPythonCommand(args=None, stderr=None):
-	"""Function for backend subprocess check_output command like testing with coverage support"""
-	theOutput = None
-	try:
-		taintArgs = buildPythonCommand(args)
-		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
-	except Exception:
-		theOutput = None
-	try:
-		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf8')
-	except UnicodeDecodeError:
-		theOutput = bytes(theOutput)
-	return theOutput
-
-
-@profiling.do_cprofile
-def timePythonCommand(args=None, stderr=None):
-	"""Function for backend subprocess check_output command
-	with support for coverage and profiling."""
-	if args is None:
-		args = [None]
-	return checkPythonCommand(args, stderr)
-
-
-def checkPythonErrors(args=None, stderr=None):
-	"""Function like checkPythonCommand, but with error passing."""
-	theOutput = None
-	try:
-		taintArgs = buildPythonCommand(args)
-		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
-		if isinstance(theOutput, bytes):
-			# default to utf8 your milage may vary
-			theOutput = theOutput.decode('utf8')
-	except Exception as err:
-		theOutput = None
-		raise RuntimeError(err)
-	return theOutput
-
-
-def debugErrorInTest(err):
-	if err is None:
-		return False
-	print(str(""))
-	print(str(type(err)))
-	print(str(err))
-	print(str((err.args)))
-	print(str(""))
-	return True
-
-
-def debugBlob(blob=None):
-	"""In case you need it."""
-	try:
-		print(str(""))
-		print(str("String:"))
-		print(str("""\""""))
-		print(str(blob))
-		print(str("""\""""))
-		print(str(""))
-		print(str("Raw:"))
-		print(str("""\""""))
-		print(repr(blob))
-		print(str("""\""""))
-		print(str(""))
-	except Exception:
-		return False
-	return True
+	def test_multicast_help_arg_main(self):
+		"""Tests the HELP argument for help usage"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.useTool(HELP, []) == error""")
+		try:
+			self.assertIsNone(multicast.__main__.useTool("HELP", []))
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
 
 
 def debugIfNoneResult(thepython, theArgs, theOutput):
@@ -156,49 +123,80 @@ def debugIfNoneResult(thepython, theArgs, theOutput):
 			theResult = True
 		else:
 			theResult = False
-			print(str(""))
-			print(str("python exe is {}").format(str(sys.executable)))
-			print(str("python cmd used is {}").format(str(thepython)))
-			print(str("arguments used were {}").format(str(theArgs)))
-			print(str(""))
-			print(str("actual output was..."))
-			print(str(""))
-			print(str("{}").format(str(theOutput)))
-			print(str(""))
+			context.debugUnexpectedOutput(theOutput, None, thepython)
 	except Exception:
 		theResult = False
 	return theResult
 
 
-class BasicUsageTestSuite(unittest.TestCase):
+class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 	"""Basic functional test cases."""
 
-	def test_absolute_truth_and_meaning(self):
-		"""Insanity Test. if ( is true ) """
-		assert True
+	def setUp(self):
+		super(self.__class__, self).setUp()
+		if (self._thepython is None):
+			self.skipTest(str("""No python cmd to test with!"""))
 
-	def test_syntax(self):
-		"""Test case importing code. if ( import is not None ) """
+	def test_run_lib_command_plain(self):
+		"""Test case for multicast.__main__ help."""
 		theResult = False
 		try:
-			from .context import multicast
-			if multicast.__name__ is None:
-				theResult = False
-			theResult = True
-		except Exception as impErr:
-			debugErrorInTest(impErr)
+			if (self._thepython is not None):
+				theOutputtext = context.checkPythonCommand([
+					str(self._thepython),
+					str("-m"),
+					str("multicast"),
+					str("--help")
+				], stderr=subprocess.STDOUT)
+				self.assertIn(str("usage:"), str(theOutputtext))
+				if (str("usage:") in str(theOutputtext)):
+					theResult = True
+				else:
+					theResult = False
+					context.debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+		except Exception as err:
+			context.debugtestError(err)
+			err = None
+			del err
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
+
+	def test_run_lib_command_main(self):
+		"""Test case for multicast vs multicast.__main__"""
+		theResult = False
+		try:
+			theExpectedText = context.checkPythonCommand([
+				str(self._thepython),
+				str("-m"),
+				str("multicast.__main__")
+			], stderr=subprocess.STDOUT)
+			self.assertIsNotNone(theExpectedText)
+			theOutputtext = context.checkPythonCommand([
+				str(self._thepython),
+				str("-m"),
+				str("multicast")
+			], stderr=subprocess.STDOUT)
+			self.assertIn(str(theExpectedText), str(theOutputtext))
+			if (str(theExpectedText) in str(theOutputtext)):
+				theResult = True
+			else:
+				theResult = False
+				context.debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), self._thepython)
+		except BaseException as err:
+			context.debugtestError(err)
+			err = None
+			del err
+			theResult = False
+		self.assertTrue(theResult, str("""Could Not swap multicast for multicast.__main__"""))
 
 	def test_version_has_value_case(self):
 		"""Test for result from --version argument: python -m multicast.* --version """
 		theResult = False
-		thepython = getPythonCommand()
-		if (thepython is not None):
+		if (self._thepython is not None):
 			try:
 				for test_case in [".__main__", ""]:
 					args = [
-						str(thepython),
+						str(self._thepython),
 						str("-m"),
 						str("multicast{}").format(
 							str(
@@ -207,7 +205,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						),
 						str("--version")
 					]
-					theOutputtext = checkPythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
 						if isinstance(theOutputtext, bytes):
@@ -215,11 +213,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
 					# ADD REAL VERSION TEST HERE
-					theResult = debugIfNoneResult(thepython, args, theOutputtext)
+					theResult = debugIfNoneResult(self._thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				debugErrorInTest(err)
+				context.debugtestError(err)
 				err = None
 				del err
 				theResult = False
@@ -228,12 +226,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_profile_template_case(self):
 		"""Test case template for profiling"""
 		theResult = False
-		thepython = getPythonCommand()
-		if (thepython is not None):
+		if (self._thepython is not None):
 			try:
-				for test_case in ["NOOP", "SAY"]:
+				for test_case in ["NOOP"]:
 					args = [
-						str(thepython),
+						str(self._thepython),
 						str("-m"),
 						str("multicast"),
 						str("{}").format(
@@ -242,33 +239,32 @@ class BasicUsageTestSuite(unittest.TestCase):
 							)
 						)
 					]
-					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtext = context.timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
 						if isinstance(theOutputtext, bytes):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					theResult = debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
+					theResult = True
 			except Exception as err:
-				debugErrorInTest(err)
+				context.debugtestError(err)
 				err = None
 				del err
 				theResult = False
 		assert theResult
 
-	@unittest.expectedFailure
-	def test_fail_template_case(self):
+	# @unittest.expectedFailure
+	def test_fail_message_works_case(self):
 		"""Test case template for profiling"""
 		theResult = False
-		thepython = getPythonCommand()
-		if (thepython is not None):
+		if (self._thepython is not None):
 			try:
-				for test_case in ["BadInput"]:
+				for test_case in ["BAdInPut"]:
 					args = [
-						str(thepython),
+						str(self._thepython),
 						str("-m"),
 						str("multicast"),
 						str("{}").format(
@@ -277,53 +273,18 @@ class BasicUsageTestSuite(unittest.TestCase):
 							)
 						)
 					]
-					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtext = context.timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
 						if isinstance(theOutputtext, bytes):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					theResult = debugIfNoneResult(thepython, args, theOutputtext)
+					theResult = debugIfNoneResult(self._thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				debugErrorInTest(err)
-				err = None
-				del err
-				theResult = False
-		assert theResult
-
-	@unittest.expectedFailure
-	def test_bad_template_case(self):
-		"""Test case template for profiling"""
-		theResult = False
-		thepython = getPythonCommand()
-		if (thepython is not None):
-			try:
-				for test_case in [None]:
-					args = [
-						str(thepython),
-						str("-m"),
-						str("multicast"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
-					]
-					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
-					# now test it
-					try:
-						if isinstance(theOutputtext, bytes):
-							theOutputtext = theOutputtext.decode('utf8')
-					except UnicodeDecodeError:
-						theOutputtext = str(repr(bytes(theOutputtext)))
-					theResult = debugIfNoneResult(thepython, args, theOutputtext)
-					# or simply:
-					self.assertIsNotNone(theOutputtext)
-			except Exception as err:
-				debugErrorInTest(err)
+				context.debugtestError(err)
 				err = None
 				del err
 				theResult = False

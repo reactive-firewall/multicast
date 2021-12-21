@@ -17,30 +17,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import unittest
+
+__module__ = """tests"""
 
 
-"""
-	Basic Tests for Python Multicast Repo.
-"""
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
 
 
-class BasicTestSuite(unittest.TestCase):
+try:
+	try:
+		import context
+	except Exception as ImportErr:  # pragma: no branch
+		ImportErr = None
+		del ImportErr
+		from . import context
+	if context.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import context")
+	else:
+		from context import unittest as unittest
+except Exception:
+	raise ImportError("[CWE-758] Failed to import test context")
+
+
+class BasicTestSuite(context.BasicUsageTestSuite):
 	"""Basic test cases."""
 
+	__module__ = """tests.test_basic"""
+
+	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test. Because it only matters if we're not mad as hatters."""
+		"""Insanitty Test 1: Because it only matters if we're not mad as hatters."""
 		assert True
 
 	def test_meta_test(self):
-		"""Insanity Test for unittests assertion."""
+		"""Insanity Test 2: for unittests assertion."""
 		self.assertTrue(True)
 		self.assertFalse(False)
 		self.assertIsNone(None)
 
 	def test_syntax(self):
-		"""Test case importing multicast."""
+		"""Test case 0: importing multicast."""
 		theResult = False
 		try:
 			from .context import multicast
@@ -55,7 +76,7 @@ class BasicTestSuite(unittest.TestCase):
 		assert theResult
 
 	def test_the_help_command(self):
-		"""Test case for backend library."""
+		"""Test case 1: import for backend library."""
 		theResult = False
 		try:
 			from .context import multicast
