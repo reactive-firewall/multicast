@@ -1,5 +1,5 @@
 *			text=auto
-*.cfg			text
+*.cfg			text diff=config
 *.txt			text
 *.py			text working-tree-encoding=UTF-8 diff=python
 *.sh			text
