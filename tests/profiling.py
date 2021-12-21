@@ -30,25 +30,55 @@
 
 
 try:
-	import tests.context as context
-	import sys as sys
-	import os as os
-except Exception:
-	raise ImportError("Failed to import test profiling")
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-758] OS Failed to import.")
 
 
 try:
 	import time
-	import cProfile
-	for keyModule in [os, sys, time, cProfile]:
-		if keyModule.__name__ is None:
-			raise NotImplementedError(
-				str("OMG! We could not import the {}!").format(
-					str(keyModule)
-				)
-			)
+	if time.__name__ is None:  # pragma: no branch
+		raise NotImplementedError("[CWE-440] We could not import time. Are we in the speed-force!")
 except Exception as err:
 	raise ImportError(err)
+	exit(3)
+
+
+try:
+	import cProfile
+	if cProfile.__name__ is None:  # pragma: no branch
+		raise NotImplementedError("[CWE-440] We could not import cProfile. ABORT!")
+except Exception as err:  # pragma: no branch
+	raise ImportError(err)
+	exit(3)
+
+
+try:
+	try:
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
+		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
+	except Exception as ImportErr:  # pragma: no branch
+		print(str(''))
+		print(str(type(ImportErr)))
+		print(str(ImportErr))
+		print(str((ImportErr.args)))
+		print(str(''))
+		ImportErr = None
+		del ImportErr
+		raise ImportError(str("[CWE-758] Profile module failed completely."))
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-440] Failed to import test profiling")
 
 
 class timewith():
@@ -75,6 +105,7 @@ class timewith():
 
 	def __exit__(self, type, value, traceback):
 		self.checkpoint(str("finished"))
+		pass
 
 
 def do_time_profile(func, timer_name="time_profile"):
