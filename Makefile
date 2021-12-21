@@ -33,6 +33,15 @@ ifeq "$(PYTHON)" ""
 	PYTHON=export LC_CTYPE="en_US.utf-8" ; python3 -B
 endif
 
+ifeq "$(COVERAGE)" ""
+	ifeq "$(PYTHON)" ""
+		COVERAGE=$(command -v coverage)
+	endif
+	ifeq "$(COVERAGE)" ""
+		COVERAGE=$(command -v coverage3)
+	endif
+endif
+
 ifeq "$(WAIT)" ""
 	WAIT=wait
 endif
@@ -90,9 +99,9 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)coverage run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
-	$(QUIET)coverage combine 2>/dev/null || true
-	$(QUIET)coverage report --include=multicast* 2>/dev/null || true
+	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
+	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -107,6 +116,7 @@ test-pytest: cleanup test-reports
 test-style: cleanup
 	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
 	$(QUIET)tests/check_spelling 2>/dev/null || true
+	$(QUIET)tests/check_cc_line.bash 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
@@ -123,6 +133,7 @@ cleanup:
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f ./.DS_Store 2>/dev/null || true
 	$(QUIET)rm -Rfd .pytest_cache/ 2>/dev/null || true
+	$(QUIET)rm -Rfd .eggs 2>/dev/null || true
 	$(QUIET)rmdir ./test-reports/ 2>/dev/null || true
 	$(QUIET)rm -f multicast/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f multicast/*/*.DS_Store 2>/dev/null || true
