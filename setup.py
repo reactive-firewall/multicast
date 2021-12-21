@@ -48,7 +48,7 @@ SLA = readFile("""LICENSE.md""")
 
 setup(
 	name="""multicast""",
-	version="""1.1.3""",
+	version="""1.2.0""",
 	description="""Python Multicast Repo for Send/Recv Stubs""",
 	long_description=readme,
 	install_requires=requirements,

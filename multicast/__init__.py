@@ -33,7 +33,7 @@ __name__ = """multicast"""
 global __version__
 """The version of this program."""
 
-__version__ = """1.1.3"""
+__version__ = """1.2.0"""
 
 
 global __MCAST_DEFAULT_PORT
