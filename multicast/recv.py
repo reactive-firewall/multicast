@@ -109,7 +109,7 @@ except Exception as importErr:
 	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
 
 
-def parseArgs(*arguments):
+def parseArgs(arguments=None):
 	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
@@ -129,21 +129,19 @@ def parseArgs(*arguments):
 	)
 	parser.add_argument(
 		'--iface', default=None,
-		help=str("").join(
-			"""local interface to use for listening to multicast data; """,
+		help=str("""local interface to use for listening to multicast data; """).join(
 			"""if unspecified, any one interface may be chosen"""
 		)
 	)
+	__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
+	__tmp_help += """should be one of the multicast groups joined globally """
+	__tmp_help += """(not necessarily joined in this python program) """
+	__tmp_help += """in the interface specified by --iface. """
+	__tmp_help += """If unspecified, bind to 0.0.0.0 """
+	__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
 	parser.add_argument(
 		'--bind-group', default=None,
-		help=str("").join(
-			"""multicast groups (ip addrs) to bind to for the udp socket; """,
-			"""should be one of the multicast groups joined globally """,
-			"""(not necessarily joined in this python program) """,
-			"""in the interface specified by --iface. """,
-			"""If unspecified, bind to 0.0.0.0 """,
-			"""(all addresses (all multicast addresses) of that interface)"""
-		)
+		help=str(__tmp_help)
 	)
 	return parser.parse_args(arguments)
 
@@ -154,26 +152,38 @@ def run(groups, port, iface=None, bind_group=None):
 	this module/instance, but it is also possible to bind to group which
 	is added by some other programs (like another python program instance of this)
 	"""
-
-	# assert bind_group in groups + [None], \
+ 
+ 	# assert bind_group in groups + [None], \
 	#     'bind group not in groups to join'
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
 	# allow reuse of socket (to allow another instance of python running this
 	# script binding to the same ip/port)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	
+	try:
+		sock.bind(('' if bind_group is None else bind_group, port))
+		for group in groups:
+			mreq = struct.pack(
+				'4sl' if iface is None else '4s4s',
+				socket.inet_aton(group),
+				socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
+			)
+			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-	sock.bind(('' if bind_group is None else bind_group, port))
-	for group in groups:
-		mreq = struct.pack(
-			'4sl' if iface is None else '4s4s',
-			socket.inet_aton(group),
-			socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
-		)
-		sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-
-	while True:
-		print(sock.recv(1316))
+		while True:
+			print(sock.recv(1316))
+			# about 969 bytes in base64 encoded as chars
+	except KeyboardInterrupt:
+		print("")
+		print(str("""Closing"""))
+	finally:
+		try:
+			sock.shutdown(socket.SHUT_RD)
+			sock.close()
+		except OSError:
+			False
+		sock = None
 
 
 def main(*argv):

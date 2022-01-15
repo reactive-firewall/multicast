@@ -69,6 +69,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.useTool(SAY, message) == error""")
 		try:
 			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message"]))
+			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message", "test"]))
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -76,12 +77,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
+	@unittest.expectedFailure
 	def test_multicast_hexdump_arg_main(self):
 		"""Tests the hexdump argument for failure given future tools"""
 		theResult = False
 		fail_fixture = str("""multicast.__main__.useTool(HEAR, hex) == error""")
 		try:
-			self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--hex"]))
+			with self.assertRaises(NotImplementedError, fail_fixture):
+				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--hex"]))
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)

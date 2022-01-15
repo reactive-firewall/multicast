@@ -33,6 +33,9 @@
 __all__ = ["""main""", """run""", """parseArgs""", """__module__""", """__name__""", """__doc__"""]
 
 
+__package__ = """multicast"""
+
+
 __module__ = """multicast"""
 
 
@@ -77,9 +80,23 @@ __doc__ = """Python Multicast Broadcaster.
 """
 
 
-import sys
-import socket
-import argparse
+try:
+	import sys
+	import socket
+	import argparse
+	depends = [
+		socket, argparse
+	]
+	for unit in depends:
+		try:
+			if unit.__name__ is None:  # pragma: no branch
+				raise ImportError(
+					str("[CWE-440] module failed to import {}.").format(str(unit))
+				)
+		except Exception:  # pragma: no branch
+			raise ImportError(str("[CWE-758] Module failed completely."))
+except Exception as err:
+	raise ImportError(err)
 
 
 try:
@@ -105,9 +122,13 @@ def parseArgs(*arguments):
 		epilog=__epilog__,
 		exit_on_error=False
 	)
+	parser.add_argument("""--port""", type=int, default=__MCAST_DEFAULT_PORT)
 	parser.add_argument('--mcast-group', default='224.1.1.1')
-	parser.add_argument('--port', type=int, default=__MCAST_DEFAULT_PORT)
-	return parser.parse_args(arguments)
+	parser.add_argument(
+		"""--message""", dest="""message""",
+		default=str("""PING from multicast_send.py: group: {group}, port: {port}""")
+	)
+	return parser.parse_args(*arguments)
 
 
 def run(group, port, data):
@@ -122,8 +143,7 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		message = b'from multicast_send.py: group: {group}, port: {port}'
-		run(args.mcast_group, int(args.port), message)
+		run(args.mcast_group, int(args.port), args.message)
 		__exit_code = 0
 	except argparse.ArgumentError:
 		print('Input has an Argument Error')

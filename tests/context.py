@@ -125,8 +125,13 @@ def getPythonCommand():
 	thepython = "exit 1 ; #"
 	try:
 		thepython = checkPythonCommand(["command", "-v", "coverage"])
-		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-			thepython = str("coverage run -p")
+		if (sys.version_info >= (3, 3)):
+			if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython = str("coverage run -p")
+			elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
+					thepython = str("coverage3 run -p")
+			else:
+				thepython = str(sys.executable)
 		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
 			try:
 				import coverage
@@ -161,6 +166,13 @@ def checkPythonCommand(args=[None], stderr=None):
 					args[0] = str(sys.executable)
 					args.insert(1, str("-m"))
 					args.insert(2, str("coverage"))
+					args.insert(3, str("run"))
+					args.insert(4, str("-p"))
+					args.insert(5, str("--source=multicast"))
+				elif str("{} -m coverage3 ").format(str(sys.executable)) in str(args[0]):
+					args[0] = str(sys.executable)
+					args.insert(1, str("-m"))
+					args.insert(2, str("coverage3"))
 					args.insert(3, str("run"))
 					args.insert(4, str("-p"))
 					args.insert(5, str("--source=multicast"))

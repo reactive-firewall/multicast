@@ -204,6 +204,7 @@ def parseArgs(arguments=None):
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
 	"""
+	arguments = __checkToolArgs(arguments)
 	return buildArgs().parse_known_intermixed_args(arguments)
 
 
