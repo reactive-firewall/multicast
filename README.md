@@ -14,11 +14,9 @@ Continuous integration testing is handeled by Circle-CI Service.
 ### master:
 [![CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/master)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/??????/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/master)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/?????/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/master/)
-[![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/multicast/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/multicast?branch=master)
-[![Coverity](https://scan.coverity.com/projects/????/badge.svg)](https://scan.coverity.com/projects/reactive-firewall-multicast)
-[![Code Climate](https://codeclimate.com/github/reactive-firewall/multicast/badges/gpa.svg)](https://codeclimate.com/github/reactive-firewall/multicast)
+[![Code Climate](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/maintainability)](https://codeclimate.com/github/reactive-firewall/multicast)
 [![CodeFactor](https://www.codefactor.io/repository/github/reactive-firewall/multicast/badge)](https://www.codefactor.io/repository/github/reactive-firewall/multicast)
 [![Codebeat badge](https://codebeat.co/badges/?????)](https://codebeat.co/projects/github-com-reactive-firewall-multicast-master)
 ![Size](https://img.shields.io/github/languages/code-size/reactive-firewall/multicast.svg)
@@ -28,7 +26,6 @@ Continuous integration testing is handeled by Circle-CI Service.
 [![Stable-CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/stable)
 [![Atable-Appveyor](https://ci.appveyor.com/api/projects/status/????/branch/stable?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/stable)
 [![stable-code-coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/)
-[![Stable Coverage Status](https://coveralls.io/repos/github/reactive-firewall/multicast/badge.svg?branch=stable)](https://coveralls.io/github/reactive-firewall/multicast?branch=stable)
 [![Staqble Codebeat Badge](https://codebeat.co/badges/????)](https://codebeat.co/projects/github-com-reactive-firewall-multicast-stable)
 
 # How do I get this running?
