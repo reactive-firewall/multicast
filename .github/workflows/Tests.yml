@@ -1,32 +1,47 @@
 name: CI
 on: [push]
 jobs:
-  MATS:
+  BUILD:
 
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pre-Clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Run Tests
+      run: |
+        echo Testing Build,
+        make -j1 -f Makefile build || true
+    - name: Post-Clean
+      run: make -j1 -f Makefile purge || true ;
+
+  MATS:
+    if: ${{ always() }}
+    needs: BUILD
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9]
     env:
       OS: ${{ matrix.os }}
-      PYTHON: '3.9'
+      PYTHON: ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
       uses: actions/setup-python@master
       with:
-        python-version: 3.9
-    - name: Setup Linters
+        python-version: ${{ matrix.python-version }}
+    - name: Setup Dependencies
       run: |
-        echo Setup linters,
+        echo Setup dependencies,
         pip install -r ./requirements.txt || true ;
         pip install coverage>=5.0 || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
-      run: |
-        echo Testing M.A.T.s,
-        make -j1 -f Makefile test || true
+      run: make -j1 -f Makefile test ;
     - name: Generate coverage report
       run: |
         coverage combine || coverage3 combine || python -m coverage combine ;
@@ -45,7 +60,8 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
 
   STYLE:
-
+    if: ${{ always() }}
+    needs: [BUILD, MATS]
     runs-on: ubuntu-latest
 
     env:
@@ -69,18 +85,3 @@ jobs:
         make -j1 -f Makefile test-style || true
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
-
-  BUILD:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Pre-Clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
-      run: |
-        echo Testing Build,
-        make -j1 -f Makefile build || true
-    - name: Post-Clean
-      run: make -j1 -f Makefile purge || true ;
