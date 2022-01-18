@@ -16,6 +16,10 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.9
+    - name: Setup Linters
+      run: |
+        echo Setup linters,
+        pip install -r ./requirements.txt || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
@@ -35,7 +39,6 @@ jobs:
         files: ./coverage.xml
         flags: unittests
         name: codecov-github-action
-        path_to_write_report: ./coverage/codecov_report.txt
         verbose: true    
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
@@ -53,10 +56,10 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.9
-    - name: Generate coverage report
+    - name: Setup Linters
       run: |
         echo Setup linters,
-        pip install -e ./requirements.txt
+        pip install -r ./requirements.txt
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
