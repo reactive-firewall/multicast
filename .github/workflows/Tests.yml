@@ -1,5 +1,5 @@
 name: CI
-on: [push]
+on: [push,pull-request]
 jobs:
   MATS:
 
@@ -22,15 +22,19 @@ jobs:
       run: |
         echo Testing M.A.T.s,
         make -j1 -f Makefile test || true
+    - name: Generate coverage report
+      run: |
+        coverage combine || coverage3 combine
+        coverage xml || coverage3 xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        directory: ./coverage/reports/
+        token: ${{ secrets.CODECOV_TOKEN }}
         env_vars: OS,PYTHON
         fail_ci_if_error: true
-        files: ./coverage1.xml,./coverage2.xml
+        files: ./coverage.xml
         flags: unittests
-        name: codecov-umbrella
+        name: codecov-github-action
         path_to_write_report: ./coverage/codecov_report.txt
         verbose: true    
     - name: Post-Clean
@@ -40,8 +44,19 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      PYTHON: '3.9'
+
     steps:
     - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: Generate coverage report
+      run: |
+        echo Setup linters,
+        pip install -e ./requirements.txt
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
