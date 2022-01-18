@@ -28,8 +28,9 @@ jobs:
         make -j1 -f Makefile test || true
     - name: Generate coverage report
       run: |
-        coverage combine || coverage3 combine
-        coverage xml || coverage3 xml
+        pip install coverage>=5.0 || true ;
+        coverage combine || coverage3 combine || python -m coverage combine ;
+        coverage xml || coverage3 xml || python -m coverage xml ;
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
