@@ -11,7 +11,7 @@ coverage:
           - tests
 
 flags:
-  tests:
+  unittests:
     paths:
       - tests
     joined: false
