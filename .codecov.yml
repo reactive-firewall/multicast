@@ -6,7 +6,7 @@ coverage:
         base: auto
       tests:
         target: 80%
-        flags: tests
+        flags: unittests
         paths:
           - tests
 
