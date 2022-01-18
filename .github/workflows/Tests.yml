@@ -30,20 +30,18 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
-      uses: actions/setup-python@master
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Setup Dependencies
-      run: |
+    - run: |
         echo Setup dependencies,
-        pip install -r ./requirements.txt || true ;
-        pip install coverage>=5.0 || true ;
+        pip install -r ./requirements.txt ;
+        pip install coverage>=5.0 ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
       run: make -j1 -f Makefile test ;
-    - name: Generate coverage report
-      run: |
+    - run: |
         coverage combine || coverage3 combine || python -m coverage combine ;
         coverage xml || coverage3 xml || python -m coverage xml ;
     - name: Upload coverage to Codecov
@@ -51,6 +49,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         env_vars: OS,PYTHON
+        drirectory: ${{ github.workspace }}
         fail_ci_if_error: true
         files: ./coverage.xml
         flags: unittests
