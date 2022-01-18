@@ -7,12 +7,11 @@ concurently without individual conections for each node pair.
 
 # CI (WIP):
 
-Continuous integration testing is handeled by Travis CI Service and Circle-CI Service.
+Continuous integration testing is handeled by Circle-CI Service.
 
 ## Status
 
 ### master:
-[![Status](https://travis-ci.org/reactive-firewall/multicast.svg?branch=master)](https://travis-ci.org/reactive-firewall/multicast)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/master)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/??????/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/master)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/?????/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
@@ -26,7 +25,6 @@ Continuous integration testing is handeled by Travis CI Service and Circle-CI Se
 ![Commits-since](https://img.shields.io/github/commits-since/reactive-firewall/multicast/stable.svg?maxAge=9000)
 
 ### Stable:
-[![Stable-Status](https://travis-ci.org/reactive-firewall/multicast.svg?branch=stable)](https://travis-ci.org/reactive-firewall/multicast)
 [![Stable-CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/stable)
 [![Atable-Appveyor](https://ci.appveyor.com/api/projects/status/????/branch/stable?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/stable)
 [![stable-code-coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/)
