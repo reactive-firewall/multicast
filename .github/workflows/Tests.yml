@@ -20,6 +20,7 @@ jobs:
       run: |
         echo Setup linters,
         pip install -r ./requirements.txt || true ;
+        pip install coverage>=5.0 || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
@@ -28,7 +29,6 @@ jobs:
         make -j1 -f Makefile test || true
     - name: Generate coverage report
       run: |
-        pip install coverage>=5.0 || true ;
         coverage combine || coverage3 combine || python -m coverage combine ;
         coverage xml || coverage3 xml || python -m coverage xml ;
     - name: Upload coverage to Codecov
