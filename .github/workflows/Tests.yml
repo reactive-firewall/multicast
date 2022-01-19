@@ -16,9 +16,8 @@ jobs:
     - name: Post-Clean
       run: make -j1 -f Makefile purge || true ;
 
-  MATS:
+  COVERAGE:
     if: ${{ always() }}
-    needs: BUILD
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,7 +25,34 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
     env:
       OS: ${{ matrix.os }}
-      PYTHON: ${{ matrix.python-version }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup dependencies
+      run: |
+        pip install -r ./requirements.txt ;
+        pip install coverage>=5.0 || true ;
+    - name: Pre-Clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Run Tests
+      run: make -j1 -f Makefile test ;
+    - name: Post-Clean
+      run: make -j1 -f Makefile clean || true ;
+
+  COVERAGE:
+    needs: [BUILD, MATS]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
@@ -51,10 +77,10 @@ jobs:
         env_vars: OS,PYTHON
         drirectory: ${{ github.workspace }}
         fail_ci_if_error: true
-        files: ./coverage.xml
+        files: coverage.xml
         flags: unittests
         name: codecov-github-action
-        verbose: true    
+        verbose: true
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
 
