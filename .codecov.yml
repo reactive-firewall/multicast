@@ -2,9 +2,12 @@ coverage:
   status:
     project:
       default: on
-        target: 95%
         base: auto
-      tests:
+      multicast:
+        target: 95%
+        paths:
+          - multicast
+      unittests:
         target: 80%
         flags: unittests
         paths:
