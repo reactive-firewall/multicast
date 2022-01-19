@@ -127,7 +127,7 @@ elif [[ ( -x $(command -v coverage) ) ]] ; then
 	coverage xml 2>/dev/null || true
 fi
 
-./codecov -n "Custom Test Run" -X gcov -F unittests -v || EXIT_CODE=5 ;
+./codecov -n "Custom Test Run" -X gcov -F unittests || EXIT_CODE=5 ;
 
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
 
