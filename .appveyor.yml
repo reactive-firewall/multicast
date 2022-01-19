@@ -9,7 +9,6 @@ image:
 - Visual Studio 2022
 - Visual Studio 2019
 - Visual Studio 2017
-- Visual Studio 2015
 clone_depth: 50
 init:
 - cmd: >-
@@ -21,9 +20,9 @@ init:
 
     choco upgrade python --pre || VER>NUL
 
-    python -m pip install flake8 || VER>NUL
+    python3 -m pip install flake8 || VER>NUL
 
-    python -m pip install coverage || VER>NUL
+    python3 -m pip install coverage || VER>NUL
 
     choco install codecov || VER>NUL
 
