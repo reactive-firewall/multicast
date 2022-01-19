@@ -99,9 +99,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)echo $(COVERAGE) ;
-	##$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
-	$(QUIET)$(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ 2>/dev/null || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
 	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
