@@ -2,18 +2,21 @@ name: CI
 on: [push]
 jobs:
   BUILD:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
+    - name: python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
     - name: Pre-Clean
+      id: clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
-      run: |
-        echo Testing Build,
-        make -j1 -f Makefile build || true
+    - name: Test Build
+      id: build
+      run: make -j1 -f Makefile build || true ;
     - name: Post-Clean
+      id: post
       run: make -j1 -f Makefile purge || true ;
 
   MATS:
@@ -36,13 +39,17 @@ jobs:
         pip install -r ./requirements.txt ;
         pip install coverage || true ;
     - name: Pre-Clean
+      id: pre
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
+      id: tests
       run: make -j1 -f Makefile test ;
     - name: Post-Clean
+      id: post
       run: make -j1 -f Makefile clean || true ;
 
   COVERAGE:
+    if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
     strategy:
@@ -76,9 +83,9 @@ jobs:
         env_vars: OS,PYTHON_VERSION
         fail_ci_if_error: true
         flags: unittests
-        name: codecov-github-action
-        path_to_write_report: ./coverage/codecov_report.txt
+        name: "codecov-github-action"
         verbose: true
+        directory: .
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
 
