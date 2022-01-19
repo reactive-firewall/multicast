@@ -47,6 +47,7 @@ jobs:
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
 
   COVERAGE:
     if: ${{ success() }}
@@ -61,22 +62,22 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@master
-    - name: Setup Python
+    - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - run: |
-        echo Setup dependencies,
+    - name: Install dependencies for ${{ matrix.python-version }}
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
         pip install coverage ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage
       run: |
-        pip install coverage ;
-        make -j1 -f Makefile test ; wait ;
-        coverage xml || true ;
-    - name: Upload coverage to Codecov
+        make -f Makefile test ; wait ;
+        python -m coverage xml || coverage xml || true ;
+    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -88,6 +89,8 @@ jobs:
         directory: .
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
 
   STYLE:
     if: ${{ always() }}
@@ -105,17 +108,18 @@ jobs:
         python-version: 3.9
     - name: Setup Linters
       run: |
+        python -m pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
         pip install flake8 ;
         pip install pyflakes ;
         pip install pep8 ;
-        pip install mccab 2>/dev/null || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Testing Style
       run: make -j1 -f Makefile test-style ;
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
 
   TOX:
     needs: [MATS, STYLE, COVERAGE]
@@ -132,8 +136,8 @@ jobs:
         python-version: 3.9
     - name: install TOX
       run: |
+        python -m pip install --upgrade pip setuptools wheel tox
         pip install -r ./requirements.txt ;
-        pip install -U tox || true ;
         pip install flake8 || true ;
         pip install pyflakes || true ;
         pip install pep8 || true ;
@@ -143,3 +147,4 @@ jobs:
       run: make -j1 -f Makefile test-tox || true ;
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
