@@ -73,10 +73,10 @@ jobs:
         pip install coverage ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage
-      run: |
-        make -f Makefile test ; wait ;
-        python -m coverage xml || coverage xml || true ;
+    - run: command -v coverage || true
+    - run: command -v coverage3 || true
+    - name: Generate Coverage for py${{ matrix.python-version }}
+      run: make -j1 -f Makefile test ; wait ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
