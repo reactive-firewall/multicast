@@ -34,7 +34,7 @@ ifeq "$(PYTHON)" ""
 endif
 
 ifeq "$(COVERAGE)" ""
-	ifeq "$(PYTHON)" ""
+	ifeq "$(COVERAGE)" ""
 		COVERAGE=$(command -v coverage)
 	endif
 	ifeq "$(COVERAGE)" ""
