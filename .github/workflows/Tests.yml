@@ -18,6 +18,7 @@ jobs:
 
   MATS:
     if: ${{ always() }}
+    needs: BUILD
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -74,7 +75,7 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        env_vars: OS,PYTHON
+        env_vars: OS,PYTHON_VERSION
         drirectory: ${{ github.workspace }}
         fail_ci_if_error: true
         files: coverage.xml
@@ -90,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PYTHON: '3.9'
+      PYTHON_VERSION: '3.9'
 
     steps:
     - uses: actions/checkout@v2
@@ -100,13 +101,42 @@ jobs:
         python-version: 3.9
     - name: Setup Linters
       run: |
-        echo Setup linters,
-        pip install -r ./requirements.txt
+        pip install -r ./requirements.txt ;
+        pip install flake8>=2.5.4 ;
+        pip install pyflakes>=1.1.0 ;
+        pip install pep8>=1.7.0 ;
+        pip install mccab || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Testing Style
+      run: make -j1 -f Makefile test-style ;
+    - name: Post-Clean
+      run: make -j1 -f Makefile clean || true ;
+
+  TOX:
+    needs: [MATS, STYLE, COVERAGE]
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.9'
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: install TOX
       run: |
-        echo Testing Style,
-        make -j1 -f Makefile test-style || true
+        pip install -r ./requirements.txt ;
+        pip install -U tox>=3.0.0 || true ;
+        pip install flake8>=2.5.4 || true ;
+        pip install pyflakes>=1.1.0 || true ;
+        pip install pep8>=1.7.0 || true ;
+        pip install mccab || true ;
+    - name: Pre-Clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Testing Style
+      run: make -j1 -f Makefile test-tox || true ;
     - name: Post-Clean
       run: make -j1 -f Makefile clean || true ;
