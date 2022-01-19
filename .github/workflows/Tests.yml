@@ -16,7 +16,7 @@ jobs:
     - name: Post-Clean
       run: make -j1 -f Makefile purge || true ;
 
-  COVERAGE:
+  MATS:
     if: ${{ always() }}
     runs-on: ${{ matrix.os }}
     strategy:
