@@ -66,17 +66,17 @@ jobs:
         pip install coverage>=5.0 ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
-      run: make -j1 -f Makefile test ;
-    - run: |
-        coverage combine || coverage3 combine || python -m coverage combine ;
-        coverage xml || coverage3 xml || python -m coverage xml ;
+    - name: Generate Coverage
+      run: |
+        make -f Makefile test ; wait ;
+        ls -lap ;
+        coverage combine || coverage3 combine || python -m coverage combine || true ; wait ;
+        coverage xml || coverage3 xml || python -m coverage xml || true ; wait ;
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         env_vars: OS,PYTHON_VERSION
-        drirectory: ${{ github.workspace }}
         fail_ci_if_error: true
         files: coverage.xml
         flags: unittests
