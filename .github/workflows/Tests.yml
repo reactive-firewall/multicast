@@ -3,6 +3,8 @@ on: [push]
 jobs:
   BUILD:
     runs-on: ubuntu-latest
+    env:
+      LANG: "en_US.UTF-8"
     steps:
     - uses: actions/checkout@master
     - name: python
@@ -28,6 +30,7 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
@@ -60,6 +63,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
     steps:
     - uses: actions/checkout@master
     - name: Setup Python ${{ matrix.python-version }}
@@ -99,6 +103,7 @@ jobs:
 
     env:
       PYTHON_VERSION: '3.9'
+      LANG: "en_US.UTF-8"
 
     steps:
     - uses: actions/checkout@v2
