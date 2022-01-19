@@ -36,7 +36,7 @@ jobs:
     - name: Setup dependencies
       run: |
         pip install -r ./requirements.txt ;
-        pip install coverage>=5.0 || true ;
+        pip install coverage || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
@@ -63,7 +63,7 @@ jobs:
     - run: |
         echo Setup dependencies,
         pip install -r ./requirements.txt ;
-        pip install coverage>=5.0 ;
+        pip install coverage ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage
@@ -102,9 +102,9 @@ jobs:
     - name: Setup Linters
       run: |
         pip install -r ./requirements.txt ;
-        pip install flake8>=2.5.4 ;
-        pip install pyflakes>=1.1.0 ;
-        pip install pep8>=1.7.0 ;
+        pip install flake8 ;
+        pip install pyflakes ;
+        pip install pep8 ;
         pip install mccab || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
@@ -129,10 +129,10 @@ jobs:
     - name: install TOX
       run: |
         pip install -r ./requirements.txt ;
-        pip install -U tox>=3.0.0 || true ;
-        pip install flake8>=2.5.4 || true ;
-        pip install pyflakes>=1.1.0 || true ;
-        pip install pep8>=1.7.0 || true ;
+        pip install -U tox || true ;
+        pip install flake8 || true ;
+        pip install pyflakes || true ;
+        pip install pep8 || true ;
         pip install mccab || true ;
     - name: Pre-Clean
       run: make -j1 -f Makefile clean || true ;
