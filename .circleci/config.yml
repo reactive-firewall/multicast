@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -45,7 +45,7 @@ jobs:
       - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
     environment:
       CI: cicleci
@@ -99,7 +99,7 @@ jobs:
       - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
     environment:
       CI: cicleci
