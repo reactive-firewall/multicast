@@ -10,9 +10,9 @@ jobs:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - checkout
       - run:
@@ -51,9 +51,9 @@ jobs:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -105,9 +105,9 @@ jobs:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -162,8 +162,8 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
       SHELL: /bin/bash
-      LC_CTYPE: en_EN.UTF-8
-    working_directory: ~/python-repo
+      LC_CTYPE: en_US.UTF-8
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
