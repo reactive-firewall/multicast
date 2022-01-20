@@ -62,6 +62,7 @@
 
 ulimit -t 1200
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
+LC_ALL="${LANG:1:5}.utf-8"
 umask 027
 
 LOCK_FILE="/tmp/codecov_test_script_lock"
@@ -92,7 +93,7 @@ fi
 
 # this is how test files are found:
 
-# THIS IS THE ACTUAL TEST
+# THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
 _TEST_ROOT_DIR="./" ;
 if [[ -d ./multicast ]] ; then
 	_TEST_ROOT_DIR="./multicast" ;
@@ -104,15 +105,38 @@ else
 	EXIT_CODE=1
 fi
 
+# This File  MUST BE GIT-IGNORED to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
 	source ./codecov_env 2>/dev/null || true ;
 fi
 
+# sorry no windows support here
+if [[ $( \uname -s ) == "Darwin" ]] ; then
+	CI_OS="macos"
+else
+	CI_OS="linux"
+fi
+
+#########################
 # actual Work starts here
-curl -fLso codecov https://codecov.io/bash;
-VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
+#########################
+curl -fLso codecov https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov ;
 for i in 1 256 512 ; do
-	shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") || EXIT_CODE=126
+	curl -fLso codecov.SHA${i}SUM "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM" ; wait ;
+	curl -fLso codecov.SHA${i}SUM.sig "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM.sig" ; wait ;
+	# test sha1/sha512 signatures if found and sha256 even if not found
+	if [[ ( -r codecov.SHA${i}SUM ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+		if [[ ( -r codecov.SHA${i}SUM.sig ) ]] ; then
+			# configure your CI evironment to trust the key at https://keybase.io/codecovsecurity/pgp_keys.asc
+            # FP: 2703 4E7F DB85 0E0B BC2C 62FF 806B B28A ED77 9869
+			# OR...
+			# Set CI=true to continue on missing keys
+			gpgv codecov.SHA${i}SUM.sig codecov.SHA${i}SUM || ${CI} || EXIT_CODE=126
+			rm -vf codecov.SHA${i}SUM.sig 2>/dev/null ;
+		fi
+		shasum -a $i -c --ignore-missing codecov.SHA${i}SUM || EXIT_CODE=126
+		rm -vf codecov.SHA${i}SUM 2>/dev/null ;
+	fi
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
@@ -127,7 +151,10 @@ elif [[ ( -x $(command -v coverage) ) ]] ; then
 	coverage xml 2>/dev/null || true
 fi
 
-./codecov -n "Custom Test Run" -X gcov -F unittests || EXIT_CODE=5 ;
+if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	./codecov -n "Custom Test Run" -X gcov -F unittests || EXIT_CODE=5 ;
+fi
+
 
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
 
