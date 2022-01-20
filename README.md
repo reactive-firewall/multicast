@@ -13,6 +13,7 @@ Continuous integration testing is handeled by Circle-CI Service.
 
 ### master:
 [![CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/master)
+[![CI](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/??????/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/master)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/master/)

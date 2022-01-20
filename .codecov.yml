@@ -1,17 +1,33 @@
 coverage:
   status:
     project:
-      default: on
+      default:
         target: 95%
+        threshold: 0%
         base: auto
-      tests:
-        target: 80%
-        flags: tests
+      multicast:
+        target: auto
+        flags:
+          - multicast
         paths:
-          - tests
+          - "multicast/*.py"
+          - "setup.py"
+      unittests:
+        target: 80%
+        flags:
+          - unittests
+        paths:
+          - "tests/*"
 
 flags:
-  tests:
+  unittests:
     paths:
-      - tests
+      - "tests/*"
+    carryforward: true
     joined: false
+  multicast:
+    paths:
+      - "multicast/*.py"
+      - "setup.py"
+    joined: false
+    carryforward: true

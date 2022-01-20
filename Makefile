@@ -34,7 +34,7 @@ ifeq "$(PYTHON)" ""
 endif
 
 ifeq "$(COVERAGE)" ""
-	ifeq "$(PYTHON)" ""
+	ifeq "$(COVERAGE)" ""
 		COVERAGE=$(command -v coverage)
 	endif
 	ifeq "$(COVERAGE)" ""
@@ -79,6 +79,7 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
+	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel || true
 	$(QUIET)$(PYTHON) -m pip install "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -99,7 +100,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)$(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
 	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
@@ -110,7 +111,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
+	$(QUIET)$(PYTHON) -m pytest --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup

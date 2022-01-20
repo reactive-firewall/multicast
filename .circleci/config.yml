@@ -2,17 +2,16 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - checkout
       - run:
@@ -38,22 +37,21 @@ jobs:
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - ~/python-repo
+            - ~/multicast
 
   test:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -96,18 +94,17 @@ jobs:
 
   pytest:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -122,6 +119,12 @@ jobs:
           name: "setup up for pytest"
           command: |
             python3 -m pip install --user pytest || true
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "setup up for pytest"
+          command: |
+            python3 -m pip install --user pytest-cov || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -162,8 +165,8 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
       SHELL: /bin/bash
-      LC_CTYPE: en_EN.UTF-8
-    working_directory: ~/python-repo
+      LC_CTYPE: en_US.UTF-8
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}

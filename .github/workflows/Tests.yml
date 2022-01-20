@@ -1,67 +1,164 @@
 name: CI
 on: [push]
 jobs:
-  MATS:
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  BUILD:
+    runs-on: ubuntu-latest
     env:
-      OS: ${{ matrix.os }}
-      PYTHON: '3.9'
+      LANG: "en_US.UTF-8"
     steps:
     - uses: actions/checkout@master
-    - name: Setup Python
+    - name: python
       uses: actions/setup-python@master
       with:
         python-version: 3.9
     - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Test Build
+      id: build
+      run: make -j1 -f Makefile build || true ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile purge || true ;
+
+  MATS:
+    if: ${{ always() }}
+    needs: BUILD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup dependencies
+      run: |
+        pip install -r ./requirements.txt ;
+        pip install coverage || true ;
+    - name: Pre-Clean
+      id: clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
+      id: tests
+      run: make -j1 -f Makefile test ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
+  COVERAGE:
+    if: ${{ success() }}
+    needs: [BUILD, MATS]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for ${{ matrix.python-version }}
       run: |
-        echo Testing M.A.T.s,
-        make -j1 -f Makefile test || true
-    - name: Upload coverage to Codecov
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt ;
+        pip install coverage ;
+        pip install pytest ;
+        pip install pytest-cov
+        pip install coverage ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Generate Coverage for py${{ matrix.python-version }}
+      run: make -j1 -f Makefile test-pytest ;
+    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        directory: ./coverage/reports/
-        env_vars: OS,PYTHON
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: .
+        flags: unittests,${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
         fail_ci_if_error: true
-        files: ./coverage1.xml,./coverage2.xml
-        flags: unittests
-        name: codecov-umbrella
-        path_to_write_report: ./coverage/codecov_report.txt
-        verbose: true    
     - name: Post-Clean
+      id: post
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
 
   STYLE:
-
+    if: ${{ always() }}
+    needs: [BUILD, MATS]
     runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.9'
+      LANG: "en_US.UTF-8"
 
     steps:
     - uses: actions/checkout@v2
-    - name: Pre-Clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: Setup Linters
       run: |
-        echo Testing Style,
-        make -j1 -f Makefile test-style || true
-    - name: Post-Clean
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt ;
+        pip install flake8 ;
+        pip install pyflakes ;
+        pip install pep8 ;
+    - name: Pre-Clean
+      id: clean
       run: make -j1 -f Makefile clean || true ;
+    - name: Testing Style
+      id: style
+      run: make -j1 -f Makefile test-style ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
 
-  BUILD:
-
+  TOX:
+    needs: [MATS, STYLE, COVERAGE]
     runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.9'
 
     steps:
     - uses: actions/checkout@v2
-    - name: Pre-Clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: install TOX
       run: |
-        echo Testing Build,
-        make -j1 -f Makefile build || true
+        python -m pip install --upgrade pip setuptools wheel tox
+        pip install -r ./requirements.txt ;
+        pip install coverage || true ;
+        pip install flake8 || true ;
+        pip install pyflakes || true ;
+        pip install pep8 || true ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Testing Tox
+      run: make -j1 -f Makefile test-tox || true ;
     - name: Post-Clean
-      run: make -j1 -f Makefile purge || true ;
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
