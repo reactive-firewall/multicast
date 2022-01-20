@@ -82,19 +82,17 @@ jobs:
       id: clean
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage for py${{ matrix.python-version }}
-      id: test-coverage
-      run: make -j1 -f Makefile test-pytest ; wait ;
+      run: make -j1 -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        env_vars: OS,PYTHON_VERSION
-        fail_ci_if_error: false
-        flags: unittests
-        name: "codecov-github-action"
-        verbose: true
-        directory: .
         files: ./coverage.xml
+        directory: .
+        flags: unittests,${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: true
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
