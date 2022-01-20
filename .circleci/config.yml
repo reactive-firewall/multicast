@@ -38,7 +38,7 @@ jobs:
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - ~/python-repo
+            - ~/multicast
 
   test:
     docker:
