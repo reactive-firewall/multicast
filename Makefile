@@ -110,7 +110,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
+	$(QUIET)$(PYTHON) -m pytest --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
