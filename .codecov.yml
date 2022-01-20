@@ -2,16 +2,17 @@ coverage:
   status:
     project:
       default: on
-      base: auto
       target: 95%
+      threshold: 0%
+      base: auto 
       unittests:
         target: 80%
         flags: unittests
         paths:
-          - tests
+          - "tests/*"
 
 flags:
   unittests:
     paths:
-      - tests
+      - "tests/*"
     joined: false
