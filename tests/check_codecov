@@ -111,10 +111,10 @@ if [[ ( -r ./codecov_env ) ]] ; then
 fi
 
 if [[ ( -r ./codecov.yml ) ]] ; then
-	cat codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate || EXIT_CODE=6
+	cat codecov.yml | curl --data-binary @- https://codecov.io/validate || EXIT_CODE=6
 fi
 if [[ ( -r ./.codecov.yml ) ]] ; then
-	cat ./.codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate || EXIT_CODE=6
+	cat ./.codecov.yml | curl --data-binary @- https://codecov.io/validate || EXIT_CODE=6
 fi
 
 # sorry no windows support here
