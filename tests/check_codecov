@@ -110,6 +110,13 @@ if [[ ( -r ./codecov_env ) ]] ; then
 	source ./codecov_env 2>/dev/null || true ;
 fi
 
+if [[ ( -r ./codecov.yml ) ]] ; then
+	cat codecov.yml | curl --data-binary @- https://codecov.io/validate || EXIT_CODE=6
+fi
+if [[ ( -r ./.codecov.yml ) ]] ; then
+	cat ./.codecov.yml | curl --data-binary @- https://codecov.io/validate || EXIT_CODE=6
+fi
+
 # sorry no windows support here
 if [[ $( \uname -s ) == "Darwin" ]] ; then
 	CI_OS="macos"
@@ -140,7 +147,7 @@ for i in 1 256 512 ; do
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	chmod -v 751 ./codecov
+	chmod -v 751 ./codecov || EXIT_CODE=126
 fi
 
 if [[ ( -x $(command -v coverage3) ) ]] ; then
