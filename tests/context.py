@@ -23,11 +23,11 @@ __name__ = """tests.context"""
 
 __doc__ = """
 	Context for Testing.
-	
+
 	Meta Tests - Fixtures:
-		
+
 		Test fixtures by importing test context.
-		
+
 		>>> import tests.context as context
 		>>>
 
@@ -116,7 +116,7 @@ def getPythonCommand():
 		>>>
 
 		Testcase 1: function should have a output.
-		
+
 		>>> tests.context.getPythonCommand() is not None
 		True
 		>>>
@@ -257,20 +257,20 @@ def debugBlob(blob=None):
 def debugtestError(someError):
 	"""
 		Helper function to debug unexpected outputs.
-		
+
 		Meta Testing:
-		
+
 		First setup test fixtures by importing test context.
-		
+
 		>>> import tests.context
 		>>>
-		
+
 		>>> err_fixture = RuntimeError(\"Example Error\")
 		>>> bad_fixture = BaseException()
 		>>>
-		
+
 		Testcase 1: function should have a output.
-		
+
 		>>> debugtestError(err_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		ERROR:
@@ -279,9 +279,9 @@ def debugtestError(someError):
 		('Example Error',)
 		<BLANKLINE>
 		>>>
-		
+
 		Testcase 2: function should have a output even with bad input.
-		
+
 		>>> debugtestError(bad_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		ERROR:
@@ -363,7 +363,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 		>>>
 
 		Testcase 2: function should have a output even with bad input.
-		
+
 		>>> tests.context.debugUnexpectedOutput(
 		... 	expected_fixture, unexpected_fixture, None
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE
@@ -431,7 +431,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls._thepython = getPythonCommand()
-	
+
 	def setUp(self):
 		"""
 			Overides unittest.TestCase.setUp(unittest.TestCase).

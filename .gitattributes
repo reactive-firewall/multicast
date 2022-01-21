@@ -3,14 +3,14 @@
 *.txt			text
 *.py			text working-tree-encoding=UTF-8 diff=python
 *.sh			text
-*.bash			text
+*.bash			text diff=shell
 *.ini			text
 *.md			text
 *.yml			text
 *.jpg			-text
 *.png			-text
-*.conf			text
+*.conf			text diff=config
 *.bat			text
 *.rst			text
-tests/check_*	text
+tests/check_*	text working-tree-encoding=UTF-8 diff=shell
 Makefile		text diff=makefile
