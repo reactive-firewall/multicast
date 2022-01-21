@@ -105,12 +105,20 @@ except Exception as badErr:  # pragma: no branch
 	exit(0)
 
 
-from tests import context
+try:
+    if 'tests.context' not in sys.modules:
+        from tests import context
+    else:  # pragma: no branch
+        context = sys.modules["""tests.context"""]
+except Exception:  # pragma: no branch
+    raise ImportError("[CWE-440] context Failed to import.")
+
 
 test_cases = (
 	test_basic.BasicTestSuite, test_usage.MulticastTestSuite,
 	test_usage.BasicIntegrationTestSuite
 )
+
 
 def load_tests(loader, tests, pattern):
 	import doctest

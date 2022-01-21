@@ -152,7 +152,7 @@ def run(groups, port, iface=None, bind_group=None):
 	this module/instance, but it is also possible to bind to group which
 	is added by some other programs (like another python program instance of this)
 	"""
- 
+
  	# assert bind_group in groups + [None], \
 	#     'bind group not in groups to join'
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -160,7 +160,8 @@ def run(groups, port, iface=None, bind_group=None):
 	# allow reuse of socket (to allow another instance of python running this
 	# script binding to the same ip/port)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	
+
+	recvBuffer = str("""""")
 	try:
 		sock.bind(('' if bind_group is None else bind_group, port))
 		for group in groups:
@@ -172,7 +173,7 @@ def run(groups, port, iface=None, bind_group=None):
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 		while True:
-			print(sock.recv(1316))
+			recvBuffer.join(sock.recv(1316))
 			# about 969 bytes in base64 encoded as chars
 	except KeyboardInterrupt:
 		print("")
@@ -184,6 +185,7 @@ def run(groups, port, iface=None, bind_group=None):
 		except OSError:
 			False
 		sock = None
+	print(str(recvBuffer))
 
 
 def main(*argv):
@@ -191,7 +193,7 @@ def main(*argv):
 
 	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
 	2: calls run with the parsed args if able and handles any errors regardles
-	
+
 	Regardles of errors the result as an 'exit code' (int) is returned.
 	(Note the __main__ handler just exits with this code as a true return code status.)
 	"""

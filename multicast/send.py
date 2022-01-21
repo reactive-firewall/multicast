@@ -134,8 +134,15 @@ def parseArgs(*arguments):
 def run(group, port, data):
 	MULTICAST_TTL = 20
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
-	sock.sendto(data.encode('utf8'), (group, port))
+	try:
+		sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
+		sock.sendto(data.encode('utf8'), (group, port))
+	finally:
+		try:
+			sock.close()
+		except OSError:
+			False
+	sock = None
 
 
 def main(*argv):
