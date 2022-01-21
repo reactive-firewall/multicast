@@ -159,7 +159,7 @@ elif [[ ( -x $(command -v coverage) ) ]] ; then
 fi
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./codecov -n "Custom Test Run" -X gcov -F unittests || EXIT_CODE=5 ;
+	./codecov -n "Custom Test Run" -X gcov -F ${CI_OS:-linux} || EXIT_CODE=5 ;
 fi
 
 
