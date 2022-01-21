@@ -5,6 +5,7 @@ jobs:
       - image: circleci/python:3.7
       - image: circleci/python:3.8
       - image: circleci/python:3.9
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -28,11 +29,11 @@ jobs:
           shell: /bin/bash
           name: "install coverage attempt"
           command: |
-            python3 -m pip install --user coverage || true
+            python3 -m pip install --upgrade --user coverage || true
       - run:
           name: "install flake8 attempt"
           command: |
-            python3 -m pip install --user flake8 || true
+            python3 -m pip install --upgrade --user flake8 || true
           when: on_success
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -45,6 +46,7 @@ jobs:
       - image: circleci/python:3.8
       - image: circleci/python:3.9
     parallelism: 2
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -65,7 +67,7 @@ jobs:
           shell: /bin/bash
           name: "Installing newer deps"
           command: |
-            python3 -m pip install --user coverage3 || true
+            python3 -m pip install --upgrade --user coverage3 || true
           when: on_fail
       - run:
           shell: /bin/bash
@@ -98,6 +100,7 @@ jobs:
       - image: circleci/python:3.8
       - image: circleci/python:3.9
     parallelism: 2
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -110,9 +113,15 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
+          name: "setup for doctest"
+          command: |
+            python3 -m pip install --upgrade --user doctest || true
+          when: on_success
+      - run:
+          shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --user coverage || true
+            python3 -m pip install --upgrade --user coverage || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -160,6 +169,7 @@ jobs:
   lint:
     docker:
       - image: circleci/python:3.9
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -204,3 +214,4 @@ workflows:
       - pytest:
           requires:
             - build
+            - test

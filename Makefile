@@ -97,6 +97,7 @@ purge: clean uninstall
 	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast || true
 	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
 	$(QUIET)rm -Rfd ./.eggs/ 2>/dev/null || true
+	$(QUIET)rm -Rfd ./test-reports/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
@@ -111,7 +112,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests
+	$(QUIET)$(PYTHON) -m pytest --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests || python -m pytest --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests ; wait ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup

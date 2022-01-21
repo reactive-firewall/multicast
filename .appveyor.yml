@@ -20,9 +20,15 @@ init:
 
     choco upgrade python --pre || VER>NUL
 
-    python3 -m pip install flake8 || VER>NUL
+    python -m pip install flake8 || VER>NUL
 
-    python3 -m pip install coverage || VER>NUL
+    python -m pip install coverage || VER>NUL
+
+    python -m pip install --upgrade doctest || VER>NUL
+
+    python -m pip install pytest || VER>NUL
+
+    python -m pip install pytest-cov || VER>NUL
 
     choco install codecov || VER>NUL
 
@@ -31,7 +37,7 @@ build_script:
 - cmd: make clean
 test_script:
 - cmd: >-
-    make test || VER>NUL
+    make test-pytest || VER>NUL
 
     dir
 
