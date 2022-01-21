@@ -81,14 +81,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != 2""")
 		try:
 			self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
-			self.assertAlmostEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 2)
+			self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 0)
+			self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 1)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
-
 
 	@unittest.expectedFailure
 	def test_multicast_hexdump_arg_main(self):
