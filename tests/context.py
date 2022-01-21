@@ -213,6 +213,18 @@ def checkCovCommand(args=[None]):
 			args.insert(3, str("--source=multicast"))
 	return args
 
+
+def checkStrOrByte(theInput):
+	theOutput = None
+	try:
+		theOutput = theInput
+		if isinstance(theInput, bytes):
+			theOutput = theInput.decode("""utf_8""")
+	except UnicodeDecodeError:
+		theOutput = bytes(theInput)
+	return theOutput
+
+
 def checkPythonCommand(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
@@ -228,15 +240,9 @@ def checkPythonCommand(args=[None], stderr=None):
 		try:
 			if err.output is not None:
 				theOutput = err.output
-		except Exception as cascadeErr:
+		except Exception:
 			theOutput = None
-			cascadeErr = None
-			del cascadeErr
-	try:
-		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode("""utf_8""")
-	except UnicodeDecodeError:
-		theOutput = bytes(theOutput)
+	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
