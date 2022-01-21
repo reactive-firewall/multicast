@@ -137,6 +137,25 @@ def getCoverageCommand():
 	return str(thecov)
 
 
+def __check_cov_before_py():
+	"""
+		Utility Function to check for coverage before just python.
+	"""
+	thepython = str(sys.executable)
+	thecov = getCoverageCommand()
+	if (sys.version_info >= (3, 3)):
+		if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 3)):
+			thepython += str(" run -p")
+	elif (str("coverage") in str(thecov)) and (sys.version_info <= (3, 2)):
+		try:
+			import coverage
+			if coverage.__name__ is not None:
+				thepython = str("{} -m coverage run -p").format(str(sys.executable))
+		except Exception:
+			thepython = str(sys.executable)
+	return thepython
+
+
 def getPythonCommand():
 	"""
 		Function for backend python command.
@@ -159,22 +178,7 @@ def getPythonCommand():
 	"""
 	thepython = "exit 1 ; #"
 	try:
-		thepython = getCoverageCommand()
-		if (sys.version_info >= (3, 3)):
-			if (str("coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython += str(" run -p")
-			else:
-				thepython = str(sys.executable)
-		elif (str("coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
-			thepython = str(sys.executable)
-			try:
-				import coverage
-				if coverage.__name__ is not None:
-					thepython = str("{} -m coverage run -p").format(str(sys.executable))
-			except Exception:
-				thepython = str(sys.executable)
-		else:
-			thepython = str(sys.executable)
+		thepython = __check_cov_before_py()
 	except Exception:
 		thepython = "exit 1 ; #"
 		try:
@@ -184,6 +188,32 @@ def getPythonCommand():
 	return str(thepython)
 
 
+def checkCovCommand(*args):
+	"""Utility Function."""
+	if sys.__name__ is None:
+		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+		if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
+			args[0] = str(sys.executable)
+			args.insert(1, str("-m"))
+			args.insert(2, str("coverage"))
+			args.insert(3, str("run"))
+			args.insert(4, str("-p"))
+			args.insert(5, str("--source=multicast"))
+		elif str("{} -m coverage3 ").format(str(sys.executable)) in str(args[0]):
+			args[0] = str(sys.executable)
+			args.insert(1, str("-m"))
+			args.insert(2, str("coverage3"))
+			args.insert(3, str("run"))
+			args.insert(4, str("-p"))
+			args.insert(5, str("--source=multicast"))
+		else:
+			args[0] = str("coverage")
+			args.insert(1, str("run"))
+			args.insert(2, str("-p"))
+			args.insert(3, str("--source=multicast"))
+			args.insert(3, str("--source=multicast"))
+	return args
+
 def checkPythonCommand(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
@@ -192,27 +222,7 @@ def checkPythonCommand(args=[None], stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:
-				if sys.__name__ is None:
-					raise ImportError("[CWE-758] Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(5, str("--source=multicast"))
-				elif str("{} -m coverage3 ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage3"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(5, str("--source=multicast"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(3, str("--source=multicast"))
+				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:
 		theOutput = None
