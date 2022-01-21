@@ -75,6 +75,21 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
+	def test_multicast_hear_invalid_arg_main(self):
+		"""Tests the message argument for failure given future tools"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != 2""")
+		try:
+			self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
+			self.assertAlmostEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 2)
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+
 	@unittest.expectedFailure
 	def test_multicast_hexdump_arg_main(self):
 		"""Tests the hexdump argument for failure given future tools"""

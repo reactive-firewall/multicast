@@ -30,15 +30,15 @@ ifeq "$(MAKE)" ""
 endif
 
 ifeq "$(PYTHON)" ""
-	PYTHON=export LC_CTYPE="en_US.utf-8" ; python3 -B
+	PYTHON=export LC_CTYPE="en_US.utf-8" ; `command -v python3` -B
 endif
 
 ifeq "$(COVERAGE)" ""
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(command -v coverage)
+		COVERAGE=`command -v coverage`
 	endif
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(command -v coverage3)
+		COVERAGE=`command -v coverage3`
 	endif
 endif
 
@@ -101,7 +101,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
+	$(QUIET)$(COVERAGE) run -p --include=multicast* -m unittest discover --verbose -s ./tests -t ./ 2>/dev/null || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
 	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
