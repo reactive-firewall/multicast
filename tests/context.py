@@ -145,7 +145,7 @@ def __check_cov_before_py():
 	thecov = getCoverageCommand()
 	if (sys.version_info >= (3, 3)):
 		if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 3)):
-			thepython += str(" run -p")
+			thecov += str(" run -p")
 	elif (str("coverage") in str(thecov)) and (sys.version_info <= (3, 2)):
 		try:
 			import coverage
@@ -188,7 +188,7 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkCovCommand(*args):
+def checkCovCommand(args=[None]):
 	"""Utility Function."""
 	if sys.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
@@ -211,7 +211,6 @@ def checkCovCommand(*args):
 			args.insert(1, str("run"))
 			args.insert(2, str("-p"))
 			args.insert(3, str("--source=multicast"))
-			args.insert(3, str("--source=multicast"))
 	return args
 
 def checkPythonCommand(args=[None], stderr=None):
@@ -221,7 +220,7 @@ def checkPythonCommand(args=[None], stderr=None):
 		if args is None or args is [None]:
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
+			if str("coverage") in args[0]:
 				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:
