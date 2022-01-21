@@ -119,7 +119,7 @@ except Exception as importErr:
 def NoOp(*args, **kwargs):
 	"""The meaning of Nothing. This function should be self-explanitory;
 	it does 'no operation' i.e. nothing.
-	
+
 	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
@@ -209,7 +209,39 @@ def parseArgs(arguments=None):
 
 
 def __checkToolArgs(args):
-	"""Handles None case for arguments as a helper function."""
+	"""Handles None case for arguments as a helper function.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+		Testcase 0: multicast.__main__ should have a doctests.
+
+		>>> import multicast.__main__
+		>>> multicast.__main__.__module__ is not None
+		True
+		>>>
+
+		Testcase 1: multicast.__checkToolArgs should return an array.
+
+		>>> import multicast.__main__
+		>>> multicast.__main__.__checkToolArgs(None) is not None
+		True
+		>>> type(multicast.__main__.__checkToolArgs(None)) is type([None])
+		True
+		>>>
+
+		Testcase 2: multicast.__checkToolArgs should return an array.
+
+		>>> import multicast.__main__
+		>>> type(multicast.__main__.__checkToolArgs(["arg1", "arg2"])) is type(["strings"])
+		True
+		>>>
+
+	"""
 	if args is None:
 		args = [None]
 	return args
