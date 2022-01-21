@@ -23,11 +23,11 @@ __name__ = """tests.context"""
 
 __doc__ = """
 	Context for Testing.
-	
+
 	Meta Tests - Fixtures:
-		
+
 		Test fixtures by importing test context.
-		
+
 		>>> import tests.context as context
 		>>>
 
@@ -116,7 +116,7 @@ def getPythonCommand():
 		>>>
 
 		Testcase 1: function should have a output.
-		
+
 		>>> tests.context.getPythonCommand() is not None
 		True
 		>>>
@@ -431,7 +431,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls._thepython = getPythonCommand()
-	
+
 	def setUp(self):
 		"""
 			Overides unittest.TestCase.setUp(unittest.TestCase).
