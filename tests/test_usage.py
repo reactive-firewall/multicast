@@ -143,6 +143,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 	def test_run_lib_command_plain(self):
 		"""Test case for multicast.__main__ help."""
 		theResult = False
+		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
 		try:
 			if (self._thepython is not None):
 				theOutputtext = context.checkPythonCommand([
@@ -161,6 +162,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			context.debugtestError(err)
 			err = None
 			del err
+			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
@@ -224,7 +226,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
 
 	def test_profile_template_case(self):
 		"""Test case template for profiling"""
@@ -276,7 +278,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 							)
 						)
 					]
-					theOutputtext = context.timePythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
 						if isinstance(theOutputtext, bytes):
