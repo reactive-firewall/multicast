@@ -106,12 +106,12 @@ except Exception as badErr:  # pragma: no branch
 
 
 try:
-    if 'tests.context' not in sys.modules:
-        from tests import context
-    else:  # pragma: no branch
-        context = sys.modules["""tests.context"""]
+	if 'tests.context' not in sys.modules:
+		from tests import context
+	else:  # pragma: no branch
+		context = sys.modules["""tests.context"""]
 except Exception:  # pragma: no branch
-    raise ImportError("[CWE-440] context Failed to import.")
+	raise ImportError("[CWE-440] context Failed to import.")
 
 
 test_cases = (

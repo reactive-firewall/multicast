@@ -37,9 +37,7 @@ try:
 	else:
 		from context import multicast
 		from context import unittest as unittest
-		from context import os as os
 		from context import subprocess as subprocess
-		from context import profiling as profiling
 except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 

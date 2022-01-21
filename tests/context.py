@@ -101,12 +101,47 @@ except Exception:  # pragma: no branch
 	raise ImportError("[CWE-440] profiling Failed to import.")
 
 
+def getCoverageCommand():
+	"""
+		Function for backend coverage command.
+		Rather than just return the sys.executable which will usually be a python implementation,
+		this function will search for a coverage tool to allow coverage testing to continue beyond
+		the process fork of typical cli testing.
+
+		Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+		>>> import tests.context
+		>>>
+
+		Testcase 1: function should have a output.
+
+		>>> tests.context.getCoverageCommand() is not None
+		True
+		>>>
+
+
+	"""
+	thecov = "exit 1 ; #"
+	try:
+		thecov = checkPythonCommand(["command", "-v", "coverage"])
+		if (str("/coverage") in str(thecov)):
+			thecov = str("coverage")
+		elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
+			thecov = str("coverage3")
+		else:
+			thecov = "exit 1 ; #"
+	except Exception:
+		thecov = "exit 1 ; #"
+	return str(thecov)
+
+
 def getPythonCommand():
 	"""
 		Function for backend python command.
 		Rather than just return the sys.executable which will usually be a python implementation,
-		this function will search for a coverage tool to allow coverage testing to continue beyond
-		the process fork of typical cli testing.
+		this function will search for a coverage tool with getCoverageCommand() first.
 
 		Meta Testing:
 
@@ -124,21 +159,18 @@ def getPythonCommand():
 	"""
 	thepython = "exit 1 ; #"
 	try:
-		thepython = checkPythonCommand(["command", "-v", "coverage"])
+		thepython = getCoverageCommand()
 		if (sys.version_info >= (3, 3)):
-			if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = str("coverage run -p")
-			elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
-					thepython = str("coverage3 run -p")
+			if (str("coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
+				thepython += str(" run -p")
 			else:
 				thepython = str(sys.executable)
-		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
+		elif (str("coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
+			thepython = str(sys.executable)
 			try:
 				import coverage
 				if coverage.__name__ is not None:
 					thepython = str("{} -m coverage run -p").format(str(sys.executable))
-				else:
-					thepython = str(sys.executable)
 			except Exception:
 				thepython = str(sys.executable)
 		else:

@@ -153,7 +153,7 @@ def run(groups, port, iface=None, bind_group=None):
 	is added by some other programs (like another python program instance of this)
 	"""
 
- 	# assert bind_group in groups + [None], \
+	# assert bind_group in groups + [None], \
 	#     'bind group not in groups to join'
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 
