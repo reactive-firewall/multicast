@@ -161,7 +161,6 @@ def run(groups, port, iface=None, bind_group=None):
 	# script binding to the same ip/port)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-	recvBuffer = str("""""")
 	try:
 		sock.bind(('' if bind_group is None else bind_group, port))
 		for group in groups:
@@ -173,7 +172,7 @@ def run(groups, port, iface=None, bind_group=None):
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
 		while True:
-			recvBuffer.join(sock.recv(1316))
+			print(sock.recv(1316))
 			# about 969 bytes in base64 encoded as chars
 	except KeyboardInterrupt:
 		print("")
@@ -185,7 +184,6 @@ def run(groups, port, iface=None, bind_group=None):
 		except OSError:
 			False
 		sock = None
-	print(str(recvBuffer))
 
 
 def main(*argv):
