@@ -104,7 +104,7 @@ jobs:
         verbose: true
         fail_ci_if_error: true
     - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ runner.os == "Linux" }}
+      if: ${{ runner.os }} == "Linux"
       run: ./cc-test-reporter after-build --exit-code 0
     - name: deepsource for ${{ matrix.python-version }}
       run: |
