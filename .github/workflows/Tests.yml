@@ -82,11 +82,13 @@ jobs:
         pip install coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
+      shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
         if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
     - name: Install deepsource tools for ${{ matrix.python-version }}
+      shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
     - name: Pre-Clean
@@ -106,6 +108,7 @@ jobs:
         fail_ci_if_error: true
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
+      shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
     - name: deepsource for ${{ matrix.python-version }}
