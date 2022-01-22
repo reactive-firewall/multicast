@@ -83,9 +83,9 @@ jobs:
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true
-        chmod +x ./cc-test-reporter 2>/dev/null || true
-        ./cc-test-reporter before-build || true
+        if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
+        if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
     - name: Install deepsource tools for ${{ matrix.python-version }}
       run: |
         if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
