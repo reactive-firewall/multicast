@@ -104,11 +104,11 @@ jobs:
         verbose: true
         fail_ci_if_error: true
     - name: code-climate for ${{ matrix.python-version }}
-        run: |
-          if [ $OS == macos-latest ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code 0 || true ; fi ;
+      run: ./cc-test-reporter after-build --exit-code 0
+      if: ${{ matrix.os }} == "ubuntu-latest"
     - name: deepsource for ${{ matrix.python-version }}
-        run: |
-          if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
+      run: |
+        if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
