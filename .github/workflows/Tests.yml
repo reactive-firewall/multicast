@@ -88,6 +88,7 @@ jobs:
         if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
     - name: Install deepsource tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
@@ -112,6 +113,8 @@ jobs:
       run: |
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
     - name: deepsource for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
     - name: Post-Clean
