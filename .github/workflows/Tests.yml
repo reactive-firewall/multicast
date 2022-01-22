@@ -81,13 +81,14 @@ jobs:
         pip install pytest-cov
         pip install coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true
         chmod +x ./cc-test-reporter 2>/dev/null || true
         ./cc-test-reporter before-build || true
     - name: Install deepsource tools for ${{ matrix.python-version }}
       run: |
-        if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else (curl https://deepsource.io/cli | sh) || true ; fi ;
+        if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -105,10 +106,11 @@ jobs:
         fail_ci_if_error: true
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
-      run: ./cc-test-reporter after-build --exit-code 0
+      run: |
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
     - name: deepsource for ${{ matrix.python-version }}
       run: |
-        if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
+        if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
