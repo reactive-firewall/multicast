@@ -64,6 +64,8 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.UTF-8"
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
     - uses: actions/checkout@master
     - name: Setup Python ${{ matrix.python-version }}
@@ -78,6 +80,14 @@ jobs:
         pip install pytest ;
         pip install pytest-cov
         pip install coverage ;
+    - name: Install code-climate tools for ${{ matrix.python-version }}
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true
+        chmod +x ./cc-test-reporter 2>/dev/null || truee
+        ./cc-test-reporter before-build || true
+    - name: Install deepsource tools for ${{ matrix.python-version }}
+      run: |
+        if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else (curl https://deepsource.io/cli | sh) || true ; fi ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -89,10 +99,14 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
         directory: .
-        flags: unittests,${{ matrix.os }},${{ matrix.python-version }}
+        flags: ${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: true
+    - name: code-climate for ${{ matrix.python-version }}
+        run: if [ $OS == macos-latest ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code 0 || true ; fi ;
+    - name: deepsource for ${{ matrix.python-version }}
+        run: if [ $OS == macos-latest ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
