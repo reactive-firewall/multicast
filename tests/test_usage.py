@@ -62,11 +62,12 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	def test_multicast_message_arg_main(self):
-		"""Tests the message argument for failure given future tools"""
+		"""Tests the message argument for expected syntax given simple args"""
 		theResult = False
 		fail_fixture = str("""multicast.__main__.useTool(SAY, message) == error""")
 		try:
-			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message"]))
+			with self.assertRaises(SystemExit):
+				self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message"]))
 			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message", "test"]))
 			theResult = True
 		except Exception as err:
@@ -76,13 +77,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	def test_multicast_hear_invalid_arg_main(self):
-		"""Tests the message argument for failure given future tools"""
+		"""Tests the message argument for failure given invalid input"""
 		theResult = False
 		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != 2""")
 		try:
-			self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
-			self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 0)
-			self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 1)
+			with self.assertRaises(SystemExit):
+				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
+				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 0)
+				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 1)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -96,7 +98,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		fail_fixture = str("""multicast.__main__.useTool(HEAR, hex) == error""")
 		try:
-			with self.assertRaises(NotImplementedError, fail_fixture):
+			with self.assertRaises(NotImplementedError):
 				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--hex"]))
 			theResult = True
 		except Exception as err:
