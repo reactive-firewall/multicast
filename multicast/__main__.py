@@ -17,32 +17,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__all__ = ["""__module__""", """__prog__""", """__prolog__""", """__epilog__""", """__doc__""", "NoOp", """SendMCast""", """joinMCast""", """dumpUsage""", """TASK_OPTIONS""", """__checkToolArgs""", """buildArgs""", """main""", """parseArgs""", """useTool"""]
+
 __package__ = """multicast"""
 
-
-__module__ = """multicast"""
-
+__module__ = """multicast.__main__"""
 
 __file__ = """multicast/__main__.py"""
 
+__prog__ = """multicast"""
 
-__prog__ = str("""multicast""")
-"""The name of this program is Python Multicast"""
+__prolog__ = """The Main Entrypoint"""
 
+__epilog__ = """Add an epilog here."""
 
-__description__ = str(
-	"""Add a Description Here"""
-)
-"""Contains the description of the program."""
-
-
-__epilog__ = str(
-	"""Add an epilog here."""
-)
-"""Contains the short epilog of the program CLI help text."""
-
-
-__doc__ = __description__ + """
+__doc__ = __prolog__ + """
 
 	Minimal Acceptance Testing:
 
@@ -59,7 +48,7 @@ __doc__ = __description__ + """
 		True
 		>>>
 
-		Testcase 0: multicast.__main__ should have a doctests.
+	Testcase 0: multicast.__main__ should have a doctests.
 
 		>>> import multicast.__main__
 		>>>
@@ -127,14 +116,14 @@ def NoOp(*args, **kwargs):
 		>>> import multicast
 		>>>
 
-		Testcase 0: multicast.__main__ should have a doctests.
+	Testcase 0: multicast.__main__ should have a doctests.
 
 		>>> import multicast.__main__
 		>>> multicast.__main__.__module__ is not None
 		True
 		>>>
 
-		Testcase 1: multicast.NoOp should return None.
+	Testcase 1: multicast.NoOp should return None.
 
 		>>> import multicast.__main__
 		>>> multicast.__main__.NoOp() is None
@@ -180,7 +169,7 @@ def buildArgs():
 	"""
 	parser = argparse.ArgumentParser(
 		prog=__prog__,
-		description=__description__,
+		description=__prolog__,
 		epilog=__epilog__,
 		add_help=False
 	)
@@ -218,14 +207,14 @@ def __checkToolArgs(args):
 		>>> import multicast
 		>>>
 
-		Testcase 0: multicast.__main__ should have a doctests.
+	Testcase 0: multicast.__main__ should have a doctests.
 
 		>>> import multicast.__main__
 		>>> multicast.__main__.__module__ is not None
 		True
 		>>>
 
-		Testcase 1: multicast.__checkToolArgs should return an array.
+	Testcase 1: multicast.__checkToolArgs should return an array.
 
 		>>> import multicast.__main__
 		>>> multicast.__main__.__checkToolArgs(None) is not None
@@ -234,7 +223,7 @@ def __checkToolArgs(args):
 		True
 		>>>
 
-		Testcase 2: multicast.__checkToolArgs should return an array.
+	Testcase 2: multicast.__checkToolArgs should return an array.
 
 		>>> import multicast.__main__
 		>>> type(multicast.__main__.__checkToolArgs(["arg1", "arg2"])) is type(["strings"])
@@ -284,8 +273,10 @@ def main(*argv):
 	return __EXIT_CODE
 
 
-if __name__ in '__main__':
+if __name__ in u'__main__':
 	__EXIT_CODE = 2
-	if (sys.argv is not None) and (len(sys.argv) >= 1):
+	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
+	else:
+		__EXIT_CODE = main(argv=["""--help"""])
 	exit(__EXIT_CODE)

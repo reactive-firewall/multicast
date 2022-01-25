@@ -30,7 +30,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-__all__ = ["""main""", """run""", """parseArgs""", """__module__""", """__name__""", """__doc__"""]
+__all__ = ["""main""", """saystep""", """parseArgs""", """__module__""", """__name__""", """__doc__"""]
 
 
 __package__ = """multicast"""
@@ -68,8 +68,8 @@ __doc__ = """Python Multicast Broadcaster.
 		B: Test that the send component is initialized.
 
 	>>> import multicast
+	>>> import multicast.__main__
 	>>>
-
 	>>> multicast.__main__ is not None
 	True
 	>>> multicast.send is not None
@@ -113,14 +113,41 @@ def parseArgs(*arguments):
 	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
+	
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.send is not None
+		True
+		>>>
+
+	Testcase 0: parseArgs should return a namespace.
+		A: Test that the multicast component is initialized.
+		B: Test that the send component is initialized.
+		C: Test that the send.parseArgs component is initialized.
+
+		>>> multicast.send is not None
+		True
+		>>> multicast.send.parseArgs is not None
+		True
+		>>> tst_fxtr_args = ['''--port=1234''', '''--mesage''', '''is required''']
+		>>> test_fixture = multicast.send.parseArgs(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...Namespace...>
+		>>>
+
+
 	"""
 	__epilog__ = """- WIP -"""
 	__description__ = """Python Multicast Broadcaster."""
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
 		description=__description__,
-		epilog=__epilog__,
-		exit_on_error=False
+		epilog=__epilog__
 	)
 	parser.add_argument("""--port""", type=int, default=__MCAST_DEFAULT_PORT)
 	parser.add_argument('--mcast-group', default='224.1.1.1')
@@ -131,7 +158,8 @@ def parseArgs(*arguments):
 	return parser.parse_args(*arguments)
 
 
-def run(group, port, data):
+def saystep(group, port, data):
+	"""The actual magic is handeled here."""
 	MULTICAST_TTL = 20
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	try:
@@ -150,7 +178,7 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		run(args.mcast_group, int(args.port), args.message)
+		saystep(args.mcast_group, int(args.port), args.message)
 		__exit_code = 0
 	except argparse.ArgumentError:
 		print('Input has an Argument Error')
@@ -160,9 +188,3 @@ def main(*argv):
 		__exit_code = 3
 	return __exit_code
 
-
-if __name__ == '__main__':
-	__exit_code = 2
-	if (sys.argv is not None) and (len(sys.argv) >= 1):
-		__exit_code = main(sys.argv[1:])
-	exit(__exit_code)

@@ -21,7 +21,7 @@ try:
 	from setuptools import setup
 	from setuptools import find_packages
 except Exception:
-	raise NotImplementedError("""Not Implemented.""")
+	raise ImportError("""Not Implemented.""")
 
 
 def readFile(filename):
@@ -46,15 +46,34 @@ except Exception:
 readme = readFile("""README.md""")
 SLA = readFile("""LICENSE.md""")
 
+try:
+	class_tags = [
+		str("""Development Status :: 4 - Beta"""),
+		str("""Operating System :: POSIX :: Linux"""),
+		str("""License :: OSI Approved :: MIT License"""),
+		str("""Programming Language :: Python"""),
+		str("""Programming Language :: Python :: 3.9"""),
+		str("""Programming Language :: Python :: 3.8"""),
+		str("""Programming Language :: Python :: 3.7"""),
+		str("""Topic :: Network""")
+	]
+except Exception:
+	class_tags = str("""Development Status :: 4 - Beta""")
+
+
 setup(
 	name="""multicast""",
-	version="""1.2.0""",
+	version="""1.3.0""",
 	description="""Python Multicast Repo for Send/Recv Stubs""",
 	long_description=readme,
+	long_description_content_type="""text/markdown""",
+	zip_safe=False,
+	include_package_data=True,
 	install_requires=requirements,
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",
+	classifiers=class_tags,
 	url="""https://github.com/reactive-firewall/multicast.git""",
 	license=SLA,
-	packages=find_packages(exclude=("""tests""")),
+	packages=find_packages(exclude=("""tests""", """docs""")),
 )
