@@ -30,7 +30,11 @@
 # ..........................................
 # NO ASSOCIATION
 
-__all__ = ["""genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""", """__module__""", """__name__""", """__proc__""", """__prolog__""", """__epilog__""", """__doc__"""]
+__all__ = [
+	"""genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
+	"""__module__""", """__name__""", """__proc__""", """__prolog__""",
+	"""__epilog__""", """__doc__"""
+]
 
 
 __package__ = """multicast"""
@@ -90,7 +94,7 @@ except Exception as importErr:
 
 def genSocket():
 	"""Generates an unbound socket.socket object ready to receive network traffic.
-	
+
 	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
@@ -270,8 +274,7 @@ def hearstep(groups, port, iface=None, bind_group=None):
 			if chunk is not None:
 				msgbuffer += str(chunk, encoding='utf8')
 				chunk = None
-				msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
-			#print(sock.recv(1316))
+				# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
 			# about 969 bytes in base64 encoded as chars
 	except KeyboardInterrupt:
 		print("""""")
@@ -280,16 +283,16 @@ def hearstep(groups, port, iface=None, bind_group=None):
 		print(str(""""""))
 	finally:
 		sock = endSocket(sock)
-	print(str(""""""))
-	print(str(msgbuffer))
-	#return msgbuffer
+	# print(str(""""""))
+	# print(str(msgbuffer))
+	return msgbuffer
 
 
 def main(*argv):
 	"""The Main Event. This does two things:
 
 	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
-	2: calls run with the parsed args if able and handles any errors regardles
+	2: calls hearstep with the parsed args if able and handles any errors regardles
 
 	Regardles of errors the result as an 'exit code' (int) is returned.
 	(Note the __main__ handler just exits with this code as a true return code status.)

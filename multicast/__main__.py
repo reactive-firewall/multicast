@@ -17,19 +17,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__all__ = ["""__module__""", """__prog__""", """__prolog__""", """__epilog__""", """__doc__""", "NoOp", """SendMCast""", """joinMCast""", """dumpUsage""", """TASK_OPTIONS""", """__checkToolArgs""", """buildArgs""", """main""", """parseArgs""", """useTool"""]
+__all__ = [
+	"""__module__""", """__prog__""", """__prolog__""", """__epilog__""",
+	"""__doc__""", "NoOp", """SendMCast""", """joinMCast""",
+	"""dumpUsage""", """TASK_OPTIONS""", """__checkToolArgs""",
+	"""buildArgs""", """main""", """parseArgs""", """useTool"""
+]
+
 
 __package__ = """multicast"""
 
+
 __module__ = """multicast.__main__"""
+
 
 __file__ = """multicast/__main__.py"""
 
-__prog__ = """multicast"""
+
+__name__ = """multicast.__main__"""
+
+
+__proc__ = """multicast"""
+
 
 __prolog__ = """The Main Entrypoint"""
 
+
 __epilog__ = """Add an epilog here."""
+
 
 __doc__ = __prolog__ + """
 
@@ -58,6 +73,7 @@ __doc__ = __prolog__ + """
 		>>>
 
 	"""
+
 
 try:
 	import sys
@@ -276,7 +292,7 @@ def main(*argv):
 if __name__ in u'__main__':
 	__EXIT_CODE = 2
 	if (sys.argv is not None) and (len(sys.argv) > 1):
-		__EXIT_CODE = main(sys.argv[1:])
+		__EXIT_CODE = main(argv=sys.argv)
 	else:
-		__EXIT_CODE = main(argv=["""--help"""])
+		__EXIT_CODE = main(argv=[__proc__, """--help"""])
 	exit(__EXIT_CODE)

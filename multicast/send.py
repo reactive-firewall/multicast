@@ -30,7 +30,10 @@
 # ..........................................
 # NO ASSOCIATION
 
-__all__ = ["""main""", """saystep""", """parseArgs""", """__module__""", """__name__""", """__doc__"""]
+__all__ = [
+	"""main""", """saystep""", """parseArgs""",
+	"""__module__""", """__name__""", """__doc__"""
+]
 
 
 __package__ = """multicast"""
@@ -56,25 +59,25 @@ __doc__ = """Python Multicast Broadcaster.
 
 	Testcase 0: Multicast should be importable.
 
-	>>> import multicast
-	>>>
+		>>> import multicast
+		>>>
 
-	>>> multicast.__doc__ is not None
-	True
-	>>>
+		>>> multicast.__doc__ is not None
+		True
+		>>>
 
 	Testcase 1: Recv should be automaticly imported.
 		A: Test that the __main__ component is initialized.
 		B: Test that the send component is initialized.
 
-	>>> import multicast
-	>>> import multicast.__main__
-	>>>
-	>>> multicast.__main__ is not None
-	True
-	>>> multicast.send is not None
-	True
-	>>>
+		>>> import multicast
+		>>> import multicast.__main__
+		>>>
+		>>> multicast.__main__ is not None
+		True
+		>>> multicast.send is not None
+		True
+		>>>
 
 
 """
@@ -113,7 +116,7 @@ def parseArgs(*arguments):
 	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
-	
+
 	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
