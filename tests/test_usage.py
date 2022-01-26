@@ -35,7 +35,7 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
-		from context import multicast
+		from context import multicast as multicast
 		from context import unittest as unittest
 		from context import subprocess as subprocess
 except Exception:

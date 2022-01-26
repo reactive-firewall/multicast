@@ -18,10 +18,10 @@
 # limitations under the License.
 
 __all__ = [
-	"""__module__""", """__prog__""", """__prolog__""", """__epilog__""",
-	"""__doc__""", "NoOp", """SendMCast""", """joinMCast""",
-	"""dumpUsage""", """TASK_OPTIONS""", """__checkToolArgs""",
-	"""buildArgs""", """main""", """parseArgs""", """useTool"""
+	"""__module__""", """__proc__""", """__prolog__""", """__epilog__""",
+	"""__doc__""", """NoOp""", """SendMCast""", """joinMCast""",
+	"""dumpUsage""", """__checkToolArgs""", """buildArgs""",
+	"""TASK_OPTIONS""", """parseArgs""", """useTool""", """main"""
 ]
 
 
@@ -34,7 +34,7 @@ __module__ = """multicast.__main__"""
 __file__ = """multicast/__main__.py"""
 
 
-__name__ = """multicast.__main__"""
+# __name__ = """multicast.__main__"""
 
 
 __proc__ = """multicast"""
@@ -72,7 +72,8 @@ __doc__ = __prolog__ + """
 		True
 		>>>
 
-	"""
+
+"""
 
 
 try:
@@ -164,7 +165,8 @@ def joinMCast(*args, **kwargs):
 
 def dumpUsage(*args, **kwargs):
 	"""Prints help usage"""
-	return buildArgs().print_help()
+	buildArgs().print_help()
+	return None
 
 
 # More boiler-plate-code
@@ -184,7 +186,7 @@ def buildArgs():
 	returns argparse.ArgumentParser - the ArgumentParser to use.
 	"""
 	parser = argparse.ArgumentParser(
-		prog=__prog__,
+		prog=__proc__,
 		description=__prolog__,
 		epilog=__epilog__,
 		add_help=False
@@ -199,7 +201,7 @@ def buildArgs():
 	)
 	parser.add_argument(
 		'some_task', nargs='?', choices=TASK_OPTIONS.keys(),
-		help='the help text for this option.'
+		help='the action and any action arguments to pass.'
 	)
 	return parser
 
@@ -246,6 +248,7 @@ def __checkToolArgs(args):
 		True
 		>>>
 
+
 	"""
 	if args is None:
 		args = [None]
@@ -267,7 +270,7 @@ def useTool(tool, *arguments):
 
 def main(*argv):
 	"""The Main Event."""
-	__EXIT_CODE = 0
+	__EXIT_CODE = 1
 	try:
 		try:
 			args, extra = parseArgs(*argv)
@@ -292,7 +295,7 @@ def main(*argv):
 if __name__ in u'__main__':
 	__EXIT_CODE = 2
 	if (sys.argv is not None) and (len(sys.argv) > 1):
-		__EXIT_CODE = main(argv=sys.argv)
+		__EXIT_CODE = main(sys.argv[1:])
 	else:
-		__EXIT_CODE = main(argv=[__proc__, """--help"""])
+		__EXIT_CODE = main([str(__proc__), """-h"""])
 	exit(__EXIT_CODE)
