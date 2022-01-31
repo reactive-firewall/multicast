@@ -227,9 +227,9 @@ def checkCovCommand(args=[None]):
 			i = 2
 		else:
 			args[0] = str(getCoverageCommand())
-		args.insert(i+1, str("run"))
-		args.insert(i+2, str("-p"))
-		args.insert(i+3, str("--source=multicast"))
+		args.insert(i + 1, str("run"))
+		args.insert(i + 2, str("-p"))
+		args.insert(i + 3, str("--source=multicast"))
 	return args
 
 
