@@ -20,6 +20,19 @@
 __module__ = """tests"""
 
 
+__doc__ = 	"""Multicast Testing Module.
+
+		Testing:
+
+		Testcase 0: Load tests fixtures
+
+			>>> import tests as _tests
+			>>> _tests.__module__ is not None
+			True
+
+
+"""
+
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
@@ -121,6 +134,23 @@ test_cases = (
 
 
 def load_tests(loader, tests, pattern):
+	"""
+		Loads the tests from the project and then attempts to load the doctests too.
+
+		Testing:
+
+		Testcase 0: Load test fixtures
+
+			>>> import tests as _tests
+			>>>
+
+		Testcase 1: Load test fixtures
+
+			>>> import tests as _tests
+			>>> _tests.load_tests is not None
+			True
+
+	"""
 	import doctest
 	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)
 	suite = unittest.TestSuite()

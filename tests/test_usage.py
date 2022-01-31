@@ -185,6 +185,8 @@ def debugIfNoneResult(thepython, theArgs, theOutput):
 class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 	"""Basic functional test cases."""
 
+	__module__ = """tests.test_usage"""
+
 	def setUp(self):
 		super(self.__class__, self).setUp()
 		if (self._thepython is None):

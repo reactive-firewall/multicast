@@ -112,13 +112,14 @@ def getCoverageCommand():
 
 		First setup test fixtures by importing test context.
 
-			>>> import tests.context
+			>>> import tests.context as context
 			>>>
 
 		Testcase 1: function should have a output.
 
-			>>> tests.context.getCoverageCommand() is not None
-			True
+			>>> import tests.context as context
+			>>> context.getCoverageCommand() is None
+			False
 			>>>
 
 
@@ -156,21 +157,29 @@ def __check_cov_before_py():
 			True
 			>>>
 
+		Testcase 2: function should have a string output of python or coverage.
+
+			>>> _test_fixture = tests.context.__check_cov_before_py()
+			>>> isinstance(_test_fixture, type(str("")))
+			True
+			>>> (str("python") in _test_fixture) or (str("coverage") in _test_fixture)
+			True
+			>>>
+
 
 	"""
 	thepython = str(sys.executable)
 	thecov = getCoverageCommand()
 	if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 7)):
-		thecov += str(" run -p")
-		thepython = str("{} -m {}").format(str(sys.executable), str(thecov))
+		thepython = str("{} run -p").format(str(thecov))
 	else:
 		try:
-			import coverage
+			import coverage as coverage
 			if coverage.__name__ is not None:
 				thepython = str("{} -m coverage run -p").format(str(sys.executable))
 		except Exception:
 			thepython = str(sys.executable)
-	return thepython
+	return str(thepython)
 
 
 def getPythonCommand():
@@ -193,7 +202,7 @@ def getPythonCommand():
 		>>>
 
 	"""
-	thepython = "exit 1 ; #"
+	thepython = "python"
 	try:
 		thepython = __check_cov_before_py()
 	except Exception:
@@ -209,19 +218,18 @@ def checkCovCommand(args=[None]):
 	"""Utility Function."""
 	if sys.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+	if str("coverage") in args[0]:
+		i = 0
 		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):
 			args[0] = str(sys.executable)
 			args.insert(1, str("-m"))
-			if str("{} -m coverage3 ").format(str(sys.executable)) in str(args[0]):
-				args.insert(2, str("coverage3"))
-			else:
-				args.insert(2, str("coverage"))
+			args.insert(2, str("coverage"))
 			i = 2
 		else:
-			i = 0
-			args.insert(i+1, str("run"))
-			args.insert(i+2, str("-p"))
-			args.insert(i+3, str("--source=multicast"))
+			args[0] = str(getCoverageCommand())
+		args.insert(i+1, str("run"))
+		args.insert(i+2, str("-p"))
+		args.insert(i+3, str("--source=multicast"))
 	return args
 
 
@@ -270,26 +278,13 @@ def checkPythonFuzzing(args=[None], stderr=None):
 		if args is None or args is [None]:
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
-				if sys.__name__ is None:
-					raise ImportError("Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(4, str("--source=multicast"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(2, str("--source=multicast"))
+			if str("coverage") in args[0]:
+				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
-			theOutput = checkStrOrByte(theOutput)
 	except Exception as err:
 		theOutput = None
 		raise RuntimeError(err)
+	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
