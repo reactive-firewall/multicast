@@ -163,7 +163,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
-			#raise unittest.SkipTest(fail_fixture)
+			# raise unittest.SkipTest(fail_fixture)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
