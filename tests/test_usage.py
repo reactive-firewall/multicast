@@ -40,6 +40,7 @@ try:
 		from context import os as os
 		from context import subprocess as subprocess
 		from context import profiling as profiling
+		from multiprocessing import Process
 except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 
@@ -114,6 +115,40 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	def test_multicast_message_send_recv(self):
+		"""Tests the basic send and recv test"""
+		theResult = False
+		fail_fixture = str("""SAY --> HEAR == error""")
+		try:
+			_fixture_SAY_args = [
+				"""--port=19991""",
+				"""--mcast-group='224.0.0.1'""",
+				"""--message='test'"""
+			]
+			_fixture_HEAR_args = [
+				"""--port=19991""",
+				"""--join-mcast-groups='224.0.0.1'""",
+				"""--bind-group='224.0.0.1'"""
+			]
+			p = Process(target=multicast.__main__.useTool, name="HEAR", args=("HEAR", _fixture_HEAR_args,))
+			p.start()
+			try:
+				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
+				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
+				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
+			except Exception:
+				p.join()
+				raise unittest.SkipTest(fail_fixture)
+			p.join()
+			self.assertIsNotNone(p.exitcode)
+			theResult = True
+		except Exception as err:
+			context.debugtestError(err)
+			#raise unittest.SkipTest(fail_fixture)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -227,6 +262,38 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				del err
 				theResult = False
 		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
+
+	def test_run_lib_command_help(self):
+		"""Test case for multicast* --help."""
+		theResult = False
+		fail_fixture = str("""multicast --help == not helpful""")
+		try:
+			if (self._thepython is not None):
+				for test_case in [".__main__", ""]:
+					args = [
+						str(self._thepython),
+						str("-m"),
+						str("multicast{}").format(
+							str(
+								test_case
+							)
+						),
+						str("--help")
+					]
+					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+					self.assertIn(str("usage:"), str(theOutputtext))
+				if (str("usage:") in str(theOutputtext)):
+					theResult = True
+				else:
+					theResult = False
+					context.debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+		except Exception as err:
+			context.debugtestError(err)
+			err = None
+			del err
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
 	def test_profile_template_case(self):
 		"""Test case template for profiling"""
