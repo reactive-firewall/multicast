@@ -178,6 +178,20 @@ def endSocket(sock=None):
 		True
 		>>>
 
+	Testcase 2: Recv should have endSocket() function that takes a socket.socket object or does nothing.
+		A: Test that the recv component has the function 'endSocket' (see testcase 1)
+		B: Test that the 'endSocket' function returns nothing
+
+		>>> multicast.recv.endSocket is not None
+		True
+		>>> multicast.recv.endSocket #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<function endSocket at ...>
+		>>> type(multicast.recv.endSocket)
+		<class 'function'>
+		>>> multicast.recv.endSocket(None) is None
+		True
+		>>>
+
 
 	"""
 	if not (sock is None):
