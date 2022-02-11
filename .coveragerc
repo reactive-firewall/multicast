@@ -7,20 +7,41 @@ concurrency = multiprocessing
 include = multicast*,tests*
 # Regexes for lines to exclude from consideration
 exclude_lines =
-    # Have to re-enable the standard pragma
-    pragma: no cover
-    except Exception
-    except BaseException:
-    # Don't complain if tests don't hit defensive assertion code:
-    raise AssertionError
-    raise NotImplementedError
-    raise ImportError
-    except unittest.SkipTest
-    except IOError
-    except OSError
+	# Have to re-enable the standard pragma
+	pragma: no cover
+	from . import
+	except Exception
+	except BaseException:
+	# Don't complain if tests don't hit defensive assertion code:
+	raise AssertionError
+	raise NotImplementedError
+	raise ImportError
+	except unittest.SkipTest
+	except subprocess.CalledProcessError
+	except IOError
+	except OSError
+	# don't complain about sys.modules
+	sys.modules
+	not in sys.modules:
+	# Don't complain if non-runnable code isn't run:
+	if __name__ in u'__main__':
+	if __name__ in '__main__':
+	if __sys_path__ not in sys.path:
+	os.abort()
+	exit(0)
 
-    # Don't complain if non-runnable code isn't run:
-    if __name__ in '__main__':
+partial_branches =
+	# Have to re-enable the standard pragma rules
+	pragma: no branch
+	# Don't complain if non-runnable code isn't run:
+	if __name__ in u'__main__':
+	if __name__ in '__main__':
+	if __sys_path__ not in sys.path:
+	# not in sys.modules:
+	if context.__name__ is None:
+	if 'os' not in sys.modules:
+	if 'os.path' not in sys.modules:
+	if 'argparse' not in sys.modules:
 
 ignore_errors = True
 
