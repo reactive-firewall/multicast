@@ -17,6 +17,10 @@
 # limitations under the License.
 
 
+ifeq "$(LC_CTYPE)" ""
+	LC_CTYPE="en_US.utf-8"
+endif
+
 ifeq "$(ECHO)" ""
 	ECHO=echo
 endif
@@ -34,12 +38,13 @@ ifeq "$(PYTHON)" ""
 endif
 
 ifeq "$(COVERAGE)" ""
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=`command -v coverage`
+	ifeq "$(COVERAGE_TOOL)" ""
+		COVERAGE_TOOL=`command -v coverage`
 	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=`command -v coverage3`
+	ifeq "$(COVERAGE_TOOL)" ""
+		COVERAGE_TOOL=`command -v coverage3`
 	endif
+	COVERAGE=export LC_CTYPE="en_US.utf-8" ; "$(COVERAGE_TOOL)"
 endif
 
 ifeq "$(WAIT)" ""
@@ -101,9 +106,9 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=multicast* -m unittest discover --buffer --verbose -s ./tests -t ./ 2>/dev/null || $(PYTHON) -m unittest discover --buffer --verbose -s ./tests -t ./ || DO_FAIL="exit 2" ;
-	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
-	$(QUIET)$(COVERAGE) report --source=multicast* 2>/dev/null || true
+	$(QUIET)$(COVERAGE) run -p --source=multicast* -m unittest discover --buffer --verbose -s ./tests -t ./ tests 2>/dev/null || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ tests || DO_FAIL="exit 2" ;
+	$(QUIET)$(COVERAGE) combine 2>/dev/null || true ;
+	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true ;
 	$(QUIET)$(DO_FAIL);
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -156,6 +161,7 @@ cleanup:
 
 clean: cleanup
 	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
+	$(QUIET)$(COVERAGE) erase || true
 	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
