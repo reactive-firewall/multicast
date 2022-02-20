@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+./*/__pycache__/*
+./*/__pycache__/
 *.py[cod]
 *$py.class
 *~
@@ -38,6 +40,8 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+test-results/
+test-results/*
 .coverage
 .coverage.*
 .cache
@@ -91,10 +95,12 @@ ENV/
 # Rope project settings
 .ropeproject
 
-
-#Mac OSX files
+# Mac OSX files
 .DS_Store
 */.DS_Store
+.*/*/.DS_Store
 *.xcworkspace
 *.xcworkspace/*
+*.xcodeproj
+*.xcodeproj/*
 

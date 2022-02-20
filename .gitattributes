@@ -2,6 +2,8 @@
 *.cfg			text diff=config
 *.txt			text
 *.py			text working-tree-encoding=UTF-8 diff=python
+*.pyc			-text
+multicast/*.py	text working-tree-encoding=UTF-8 diff=python
 *.sh			text
 *.bash			text diff=shell
 *.ini			text
