@@ -73,9 +73,10 @@ endif
 
 ifeq "$(RM)" ""
 	RM=`command -v rm` -f
-	ifeq "$(RMDIR)" ""
-		RMDIR=$(RM)Rd
-	endif
+endif
+
+ifeq "$(RMDIR)" ""
+	RMDIR=$(RM) -Rd
 endif
 
 PHONY: must_be_root cleanup
@@ -139,7 +140,7 @@ cleanup:
 	$(QUIET)$(RM) tests/__pycache__/* 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*.pyc 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*~ 2>/dev/null || true
-	$(QUIET)$(RM) multicast//__pycache__/* 2>/dev/null || true
+	$(QUIET)$(RM) multicast/__pycache__/* 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*/*.pyc 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*/*~ 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*.DS_Store 2>/dev/null || true
