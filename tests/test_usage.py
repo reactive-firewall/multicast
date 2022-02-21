@@ -86,6 +86,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
 				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 0)
 				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 1)
+				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "11911", "--group=None"]), 1)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -192,24 +193,24 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		if (self._thepython is None):
 			self.skipTest(str("""No python cmd to test with!"""))
 
-	def test_run_lib_command_plain(self):
+	def test_prints_usage_WHEN_called_GIVEN_help_argument(self):
 		"""Test case for multicast.__main__ help."""
 		theResult = False
 		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
 		try:
 			if (self._thepython is not None):
-				theOutputtext = context.checkPythonCommand([
+				theOutputtxt = context.checkPythonCommand([
 					str(self._thepython),
 					str("-m"),
 					str("multicast"),
 					str("--help")
 				], stderr=subprocess.STDOUT)
-				self.assertIn(str("usage:"), str(theOutputtext))
-				if (str("usage:") in str(theOutputtext)):
+				self.assertIn(str("usage:"), str(theOutputtxt))
+				if (str("usage:") in str(theOutputtxt)):
 					theResult = True
 				else:
 					theResult = False
-					context.debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+					context.debugUnexpectedOutput(str("usage:"), str(theOutputtxt), self._thepython)
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
@@ -218,7 +219,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
-	def test_run_lib_command_main(self):
+	def test_equivilant_response_WHEN_absolute_vs_implicit(self):
 		"""Test case for multicast vs multicast.__main__"""
 		theResult = False
 		try:
@@ -228,17 +229,17 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				str("multicast.__main__")
 			], stderr=subprocess.STDOUT)
 			self.assertIsNotNone(theExpectedText)
-			theOutputtext = context.checkPythonCommand([
+			theOutputtxt = context.checkPythonCommand([
 				str(self._thepython),
 				str("-m"),
 				str("multicast")
 			], stderr=subprocess.STDOUT)
-			self.assertIn(str(theExpectedText), str(theOutputtext))
-			if (str(theExpectedText) in str(theOutputtext)):
+			self.assertIn(str(theExpectedText), str(theOutputtxt))
+			if (str(theExpectedText) in str(theOutputtxt)):
 				theResult = True
 			else:
 				theResult = False
-				context.debugUnexpectedOutput(str(theExpectedText), str(theOutputtext), self._thepython)
+				context.debugUnexpectedOutput(str(theExpectedText), str(theOutputtxt), self._thepython)
 		except BaseException as err:
 			context.debugtestError(err)
 			err = None
@@ -246,7 +247,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not swap multicast for multicast.__main__"""))
 
-	def test_version_has_value_case(self):
+	def test_prints_version_WHEN_called_GIVEN_version_argument(self):
 		"""Test for result from --version argument: python -m multicast.* --version """
 		theResult = False
 		if (self._thepython is not None):
@@ -262,17 +263,17 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						),
 						str("--version")
 					]
-					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
-						if isinstance(theOutputtext, bytes):
-							theOutputtext = theOutputtext.decode('utf8')
+						if isinstance(theOutputtxt, bytes):
+							theOutputtxt = theOutputtxt.decode('utf8')
 					except UnicodeDecodeError:
-						theOutputtext = str(repr(bytes(theOutputtext)))
+						theOutputtxt = str(repr(bytes(theOutputtxt)))
 					# ADD REAL VERSION TEST HERE
-					theResult = debugIfNoneResult(self._thepython, args, theOutputtext)
+					theResult = debugIfNoneResult(self._thepython, args, theOutputtxt)
 					# or simply:
-					self.assertIsNotNone(theOutputtext)
+					self.assertIsNotNone(theOutputtxt)
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
@@ -280,7 +281,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				theResult = False
 		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
 
-	def test_run_lib_command_help(self):
+	def test_Usage_Error_WHEN_the_help_command_is_called(self):
 		"""Test case for multicast* --help."""
 		theResult = False
 		fail_fixture = str("""multicast --help == not helpful""")
@@ -297,13 +298,13 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						),
 						str("--help")
 					]
-					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
-					self.assertIn(str("usage:"), str(theOutputtext))
-				if (str("usage:") in str(theOutputtext)):
+					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+					self.assertIn(str("usage:"), str(theOutputtxt))
+				if (str("usage:") in str(theOutputtxt)):
 					theResult = True
 				else:
 					theResult = False
-					context.debugUnexpectedOutput(str("usage:"), str(theOutputtext), self._thepython)
+					context.debugUnexpectedOutput(str("usage:"), str(theOutputtxt), self._thepython)
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
@@ -328,15 +329,15 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 							)
 						)
 					]
-					theOutputtext = context.timePythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtxt = context.timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
-						if isinstance(theOutputtext, bytes):
-							theOutputtext = theOutputtext.decode('utf8')
+						if isinstance(theOutputtxt, bytes):
+							theOutputtxt = theOutputtxt.decode('utf8')
 					except UnicodeDecodeError:
-						theOutputtext = str(repr(bytes(theOutputtext)))
+						theOutputtxt = str(repr(bytes(theOutputtxt)))
 					# or simply:
-					self.assertIsNotNone(theOutputtext)
+					self.assertIsNotNone(theOutputtxt)
 					theResult = True
 			except Exception as err:
 				context.debugtestError(err)
@@ -345,13 +346,13 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				theResult = False
 		assert theResult
 
-	# @unittest.expectedFailure
+	@unittest.expectedFailure
 	def test_fail_message_works_case(self):
 		"""Test case template for profiling"""
 		theResult = False
 		if (self._thepython is not None):
 			try:
-				for test_case in ["BAdInPut"]:
+				for test_case in ["BAdInPut", "1", "exit"]:
 					args = [
 						str(self._thepython),
 						str("-m"),
@@ -362,16 +363,16 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 							)
 						)
 					]
-					theOutputtext = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
 					try:
-						if isinstance(theOutputtext, bytes):
-							theOutputtext = theOutputtext.decode('utf8')
+						if isinstance(theOutputtxt, bytes):
+							theOutputtxt = theOutputtxt.decode('utf8')
 					except UnicodeDecodeError:
-						theOutputtext = str(repr(bytes(theOutputtext)))
-					theResult = debugIfNoneResult(self._thepython, args, theOutputtext)
+						theOutputtxt = str(repr(bytes(theOutputtxt)))
+					theResult = debugIfNoneResult(self._thepython, args, theOutputtxt)
 					# or simply:
-					self.assertIsNotNone(theOutputtext)
+					self.assertIsNotNone(theOutputtxt)
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
