@@ -145,12 +145,12 @@ def parseArgs(*arguments):
 
 
 	"""
-	__epilog__ = """- WIP -"""
+	__epilogue__ = """- WIP -"""
 	__description__ = """Python Multicast Broadcaster."""
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
 		description=__description__,
-		epilog=__epilog__
+		epilog=__epilogue__
 	)
 	parser.add_argument("""--port""", type=int, default=__MCAST_DEFAULT_PORT)
 	parser.add_argument('--mcast-group', default='224.1.1.1')

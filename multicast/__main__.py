@@ -18,7 +18,7 @@
 # limitations under the License.
 
 __all__ = [
-	"""__module__""", """__proc__""", """__prolog__""", """__epilog__""",
+	"""__module__""", """__proc__""", """__prologue__""", """__epilogue__""",
 	"""__doc__""", """NoOp""", """SendMCast""", """joinMCast""",
 	"""dumpUsage""", """__checkToolArgs""", """buildArgs""",
 	"""TASK_OPTIONS""", """parseArgs""", """useTool""", """main"""
@@ -40,13 +40,13 @@ __file__ = """multicast/__main__.py"""
 __proc__ = """multicast"""
 
 
-__prolog__ = """The Main Entrypoint"""
+__prologue__ = """The Main Entrypoint"""
 
 
-__epilog__ = """Add an epilog here."""
+__epilogue__ = """Add an epilogue here."""
 
 
-__doc__ = __prolog__ + """
+__doc__ = __prologue__ + """
 
 	Minimal Acceptance Testing:
 
@@ -187,8 +187,8 @@ def buildArgs():
 	"""
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
-		description=__prolog__,
-		epilog=__epilog__,
+		description=__prologue__,
+		epilog=__epilogue__,
 		add_help=False
 	)
 	group = parser.add_mutually_exclusive_group(required=False)

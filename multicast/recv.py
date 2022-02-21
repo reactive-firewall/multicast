@@ -32,8 +32,8 @@
 
 __all__ = [
 	"""genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
-	"""__module__""", """__name__""", """__proc__""", """__prolog__""",
-	"""__epilog__""", """__doc__"""
+	"""__module__""", """__name__""", """__proc__""", """__prologue__""",
+	"""__epilogue__""", """__doc__"""
 ]
 
 
@@ -52,13 +52,13 @@ __name__ = """multicast.recv"""
 __proc__ = """multicast HEAR"""
 
 
-__epilog__ = """Generally speaking you want to bind to one of the groups you joined in
+__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
 	this module/instance, but it is also possible to bind to group which
 	is added by some other programs (like another python program instance of this)
 """
 
 
-__prolog__ = """Python Multicast Receiver. Spawns a listener for multicast based on arguments."""
+__prologue__ = """Python Multicast Receiver. Spawns a listener for multicast based on arguments."""
 
 
 try:
@@ -239,8 +239,8 @@ def parseArgs(arguments=None):
 	"""
 	parser = argparse.ArgumentParser(
 		prog=__proc__,
-		description=__prolog__,
-		epilog=__epilog__
+		description=__prologue__,
+		epilog=__epilogue__
 	)
 	parser.add_argument('--port', type=int, default=__MCAST_DEFAULT_PORT)
 	parser.add_argument(
@@ -326,7 +326,7 @@ def main(*argv):
 	return __exit_code
 
 
-__doc__ = __prolog__ + """
+__doc__ = __prologue__ + """
 
 	Minimal Acceptance Testing:
 
@@ -365,18 +365,18 @@ __doc__ = __prolog__ + """
 		True
 		>>> type(multicast.recv.__doc__) == type(multicast.recv.__module__)
 		True
-		>>> multicast.recv.__prolog__ is not None
+		>>> multicast.recv.__prologue__ is not None
 		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__prolog__)
+		>>> type(multicast.recv.__doc__) == type(multicast.recv.__prologue__)
 		True
-		>>> multicast.recv.__epilog__ is not None
+		>>> multicast.recv.__epilogue__ is not None
 		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__epilog__)
+		>>> type(multicast.recv.__doc__) == type(multicast.recv.__epilogue__)
 		True
 		>>> type(multicast.recv.__doc__) == type(multicast.recv.__proc__)
 		True
 		>>>
 
 
-""" + __epilog__ + genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__
+""" + __epilogue__ + genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__
 
