@@ -18,7 +18,7 @@
 # limitations under the License.
 
 
-# Third-party Acknowlegement:
+# Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
 # https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154
@@ -160,7 +160,7 @@ try:  # noqa
 			return profiled_func
 		return inner
 
-except ImportError:
+except ImportError:  # pragma: no branch
 	def do_profile(follow=None):
 		"Helpful if you accidentally leave in production!"
 		if follow is None:
@@ -178,7 +178,7 @@ def main(argv=None):
 	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
 
 
-if __name__ in '__main__':
+if __name__ in '__main__':  # pragma: no branch
 	exitcode = 3
 	try:
 		exitcode = main(sys.argv[1:])

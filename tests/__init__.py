@@ -19,6 +19,7 @@
 
 __module__ = """tests"""
 
+__name__ = """tests"""
 
 __doc__ = """Multicast Testing Module.
 

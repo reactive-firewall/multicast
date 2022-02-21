@@ -17,7 +17,7 @@
 # limitations under the License.
 
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__version__""", """__prolog__""",
+	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """__MCAST_DEFAULT_PORT""", """recv""", """send"""
 ]
 
@@ -37,10 +37,10 @@ global __version__
 __version__ = """1.3.0"""
 
 
-__prolog__ = str("""Python Multicast library version {version}.""").format(version=__version__)
+__prologue__ = str("""Python Multicast library version {version}.""").format(version=__version__)
 
 
-__doc__ = __prolog__ + """
+__doc__ = __prologue__ + """
 
 	Minimal Acceptance Testing:
 

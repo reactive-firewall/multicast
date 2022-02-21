@@ -34,16 +34,16 @@ __doc__ = """
 		>>> from context import os as os
 		>>>
 
-		>>> from context import unittest as unittest
+		>>> from context import unittest as _unittest
 		>>>
 
-		>>> from context import subprocess as subprocess
+		>>> from context import subprocess as _subprocess
 		>>>
 
-		>>> from context import multicast as multicast
+		>>> from context import multicast as _multicast
 		>>>
 
-		>>> from context import profiling as profiling
+		>>> from context import profiling as _profiling
 		>>>
 
 """
@@ -101,6 +101,32 @@ except Exception:  # pragma: no branch
 	raise ImportError("[CWE-440] profiling Failed to import.")
 
 
+__BLANK = str("""""")
+"""
+	A literaly named variable to improve readability of code when using a blank string.
+
+	Meta Testing:
+
+	First setup test fixtures by importing test context.
+
+		>>> import tests.context as _context
+		>>>
+
+	Testcase 1: __BLANK should be a blank string.
+
+		>>> import tests.context as _context
+		>>> _context.__BLANK is None
+		False
+		>>> isinstance(_context.__BLANK, type(str()))
+		True
+		>>> len(_context.__BLANK) == int(0)
+		True
+		>>>
+
+
+"""
+
+
 def getCoverageCommand():
 	"""
 		Function for backend coverage command.
@@ -131,9 +157,9 @@ def getCoverageCommand():
 			thecov = str("coverage")
 		elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
 			thecov = str("coverage3")
-		else:
+		else:  # pragma: no branch
 			thecov = "exit 1 ; #"
-	except Exception:
+	except Exception:  # pragma: no branch
 		thecov = "exit 1 ; #"
 	return str(thecov)
 
@@ -172,7 +198,7 @@ def __check_cov_before_py():
 	thecov = getCoverageCommand()
 	if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 7)):
 		thepython = str("{} run -p").format(str(thecov))
-	else:
+	else:  # pragma: no branch
 		try:
 			import coverage as coverage
 			if coverage.__name__ is not None:
@@ -205,7 +231,7 @@ def getPythonCommand():
 	thepython = "python"
 	try:
 		thepython = __check_cov_before_py()
-	except Exception:
+	except Exception:   # pragma: no branch
 		thepython = "exit 1 ; #"
 		try:
 			thepython = str(sys.executable)
@@ -216,16 +242,16 @@ def getPythonCommand():
 
 def checkCovCommand(args=[None]):
 	"""Utility Function."""
-	if sys.__name__ is None:
+	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
 	if str("coverage") in args[0]:
 		i = 0
-		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):
+		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
 			args[0] = str(sys.executable)
 			args.insert(1, str("-m"))
 			args.insert(2, str("coverage"))
 			i = 2
-		else:
+		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
 		args.insert(i + 1, str("run"))
 		args.insert(i + 2, str("-p"))
@@ -248,13 +274,13 @@ def checkPythonCommand(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
+		if args is None or args is [None]:  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
 				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception as err:
+	except Exception as err:  # pragma: no branch
 		theOutput = None
 		try:
 			if err.output is not None:
@@ -497,6 +523,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case 0: Insanitty Test."""
 		assert True
 		self.assertTrue(True, "Insanitty Test Failed")
+
+	def test_finds_python_WHEN_testing(self):
+		"""Test case 0: Class Test-Fixture Meta Test."""
+		self.test_absolute_truth_and_meaning()
+		if (self._thepython is None) and (len(self._thepython) <= 0):
+			self.fail(str("""No python cmd to test with!"""))
+		self.test_absolute_truth_and_meaning()
 
 	@classmethod
 	def tearDownClass(cls):
