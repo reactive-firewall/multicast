@@ -18,7 +18,7 @@
 # limitations under the License.
 
 
-# Third-party Acknowlegement:
+# Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: run, and parseArgs) was modified/derived from:
 # https://stackoverflow.com/a/52791404

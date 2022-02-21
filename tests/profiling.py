@@ -18,7 +18,7 @@
 # limitations under the License.
 
 
-# Third-party Acknowlegement:
+# Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
 # https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154
