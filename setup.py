@@ -17,6 +17,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Sets up the package."""
+
+__prologue__ = """Python Multicast Repo for Send/Recv Stubs."""
+"""The one-line description or summary of this program."""
+
+__doc__ = __prologue__ + """
+
+Minimal Acceptance Testing:
+
+	Just setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+		>>> multicast.__package__ is not None
+		True
+		>>>
+
+"""
+
 try:
 	from setuptools import setup
 	from setuptools import find_packages
@@ -25,7 +44,26 @@ except Exception:
 
 
 def readFile(filename):
-	"""Helper Function to read files"""
+	"""Will attempt to read the file at with the given filename or path.
+
+	Used as a helper function to read files and return strings with the content.
+
+		Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>>
+
+		Testcase 0: Should have Function readFile() WHEN loading setup.py.
+
+			>>> multicast.readFile is not None
+			True
+			>>> type(multicast.readFile) is type(1)
+			False
+			>>>
+
+	"""
 	theResult = None
 	try:
 		with open(str("""./{}""").format(str(filename))) as f:
@@ -34,7 +72,7 @@ def readFile(filename):
 		theResult = str(
 			"""See https://github.com/reactive-firewall/multicast/{}"""
 		).format(filename)
-	return theResult
+	return str(theResult)
 
 
 try:
@@ -44,11 +82,17 @@ except Exception:
 	requirements = None
 
 readme = readFile("""README.md""")
+"""The multi-line description and/or summary of this program."""
+
 SLA = readFile("""LICENSE.md""")
+"""The "Software License Agreement" of this program."""
 
 try:
 	class_tags = [
 		str("""Development Status :: 4 - Beta"""),
+		str("""Environment :: Console"""),
+		str("""Intended Audience :: Developers"""),
+		str("""Operating System :: MacOS :: MacOS X"""),
 		str("""Operating System :: POSIX :: Linux"""),
 		str("""License :: OSI Approved :: MIT License"""),
 		str("""Programming Language :: Python"""),
@@ -60,11 +104,10 @@ try:
 except Exception:
 	class_tags = str("""Development Status :: 4 - Beta""")
 
-
 setup(
 	name="""multicast""",
 	version="""1.3.0""",
-	description="""Python Multicast Repo for Send/Recv Stubs""",
+	description=__prologue__,
 	long_description=readme,
 	long_description_content_type="""text/markdown""",
 	zip_safe=False,

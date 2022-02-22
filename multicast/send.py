@@ -30,6 +30,8 @@
 # ..........................................
 # NO ASSOCIATION
 
+"""multicast SAY ..."""
+
 __all__ = [
 	"""main""", """saystep""", """parseArgs""",
 	"""__module__""", """__name__""", """__doc__"""
@@ -113,7 +115,9 @@ except Exception as importErr:
 
 
 def parseArgs(*arguments):
-	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
+	"""Will attempt to parse the given CLI arguments.
+
+	See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
 
@@ -143,7 +147,6 @@ def parseArgs(*arguments):
 		<...Namespace...>
 		>>>
 
-
 	"""
 	__epilogue__ = """- WIP -"""
 	__description__ = """Python Multicast Broadcaster."""
@@ -162,7 +165,10 @@ def parseArgs(*arguments):
 
 
 def saystep(group, port, data):
-	"""The actual magic is handeled here."""
+	"""Will send the given data over the given port to the given group.
+
+	The actual magic is handeled here.
+	"""
 	MULTICAST_TTL = 20
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	try:
@@ -171,23 +177,24 @@ def saystep(group, port, data):
 	finally:
 		try:
 			sock.close()
-		except OSError:
+		except OSError:  # pragma: no branch
 			False
 	sock = None
 
 
 def main(*argv):
-	"""The Main Event."""
+	"""Will handle the Main Event from multicast.__main__ when called."""
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
 		saystep(args.mcast_group, int(args.port), args.message)
 		__exit_code = 0
-	except argparse.ArgumentError:
+	except argparse.ArgumentError:  # pragma: no branch
 		print('Input has an Argument Error')
 		__exit_code = 2
-	except Exception as e:
+	except Exception as e:  # pragma: no branch
 		print(str(e))
 		__exit_code = 3
-	return __exit_code
+		del e
+	return int(__exit_code)
 

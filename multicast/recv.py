@@ -30,6 +30,8 @@
 # ..........................................
 # NO ASSOCIATION
 
+"""multicast HEAR ..."""
+
 __all__ = [
 	"""genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
 	"""__module__""", """__name__""", """__proc__""", """__prologue__""",
@@ -93,7 +95,7 @@ except Exception as importErr:
 
 
 def genSocket():
-	"""Generates an unbound socket.socket object ready to receive network traffic.
+	"""Will generate an unbound socket.socket object ready to receive network traffic.
 
 	Minimal Acceptance Testing:
 
@@ -139,7 +141,7 @@ def genSocket():
 
 
 def endSocket(sock=None):
-	"""Generates an unbound socket.socket object ready to receive network traffic.
+	"""Will generates an unbound socket.socket object ready to receive network traffic.
 
 	Minimal Acceptance Testing:
 
@@ -195,17 +197,18 @@ def endSocket(sock=None):
 
 
 	"""
-	if not (sock is None):
+	if not (sock is None):  # pragma: no branch
 		try:
 			sock.shutdown(socket.SHUT_RD)
 			sock.close()
 		except OSError:
 			sock = None
-	return None
 
 
 def parseArgs(arguments=None):
-	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
+	"""Will attempt to parse the given CLI arguments.
+
+	See argparse.ArgumentParser for more.
 	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
 
@@ -267,7 +270,8 @@ def parseArgs(arguments=None):
 
 
 def hearstep(groups, port, iface=None, bind_group=None):
-	"""
+	"""Will listen on the given port of an interface for multicast messages to the given group(s).
+
 	The work-horse function.
 	"""
 	if groups is None:
@@ -291,20 +295,20 @@ def hearstep(groups, port, iface=None, bind_group=None):
 				chunk = None
 				# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
 			# about 969 bytes in base64 encoded as chars
-	except KeyboardInterrupt:
+	except KeyboardInterrupt:  # pragma: no branch
 		print("""""")
 		print(str("""User Interrupted"""))
-	except OSError:
+	except OSError:  # pragma: no branch
 		print(str(""""""))
 	finally:
 		sock = endSocket(sock)
-	# print(str(""""""))
-	# print(str(msgbuffer))
 	return msgbuffer
 
 
 def main(*argv):
-	"""The Main Event. This does two things:
+	"""Will handle the Main Event from multicast.__main__ when called.
+
+	This does two things:
 
 	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
 	2: calls hearstep with the parsed args if able and handles any errors regardles
@@ -323,7 +327,7 @@ def main(*argv):
 	except Exception as e:
 		print(str(e))
 		__exit_code = 3
-	return __exit_code
+	return int(__exit_code)
 
 
 __doc__ = __prologue__ + """

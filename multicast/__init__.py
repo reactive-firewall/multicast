@@ -16,28 +16,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Contains the Python Multicast library."""
+
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """__MCAST_DEFAULT_PORT""", """recv""", """send"""
+	"""__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
+	"""__MCAST_DEFAULT_TTL""", """recv""", """send"""
 ]
 
 __package__ = """multicast"""
+"""The package of this program."""
 
 
 __module__ = """multicast"""
+"""The module of this program."""
 
 
 __name__ = """multicast"""
+"""The name of this program."""
 
 
 global __version__
+
+__version__ = """1.3.0"""
 """The version of this program."""
 
 
-__version__ = """1.3.0"""
-
-
 __prologue__ = str("""Python Multicast library version {version}.""").format(version=__version__)
+"""The one-line description or summary of this program."""
 
 
 __doc__ = __prologue__ + """
@@ -66,10 +72,32 @@ __doc__ = __prologue__ + """
 		True
 		>>>
 
+	Testcase 1: multicast.send should have a doctests.
+
+		>>> import multicast.send
+		>>>
+
+		>>> multicast.send.__module__ is not None
+		True
+		>>>
+
+	Testcase 2: multicast.__main__ should have a doctests.
+
+		>>> import multicast.__main__ as _main
+		>>>
+
+		>>> _main.__module__ is not None
+		True
+		>>> _main.__doc__ is not None
+		True
+		>>>
+
 	"""
 
 
 global __MCAST_DEFAULT_PORT
+
+__MCAST_DEFAULT_PORT = 19991
 """
 	Arbitrary port to use by default, though any dynamic and free port would work.
 
@@ -92,7 +120,55 @@ global __MCAST_DEFAULT_PORT
 
 """
 
-__MCAST_DEFAULT_PORT = 19991
+global __MCAST_DEFAULT_GROUP
+
+__MCAST_DEFAULT_GROUP = """224.0.0.1"""
+"""
+	Arbitrary group to use by default, though any mcst grp would work.
+
+	Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the __MCAST_DEFAULT_GROUP attribute is initialized.
+		B: Test that the __MCAST_DEFAULT_GROUP attribute is an IP string.
+
+		>>> multicast.__MCAST_DEFAULT_GROUP is not None
+		True
+		>>> type(multicast.__MCAST_DEFAULT_GROUP) is type(str)
+		True
+		>>>
+
+"""
+
+global __MCAST_DEFAULT_TTL
+
+__MCAST_DEFAULT_TTL = 20
+"""
+	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
+
+	Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default TTL.
+		A: Test that the __MCAST_DEFAULT_TTL attribute is initialized.
+		B: Test that the __MCAST_DEFAULT_TTL attribute is an int.
+
+		>>> multicast.__MCAST_DEFAULT_TTL is not None
+		True
+		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
+		True
+		>>>
+
+"""
 
 
 try:

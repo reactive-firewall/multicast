@@ -346,8 +346,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				theResult = False
 		assert theResult
 
-	@unittest.expectedFailure
-	def test_fail_message_works_case(self):
+	def test_invalid_Error_WHEN_cli_called_GIVEN_bad_input(self):
 		"""Test case template for profiling"""
 		theResult = False
 		if (self._thepython is not None):
@@ -373,6 +372,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					theResult = debugIfNoneResult(self._thepython, args, theOutputtxt)
 					# or simply:
 					self.assertIsNotNone(theOutputtxt)
+					self.assertIn(str("invalid choice:"), str(theOutputtxt))
+					self.assertIn(str(test_case), str(theOutputtxt))
 			except Exception as err:
 				context.debugtestError(err)
 				err = None

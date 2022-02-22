@@ -16,7 +16,6 @@ exclude_lines =
 	raise AssertionError
 	raise NotImplementedError
 	raise ImportError
-	except unittest.SkipTest
 	except subprocess.CalledProcessError
 	except IOError
 	except OSError
@@ -33,6 +32,7 @@ exclude_lines =
 partial_branches =
 	# Have to re-enable the standard pragma rules
 	pragma: no branch
+	except unittest.SkipTest
 	# Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':
 	if __name__ in '__main__':

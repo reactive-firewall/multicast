@@ -17,18 +17,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""The Main Entrypoint."""
+
+
 __all__ = [
-	"""__module__""", """__proc__""", """__prologue__""", """__epilogue__""",
-	"""__doc__""", """NoOp""", """SendMCast""", """joinMCast""",
+	"""__package__""", """__module__""", """__name__""", """__proc__""",
+	"""NoOp""", """SendMCast""", """joinMCast""",
 	"""dumpUsage""", """__checkToolArgs""", """buildArgs""",
-	"""TASK_OPTIONS""", """parseArgs""", """useTool""", """main"""
+	"""__prologue__""", """__epilogue__""",
+	"""__doc__""", """main"""
 ]
 
 
 __package__ = """multicast"""
 
 
-__module__ = """multicast.__main__"""
+__module__ = """multicast"""
 
 
 __file__ = """multicast/__main__.py"""
@@ -40,7 +44,7 @@ __file__ = """multicast/__main__.py"""
 __proc__ = """multicast"""
 
 
-__prologue__ = """The Main Entrypoint"""
+__prologue__ = """The Main Entrypoint."""
 
 
 __epilogue__ = """Add an epilogue here."""
@@ -52,10 +56,16 @@ __doc__ = __prologue__ + """
 
 	First setup test fixtures by importing multicast.
 
-		>>> import multicast
+		>>> import multicast as multicast
+		>>>
+		>>> import multicast.__main__
 		>>>
 
 		>>> multicast.__doc__ is not None
+		True
+		>>>
+
+		>>> multicast.__main__.__doc__ is not None
 		True
 		>>>
 
@@ -123,14 +133,16 @@ except Exception as importErr:
 
 
 def NoOp(*args, **kwargs):
-	"""The meaning of Nothing. This function should be self-explanitory;
+	"""The meaning of Nothing.
+
+	This function should be self-explanitory;
 	it does 'no operation' i.e. nothing.
 
 	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
 
-		>>> import multicast
+		>>> import multicast.__main__
 		>>>
 
 	Testcase 0: multicast.__main__ should have a doctests.

@@ -127,10 +127,10 @@ test-pytest: cleanup test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
+	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || $(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
 	$(QUIET)tests/check_spelling 2>/dev/null || true
+	$(QUIET)tests/check_cc_lines 2>/dev/null || true
 	$(QUIET)tests/check_codecov 2>/dev/null || true
-	$(QUIET)tests/check_cc_line.bash 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
