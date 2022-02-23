@@ -33,7 +33,7 @@
 """multicast HEAR ..."""
 
 __all__ = [
-	"""genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
+	"""__package__""", """genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
 	"""__module__""", """__name__""", """__proc__""", """__prologue__""",
 	"""__epilogue__""", """__doc__"""
 ]
@@ -89,7 +89,7 @@ try:
 		from . import __MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
 	else:  # pragma: no branch
 		__MCAST_DEFAULT_PORT = sys.modules["""multicast.__MCAST_DEFAULT_PORT"""]
-except Exception as importErr:
+except Exception as importErr:  # pragma: no branch
 	del importErr
 	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
 
@@ -162,7 +162,7 @@ def endSocket(sock=None):
 		True
 		>>>
 
-	Testcase 1: Recv should have endSocket() function that takes a socket.socket object and closes it.
+	Testcase 1: Recv should have endSocket() function that takes a socket.socket and closes it.
 		A: Test that the recv component has the function 'genSocket'
 		B: Test that the recv component has the function 'endSocket'
 		C: Test that the 'endSocket' function returns None when given the genSocket
@@ -199,8 +199,8 @@ def endSocket(sock=None):
 	"""
 	if not (sock is None):  # pragma: no branch
 		try:
-			sock.shutdown(socket.SHUT_RD)
 			sock.close()
+			sock.shutdown(socket.SHUT_RD)
 		except OSError:
 			sock = None
 
@@ -273,6 +273,40 @@ def hearstep(groups, port, iface=None, bind_group=None):
 	"""Will listen on the given port of an interface for multicast messages to the given group(s).
 
 	The work-horse function.
+
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.recv is not None
+		True
+		>>>
+
+	Testcase 1: Stability testing.
+
+		>>> import multicast
+		>>>
+		>>> multicast.recv is None
+		False
+		>>>
+		>>> multicast.recv.hearstep is None
+		False
+		>>> type(multicast.recv.hearstep)
+		<class 'function'>
+		>>> multicast.recv.hearstep(None, 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<BLANKLINE>
+		'...'
+		>>> multicast.recv.hearstep([multicast.__MCAST_DEFAULT_GROUP], 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<BLANKLINE>
+		'...'
+		>>> multicast.recv.hearstep([multicast.__MCAST_DEFAULT_GROUP], 19991, None, multicast.__MCAST_DEFAULT_GROUP) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<BLANKLINE>
+		'...'
+		>>>
+
+
 	"""
 	if groups is None:
 		groups = []
@@ -313,14 +347,58 @@ def main(*argv):
 	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
 	2: calls hearstep with the parsed args if able and handles any errors regardles
 
+	Every main(*args) function in multicast is expected to return an int().
 	Regardles of errors the result as an 'exit code' (int) is returned.
-	(Note the __main__ handler just exits with this code as a true return code status.)
+	The only exception is multicast.__main__.main(*args) which will exit with the underlying
+	return codes.
+	The expected return codes are as follows:
+		= 0:  Any nominal state (i.e. no errors and possibly success)
+		<=1:  Any erroneous state (caveat: includes simple failure)
+		= 2:  Any failed state
+		= 3:  Any undefined (but assumed erroneous) state
+		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
+
+	param iterable - argv - the array of arguments. Usually sys.argv[1:]
+	returns int - the Namespace parsed with the key-value pairs.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.send is not None
+		True
+		>>>
+
+	Testcase 0: main should return an int.
+		A: Test that the multicast component is initialized.
+		B: Test that the send component is initialized.
+		C: Test that the send.main function is initialized.
+		D: Test that the send.main function returns an int 0-3.
+
+		>>> multicast.send is not None
+		True
+		>>> multicast.send.main is not None
+		True
+		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
+		>>> test_fixture = multicast.send.main(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...int...>
+		>>> int(test_fixture) >= int(0)
+		True
+		>>> int(test_fixture) < int(4)
+		True
+		>>>
+
 
 	"""
-	__exit_code = 0
+	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
 		hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
+		__exit_code = 0
 	except argparse.ArgumentError:
 		print('Input has an Argument Error')
 		__exit_code = 2
@@ -366,6 +444,8 @@ __doc__ = __prologue__ + """
 		>>> multicast.recv is not None
 		True
 		>>> multicast.recv.__module__ is not None
+		True
+		>>> multicast.recv.__package__ is not None
 		True
 		>>> type(multicast.recv.__doc__) == type(multicast.recv.__module__)
 		True

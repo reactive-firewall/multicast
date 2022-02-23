@@ -30,30 +30,43 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast SAY ..."""
+"""Python Multicast Broadcaster.
 
-__all__ = [
-	"""main""", """saystep""", """parseArgs""",
-	"""__module__""", """__name__""", """__doc__"""
-]
+Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Send should be automaticly imported.
+		A: Test that the send component is initialized.
+		B: Test that the send.__MAGIC__ components are initialized.
+
+		>>> multicast.send is not None
+		True
+		>>>
+
+		>>> multicast.send.__doc__ is not None
+		True
+		>>>
+
+		>>> multicast.send.__module__ is not None
+		True
+		>>>
+
+		>>> multicast.send.__proc__ is not None
+		True
+		>>>
+
+
+"""
 
 
 __package__ = """multicast"""
-
-
-__module__ = """multicast"""
-
-
-__file__ = """multicast/send.py"""
-
-
-__name__ = """multicast.send"""
-
-
-__proc__ = "multicast SAY"
-
-
-__doc__ = """Python Multicast Broadcaster.
+"""The package of this program.
 
 	Minimal Acceptance Testing:
 
@@ -64,25 +77,63 @@ __doc__ = """Python Multicast Broadcaster.
 		>>> import multicast
 		>>>
 
-		>>> multicast.__doc__ is not None
+	Testcase 1: Send should be automaticly imported.
+
+		>>> multicast.send.__package__ is not None
 		True
 		>>>
-
-	Testcase 1: Recv should be automaticly imported.
-		A: Test that the __main__ component is initialized.
-		B: Test that the send component is initialized.
-
-		>>> import multicast
-		>>> import multicast.__main__
-		>>>
-		>>> multicast.__main__ is not None
-		True
-		>>> multicast.send is not None
-		True
-		>>>
-
 
 """
+
+
+__module__ = """multicast"""
+"""The module of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Send should be automaticly imported.
+
+		>>> multicast.send.__module__ is not None
+		True
+		>>>
+
+"""
+
+
+__file__ = """multicast/send.py"""
+"""The file of this component."""
+
+
+__name__ = """multicast.send"""
+"""The name of this component.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Send should be automaticly imported.
+
+		>>> multicast.send.__name__ is not None
+		True
+		>>>
+
+"""
+
+
+__proc__ = """multicast SAY"""
+"""The name of this program."""
 
 
 try:
@@ -105,13 +156,13 @@ except Exception as err:
 
 
 try:
-	if 'multicast.__MCAST_DEFAULT_PORT' not in sys.modules:
-		from . import __MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
+	if 'multicast' not in sys.modules:
+		from . import multicast as multicast
 	else:  # pragma: no branch
-		__MCAST_DEFAULT_PORT = sys.modules["""multicast.__MCAST_DEFAULT_PORT"""]
+		multicast = sys.modules["""multicast"""]
 except Exception as importErr:
 	del importErr
-	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
+	import multicast as multicast
 
 
 def parseArgs(*arguments):
@@ -139,13 +190,14 @@ def parseArgs(*arguments):
 		True
 		>>> multicast.send.parseArgs is not None
 		True
-		>>> tst_fxtr_args = ['''--port=1234''', '''--mesage''', '''is required''']
+		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
 		>>> test_fixture = multicast.send.parseArgs(tst_fxtr_args)
 		>>> test_fixture is not None
 		True
 		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<...Namespace...>
 		>>>
+
 
 	"""
 	__epilogue__ = """- WIP -"""
@@ -155,8 +207,8 @@ def parseArgs(*arguments):
 		description=__description__,
 		epilog=__epilogue__
 	)
-	parser.add_argument("""--port""", type=int, default=__MCAST_DEFAULT_PORT)
-	parser.add_argument('--mcast-group', default='224.1.1.1')
+	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
+	parser.add_argument("""--mcast-group""", default=multicast.__MCAST_DEFAULT_GROUP)
 	parser.add_argument(
 		"""--message""", dest="""message""",
 		default=str("""PING from multicast_send.py: group: {group}, port: {port}""")
@@ -169,10 +221,9 @@ def saystep(group, port, data):
 
 	The actual magic is handeled here.
 	"""
-	MULTICAST_TTL = 20
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	try:
-		sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
+		sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, multicast.__MCAST_DEFAULT_TTL)
 		sock.sendto(data.encode('utf8'), (group, port))
 	finally:
 		try:
@@ -183,7 +234,55 @@ def saystep(group, port, data):
 
 
 def main(*argv):
-	"""Will handle the Main Event from multicast.__main__ when called."""
+	"""Will handle the Main Event from multicast.__main__ when called.
+
+	Every main(*args) function in multicast is expected to return an int().
+	Regardles of errors the result as an 'exit code' (int) is returned.
+	The only exception is multicast.__main__.main(*args) which will exit with the underlying
+	return codes.
+	The expected return codes are as follows:
+		= 0:  Any nominal state (i.e. no errors and possibly success)
+		<=1:  Any erroneous state (caveat: includes simple failure)
+		= 2:  Any failed state
+		= 3:  Any undefined (but assumed erroneous) state
+		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
+
+	param iterable - argv - the array of arguments. Usually sys.argv[1:]
+	returns int - the Namespace parsed with the key-value pairs.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.send is not None
+		True
+		>>>
+
+	Testcase 0: main should return an int.
+		A: Test that the multicast component is initialized.
+		B: Test that the send component is initialized.
+		C: Test that the send.main function is initialized.
+		D: Test that the send.main function returns an int 0-3.
+
+		>>> multicast.send is not None
+		True
+		>>> multicast.send.main is not None
+		True
+		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
+		>>> test_fixture = multicast.send.main(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...int...>
+		>>> int(test_fixture) >= int(0)
+		True
+		>>> int(test_fixture) < int(4)
+		True
+		>>>
+
+
+	"""
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)

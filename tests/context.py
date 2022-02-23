@@ -264,7 +264,7 @@ def checkStrOrByte(theInput):
 	try:
 		theOutput = theInput
 		if isinstance(theInput, bytes):
-			theOutput = theInput.decode("""utf_8""")
+			theOutput = theInput.decode("""UTF-8""")
 	except UnicodeDecodeError:
 		theOutput = bytes(theInput)
 	return theOutput
@@ -316,17 +316,17 @@ def checkPythonFuzzing(args=[None], stderr=None):
 
 def debugBlob(blob=None):
 	try:
-		print(str(""))
+		print(__BLANK)
 		print(str("String:"))
 		print(str("""\""""))
 		print(str(blob))
 		print(str("""\""""))
-		print(str(""))
+		print(__BLANK)
 		print(str("Data:"))
 		print(str("""\""""))
 		print(repr(blob))
 		print(str("""\""""))
-		print(str(""))
+		print(__BLANK)
 	except Exception:
 		return False
 	return True
@@ -370,7 +370,7 @@ def debugtestError(someError):
 		>>>
 
 	"""
-	print(str(""))
+	print(__BLANK)
 	print(str("ERROR:"))
 	if someError is not None:
 		print(str(type(someError)))
@@ -379,7 +379,7 @@ def debugtestError(someError):
 			print(str((someError.args)))
 		else:
 			print(str("<No Args>"))
-		print(str(""))
+		print(__BLANK)
 
 
 def check_exec_command_has_output(test_case, someArgs):
@@ -459,21 +459,21 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 		>>>
 
 	"""
-	print(str(""))
+	print(__BLANK)
 	if (thepython is not None):
 		print(str("python cmd used: {}").format(str(thepython)))
 	else:
 		print("Warning: Unexpected output!")
-	print(str(""))
+	print(__BLANK)
 	if (expectedOutput is not None):
 		print(str("The expected output is..."))
-		print(str(""))
+		print(__BLANK)
 		print(str("{}").format(str(expectedOutput)))
-		print(str(""))
+		print(__BLANK)
 	print(str("The actual output was..."))
-	print(str(""))
+	print(__BLANK)
 	print(str("{}").format(str(actualOutput)))
-	print(str(""))
+	print(__BLANK)
 
 
 class BasicUsageTestSuite(unittest.TestCase):
@@ -508,6 +508,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
+		"""Overides unittest.TestCase.setUpClass(cls) to setup thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
 	def setUp(self):
@@ -525,7 +526,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		self.assertTrue(True, "Insanitty Test Failed")
 
 	def test_finds_python_WHEN_testing(self):
-		"""Test case 0: Class Test-Fixture Meta Test."""
+		"""Test case 1: Class Test-Fixture Meta Test."""
 		self.test_absolute_truth_and_meaning()
 		if (self._thepython is None) and (len(self._thepython) <= 0):
 			self.fail(str("""No python cmd to test with!"""))

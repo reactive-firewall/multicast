@@ -20,26 +20,78 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
-	"""__MCAST_DEFAULT_TTL""", """recv""", """send"""
+	"""__builtins__""", """__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
+	"""__MCAST_DEFAULT_TTL""", """recv""", """send""", """__main__"""
 ]
 
 __package__ = """multicast"""
-"""The package of this program."""
+"""The package of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__package__ is not None
+		True
+		>>>
+
+"""
 
 
 __module__ = """multicast"""
-"""The module of this program."""
+"""The module of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__module__ is not None
+		True
+		>>>
+
+"""
 
 
 __name__ = """multicast"""
-"""The name of this program."""
+"""The name of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__name__ is not None
+		True
+		>>>
+
+"""
 
 
 global __version__
 
 __version__ = """1.3.0"""
-"""The version of this program."""
+"""The version of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__version__ is not None
+		True
+		>>>
+
+"""
 
 
 __prologue__ = str("""Python Multicast library version {version}.""").format(version=__version__)
@@ -83,6 +135,7 @@ __doc__ = __prologue__ + """
 
 	Testcase 2: multicast.__main__ should have a doctests.
 
+		>>> import multicast as _multicast
 		>>> import multicast.__main__ as _main
 		>>>
 
@@ -92,7 +145,8 @@ __doc__ = __prologue__ + """
 		True
 		>>>
 
-	"""
+
+"""
 
 
 global __MCAST_DEFAULT_PORT
@@ -231,14 +285,16 @@ except Exception as importErr:
 	import multicast.send as send
 
 
-if __name__ in '__main__':
-	try:
-		if 'multicast.__main__' not in sys.modules:
-			from . import __main__ as __main__
-		else:  # pragma: no branch
-			__main__ = sys.modules["""multicast.__main__"""]
-	except Exception:
+try:
+	if 'multicast.__main__' not in sys.modules:
 		from . import __main__ as __main__
+	else:  # pragma: no branch
+		__main__ = sys.modules["""multicast.__main__"""]
+except Exception:
+	from . import __main__ as __main__
+
+
+if __name__ in '__main__':
 	__EXIT_CODE = 2
 	if __main__.__name__ is None:
 		raise ImportError(str("Failed to open multicast"))

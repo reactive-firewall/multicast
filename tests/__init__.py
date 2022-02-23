@@ -135,8 +135,7 @@ test_cases = (
 
 
 def load_tests(loader, tests, pattern):
-	"""
-		Loads the tests from the project and then attempts to load the doctests too.
+	"""Loads the tests from the project and then attempts to load the doctests too.
 
 		Testing:
 
@@ -152,7 +151,13 @@ def load_tests(loader, tests, pattern):
 			True
 
 	"""
-	import doctest
+	try:
+		if 'doctest' not in sys.modules:
+			import doctest
+		else:  # pragma: no branch
+			doctest = sys.modules["""doctest"""]
+	except Exception:  # pragma: no branch
+		raise ImportError("[CWE-440] doctest Failed to import.")
 	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)
 	suite = unittest.TestSuite()
 	for test_class in test_cases:

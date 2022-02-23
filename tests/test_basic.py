@@ -68,9 +68,13 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		try:
 			from .context import multicast
 			self.assertIsNotNone(multicast.__name__)
+			theResult = True
 			if multicast.__name__ is None:
 				theResult = False
-			theResult = True
+			if multicast.__module__ is None:
+				theResult = False
+			if multicast.__doc__ is None:
+				theResult = False
 		except Exception as impErr:
 			print(str(type(impErr)))
 			print(str(impErr))

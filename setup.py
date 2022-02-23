@@ -40,7 +40,7 @@ try:
 	from setuptools import setup
 	from setuptools import find_packages
 except Exception:
-	raise ImportError("""Not Implemented.""")
+	raise NotImplementedError("""[CWE-440] Not Implemented.""")
 
 
 def readFile(filename):

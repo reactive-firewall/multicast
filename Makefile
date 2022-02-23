@@ -29,7 +29,7 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=make
+	MAKE=make -j1
 endif
 
 ifeq "$(PYTHON)" ""
@@ -37,12 +37,7 @@ ifeq "$(PYTHON)" ""
 endif
 
 ifeq "$(COVERAGE)" ""
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=`command -v coverage`
-	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=`command -v coverage3`
-	endif
+	COVERAGE=$(PYTHON) -m coverage
 endif
 
 ifeq "$(WAIT)" ""
@@ -108,7 +103,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=multicast* -m unittest discover --buffer --verbose -s ./tests -t ./ tests 2>/dev/null || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ tests || DO_FAIL="exit 2" ;
+	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(COVERAGE) combine 2>/dev/null || true ;
 	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true ;
 	$(QUIET)$(DO_FAIL) ;
@@ -123,7 +118,7 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests || python -m pytest --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v tests ; wait ;
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || python -m pytest --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v . ; wait ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
@@ -134,10 +129,10 @@ test-style: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
 	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true
 	$(QUIET)$(RM) tests/*~ 2>/dev/null || true
 	$(QUIET)$(RM) tests/__pycache__/* 2>/dev/null || true
+	$(QUIET)$(RM) __pycache__/* 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*.pyc 2>/dev/null || true
 	$(QUIET)$(RM) multicast/*~ 2>/dev/null || true
 	$(QUIET)$(RM) multicast/__pycache__/* 2>/dev/null || true
@@ -163,6 +158,7 @@ cleanup:
 	$(QUIET)$(RMDIR) tests/__pycache__ 2>/dev/null || true
 	$(QUIET)$(RMDIR) multicast/__pycache__ 2>/dev/null || true
 	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./__pycache__ 2>/dev/null || true
 	$(QUIET)$(RMDIR) multicast.egg-info 2>/dev/null || true
 	$(QUIET)$(RMDIR) .pytest_cache/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) .eggs 2>/dev/null || true
@@ -171,6 +167,7 @@ cleanup:
 	$(QUIET)$(WAIT) ;
 
 clean: cleanup
+	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
 	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./test-results/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
