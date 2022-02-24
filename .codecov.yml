@@ -2,11 +2,11 @@ coverage:
   status:
     project:
       default:
-        target: 95%
-        threshold: 0%
+        target: auto
         base: auto
       multicast:
-        target: auto
+        target: 95%
+        threshold: 0%
         flags:
           - multicast
         paths:
@@ -29,5 +29,4 @@ flags:
     paths:
       - "multicast/*.py"
       - "setup.py"
-    joined: false
     carryforward: true
