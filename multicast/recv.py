@@ -411,7 +411,8 @@ def main(*argv):
 	return int(__exit_code)
 
 
-__doc__ = __prologue__ + """
+__doc__ = (__prologue__
+	+ """
 
 	Minimal Acceptance Testing:
 
@@ -465,4 +466,10 @@ __doc__ = __prologue__ + """
 		>>>
 
 
-""" + __epilogue__ + genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__ + main.__doc__
+"""
+	+ __epilogue__
+	+ genSocket.__doc__
+	+ endSocket.__doc__
+	+ parseArgs.__doc__
+	+ hearstep.__doc__
+	+ main.__doc__)

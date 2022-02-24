@@ -169,19 +169,19 @@ def parseArgs(*arguments):
 	"""Will attempt to parse the given CLI arguments.
 
 	See argparse.ArgumentParser for more.
-	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
+	param str - arguments - the array of arguments to parse. (Usually sys.argv[1:])
 	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
 
-	Minimal Acceptance Testing:
+	Testing:
 
-	First setup test fixtures by importing multicast.
+	Testcase 0: First setup test fixtures by importing multicast.
 
 		>>> import multicast
 		>>> multicast.send is not None
 		True
 		>>>
 
-	Testcase 0: parseArgs should return a namespace.
+	Testcase 1: parseArgs should return a namespace.
 		A: Test that the multicast component is initialized.
 		B: Test that the send component is initialized.
 		C: Test that the send.parseArgs component is initialized.
