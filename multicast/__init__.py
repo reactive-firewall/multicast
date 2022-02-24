@@ -20,7 +20,7 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__builtins__""", """__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
+	"""__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
 	"""__MCAST_DEFAULT_TTL""", """recv""", """send""", """__main__"""
 ]
 

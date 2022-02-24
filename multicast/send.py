@@ -296,4 +296,3 @@ def main(*argv):
 		__exit_code = 3
 		del e
 	return int(__exit_code)
-

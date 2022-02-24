@@ -298,10 +298,13 @@ def hearstep(groups, port, iface=None, bind_group=None):
 		>>> multicast.recv.hearstep(None, 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		'...'
-		>>> multicast.recv.hearstep([multicast.__MCAST_DEFAULT_GROUP], 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
+		>>> multicast.recv.hearstep([tst_fxtr], 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		'...'
-		>>> multicast.recv.hearstep([multicast.__MCAST_DEFAULT_GROUP], 19991, None, multicast.__MCAST_DEFAULT_GROUP) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> multicast.recv.hearstep(
+		... 		[tst_fxtr], 19991, None, tst_fxtr
+		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		'...'
 		>>>
@@ -462,5 +465,4 @@ __doc__ = __prologue__ + """
 		>>>
 
 
-""" + __epilogue__ + genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__
-
+""" + __epilogue__ + genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__ + main.__doc__
