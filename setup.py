@@ -33,7 +33,6 @@ Minimal Acceptance Testing:
 
 try:
 	from setuptools import setup
-	from setuptools import config
 	from setuptools import find_packages
 	from setuptools.config import read_configuration
 except Exception:
