@@ -150,13 +150,11 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
     - name: Testing Style
       id: style
-      needs: [clean]
       run: make -j1 -f Makefile test-style ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
-      needs: [clean, style]
 
 
   EXTRATESTS:
