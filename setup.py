@@ -17,16 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sets up the package."""
-
-__prologue__ = """Python Multicast Repo for Send/Recv Stubs."""
-"""The one-line description or summary of this program."""
-
-__doc__ = __prologue__ + """
+"""Sets up the package.
 
 Minimal Acceptance Testing:
 
-	Just setup test fixtures by importing multicast.
+	Testcase 0: Just setup test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -38,7 +33,9 @@ Minimal Acceptance Testing:
 
 try:
 	from setuptools import setup
+	from setuptools import config
 	from setuptools import find_packages
+	from setuptools.config import read_configuration
 except Exception:
 	raise NotImplementedError("""[CWE-440] Not Implemented.""")
 
@@ -81,6 +78,10 @@ try:
 except Exception:
 	requirements = None
 
+
+conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
+
+
 readme = readFile("""README.md""")
 """The multi-line description and/or summary of this program."""
 
@@ -99,24 +100,26 @@ try:
 		str("""Programming Language :: Python :: 3.9"""),
 		str("""Programming Language :: Python :: 3.8"""),
 		str("""Programming Language :: Python :: 3.7"""),
+		str("""Topic :: Software Development :: Libraries :: Python Modules""")
 		str("""Topic :: Network""")
 	]
 except Exception:
 	class_tags = str("""Development Status :: 4 - Beta""")
 
 setup(
-	name="""multicast""",
-	version="""1.3.0""",
-	description=__prologue__,
+	name=conf_dict["""metadata"""]["""name"""],
+	version=conf_dict["""metadata"""]["""version"""],
+	description=conf_dict["""metadata"""]["""description"""],
 	long_description=readme,
 	long_description_content_type="""text/markdown""",
 	zip_safe=False,
 	include_package_data=True,
 	install_requires=requirements,
-	author="""reactive-firewall""",
-	author_email="""reactive-firewall@users.noreply.github.com""",
+	author=conf_dict["""metadata"""]["""author"""],
+	author_email=conf_dict["""metadata"""]["""author_email"""],
 	classifiers=class_tags,
-	url="""https://github.com/reactive-firewall/multicast.git""",
+	url=conf_dict["""metadata"""]["""url"""],
+	download_url=conf_dict["""metadata"""]["""download_url"""],
 	license=SLA,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )

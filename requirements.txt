@@ -23,7 +23,7 @@
 # struct - builtin - PSF licence
 argparse>=1.4.0
 # argparse - builtin - PSF licence
-setuptools>=38.0
+setuptools>=38.3
 # virtualenv - MIT
 #virtualenv>=15.0.1
 # six - MIT
@@ -32,7 +32,7 @@ setuptools>=38.0
 #pgpy>=0.4.1
 tox>=3.0.0
 #py>=1.4.33
-pip>=19.0
+pip>=21.0
 # multicast - MIT
 #-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
 
