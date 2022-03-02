@@ -202,7 +202,7 @@ jobs:
       run: |
         if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
     - name: Pre-Clean
-      id: clean-${{ github.head_ref || github.run_id }}
+      id: clean-extras
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage for py${{ matrix.python-version }} extra tests
       if: ${{ success() }}
@@ -228,7 +228,7 @@ jobs:
       run: |
         if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
     - name: Post-Clean
-      id: post-${{ github.head_ref || github.run_id }}
+      id: post-extras
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
