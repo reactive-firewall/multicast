@@ -100,7 +100,7 @@ try:
 		str("""Programming Language :: Python :: 3.9"""),
 		str("""Programming Language :: Python :: 3.8"""),
 		str("""Programming Language :: Python :: 3.7"""),
-		str("""Topic :: Software Development :: Libraries :: Python Modules""")
+		str("""Topic :: Software Development :: Libraries :: Python Modules"""),
 		str("""Topic :: Network""")
 	]
 except Exception:
