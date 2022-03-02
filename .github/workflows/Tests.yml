@@ -150,14 +150,94 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
     - name: Testing Style
       id: style
+      needs: [clean]
       run: make -j1 -f Makefile test-style ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
+      needs: [clean, style]
+
+
+  EXTRATESTS:
+    if: ${{ success() }}
+    needs: [BUILD, MATS, COVERAGE]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.9, 3.10, 3.11]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for ${{ matrix.python-version }}
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install -r ./requirements.txt ;
+        python -m pip install coverage ;
+        python -m pip install --upgrade mccabe ;
+        python -m pip install --upgrade pytest ;
+        python -m pip install --upgrade pydocstyle ;
+        python -m pip install --upgrade pytest-cov ;
+        python -m pip install --upgrade pytest-flake8 ;
+        python -m pip install --upgrade pytest-doctest || true ;
+        python -m pip install --upgrade coverage ;
+    - name: Install code-climate tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
+        if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
+    - name: Install deepsource tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
+    - name: Pre-Clean
+      id: clean-${{ github.head_ref || github.run_id }}
+      run: make -j1 -f Makefile clean || true ;
+    - name: Generate Coverage for py${{ matrix.python-version }} extra tests
+      if: ${{ success() }}
+      run: make -j1 -f Makefile test-pytest || ( echo "::error file=Makefile,title=Extras::Some Extra Tests for Python $PYTHON_VERSION Failed on $OS." && exit 0 ) ;
+    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: .
+        flags: ${{ matrix.os }},${{ matrix.python-version }},extras
+        name: multicast-github-extra-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: false
+    - name: code-climate for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+    - name: deepsource for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+    - name: Post-Clean
+      id: post-${{ github.head_ref || github.run_id }}
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
 
   TOX:
-    needs: [MATS, STYLE, COVERAGE]
+    if: ${{ success() }}
+    needs: [MATS, STYLE, COVERAGE, EXTRATESTS]
     runs-on: ubuntu-latest
 
     env:
