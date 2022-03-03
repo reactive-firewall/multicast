@@ -61,7 +61,6 @@ flag_management:
         - tests/*  #fill in your own path. Note, accepts globs, not regexes
       carryforward: true
     - name: extras
-      joined: false
       carryforward: true
     - name: unittests
       paths:
@@ -73,4 +72,3 @@ flag_management:
       carryforward: false
     - name: windows-latest
       carryforward: false
-      joined: false
