@@ -245,17 +245,18 @@ def checkCovCommand(args=[None]):
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
 	if str("coverage") in args[0]:
-		i = 0
+		i = 1
 		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
 			args[0] = str(sys.executable)
 			args.insert(1, str("-m"))
 			args.insert(2, str("coverage"))
-			i = 2
+			i += 2
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
-		args.insert(i + 1, str("run"))
-		args.insert(i + 2, str("-p"))
-		args.insert(i + 3, str("--source=multicast"))
+		extra_args = ["""run""", """-p""", """--source=multicast"""]
+		for k in range(0, len(extra_args)):
+			offset = i + k
+			args.insert(offset, extra_args[k])
 	return args
 
 
