@@ -301,13 +301,13 @@ def checkPythonFuzzing(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
+		if args is None or args is [None]:  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
 				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception as err:
+	except BaseException as err:  # pragma: no branch
 		theOutput = None
 		raise RuntimeError(err)
 	theOutput = checkStrOrByte(theOutput)
@@ -315,6 +315,57 @@ def checkPythonFuzzing(args=[None], stderr=None):
 
 
 def debugBlob(blob=None):
+	"""Helper function to debug unexpected outputs.
+
+		Especialy usefull for cross-python testing where output may differ
+		yet may be from the same logical data.
+
+		Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context
+			>>>
+
+			>>> norm_fixture = "Example Sample"
+			>>> othr_fixture = \"""'Example Sample'\"""
+			>>>
+
+		Testcase 1: function should have a output.
+
+			>>> debugBlob(norm_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<BLANKLINE>
+			String:
+			"
+			Example Sample
+			"
+			<BLANKLINE>
+			Data:
+			"
+			'Example Sample'
+			"
+			<BLANKLINE>
+			True
+			>>>
+
+		Testcase 2: function should have a output even with bad input.
+
+			>>> debugBlob(othr_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<BLANKLINE>
+			String:
+			"
+			...Example Sample...
+			"
+			<BLANKLINE>
+			Data:
+			"
+			...'Example Sample'...
+			"
+			<BLANKLINE>
+			True
+			>>>
+
+	"""
 	try:
 		print(__BLANK)
 		print(str("String:"))
@@ -333,8 +384,7 @@ def debugBlob(blob=None):
 
 
 def debugtestError(someError):
-	"""
-		Helper function to debug unexpected outputs.
+	"""Helper function to debug unexpected outputs.
 
 		Meta Testing:
 
@@ -384,7 +434,9 @@ def debugtestError(someError):
 
 def check_exec_command_has_output(test_case, someArgs):
 	"""Test case for command output != None.
-		returns True if has output and False otherwise."""
+
+		returns True if has output and False otherwise.
+	"""
 	theResult = False
 	fail_msg_fixture = str("""Expecting output: CLI test had no output.""")
 	try:
@@ -407,8 +459,7 @@ def check_exec_command_has_output(test_case, someArgs):
 
 
 def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
-	"""
-		Helper function to debug unexpected outputs.
+	"""Helper function to debug unexpected outputs.
 
 		Meta Testing:
 
