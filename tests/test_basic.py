@@ -17,17 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests"""
-
-
-try:
-	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
-
 
 try:
 	try:
@@ -40,6 +30,7 @@ try:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
 		from context import unittest as unittest
+		from context import sys as _sys
 except Exception:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context")
 
@@ -118,10 +109,15 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		self.assertIsNone(None)
 		# define new tests below
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")
+	@unittest.skipUnless(_sys.platform.startswith("linux"), "This test example requires linux")
 	def test_Skip_UNLESS_linux_only(self):
 		"""Linux is the test."""
-		self.assertTrue(sys.platform.startswith("linux"))
+		self.assertTrue(_sys.platform.startswith("linux"))
+
+	@unittest.skipUnless(_sys.platform.startswith("darwin"), "This test example requires macOS")
+	def test_Skip_UNLESS_darwin_only(self):
+		"""MacOS is the test."""
+		self.assertTrue(_sys.platform.startswith("darwin"))
 
 
 # leave this part

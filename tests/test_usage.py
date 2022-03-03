@@ -43,6 +43,8 @@ Tests of integration by usage.
 
 """
 
+__module__ = """tests"""
+
 
 try:
 	import sys

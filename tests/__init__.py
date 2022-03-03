@@ -17,22 +17,21 @@
 # limitations under the License.
 
 
-__module__ = """tests"""
+"""Multicast Testing Module.
 
-__name__ = """tests"""
+	Testing:
 
-__doc__ = """Multicast Testing Module.
+	Testcase 0: Load tests fixtures
 
-		Testing:
-
-		Testcase 0: Load tests fixtures
-
-			>>> import tests as _tests
-			>>> _tests.__module__ is not None
-			True
+		>>> import tests as _tests
+		>>> _tests.__module__ is not None
+		True
 
 
 """
+
+
+__module__ = """tests"""
 
 try:
 	import sys
@@ -135,20 +134,20 @@ test_cases = (
 
 
 def load_tests(loader, tests, pattern):
-	"""Loads the tests from the project and then attempts to load the doctests too.
+	"""Will Load the tests from the project and then attempts to load the doctests too.
 
-		Testing:
+	Testing:
 
-		Testcase 0: Load test fixtures
+	Testcase 0: Load test fixtures
 
-			>>> import tests as _tests
-			>>>
+		>>> import tests as _tests
+		>>>
 
-		Testcase 1: Load test fixtures
+	Testcase 1: Load test fixtures
 
-			>>> import tests as _tests
-			>>> _tests.load_tests is not None
-			True
+		>>> import tests as _tests
+		>>> _tests.load_tests is not None
+		True
 
 	"""
 	try:

@@ -254,9 +254,10 @@ def checkCovCommand(args=[None]):
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
 		extra_args = ["""run""", """-p""", """--source=multicast"""]
-		for k in range(0, len(extra_args)):
+		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
+		for k, ktem in enumerate(extra_args):
 			offset = i + k
-			args.insert(offset, extra_args[k])
+			args.insert(offset, ktem)
 	return args
 
 
@@ -564,8 +565,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		cls._thepython = getPythonCommand()
 
 	def setUp(self):
-		"""
-			Overides unittest.TestCase.setUp(unittest.TestCase).
+		"""Overides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if (self._thepython is None) and (len(self._thepython) <= 0):
@@ -579,7 +579,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	def test_finds_python_WHEN_testing(self):
 		"""Test case 1: Class Test-Fixture Meta Test."""
-		self.test_absolute_truth_and_meaning()
 		if (self._thepython is None) and (len(self._thepython) <= 0):
 			self.fail(str("""No python cmd to test with!"""))
 		self.test_absolute_truth_and_meaning()

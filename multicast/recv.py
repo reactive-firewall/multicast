@@ -137,7 +137,7 @@ def genSocket():
 	script binding to the same ip/port).
 	"""
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	sock.settimeout(20)
+	sock.settimeout(socket.IP_DEFAULT_MULTICAST_TTL)
 	return sock
 
 
