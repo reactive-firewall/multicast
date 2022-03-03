@@ -64,7 +64,7 @@ ulimit -t 600
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
-LOCK_FILE="/tmp/spelling_test_script_lock"
+LOCK_FILE="${TMPDIR:-/tmp}/spelling_test_script_lock"
 EXIT_CODE=0
 
 # exit fast if command is missing

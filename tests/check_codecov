@@ -64,13 +64,14 @@ ulimit -t 1200
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
 LC_ALL="${LANG:1:5}.utf-8"
-umask 027
+umask 127
 
-LOCK_FILE="/tmp/codecov_test_script_lock"
+LOCK_FILE="${TMPDIR:-/tmp}/codecov_test_script_lock"
 EXIT_CODE=0
 
 test -x $(command -v grep) || exit 126 ;
 test -x $(command -v curl) || exit 126 ;
+test -x $(command -v gpgv) || exit 126 ;
 test -x $(command -v shasum) || exit 126 ;
 
 # sorry no windows support here
@@ -95,7 +96,7 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
         trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
         trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-        echo CodeCov already in progress by `head ${LOCK_FILE}` ;
+        echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
         false ;
         exit 126 ;
 fi
@@ -113,7 +114,8 @@ else
 	EXIT_CODE=1
 fi
 
-# This File  MUST BE GIT-IGNORED to be SAFELY USED to store Tokens and env vars (update logic as needed)
+# This File  MUST BE GIT-IGNORED
+# to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
 	source ./codecov_env 2>/dev/null || true ;
 fi
@@ -161,14 +163,14 @@ elif [[ ( -x $(command -v coverage) ) ]] ; then
 fi
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./codecov -n "Custom Test Run" -X gcov -F ${CI_OS:-linux} || EXIT_CODE=5 ;
+	./codecov -n "Custom Test Run" -X gcov -F multicast,${CI_OS:-linux}-latest -Z || EXIT_CODE=10 ;
 fi
 
 
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
 
-rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
 rm -f ./codecov 2>/dev/null > /dev/null || true ; wait ;
+rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;

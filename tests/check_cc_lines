@@ -64,24 +64,31 @@ ulimit -t 600
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
-LOCK_FILE="/tmp/cc_line_test_script_lock"
+LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
 EXIT_CODE=0
 
 test -x $(command -v grep) || exit 126 ;
+test -x $(command -v curl) || exit 126 ;
+test -x $(command -v find) || exit 126 ;
+test -x $(command -v git) || exit 126 ;
+
+function cleanup() {
+	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
+}
 
 if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
+		trap 'cleanup ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
+		trap 'cleanup ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
+		trap 'cleanup ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
 		# trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
-		trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		trap 'cleanup ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
+		trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
+		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-        echo Test already in progress by `head ${LOCK_FILE}` ;
-        false ;
-        exit 126 ;
+		echo "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
+		false ;
+		exit 126 ;
 fi
 
 # this is how test files are found:
@@ -105,7 +112,7 @@ for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -iname '*.py' -o -iname '*.txt' -o 
 		EXIT_CODE=126
 	else
 		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -le 0) ]] ; then
-			echo "FAIL: ${_TEST_DOC} is missing a copyright line" ;
+			echo "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
 			EXIT_CODE=127
 		fi
 		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
