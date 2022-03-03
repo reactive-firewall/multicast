@@ -133,8 +133,9 @@ def genSocket():
 
 	"""
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	# allow reuse of socket (to allow another instance of python running this
-	# script binding to the same ip/port)
+	"""Allows reuse of socket (to allow another instance of python running this
+	script binding to the same ip/port).
+	"""
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	sock.settimeout(20)
 	return sock
