@@ -138,10 +138,11 @@ __proc__ = """multicast SAY"""
 
 try:
 	import sys
-	import socket
 	import argparse
+	import unicodedata
+	import socket
 	depends = [
-		socket, argparse
+		unicodedata, socket, argparse
 	]
 	for unit in depends:
 		try:
@@ -210,8 +211,8 @@ def parseArgs(*arguments):
 	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
 	parser.add_argument("""--mcast-group""", default=multicast.__MCAST_DEFAULT_GROUP)
 	parser.add_argument(
-		"""--message""", dest="""message""",
-		default=str("""PING from multicast_send.py: group: {group}, port: {port}""")
+		"""--message""", nargs='+', dest="""message""",
+		default=str("""PING from {name}: group: {group}, port: {port}""")
 	)
 	return parser.parse_args(*arguments)
 
@@ -286,7 +287,14 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		saystep(args.mcast_group, int(args.port), args.message)
+		_payload = str(unicodedata.lookup("""SOFT HYPHEN""")).join(
+			[chunk for chunk in args.message]
+		).format(
+			name=str(__name__),
+			group=str(args.mcast_group),
+			port=int(args.port)
+		)
+		saystep(args.mcast_group, int(args.port), _payload)
 		__exit_code = 0
 	except argparse.ArgumentError:  # pragma: no branch
 		print('Input has an Argument Error')

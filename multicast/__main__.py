@@ -106,13 +106,13 @@ except Exception as err:
 
 
 try:
-	if 'multicast.__version__' not in sys.modules:
-		from . import __version__ as __version__
+	if 'multicast' not in sys.modules:
+		from . import multicast as multicast
 	else:  # pragma: no branch
-		__version__ = sys.modules["""multicast.__version__"""]
+		multicast = sys.modules["""multicast"""]
 except Exception as importErr:
 	del importErr
-	import multicast.__version__ as __version__
+	import multicast as multicast
 
 
 try:
@@ -238,7 +238,7 @@ def buildArgs():
 		'-V', '--version',
 		action='version', version=str(
 			"%(prog)s {version}"
-		).format(version=str(__version__))
+		).format(version=str(multicast.__version__))
 	)
 	parser.add_argument(
 		'some_task', nargs='?', choices=TASK_OPTIONS.keys(),

@@ -17,14 +17,13 @@ exclude_lines =
 	raise NotImplementedError
 	raise ImportError
 	except subprocess.CalledProcessError
-	except IOError
-	except OSError
+	except ..Error
 	# don't complain about sys.modules
 	sys.modules
 	not in sys.modules:
 	# Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':
-	if __name__ in '__main__':
+	if __name__ .. .__main__.:
 	if __sys_path__ not in sys.path:
 	os.abort()
 	exit(0)
@@ -32,12 +31,15 @@ exclude_lines =
 partial_branches =
 	# Have to re-enable the standard pragma rules
 	pragma: no branch
+	finally:
 	except unittest.SkipTest
 	# Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':
 	if __name__ in '__main__':
 	if __sys_path__ not in sys.path:
-	# not in sys.modules:
+	# don't complain about sys.modules
+	sys.modules
+	not in sys.modules:
 	if context.__name__ is None:
 	if 'os' not in sys.modules:
 	if 'os.path' not in sys.modules:

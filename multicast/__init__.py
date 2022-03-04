@@ -155,7 +155,7 @@ __MCAST_DEFAULT_PORT = 19991
 """
 	Arbitrary port to use by default, though any dynamic and free port would work.
 
-	Testing:
+	Minimal Testing:
 
 	First setup test fixtures by importing multicast.
 
@@ -180,7 +180,7 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
 	Arbitrary group to use by default, though any mcst grp would work.
 
-	Testing:
+	Minimal Testing:
 
 	First setup test fixtures by importing multicast.
 
@@ -204,7 +204,7 @@ global __MCAST_DEFAULT_TTL
 """
 	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
 
-	Testing:
+	Minimal Testing:
 
 	First setup test fixtures by importing multicast.
 
@@ -291,10 +291,10 @@ try:
 	else:  # pragma: no branch
 		__main__ = sys.modules["""multicast.__main__"""]
 except Exception:
-	from . import __main__ as __main__
+	import multicast.__main__ as __main__
 
 
-if __name__ in '__main__':
+if __name__ == '__main__':
 	__EXIT_CODE = 2
 	if __main__.__name__ is None:
 		raise ImportError(str("Failed to open multicast"))

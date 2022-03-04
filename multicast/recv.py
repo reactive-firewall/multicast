@@ -65,10 +65,10 @@ __prologue__ = """Python Multicast Receiver. Spawns a listener for multicast bas
 
 try:
 	import sys
+	import argparse
 	import unicodedata
 	import socket
 	import struct
-	import argparse
 	depends = [
 		unicodedata, socket, struct, argparse
 	]
@@ -85,13 +85,13 @@ except Exception as err:
 
 
 try:
-	if 'multicast.__MCAST_DEFAULT_PORT' not in sys.modules:
-		from . import __MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
+	if 'multicast' not in sys.modules:
+		from . import multicast as multicast
 	else:  # pragma: no branch
-		__MCAST_DEFAULT_PORT = sys.modules["""multicast.__MCAST_DEFAULT_PORT"""]
-except Exception as importErr:  # pragma: no branch
+		multicast = sys.modules["""multicast"""]
+except Exception as importErr:
 	del importErr
-	import multicast.__MCAST_DEFAULT_PORT as __MCAST_DEFAULT_PORT
+	import multicast as multicast
 
 
 def genSocket():
@@ -246,7 +246,7 @@ def parseArgs(arguments=None):
 		description=__prologue__,
 		epilog=__epilogue__
 	)
-	parser.add_argument('--port', type=int, default=__MCAST_DEFAULT_PORT)
+	parser.add_argument('--port', type=int, default=multicast.__MCAST_DEFAULT_PORT)
 	parser.add_argument(
 		'--join-mcast-groups', default=[], nargs='*',
 		help="""multicast groups (ip addrs) to listen to join."""
