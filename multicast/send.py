@@ -230,9 +230,7 @@ def saystep(group, port, data):
 		try:
 			sock.close()
 		except OSError:  # pragma: no branch
-			False
-	sock = None
-
+			sock = None
 
 def main(*argv):
 	"""Will handle the Main Event from multicast.__main__ when called.

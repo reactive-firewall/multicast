@@ -97,6 +97,9 @@ except Exception as importErr:
 def genSocket():
 	"""Will generate an unbound socket.socket object ready to receive network traffic.
 
+	Implementation allows reuse of socket (to allow another instance of python running
+	this script binding to the same ip/port).
+
 	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
@@ -133,9 +136,6 @@ def genSocket():
 
 	"""
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	"""Allows reuse of socket (to allow another instance of python running this
-	script binding to the same ip/port).
-	"""
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	sock.settimeout(socket.IP_DEFAULT_MULTICAST_TTL)
 	return sock
