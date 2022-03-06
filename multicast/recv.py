@@ -137,7 +137,7 @@ def genSocket():
 	"""
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	sock.settimeout(socket.IP_DEFAULT_MULTICAST_TTL)
+	sock.settimeout(multicast.__MCAST_DEFAULT_TTL)
 	return sock
 
 
