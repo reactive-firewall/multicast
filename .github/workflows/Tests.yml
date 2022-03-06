@@ -13,13 +13,50 @@ jobs:
         python-version: 3.9
     - name: Pre-Clean
       id: clean
-      run: make -j1 -f Makefile clean || true ;
+      run: make -j1 -f Makefile purge 2>/dev/null || true ;
     - name: Test Build
       id: build
-      run: make -j1 -f Makefile build || true ;
+      run: make -j1 -f Makefile build ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile purge || true ;
+
+  BOOTSTRAP:
+    if: ${{ always() }}
+    needs: BUILD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        lang-var: ["en_US.UTF-8", "de.UTF-8", "jp.UTF-8"]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: ${{ matrix.lang-var }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup dependencies
+      run: |
+        pip install -r ./requirements.txt ;
+    - name: Pre-build
+      id: bootstrap
+      run: |
+        make -j1 -f Makefile clean || true ;
+        make -j1 -f Makefile build ;
+    - name: Run Tests
+      id: test-install
+      run: make -j1 -f Makefile install || true ;
+    - name: Test Info
+      id: test-info
+      run: python -m setup.py --name --version --lisense || true ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
 
   MATS:
     if: ${{ always() }}
