@@ -78,15 +78,17 @@ PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "INFO: No need to build. Try make -f Makefile install"
-	$(QUIET)$(PYTHON) ./setup.py build
+	$(QUIET)$(PYTHON) setup.py build
+	$(QUIET)$(PYTHON) setup.py bdist_wheel --universal
+	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: must_be_root
+install: build must_be_root
 	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel || true
-	$(QUIET)$(PYTHON) -m pip install "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -97,7 +99,9 @@ uninstall:
 
 purge: clean uninstall
 	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast || true
+	$(QUIET)$(PYTHON) ./setup.py clean || true
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -122,7 +126,7 @@ test-pytest: cleanup test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || $(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
+	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_cc_lines 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
