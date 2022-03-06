@@ -6,6 +6,8 @@ coverage:
   precision: 2
   range: "80...100"
   status:
+    default_rules:
+      flag_coverage_not_uploaded_behavior: exclude
     project:
       default:
         target: auto
@@ -18,28 +20,30 @@ coverage:
         only_pulls: false
       multicast:
         target: 95%
-        threshold: 0%
+        threshold: 1%
         flags:
           - multicast
         paths:
-          - "multicast/*.py"
+          - "multicast/"
           - "setup.py"
+          - "!tests/"
       unittests:
         target: 80%
+        threshold: 5%
         flags:
           - unittests
         paths:
-          - "tests/*.py"
+          - "tests/"
 
 
 flag_management:
   default_rules: # the rules that will be followed for any flag added, generally
-    carryforward: true
+    carryforward: false
     statuses:
       - name_prefix: project-
         type: project
         target: auto
-        threshold: 1%
+        threshold: 0%
       - name_prefix: patch-
         type: patch
         target: 50%
@@ -50,25 +54,15 @@ flag_management:
         - setup.py
       carryforward: true
       statuses:
-        - name_prefix: new
-          type: project
-          target: 51%
-        - name_prefix: new
-          type: patch
+        - type: project
           target: 90%
     - name: tests
       paths:
-        - tests/*  #fill in your own path. Note, accepts globs, not regexes
-      carryforward: true
-    - name: extras
+        - tests/check_*  #fill in your own path. Note, accepts globs, not regexes
+        - tests/*.py  #fill in your own path. Note, accepts globs, not regexes
+        - "!multicast/"
       carryforward: true
     - name: unittests
       paths:
-        - tests/*.py  #fill in your own path. Note, accepts globs, not regexes
+        - tests/  #fill in your own path. Note, accepts globs, not regexes
       carryforward: true
-    - name: macos-latest
-      carryforward: false
-    - name: linux-latest
-      carryforward: false
-    - name: windows-latest
-      carryforward: false
