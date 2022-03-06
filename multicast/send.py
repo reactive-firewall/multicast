@@ -232,6 +232,7 @@ def saystep(group, port, data):
 		except OSError:  # pragma: no branch
 			sock = None
 
+
 def main(*argv):
 	"""Will handle the Main Event from multicast.__main__ when called.
 
@@ -285,9 +286,9 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		_payload = str(unicodedata.lookup("""SOFT HYPHEN""")).join(
-			[chunk for chunk in args.message]
-		).format(
+		_payload = str(
+			unicodedata.lookup("""SOFT HYPHEN""")
+		).join(list(args.message)).format(
 			name=str(__name__),
 			group=str(args.mcast_group),
 			port=int(args.port)
