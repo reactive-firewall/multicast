@@ -252,7 +252,10 @@ try:
 	import socket
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
-	__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)
+	if sys.platform.startswith("darwin") or sys.platform.startswith("linux"):  # pragma: no-branch
+		__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)
+	else:
+		__MCAST_DEFAULT_TTL = int(20)
 except Exception as err:
 	raise ImportError(err)
 
