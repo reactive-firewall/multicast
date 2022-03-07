@@ -263,8 +263,9 @@ def checkCovCommand(args=[None]):
 
 def checkStrOrByte(theInput):
 	theOutput = None
-	try:
+	if theInput is not None:
 		theOutput = theInput
+	try:
 		if isinstance(theInput, bytes):
 			theOutput = theInput.decode("""UTF-8""")
 	except UnicodeDecodeError:
@@ -272,11 +273,11 @@ def checkStrOrByte(theInput):
 	return theOutput
 
 
-def checkPythonCommand(args=[None], stderr=None):
+def checkPythonCommand(args, stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:  # pragma: no branch
+		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
@@ -381,7 +382,7 @@ def debugBlob(blob=None):
 		print(str("""\""""))
 		print(__BLANK)
 	except Exception:
-		return False
+		print(__BLANK)
 	return True
 
 

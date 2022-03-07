@@ -287,9 +287,7 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		_payload = str(
-			unicodedata.lookup("""SOFT HYPHEN""") if sys.stdout.isatty() is True else __BLANK
-		).join(list(args.message)).format(
+		_payload = str(args.message).format(
 			name=str(__name__),
 			group=str(args.mcast_group),
 			port=int(args.port)

@@ -31,7 +31,7 @@ __all__ = [
 __package__ = """multicast"""
 
 
-__module__ = """multicast"""
+__module__ = """multicast.__main__"""
 
 
 __file__ = """multicast/__main__.py"""
@@ -106,13 +106,13 @@ except Exception as err:
 
 
 try:
-	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
+	if 'multicast.__version__' not in sys.modules:
+		from . import __version__ as __version__
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		__version__ = sys.modules["""multicast.__version__"""]
 except Exception as importErr:
 	del importErr
-	import multicast as multicast
+	import multicast.__version__ as __version__
 
 
 try:
@@ -174,7 +174,7 @@ def SendMCast(*args, **kwargs):
 
 
 def joinMCast(*args, **kwargs):
-	"""Will subscribe and listen for multicast messages to a given group."""
+	"""Will listen for multicast messages."""
 	return recv.main(*args, **kwargs)
 
 
@@ -238,7 +238,7 @@ def buildArgs():
 		'-V', '--version',
 		action='version', version=str(
 			"%(prog)s {version}"
-		).format(version=str(multicast.__version__))
+		).format(version=str(__version__))
 	)
 	parser.add_argument(
 		'some_task', nargs='?', choices=TASK_OPTIONS.keys(),
@@ -362,12 +362,13 @@ def main(*argv):
 	except BaseException:  # pragma: no branch
 		e = str("CRITICAL - An error occured while handling")
 		e += str(" the cascading failure.")
-		print(str(e))
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(str(e))
 		__EXIT_CODE = 3
 	return __EXIT_CODE  # noqa
 
 
-if __name__ in """__main__""":
+if __name__ in '__main__':
 	__EXIT_CODE = 2
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])

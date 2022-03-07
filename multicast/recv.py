@@ -405,7 +405,12 @@ def main(*argv):
 	__exit_code = 1
 	try:
 		args = parseArgs(*argv)
-		hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
+		response = hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
+		if (sys.stdout.isatty() and len(response) > 0):  # pragma: no cover
+			print(__BLANK)
+			print(str(response))
+			print(__BLANK)
+		del response
 		__exit_code = 0
 	except argparse.ArgumentError:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover

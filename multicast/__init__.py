@@ -21,7 +21,7 @@
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """__BLANK""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
-	"""__MCAST_DEFAULT_TTL""", """recv""", """send""", """__main__"""
+	"""__MCAST_DEFAULT_TTL""", """recv""", """send"""
 ]
 
 __package__ = """multicast"""
@@ -248,6 +248,9 @@ __BLANK = str("""""")
 		>>> type(__BLANK) is type(str)
 		True
 		>>>
+		>>> len(__BLANK) <= 0
+		True
+		>>>
 
 """
 
@@ -317,17 +320,14 @@ except Exception as importErr:
 
 
 try:
-	if 'multicast.__main__' not in sys.modules:
-		from . import __main__ as __main__
-	else:  # pragma: no branch
+	if """multicast.__main__""" in sys.modules:  # pragma: no cover
 		__main__ = sys.modules["""multicast.__main__"""]
 except Exception:
 	import multicast.__main__ as __main__
 
 
-if __name__ == '__main__':
+if __name__ in u'__main__':
 	__EXIT_CODE = 2
-	if __main__.__name__ is None:
-		raise ImportError(str("Failed to open multicast"))
-	__EXIT_CODE = __main__.main(sys.argv[1:])
+	if __main__.main is not None:
+		__EXIT_CODE = __main__.main(sys.argv[1:])
 	exit(__EXIT_CODE)

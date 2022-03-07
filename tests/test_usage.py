@@ -311,12 +311,23 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						str("--help")
 					]
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
-					self.assertIn(str("usage:"), str(theOutputtxt))
-				if (str("usage:") in str(theOutputtxt)):
-					theResult = True
-				else:
-					theResult = False
-					context.debugUnexpectedOutput(str("usage:"), str(theOutputtxt), self._thepython)
+					context.debugBlob(theOutputtxt)
+					# now test it
+					try:
+						if isinstance(theOutputtxt, bytes):
+							theOutputtxt = theOutputtxt.decode('utf8')
+					except UnicodeDecodeError:
+						theOutputtxt = str(repr(bytes(theOutputtxt)))
+					# or simply:
+					self.assertIsNotNone(theOutputtxt)
+					self.assertIn(str("""usage:"""), str(theOutputtxt))
+					if (str("""usage:""") in str(theOutputtxt)):
+						theResult = True or theResult
+					else:
+						theResult = False
+						context.debugUnexpectedOutput(
+							str("usage:"), str(theOutputtxt), self._thepython
+						)
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
