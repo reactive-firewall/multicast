@@ -20,7 +20,7 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
+	"""__doc__""", """__BLANK""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
 	"""__MCAST_DEFAULT_TTL""", """recv""", """send""", """__main__"""
 ]
 
@@ -135,7 +135,6 @@ __doc__ = __prologue__ + """
 
 	Testcase 2: multicast.__main__ should have a doctests.
 
-		>>> import multicast as _multicast
 		>>> import multicast.__main__ as _main
 		>>>
 
@@ -149,7 +148,7 @@ __doc__ = __prologue__ + """
 """
 
 
-global __MCAST_DEFAULT_PORT
+global __MCAST_DEFAULT_PORT  # noqa
 
 __MCAST_DEFAULT_PORT = 19991
 """
@@ -171,10 +170,13 @@ __MCAST_DEFAULT_PORT = 19991
 		>>> type(multicast.__MCAST_DEFAULT_PORT) is type(1)
 		True
 		>>>
+		>>> multicast.__MCAST_DEFAULT_PORT > int(1024)
+		True
+		>>>
 
 """
 
-global __MCAST_DEFAULT_GROUP
+global __MCAST_DEFAULT_GROUP  # noqa
 
 __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
@@ -200,7 +202,7 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
 
 
-global __MCAST_DEFAULT_TTL
+global __MCAST_DEFAULT_TTL  # noqa
 """
 	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
 
@@ -218,6 +220,32 @@ global __MCAST_DEFAULT_TTL
 		>>> multicast.__MCAST_DEFAULT_TTL is not None
 		True
 		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
+		True
+		>>>
+
+"""
+
+
+global __BLANK  # noqa
+
+__BLANK = str("""""")
+"""
+	Arbitrary blank string.
+
+	Minimal Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> __BLANK = multicast.__BLANK
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the __BLANK attribute is initialized.
+		B: Test that the __BLANK attribute is an empty string.
+
+		>>> __BLANK is not None
+		True
+		>>> type(__BLANK) is type(str)
 		True
 		>>>
 
@@ -253,9 +281,9 @@ try:
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
 	if sys.platform.startswith("darwin") or sys.platform.startswith("linux"):  # pragma: no-branch
-		__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)
-	else:
-		__MCAST_DEFAULT_TTL = int(20)
+		__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)  # pragma: no cover
+	else:  # pragma: no-branch
+		__MCAST_DEFAULT_TTL = int(20)  # pragma: no cover
 except Exception as err:
 	raise ImportError(err)
 

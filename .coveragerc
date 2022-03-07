@@ -26,7 +26,8 @@ exclude_lines =
 	if __name__ .. .__main__.:
 	if __sys_path__ not in sys.path:
 	os.abort()
-	exit(0)
+	exit
+
 
 partial_branches =
 	# Have to re-enable the standard pragma rules

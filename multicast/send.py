@@ -161,6 +161,7 @@ try:
 		from . import multicast as multicast
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
+	__BLANK = multicast.__BLANK
 except Exception as importErr:
 	del importErr
 	import multicast as multicast
@@ -287,7 +288,7 @@ def main(*argv):
 	try:
 		args = parseArgs(*argv)
 		_payload = str(
-			unicodedata.lookup("""SOFT HYPHEN""")
+			unicodedata.lookup("""SOFT HYPHEN""") if sys.stdout.isatty() is True else __BLANK
 		).join(list(args.message)).format(
 			name=str(__name__),
 			group=str(args.mcast_group),
@@ -296,10 +297,13 @@ def main(*argv):
 		saystep(args.mcast_group, int(args.port), _payload)
 		__exit_code = 0
 	except argparse.ArgumentError:  # pragma: no branch
-		print('Input has an Argument Error')
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(__BLANK)
+			print(str("""Input has an Argument Error"""))
 		__exit_code = 2
 	except Exception as e:  # pragma: no branch
-		print(str(e))
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(str(e))
 		__exit_code = 3
 		del e
 	return int(__exit_code)

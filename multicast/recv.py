@@ -89,6 +89,7 @@ try:
 		from . import multicast as multicast
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
+	__BLANK = multicast.__BLANK
 except Exception as importErr:
 	del importErr
 	import multicast as multicast
@@ -201,8 +202,8 @@ def endSocket(sock=None):
 	if not (sock is None):  # pragma: no branch
 		try:
 			sock.close()
-			sock.shutdown(socket.SHUT_RD)
-		except OSError:
+			sock.shutdown(socket.SHUT_RD) # pragma: no cover
+		except OSError:  # pragma: no branch
 			sock = None
 
 
@@ -246,15 +247,15 @@ def parseArgs(arguments=None):
 		description=__prologue__,
 		epilog=__epilogue__
 	)
-	parser.add_argument('--port', type=int, default=multicast.__MCAST_DEFAULT_PORT)
+	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
 	parser.add_argument(
-		'--join-mcast-groups', default=[], nargs='*',
+		"""--join-mcast-groups""", default=[], nargs='*',
 		help="""multicast groups (ip addrs) to listen to join."""
 	)
 	__tmp_help = """local interface to use for listening to multicast data; """
 	__tmp_help += """if unspecified, any one interface may be chosen."""
 	parser.add_argument(
-		'--iface', default=None,
+		"""--iface""", default=None,
 		help=str(__tmp_help)
 	)
 	__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
@@ -264,7 +265,7 @@ def parseArgs(arguments=None):
 	__tmp_help += """If unspecified, bind to 0.0.0.0 """
 	__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
 	parser.add_argument(
-		'--bind-group', default=None,
+		"""--bind-group""", default=None,
 		help=str(__tmp_help)
 	)
 	return parser.parse_args(arguments)
@@ -297,16 +298,13 @@ def hearstep(groups, port, iface=None, bind_group=None):
 		>>> type(multicast.recv.hearstep)
 		<class 'function'>
 		>>> multicast.recv.hearstep(None, 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<BLANKLINE>
 		'...'
 		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
 		>>> multicast.recv.hearstep([tst_fxtr], 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<BLANKLINE>
 		'...'
 		>>> multicast.recv.hearstep(
 		... 		[tst_fxtr], 19991, None, tst_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<BLANKLINE>
 		'...'
 		>>>
 
@@ -315,7 +313,7 @@ def hearstep(groups, port, iface=None, bind_group=None):
 	if groups is None:
 		groups = []
 	sock = genSocket()
-	msgbuffer = str("""""")
+	msgbuffer = str(__BLANK)
 	try:
 		sock.bind(('' if bind_group is None else bind_group, port))
 		for group in groups:
@@ -328,16 +326,18 @@ def hearstep(groups, port, iface=None, bind_group=None):
 			chunk = None
 		while True:
 			chunk = sock.recv(1316)
-			if chunk is not None:
+			if not (chunk is None):
 				msgbuffer += str(chunk, encoding='utf8')
 				chunk = None
 				# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
 			# about 969 bytes in base64 encoded as chars
 	except KeyboardInterrupt:  # pragma: no branch
-		print("""""")
-		print(str("""User Interrupted"""))
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(__BLANK)
+			print(str("""User Interrupted"""))
 	except OSError:  # pragma: no branch
-		print(str(""""""))
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(__BLANK)
 	finally:
 		sock = endSocket(sock)
 	return msgbuffer
@@ -392,7 +392,11 @@ def main(*argv):
 		<...int...>
 		>>> int(test_fixture) >= int(0)
 		True
+		>>> type(test_fixture) is type(0)
+		True
 		>>> int(test_fixture) < int(4)
+		True
+		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(4))
 		True
 		>>>
 
@@ -403,11 +407,14 @@ def main(*argv):
 		args = parseArgs(*argv)
 		hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
 		__exit_code = 0
-	except argparse.ArgumentError:
-		print('Input has an Argument Error')
+	except argparse.ArgumentError:  # pragma: no branch
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(__BLANK)
+			print(str("""Input has an Argument Error"""))
 		__exit_code = 2
 	except Exception as e:
-		print(str(e))
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(str(e))
 		__exit_code = 3
 	return int(__exit_code)
 
