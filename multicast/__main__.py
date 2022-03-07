@@ -174,7 +174,7 @@ def SendMCast(*args, **kwargs):
 
 
 def joinMCast(*args, **kwargs):
-	"""Will listen for multicast messages."""
+	"""Will subscribe and listen for multicast messages to a given group."""
 	return recv.main(*args, **kwargs)
 
 
