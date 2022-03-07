@@ -362,13 +362,12 @@ def main(*argv):
 	except BaseException:  # pragma: no branch
 		e = str("CRITICAL - An error occured while handling")
 		e += str(" the cascading failure.")
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(str(e))
+		print(str(e))
 		__EXIT_CODE = 3
 	return __EXIT_CODE  # noqa
 
 
-if __name__ in '__main__':
+if __name__ in """__main__""":
 	__EXIT_CODE = 2
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
