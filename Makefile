@@ -77,32 +77,33 @@ endif
 PHONY: must_be_root cleanup
 
 build:
-	$(QUIET)$(ECHO) "INFO: No need to build. Try make -f Makefile install"
+	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
 	$(QUIET)$(PYTHON) setup.py build
 	$(QUIET)$(PYTHON) setup.py bdist_wheel --universal
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
+	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: build must_be_root
-	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel || true
+install: init build must_be_root
 	$(QUIET)$(PYTHON) -m pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(PYTHON) -m pip uninstall multicast || true
+	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast || true
+	$(QUIET)$(PYTHON) ./setup.py uninstall 2>/dev/null || true
 	$(QUIET)$(PYTHON) ./setup.py clean || true
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
+	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -158,6 +159,9 @@ cleanup:
 	$(QUIET)$(RM) ./.*/*~ 2>/dev/null || true
 	$(QUIET)$(RM) ./*~ 2>/dev/null || true
 	$(QUIET)$(RM) ./.*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./src/**/* 2>/dev/null || true
+	$(QUIET)$(RM) ./src/* 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./src/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) tests/__pycache__ 2>/dev/null || true
 	$(QUIET)$(RMDIR) multicast/__pycache__ 2>/dev/null || true
 	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>/dev/null || true
@@ -172,14 +176,20 @@ cleanup:
 clean: cleanup
 	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
 	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./test-results/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
+
+user-install: build
+	$(QUIET)$(PYTHON) -m pip install --user --upgrade pip setuptools wheel || true
+	$(QUIET)$(PYTHON) -m pip install --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/master/requirements.txt"
+	$(QUIET)$(PYTHON) -m pip install --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
 
 %:
 	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;

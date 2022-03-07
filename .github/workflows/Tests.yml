@@ -49,13 +49,15 @@ jobs:
         make -j1 -f Makefile build ;
     - name: Run Tests
       id: test-install
-      run: make -j1 -f Makefile install || true ;
+      run: make -j1 -f Makefile user-install ;
     - name: Test Info
       id: test-info
       run: python -m setup.py --name --version --license || true ;
     - name: Post-Clean
       id: post
-      run: make -j1 -f Makefile clean || true ;
+      run: |
+        make -j1 -f Makefile purge || true ;
+        make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
 
@@ -145,6 +147,12 @@ jobs:
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: true
+    - name: Upload Python ${{ matrix.python-version }} Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./test-reports/
+        if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
