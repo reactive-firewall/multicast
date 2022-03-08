@@ -17,17 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests"""
-
-
-try:
-	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
-
 
 try:
 	try:
@@ -40,7 +30,8 @@ try:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
 		from context import unittest as unittest
-except Exception:
+		from context import sys as _sys
+except Exception:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context")
 
 
@@ -54,29 +45,31 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		"""Insanitty Test 1: Because it only matters if we're not mad as hatters."""
 		assert True
 
-	def test_meta_test(self):
+	def test_Does_Pass_WHEN_Meta_Test(self):
 		"""Insanity Test 2: for unittests assertion."""
 		self.assertTrue(True)
 		self.assertFalse(False)
 		self.assertIsNone(None)
+		self.test_absolute_truth_and_meaning()
+		self.test_None_WHEN_Nothing()
 
-	def test_syntax(self):
+	def test_Does_Pass_WHEN_Using_Import_From_Syntax(self):
 		"""Test case 0: importing multicast."""
 		theResult = False
 		try:
 			from .context import multicast
 			self.assertIsNotNone(multicast.__name__)
-			if multicast.__name__ is None:
-				theResult = False
+			self.assertIsNotNone(multicast.__module__)
+			self.assertIsNotNone(multicast.__doc__)
 			theResult = True
 		except Exception as impErr:
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
-	def test_the_help_command(self):
-		"""Test case 1: import for backend library."""
+	def test_Error_WHEN_the_help_command_is_called(self):
+		"""Test case 1: the --help options should error when called."""
 		theResult = False
 		try:
 			from .context import multicast
@@ -90,9 +83,9 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 			theResult = True
 		except Exception:
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
-	def test_corner_case_example(self):
+	def test_IsNone_WHEN_given_corner_case_input(self):
 		"""Example Test case for bad input directly into function."""
 		theResult = False
 		try:
@@ -105,17 +98,22 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 			theResult = True
 		except Exception:
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
-	def test_new_tests(self):
+	def test_None_WHEN_Nothing(self):
 		"""Try adding new tests."""
 		self.assertIsNone(None)
 		# define new tests below
 
-	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")
-	def test_this_linux_only(self):
+	@unittest.skipUnless(_sys.platform.startswith("linux"), "This test example requires linux")
+	def test_Skip_UNLESS_linux_only(self):
 		"""Linux is the test."""
-		self.assertTrue(sys.platform.startswith("linux"))
+		self.assertTrue(_sys.platform.startswith("linux"))
+
+	@unittest.skipUnless(_sys.platform.startswith("darwin"), "This test example requires macOS")
+	def test_Skip_UNLESS_darwin_only(self):
+		"""MacOS is the test."""
+		self.assertTrue(_sys.platform.startswith("darwin"))
 
 
 # leave this part

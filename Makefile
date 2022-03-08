@@ -16,6 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifeq "$(LC_CTYPE)" ""
+	LC_CTYPE="en_US.UTF-8"
+endif
 
 ifeq "$(ECHO)" ""
 	ECHO=echo
@@ -26,20 +29,15 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=make
+	MAKE=make -j1
 endif
 
 ifeq "$(PYTHON)" ""
-	PYTHON=export LC_CTYPE="en_US.utf-8" ; python3 -B
+	PYTHON=`command -v python3` -B
 endif
 
 ifeq "$(COVERAGE)" ""
-	ifeq "$(PYTHON)" ""
-		COVERAGE=$(command -v coverage)
-	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(command -v coverage3)
-	endif
+	COVERAGE=$(PYTHON) -m coverage
 endif
 
 ifeq "$(WAIT)" ""
@@ -68,99 +66,130 @@ ifeq "$(DO_FAIL)" ""
 	DO_FAIL=$(ECHO) "ok"
 endif
 
+ifeq "$(RM)" ""
+	RM=`command -v rm` -f
+endif
+
+ifeq "$(RMDIR)" ""
+	RMDIR=$(RM) -Rd
+endif
+
 PHONY: must_be_root cleanup
 
 build:
-	$(QUIET)$(ECHO) "INFO: No need to build. Try make -f Makefile install"
-	$(QUIET)$(PYTHON) ./setup.py build
+	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
+	$(QUIET)$(PYTHON) setup.py build
+	$(QUIET)$(PYTHON) setup.py bdist_wheel --universal
+	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
+	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: must_be_root
-	$(QUIET)$(PYTHON) -m pip install "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+install: init build must_be_root
+	$(QUIET)$(PYTHON) -m pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(PYTHON) -m pip uninstall multicast || true
+	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-reports:
-	$(QUIET)mkdir test-reports 2>/dev/null >/dev/null || true ;
-	$(QUIET)$(ECHO) "$@: Done."
-
 purge: clean uninstall
-	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast || true
-	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
-	$(QUIET)rm -Rfd ./.eggs/ 2>/dev/null || true
+	$(QUIET)$(PYTHON) ./setup.py uninstall 2>/dev/null || true
+	$(QUIET)$(PYTHON) ./setup.py clean || true
+	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
+	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
-	$(QUIET)$(COVERAGE) combine 2>/dev/null || true
-	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true
-	$(QUIET)$(DO_FAIL);
+	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
+	$(QUIET)$(COVERAGE) combine 2>/dev/null || true ;
+	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true ;
+	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
+test-reports:
+	$(QUIET)mkdir test-reports 2>/dev/null >/dev/null || true ;
+	$(QUIET)$(ECHO) "$@: Done."
+
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || python -m pytest --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v . ; wait ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
-	$(QUIET)flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini
+	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
 	$(QUIET)tests/check_spelling 2>/dev/null || true
-	$(QUIET)tests/check_cc_line.bash 2>/dev/null || true
+	$(QUIET)tests/check_cc_lines 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 cleanup:
-	$(QUIET)rm -f tests/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f tests/*~ 2>/dev/null || true
-	$(QUIET)rm -Rfd tests/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -f multicast/*.pyc 2>/dev/null || true
-	$(QUIET)rm -Rfd multicast/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -Rfd multicast/*/__pycache__ 2>/dev/null || true
-	$(QUIET)rm -f multicast/*~ 2>/dev/null || true
-	$(QUIET)rm -f *.pyc 2>/dev/null || true
-	$(QUIET)rm -f multicast/*/*.pyc 2>/dev/null || true
-	$(QUIET)rm -f multicast/*/*~ 2>/dev/null || true
-	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f ./.DS_Store 2>/dev/null || true
-	$(QUIET)rm -Rfd .pytest_cache/ 2>/dev/null || true
-	$(QUIET)rm -Rfd .eggs 2>/dev/null || true
-	$(QUIET)rmdir ./test-reports/ 2>/dev/null || true
-	$(QUIET)rm -f multicast/*.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f multicast/*/*.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f multicast/.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f multicast/*/.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f tests/.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f tests/*/.DS_Store 2>/dev/null || true
-	$(QUIET)rm -f multicast.egg-info/* 2>/dev/null || true
-	$(QUIET)rmdir multicast.egg-info 2>/dev/null || true
-	$(QUIET)rm -f ./*/*~ 2>/dev/null || true
-	$(QUIET)rm -f ./*~ 2>/dev/null || true
-	$(QUIET)coverage erase 2>/dev/null || true
-	$(QUIET)rm -f ./.coverage 2>/dev/null || true
-	$(QUIET)rm -f ./coverage*.xml 2>/dev/null || true
-	$(QUIET)rm -f ./sitecustomize.py 2>/dev/null || true
-	$(QUIET)rm -f ./.*~ 2>/dev/null || true
-	$(QUIET)rm -Rfd ./.tox/ 2>/dev/null || true
+	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) tests/*~ 2>/dev/null || true
+	$(QUIET)$(RM) tests/__pycache__/* 2>/dev/null || true
+	$(QUIET)$(RM) __pycache__/* 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*~ 2>/dev/null || true
+	$(QUIET)$(RM) multicast/__pycache__/* 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*/*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*/*.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) multicast/.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) multicast/*/.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) tests/.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) tests/*/.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) multicast.egg-info/* 2>/dev/null || true
+	$(QUIET)$(RM) ./*.pyc 2>/dev/null || true
+	$(QUIET)$(RM) ./.coverage 2>/dev/null || true
+	$(QUIET)$(RM) ./coverage*.xml 2>/dev/null || true
+	$(QUIET)$(RM) ./sitecustomize.py 2>/dev/null || true
+	$(QUIET)$(RM) ./.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) ./*/.DS_Store 2>/dev/null || true
+	$(QUIET)$(RM) ./*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./.*/*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./.*~ 2>/dev/null || true
+	$(QUIET)$(RM) ./src/**/* 2>/dev/null || true
+	$(QUIET)$(RM) ./src/* 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./src/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) tests/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) multicast/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./__pycache__ 2>/dev/null || true
+	$(QUIET)$(RMDIR) multicast.egg-info 2>/dev/null || true
+	$(QUIET)$(RMDIR) .pytest_cache/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) .eggs 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
+	$(QUIET)$(RMDIR) ./.tox/ 2>/dev/null || true
+	$(QUIET)$(WAIT) ;
 
 clean: cleanup
-	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
-	$(QUIET)rm -Rfd ./build/ 2>/dev/null || true
+	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
+	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
-	if test $$runner != "root" ; then echo "You are not root." ; exit 1 ; fi
+	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
+
+user-install: build
+	$(QUIET)$(PYTHON) -m pip install --user --upgrade pip setuptools wheel || true
+	$(QUIET)$(PYTHON) -m pip install --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/master/requirements.txt"
+	$(QUIET)$(PYTHON) -m pip install --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
 
 %:
 	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;

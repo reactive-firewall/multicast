@@ -6,8 +6,9 @@ branches:
 skip_tags: true
 max_jobs: 1
 image:
+- Visual Studio 2022
+- Visual Studio 2019
 - Visual Studio 2017
-- Visual Studio 2015
 clone_depth: 50
 init:
 - cmd: >-
@@ -23,6 +24,12 @@ init:
 
     python -m pip install coverage || VER>NUL
 
+    python -m pip install --upgrade doctest || VER>NUL
+
+    python -m pip install pytest || VER>NUL
+
+    python -m pip install pytest-cov || VER>NUL
+
     choco install codecov || VER>NUL
 
     dir
@@ -30,7 +37,7 @@ build_script:
 - cmd: make clean
 test_script:
 - cmd: >-
-    make test || VER>NUL
+    make test-pytest || VER>NUL
 
     dir
 
@@ -42,7 +49,7 @@ test_script:
 
     dir
 
-    codecov || VER>NUL
+    codecov -f coverage.xml || VER>NUL
 
     dir
 

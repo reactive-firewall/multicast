@@ -60,35 +60,52 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 600
-PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
-umask 137
+ulimit -t 1200
+PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
+LANG=${LANG:-"en_US"}
+LC_ALL="${LANG:1:5}.utf-8"
+umask 127
 
-LOCK_FILE="/tmp/cc_line_test_script_lock"
+LOCK_FILE="${TMPDIR:-/tmp}/codecov_test_script_lock"
 EXIT_CODE=0
 
 test -x $(command -v grep) || exit 126 ;
+test -x $(command -v curl) || exit 126 ;
+test -x $(command -v gpgv) || exit 126 ;
+test -x $(command -v shasum) || exit 126 ;
+
+# sorry no windows support here
+if [[ $( \uname -s ) == "Darwin" ]] ; then
+	CI_OS="macos"
+else
+	CI_OS="linux"
+fi
+
+function cleanup() {
+	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
+	rm -f ./codecov 2>/dev/null || true ; wait ;
+}
 
 if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
-        trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+        trap 'cleanup ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
+        trap 'cleanup ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
+        trap 'cleanup ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
+		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
+		# trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+        trap 'cleanup ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
+        trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
+        trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-        echo Test already in progress by `head ${LOCK_FILE}` ;
+        echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
         false ;
         exit 126 ;
 fi
 
 # this is how test files are found:
 
-# THIS IS THE ACTUAL TEST
+# THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
 _TEST_ROOT_DIR="./" ;
 if [[ -d ./multicast ]] ; then
-	_TEST_ROOT_DIR="./multicast" ;
 	_TEST_ROOT_DIR="./" ;
 elif [[ -d ./tests ]] ; then
 	_TEST_ROOT_DIR="./" ;
@@ -97,36 +114,62 @@ else
 	EXIT_CODE=1
 fi
 
-_TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
+# This File  MUST BE GIT-IGNORED
+# to be SAFELY USED to store Tokens and env vars (update logic as needed)
+if [[ ( -r ./codecov_env ) ]] ; then
+	source ./codecov_env 2>/dev/null || true ;
+fi
 
-for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 | xargs -0 -L1 -I{} git ls-files "{}" ; wait ;) ; do
-	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -ne 0) ]] ; then
-		echo "SKIP: ${_TEST_DOC} is disclaimed." ;
-		EXIT_CODE=126
-	else
-		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -le 0) ]] ; then
-			echo "FAIL: ${_TEST_DOC} is missing a copyright line" ;
-			EXIT_CODE=127
+if [[ ( -r ./codecov.yml ) ]] ; then
+	cat codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate 2>/dev/null || EXIT_CODE=6
+fi
+if [[ ( -r ./.codecov.yml ) ]] ; then
+	cat ./.codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate 2>/dev/null || EXIT_CODE=6
+fi
+
+
+#########################
+# actual Work starts here
+#########################
+curl -fLso codecov https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov ;
+for i in 1 256 512 ; do
+	curl -fLso codecov.SHA${i}SUM "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM" ; wait ;
+	curl -fLso codecov.SHA${i}SUM.sig "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM.sig" ; wait ;
+	# test sha1/sha512 signatures if found and sha256 even if not found
+	if [[ ( -r codecov.SHA${i}SUM ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+		if [[ ( -r codecov.SHA${i}SUM.sig ) ]] ; then
+			# configure your CI evironment to trust the key at https://keybase.io/codecovsecurity/pgp_keys.asc
+            # FP: 2703 4E7F DB85 0E0B BC2C 62FF 806B B28A ED77 9869
+			# OR...
+			# Set CI=true to continue on missing keys
+			gpgv codecov.SHA${i}SUM.sig codecov.SHA${i}SUM || ${CI} || EXIT_CODE=126
+			rm -vf codecov.SHA${i}SUM.sig 2>/dev/null ;
 		fi
-		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
-			echo "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
-		fi
-		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt ${_TEST_YEAR}) ]] ; then
-			echo "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" ;
-		fi
-		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
-			case "$EXIT_CODE" in
-				0) true ;;
-				*) echo "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
-			esac
-		fi
+		shasum -a $i -c --ignore-missing codecov.SHA${i}SUM || EXIT_CODE=126
+		rm -vf codecov.SHA${i}SUM 2>/dev/null ;
 	fi
 done
 
-unset _TEST_ROOT_DIR 2>/dev/null || true ;
-unset _TEST_DOC 2>/dev/null || true ;
-unset _TEST_YEAR 2>/dev/null || true ;
+if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	chmod -v 751 ./codecov || EXIT_CODE=126
+fi
 
+if [[ ( -x $(command -v coverage3) ) ]] ; then
+	coverage3 combine 2>/dev/null || true
+	coverage3 xml 2>/dev/null || true
+elif [[ ( -x $(command -v coverage) ) ]] ; then
+	coverage combine 2>/dev/null || true
+	coverage xml 2>/dev/null || true
+fi
+
+if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	./codecov -n "Custom Test Run" -X gcov -F multicast,${CI_OS:-linux}-latest -Z || EXIT_CODE=10 ;
+fi
+
+
+unset _TEST_ROOT_DIR 2>/dev/null || true ;
+
+rm -f ./codecov 2>/dev/null > /dev/null || true ; wait ;
 rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
 
 # goodbye

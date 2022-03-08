@@ -1,49 +1,236 @@
 name: CI
-
 on: [push]
-
 jobs:
-  MATS:
-
+  BUILD:
     runs-on: ubuntu-latest
-
+    env:
+      LANG: "en_US.UTF-8"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
+    - name: python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
     - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile purge 2>/dev/null || true ;
+    - name: Test Build
+      id: build
+      run: make -j1 -f Makefile build ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile purge || true ;
+
+  BOOTSTRAP:
+    if: ${{ always() }}
+    needs: BUILD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        lang-var: ["en_US.UTF-8", "de.UTF-8", "jp.UTF-8"]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: ${{ matrix.lang-var }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt
+    - name: Pre-build
+      id: bootstrap
+      run: |
+        make -j1 -f Makefile clean || true ;
+        make -j1 -f Makefile build ;
+    - name: Run Tests
+      id: test-install
+      run: make -j1 -f Makefile user-install ;
+    - name: Test Info
+      id: test-info
+      run: python -m setup.py --name --version --license || true ;
+    - name: Post-Clean
+      id: post
+      run: |
+        make -j1 -f Makefile purge || true ;
+        make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
+
+  MATS:
+    if: ${{ always() }}
+    needs: BUILD
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup dependencies
+      run: |
+        pip install -r ./requirements.txt ;
+        pip install coverage || true ;
+    - name: Pre-Clean
+      id: clean
       run: make -j1 -f Makefile clean || true ;
     - name: Run Tests
-      run: |
-        echo Testing M.A.T.s,
-        make -j1 -f Makefile test || true
+      id: tests
+      run: make -j1 -f Makefile test ;
     - name: Post-Clean
+      id: post
       run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
+  COVERAGE:
+    if: ${{ success() }}
+    needs: [BUILD, MATS]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8, 3.9]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.UTF-8"
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for ${{ matrix.python-version }}
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt ;
+        pip install coverage ;
+        pip install pytest ;
+        pip install pytest-cov
+        pip install coverage ;
+    - name: Install code-climate tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
+        if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
+    - name: Install deepsource tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Generate Coverage for py${{ matrix.python-version }}
+      run: make -j1 -f Makefile test-pytest ;
+    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        directory: .
+        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: true
+    - name: Upload Python ${{ matrix.python-version }} Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./test-reports/
+        if-no-files-found: ignore
+    - name: code-climate for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+    - name: deepsource for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      shell: bash
+      run: |
+        if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
 
   STYLE:
-
+    if: ${{ always() }}
+    needs: [BUILD, MATS]
     runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.9'
+      LANG: "en_US.UTF-8"
 
     steps:
     - uses: actions/checkout@v2
-    - name: Pre-Clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: Setup Linters
       run: |
-        echo Testing Style,
-        make -j1 -f Makefile test-style || true
-    - name: Post-Clean
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt ;
+        pip install flake8 ;
+        pip install pyflakes ;
+        pip install pep8 ;
+    - name: Pre-Clean
+      id: clean
       run: make -j1 -f Makefile clean || true ;
+    - name: Testing Style
+      id: style
+      run: make -j1 -f Makefile test-style ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
 
-  BUILD:
 
+  TOX:
+    if: ${{ success() }}
+    needs: [MATS, STYLE, COVERAGE]
     runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: '3.9'
 
     steps:
     - uses: actions/checkout@v2
-    - name: Pre-Clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.9
+    - name: install TOX
       run: |
-        echo Testing Build,
-        make -j1 -f Makefile build || true
+        python -m pip install --upgrade pip setuptools wheel tox
+        pip install -r ./requirements.txt ;
+        pip install coverage || true ;
+        pip install flake8 || true ;
+        pip install pyflakes || true ;
+        pip install pep8 || true ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Testing Tox
+      run: make -j1 -f Makefile test-tox || true ;
     - name: Post-Clean
-      run: make -j1 -f Makefile purge || true ;
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}

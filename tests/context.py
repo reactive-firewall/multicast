@@ -23,27 +23,27 @@ __name__ = """tests.context"""
 
 __doc__ = """
 	Context for Testing.
-	
+
 	Meta Tests - Fixtures:
-		
+
 		Test fixtures by importing test context.
-		
+
 		>>> import tests.context as context
 		>>>
 
 		>>> from context import os as os
 		>>>
 
-		>>> from context import unittest as unittest
+		>>> from context import unittest as _unittest
 		>>>
 
-		>>> from context import subprocess as subprocess
+		>>> from context import subprocess as _subprocess
 		>>>
 
-		>>> from context import multicast as multicast
+		>>> from context import multicast as _multicast
 		>>>
 
-		>>> from context import profiling as profiling
+		>>> from context import profiling as _profiling
 		>>>
 
 """
@@ -101,12 +101,118 @@ except Exception:  # pragma: no branch
 	raise ImportError("[CWE-440] profiling Failed to import.")
 
 
+__BLANK = str("""""")
+"""
+	A literaly named variable to improve readability of code when using a blank string.
+
+	Meta Testing:
+
+	First setup test fixtures by importing test context.
+
+		>>> import tests.context as _context
+		>>>
+
+	Testcase 1: __BLANK should be a blank string.
+
+		>>> import tests.context as _context
+		>>> _context.__BLANK is None
+		False
+		>>> isinstance(_context.__BLANK, type(str()))
+		True
+		>>> len(_context.__BLANK) == int(0)
+		True
+		>>>
+
+
+"""
+
+
+def getCoverageCommand():
+	"""
+		Function for backend coverage command.
+		Rather than just return the sys.executable which will usually be a python implementation,
+		this function will search for a coverage tool to allow coverage testing to continue beyond
+		the process fork of typical cli testing.
+
+		Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context as context
+			>>>
+
+		Testcase 1: function should have a output.
+
+			>>> import tests.context as context
+			>>> context.getCoverageCommand() is None
+			False
+			>>>
+
+
+	"""
+	thecov = "exit 1 ; #"
+	try:
+		thecov = checkPythonCommand(["command", "-v", "coverage"])
+		if (str("/coverage") in str(thecov)):
+			thecov = str("coverage")
+		elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
+			thecov = str("coverage3")
+		else:  # pragma: no branch
+			thecov = "exit 1 ; #"
+	except Exception:  # pragma: no branch
+		thecov = "exit 1 ; #"
+	return str(thecov)
+
+
+def __check_cov_before_py():
+	"""
+		Utility Function to check for coverage availability before just using plain python.
+		Rather than just return the sys.executable which will usually be a python implementation,
+		this function will search for a coverage tool before falling back on just plain python.
+
+		Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context
+			>>>
+
+		Testcase 1: function should have a output.
+
+			>>> tests.context.__check_cov_before_py() is not None
+			True
+			>>>
+
+		Testcase 2: function should have a string output of python or coverage.
+
+			>>> _test_fixture = tests.context.__check_cov_before_py()
+			>>> isinstance(_test_fixture, type(str("")))
+			True
+			>>> (str("python") in _test_fixture) or (str("coverage") in _test_fixture)
+			True
+			>>>
+
+
+	"""
+	thepython = str(sys.executable)
+	thecov = getCoverageCommand()
+	if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 7)):
+		thepython = str("{} run -p").format(str(thecov))
+	else:  # pragma: no branch
+		try:
+			import coverage as coverage
+			if coverage.__name__ is not None:
+				thepython = str("{} -m coverage run -p").format(str(sys.executable))
+		except Exception:
+			thepython = str(sys.executable)
+	return str(thepython)
+
+
 def getPythonCommand():
 	"""
 		Function for backend python command.
 		Rather than just return the sys.executable which will usually be a python implementation,
-		this function will search for a coverage tool to allow coverage testing to continue beyond
-		the process fork of typical cli testing.
+		this function will search for a coverage tool with getCoverageCommand() first.
 
 		Meta Testing:
 
@@ -116,34 +222,16 @@ def getPythonCommand():
 		>>>
 
 		Testcase 1: function should have a output.
-		
+
 		>>> tests.context.getPythonCommand() is not None
 		True
 		>>>
 
 	"""
-	thepython = "exit 1 ; #"
+	thepython = "python"
 	try:
-		thepython = checkPythonCommand(["command", "-v", "coverage"])
-		if (sys.version_info >= (3, 3)):
-			if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-				thepython = str("coverage run -p")
-			elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
-					thepython = str("coverage3 run -p")
-			else:
-				thepython = str(sys.executable)
-		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
-			try:
-				import coverage
-				if coverage.__name__ is not None:
-					thepython = str("{} -m coverage run -p").format(str(sys.executable))
-				else:
-					thepython = str(sys.executable)
-			except Exception:
-				thepython = str(sys.executable)
-		else:
-			thepython = str(sys.executable)
-	except Exception:
+		thepython = __check_cov_before_py()
+	except Exception:   # pragma: no branch
 		thepython = "exit 1 ; #"
 		try:
 			thepython = str(sys.executable)
@@ -152,50 +240,57 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkPythonCommand(args=[None], stderr=None):
+def checkCovCommand(args=[None]):
+	"""Utility Function."""
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+	if str("coverage") in args[0]:
+		i = 1
+		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
+			args[0] = str(sys.executable)
+			args.insert(1, str("-m"))
+			args.insert(2, str("coverage"))
+			i += 2
+		else:  # pragma: no branch
+			args[0] = str(getCoverageCommand())
+		extra_args = ["""run""", """-p""", """--source=multicast"""]
+		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
+		for k, ktem in enumerate(extra_args):
+			offset = i + k
+			args.insert(offset, ktem)
+	return args
+
+
+def checkStrOrByte(theInput):
+	theOutput = None
+	if theInput is not None:
+		theOutput = theInput
+	try:
+		if isinstance(theInput, bytes):
+			theOutput = theInput.decode("""UTF-8""")
+	except UnicodeDecodeError:
+		theOutput = bytes(theInput)
+	return theOutput
+
+
+def checkPythonCommand(args, stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
+		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
-				if sys.__name__ is None:
-					raise ImportError("[CWE-758] Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(5, str("--source=multicast"))
-				elif str("{} -m coverage3 ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage3"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(5, str("--source=multicast"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(3, str("--source=multicast"))
+			if str("coverage") in args[0]:
+				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
-	except Exception as err:
+	except Exception as err:  # pragma: no branch
 		theOutput = None
 		try:
 			if err.output is not None:
 				theOutput = err.output
-		except Exception as cascadeErr:
+		except Exception:
 			theOutput = None
-			cascadeErr = None
-			del cascadeErr
-	try:
-		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode("""utf_8""")
-	except UnicodeDecodeError:
-		theOutput = bytes(theOutput)
+	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
@@ -209,68 +304,104 @@ def checkPythonFuzzing(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
+		if args is None or args is [None]:  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
-				if sys.__name__ is None:
-					raise ImportError("Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(4, str("--source=multicast"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(2, str("--source=multicast"))
+			if str("coverage") in args[0]:
+				args = checkCovCommand(args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
-		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf_8')
-	except Exception as err:
+	except BaseException as err:  # pragma: no branch
 		theOutput = None
 		raise RuntimeError(err)
+	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
 def debugBlob(blob=None):
+	"""Helper function to debug unexpected outputs.
+
+		Especialy usefull for cross-python testing where output may differ
+		yet may be from the same logical data.
+
+		Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context
+			>>>
+
+			>>> norm_fixture = "Example Sample"
+			>>> othr_fixture = \"""'Example Sample'\"""
+			>>>
+
+		Testcase 1: function should have a output.
+
+			>>> debugBlob(norm_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<BLANKLINE>
+			String:
+			"
+			Example Sample
+			"
+			<BLANKLINE>
+			Data:
+			"
+			'Example Sample'
+			"
+			<BLANKLINE>
+			True
+			>>>
+
+		Testcase 2: function should have a output even with bad input.
+
+			>>> debugBlob(othr_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<BLANKLINE>
+			String:
+			"
+			...Example Sample...
+			"
+			<BLANKLINE>
+			Data:
+			"
+			...'Example Sample'...
+			"
+			<BLANKLINE>
+			True
+			>>>
+
+	"""
 	try:
-		print(str(""))
+		print(__BLANK)
 		print(str("String:"))
 		print(str("""\""""))
 		print(str(blob))
 		print(str("""\""""))
-		print(str(""))
+		print(__BLANK)
 		print(str("Data:"))
 		print(str("""\""""))
 		print(repr(blob))
 		print(str("""\""""))
-		print(str(""))
+		print(__BLANK)
 	except Exception:
-		return False
+		print(__BLANK)
 	return True
 
 
 def debugtestError(someError):
-	"""
-		Helper function to debug unexpected outputs.
-		
+	"""Helper function to debug unexpected outputs.
+
 		Meta Testing:
-		
+
 		First setup test fixtures by importing test context.
-		
+
 		>>> import tests.context
 		>>>
-		
+
 		>>> err_fixture = RuntimeError(\"Example Error\")
 		>>> bad_fixture = BaseException()
 		>>>
-		
+
 		Testcase 1: function should have a output.
-		
+
 		>>> debugtestError(err_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		ERROR:
@@ -279,9 +410,9 @@ def debugtestError(someError):
 		('Example Error',)
 		<BLANKLINE>
 		>>>
-		
+
 		Testcase 2: function should have a output even with bad input.
-		
+
 		>>> debugtestError(bad_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<BLANKLINE>
 		ERROR:
@@ -292,7 +423,7 @@ def debugtestError(someError):
 		>>>
 
 	"""
-	print(str(""))
+	print(__BLANK)
 	print(str("ERROR:"))
 	if someError is not None:
 		print(str(type(someError)))
@@ -301,12 +432,14 @@ def debugtestError(someError):
 			print(str((someError.args)))
 		else:
 			print(str("<No Args>"))
-		print(str(""))
+		print(__BLANK)
 
 
 def check_exec_command_has_output(test_case, someArgs):
 	"""Test case for command output != None.
-		returns True if has output and False otherwise."""
+
+		returns True if has output and False otherwise.
+	"""
 	theResult = False
 	fail_msg_fixture = str("""Expecting output: CLI test had no output.""")
 	try:
@@ -329,8 +462,7 @@ def check_exec_command_has_output(test_case, someArgs):
 
 
 def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
-	"""
-		Helper function to debug unexpected outputs.
+	"""Helper function to debug unexpected outputs.
 
 		Meta Testing:
 
@@ -363,7 +495,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 		>>>
 
 		Testcase 2: function should have a output even with bad input.
-		
+
 		>>> tests.context.debugUnexpectedOutput(
 		... 	expected_fixture, unexpected_fixture, None
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE
@@ -381,21 +513,21 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 		>>>
 
 	"""
-	print(str(""))
+	print(__BLANK)
 	if (thepython is not None):
 		print(str("python cmd used: {}").format(str(thepython)))
 	else:
 		print("Warning: Unexpected output!")
-	print(str(""))
+	print(__BLANK)
 	if (expectedOutput is not None):
 		print(str("The expected output is..."))
-		print(str(""))
+		print(__BLANK)
 		print(str("{}").format(str(expectedOutput)))
-		print(str(""))
+		print(__BLANK)
 	print(str("The actual output was..."))
-	print(str(""))
+	print(__BLANK)
 	print(str("{}").format(str(actualOutput)))
-	print(str(""))
+	print(__BLANK)
 
 
 class BasicUsageTestSuite(unittest.TestCase):
@@ -430,11 +562,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
+		"""Overides unittest.TestCase.setUpClass(cls) to setup thepython test fixture."""
 		cls._thepython = getPythonCommand()
-	
+
 	def setUp(self):
-		"""
-			Overides unittest.TestCase.setUp(unittest.TestCase).
+		"""Overides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if (self._thepython is None) and (len(self._thepython) <= 0):
@@ -445,6 +577,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Test case 0: Insanitty Test."""
 		assert True
 		self.assertTrue(True, "Insanitty Test Failed")
+
+	def test_finds_python_WHEN_testing(self):
+		"""Test case 1: Class Test-Fixture Meta Test."""
+		if (self._thepython is None) and (len(self._thepython) <= 0):
+			self.fail(str("""No python cmd to test with!"""))
+		self.test_absolute_truth_and_meaning()
 
 	@classmethod
 	def tearDownClass(cls):

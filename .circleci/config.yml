@@ -2,17 +2,17 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - checkout
       - run:
@@ -29,31 +29,31 @@ jobs:
           shell: /bin/bash
           name: "install coverage attempt"
           command: |
-            python3 -m pip install --user coverage || true
+            python3 -m pip install --upgrade --user coverage || true
       - run:
           name: "install flake8 attempt"
           command: |
-            python3 -m pip install --user flake8 || true
+            python3 -m pip install --upgrade --user flake8 || true
           when: on_success
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - ~/python-repo
+            - ~/multicast
 
   test:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -67,7 +67,7 @@ jobs:
           shell: /bin/bash
           name: "Installing newer deps"
           command: |
-            python3 -m pip install --user coverage3 || true
+            python3 -m pip install --upgrade --user coverage3 || true
           when: on_fail
       - run:
           shell: /bin/bash
@@ -96,32 +96,44 @@ jobs:
 
   pytest:
     docker:
-      - image: circleci/python:3.6.1
       - image: circleci/python:3.7
       - image: circleci/python:3.8
-	  - image: circleci/python:3.9
+      - image: circleci/python:3.9
     parallelism: 2
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
-      LC_CTYPE: en_EN.UTF-8
+      LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
-    working_directory: ~/python-repo
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
+          name: "setup for doctest"
+          command: |
+            python3 -m pip install --upgrade --user doctest || true
+          when: on_success
+      - run:
+          shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --user coverage || true
+            python3 -m pip install --upgrade --user coverage || true
           when: on_success
       - run:
           shell: /bin/bash
           name: "setup up for pytest"
           command: |
             python3 -m pip install --user pytest || true
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "setup up for pytest"
+          command: |
+            python3 -m pip install --user pytest-cov || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -157,13 +169,14 @@ jobs:
   lint:
     docker:
       - image: circleci/python:3.9
+    resource_class: medium
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
       LANG: en_US.UTF-8
       SHELL: /bin/bash
-      LC_CTYPE: en_EN.UTF-8
-    working_directory: ~/python-repo
+      LC_CTYPE: en_US.UTF-8
+    working_directory: ~/multicast
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -201,3 +214,4 @@ workflows:
       - pytest:
           requires:
             - build
+            - test

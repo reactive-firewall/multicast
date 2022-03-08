@@ -16,60 +16,89 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Contains the Python Multicast library."""
+
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__version__""", """__prolog__""",
-	"""__doc__""", """__MCAST_DEFAULT_PORT""", """recv""", """send"""
+	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
+	"""__doc__""", """__BLANK""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
+	"""__MCAST_DEFAULT_TTL""", """recv""", """send"""
 ]
 
 __package__ = """multicast"""
+"""The package of this program.
 
-
-__module__ = """multicast"""
-
-
-__name__ = """multicast"""
-
-
-global __version__
-"""The version of this program."""
-
-__version__ = """1.2.0"""
-
-
-global __MCAST_DEFAULT_PORT
-"""
-	Arbitrary port to use by default, though any dynamic and free port would work
-
-	Testing:
+	Minimal Acceptance Testing:
 
 	First setup test fixtures by importing multicast.
 
-	>>> import multicast
-	>>>
+		>>> import multicast as _multicast
+		>>>
 
-	>>> multicast.recv is not None
-	True
-	>>>
-
-	Testcase 0: Multicast should have a default port.
-		A: Test that the __MCAST_DEFAULT_PORT attribute is initialized.
-		B: Test that the __MCAST_DEFAULT_PORT attribute is an int.
-
-	>>> multicast.__MCAST_DEFAULT_PORT is not None
-	True
-	>>> type(multicast.__MCAST_DEFAULT_PORT) is type(1)
-	True
-	>>>
+		>>> _multicast.__package__ is not None
+		True
+		>>>
 
 """
 
-__MCAST_DEFAULT_PORT = 19991
+
+__module__ = """multicast"""
+"""The module of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__module__ is not None
+		True
+		>>>
+
+"""
 
 
-__prolog__ = str("""Python Multicast library version {version}.""").format(version=__version__)
+__name__ = """multicast"""
+"""The name of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__name__ is not None
+		True
+		>>>
+
+"""
 
 
-__doc__ = __prolog__ + """
+global __version__
+
+__version__ = """1.3.0"""
+"""The version of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__version__ is not None
+		True
+		>>>
+
+"""
+
+
+__prologue__ = str("""Python Multicast library version {version}.""").format(version=__version__)
+"""The one-line description or summary of this program."""
+
+
+__doc__ = __prologue__ + """
 
 	Minimal Acceptance Testing:
 
@@ -86,7 +115,7 @@ __doc__ = __prolog__ + """
 		True
 		>>>
 
-		Testcase 0: multicast.recv should have a doctests.
+	Testcase 0: multicast.recv should have a doctests.
 
 		>>> import multicast.recv
 		>>>
@@ -95,7 +124,135 @@ __doc__ = __prolog__ + """
 		True
 		>>>
 
-	"""
+	Testcase 1: multicast.send should have a doctests.
+
+		>>> import multicast.send
+		>>>
+
+		>>> multicast.send.__module__ is not None
+		True
+		>>>
+
+	Testcase 2: multicast.__main__ should have a doctests.
+
+		>>> import multicast.__main__ as _main
+		>>>
+
+		>>> _main.__module__ is not None
+		True
+		>>> _main.__doc__ is not None
+		True
+		>>>
+
+
+"""
+
+
+global __MCAST_DEFAULT_PORT  # noqa
+
+__MCAST_DEFAULT_PORT = 19991
+"""
+	Arbitrary port to use by default, though any dynamic and free port would work.
+
+	Minimal Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the __MCAST_DEFAULT_PORT attribute is initialized.
+		B: Test that the __MCAST_DEFAULT_PORT attribute is an int.
+
+		>>> multicast.__MCAST_DEFAULT_PORT is not None
+		True
+		>>> type(multicast.__MCAST_DEFAULT_PORT) is type(1)
+		True
+		>>>
+		>>> multicast.__MCAST_DEFAULT_PORT > int(1024)
+		True
+		>>>
+
+"""
+
+global __MCAST_DEFAULT_GROUP  # noqa
+
+__MCAST_DEFAULT_GROUP = """224.0.0.1"""
+"""
+	Arbitrary group to use by default, though any mcst grp would work.
+
+	Minimal Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the __MCAST_DEFAULT_GROUP attribute is initialized.
+		B: Test that the __MCAST_DEFAULT_GROUP attribute is an IP string.
+
+		>>> multicast.__MCAST_DEFAULT_GROUP is not None
+		True
+		>>> type(multicast.__MCAST_DEFAULT_GROUP) is type(str)
+		True
+		>>>
+
+"""
+
+
+global __MCAST_DEFAULT_TTL  # noqa
+"""
+	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
+
+	Minimal Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default TTL.
+		A: Test that the __MCAST_DEFAULT_TTL attribute is initialized.
+		B: Test that the __MCAST_DEFAULT_TTL attribute is an int.
+
+		>>> multicast.__MCAST_DEFAULT_TTL is not None
+		True
+		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
+		True
+		>>>
+
+"""
+
+
+global __BLANK  # noqa
+
+__BLANK = str("""""")
+"""
+	Arbitrary blank string.
+
+	Minimal Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> __BLANK = multicast.__BLANK
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the __BLANK attribute is initialized.
+		B: Test that the __BLANK attribute is an empty string.
+
+		>>> __BLANK is not None
+		True
+		>>> type(__BLANK) is type(str)
+		True
+		>>>
+		>>> len(__BLANK) <= 0
+		True
+		>>>
+
+"""
 
 
 try:
@@ -115,9 +272,21 @@ except Exception as err:
 
 
 try:
+	import unicodedata
+	if unicodedata.__name__ is None:
+		raise ImportError("FAIL: we could not import unicodedata. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+try:
 	import socket
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
+	if sys.platform.startswith("darwin") or sys.platform.startswith("linux"):  # pragma: no-branch
+		__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)  # pragma: no cover
+	else:  # pragma: no-branch
+		__MCAST_DEFAULT_TTL = int(20)  # pragma: no cover
 except Exception as err:
 	raise ImportError(err)
 
@@ -147,21 +316,18 @@ try:
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
 	del importErr
-	import multicast.recv as send
+	import multicast.send as send
 
 
-if __name__ in '__main__':
-	try:
-		if 'multicast.__main__' not in sys.modules:
-			from . import __main__ as __main__
-		else:  # pragma: no branch
-			__main__ = sys.modules["""multicast.__main__"""]
-	except Exception:
-		from . import __main__ as __main__
+try:
+	if """multicast.__main__""" in sys.modules:  # pragma: no cover
+		__main__ = sys.modules["""multicast.__main__"""]
+except Exception:
+	import multicast.__main__ as __main__
 
-if __name__ in '__main__':
+
+if __name__ in u'__main__':
 	__EXIT_CODE = 2
-	if __main__.__name__ is None:
-		raise ImportError(str("Failed to open multicast"))
-	__EXIT_CODE = __main__.main(sys.argv[1:])
+	if __main__.main is not None:
+		__EXIT_CODE = __main__.main(sys.argv[1:])
 	exit(__EXIT_CODE)

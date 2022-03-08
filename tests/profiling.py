@@ -18,7 +18,7 @@
 # limitations under the License.
 
 
-# Third-party Acknowlegement:
+# Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
 # https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154
@@ -109,7 +109,34 @@ class timewith():
 
 
 def do_time_profile(func, timer_name="time_profile"):
-	"""Runs a function with a timer"""
+	"""Runs a function with a timer.
+
+	Time Testing:
+
+		First some test fixtures:
+
+		>>> import tests.context as context
+		>>> from context import profiling as profiling
+		>>>
+
+	Testcase 0: test the time_profile.
+
+		>>> def doWork():
+		...    \"""Does some work.\"""
+		...    for i in range(0, 42):
+		...        print(str("Do Task {}").format(int(i)))
+		>>>
+		>>> profiling.do_time_profile(
+		...    doWork,
+		...    timer_name=str("work time test")
+		... )() #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		work...Start Timer...
+		...Do Task...
+		work...Stop Timer...
+		work...took ... seconds
+		>>>
+
+	"""
 	import functools
 
 	@functools.wraps(func)
@@ -126,7 +153,36 @@ def do_time_profile(func, timer_name="time_profile"):
 
 
 def do_cprofile(func):
-	"""use built-in profiler to profile."""
+	"""Use built-in profiler to profile.
+
+	Time Testing:
+
+		First some test fixtures:
+
+		>>> import tests.context as context
+		>>> from context import profiling as profiling
+		>>>
+
+	Testcase 0: test the time_profile.
+
+		>>> def doWork():
+		...    \"""Does some work.\"""
+		...    for i in range(0, 42):
+		...        print(str("Do Task {}").format(int(i)))
+		>>>
+		>>> profiling.do_cprofile(
+		...    doWork
+		... )() #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		Do Task 0...Do Task 10...Do Task 20...Do Task 30...Do Task 40...
+		...function calls in ... seconds...Ordered by: standard name...
+		...ncalls  tottime  percall  cumtime  percall filename:lineno(function)...
+		...<...>:1(doWork)...{built-in method builtins.print}...
+		<BLANKLINE>
+		<BLANKLINE>
+		>>>
+
+
+	"""
 	def profiled_func(*args, **kwargs):
 		profile = cProfile.Profile()
 		try:
@@ -142,7 +198,7 @@ def do_cprofile(func):
 try:  # noqa
 	from line_profiler import LineProfiler
 
-	def do_profile(follow=None):
+	def do_profile(follow=None):  # pragma: no cover
 		if follow is None:
 			follow = []
 
@@ -160,7 +216,7 @@ try:  # noqa
 			return profiled_func
 		return inner
 
-except ImportError:
+except ImportError:  # pragma: no cover
 	def do_profile(follow=None):
 		"Helpful if you accidentally leave in production!"
 		if follow is None:
@@ -173,16 +229,15 @@ except ImportError:
 		return inner
 
 
-def main(argv=None):
+def main(argv=None):  # pragma: no cover
 	"""The Main Event makes no sense to profiling."""
 	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
 
 
-if __name__ in '__main__':
+if __name__ in '__main__':  # pragma: no cover
 	exitcode = 3
 	try:
 		exitcode = main(sys.argv[1:])
 	finally:
 		exit(exitcode)
-
 
