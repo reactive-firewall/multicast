@@ -297,13 +297,13 @@ def hearstep(groups, port, iface=None, bind_group=None):
 		False
 		>>> type(multicast.recv.hearstep)
 		<class 'function'>
-		>>> multicast.recv.hearstep(None, 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> multicast.recv.hearstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		'...'
 		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
-		>>> multicast.recv.hearstep([tst_fxtr], 19991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> multicast.recv.hearstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		'...'
 		>>> multicast.recv.hearstep(
-		... 		[tst_fxtr], 19991, None, tst_fxtr
+		... 		[tst_fxtr], 59991, None, tst_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		'...'
 		>>>
@@ -314,6 +314,7 @@ def hearstep(groups, port, iface=None, bind_group=None):
 		groups = []
 	sock = genSocket()
 	msgbuffer = str(__BLANK)
+	chunk = None
 	try:
 		sock.bind(('' if bind_group is None else bind_group, port))
 		for group in groups:
@@ -323,14 +324,8 @@ def hearstep(groups, port, iface=None, bind_group=None):
 				socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
 			)
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-			chunk = None
 		while True:
 			chunk = sock.recv(1316)
-			if not (chunk is None):
-				msgbuffer += str(chunk, encoding='utf8')
-				chunk = None
-				# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
-			# about 969 bytes in base64 encoded as chars
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(__BLANK)
@@ -340,6 +335,11 @@ def hearstep(groups, port, iface=None, bind_group=None):
 			print(__BLANK)
 	finally:
 		sock = endSocket(sock)
+	if not (chunk is None):
+		msgbuffer += str(chunk, encoding='utf8')
+		chunk = None
+		# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
+	# about 969 bytes in base64 encoded as chars
 	return msgbuffer
 
 
@@ -406,7 +406,7 @@ def main(*argv):
 	try:
 		args = parseArgs(*argv)
 		response = hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
-		if (sys.stdout.isatty() and len(response) > 0):  # pragma: no cover
+		if sys.stdout.isatty() and (len(response) > 0):  # pragma: no cover
 			print(__BLANK)
 			print(str(response))
 			print(__BLANK)

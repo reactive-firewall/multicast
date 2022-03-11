@@ -150,7 +150,7 @@ __doc__ = __prologue__ + """
 
 global __MCAST_DEFAULT_PORT  # noqa
 
-__MCAST_DEFAULT_PORT = 19991
+__MCAST_DEFAULT_PORT = 44244
 """
 	Arbitrary port to use by default, though any dynamic and free port would work.
 
@@ -203,6 +203,8 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 
 
 global __MCAST_DEFAULT_TTL  # noqa
+
+__MCAST_DEFAULT_TTL = int(15)
 """
 	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
 
@@ -283,10 +285,6 @@ try:
 	import socket
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
-	if sys.platform.startswith("darwin") or sys.platform.startswith("linux"):  # pragma: no-branch
-		__MCAST_DEFAULT_TTL = int(socket.IP_DEFAULT_MULTICAST_TTL)  # pragma: no cover
-	else:  # pragma: no-branch
-		__MCAST_DEFAULT_TTL = int(20)  # pragma: no cover
 except Exception as err:
 	raise ImportError(err)
 
