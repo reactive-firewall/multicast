@@ -67,7 +67,7 @@ try:
 		from context import multicast as multicast
 		from context import unittest as unittest
 		from context import subprocess as subprocess
-		from multiprocessing import Process
+		from context import Process as Process
 except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 
@@ -96,12 +96,21 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_say_is_stable_WHEN_calling_multicast_GIVEN_say_tool(self):
 		"""Tests the message argument for expected syntax given simple args"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(SAY, message) == error""")
+		fail_fixture = str("""multicast.__main__.useTool(SAY, message) != valid exit(0..3)""")
 		try:
-			with self.assertRaises(SystemExit):
-				self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message"]))
-			self.assertIsNotNone(multicast.__main__.useTool("SAY", ["--message", "test"]))
-			theResult = True
+			tst_err_rslt_a = multicast.__main__.useTool("SAY", ["--message"])
+			tst_err_rslt_b = multicast.__main__.useTool("SAY", ["--message", "test"])
+			self.assertIsNotNone(tst_err_rslt_a)
+			self.assertIsNotNone(tst_err_rslt_b)
+			self.assertNotEqual(int(tst_err_rslt_a), int(0))
+			self.assertNotEqual(int(tst_err_rslt_a), int(1))
+			self.assertNotEqual(int(tst_err_rslt_b), int(1))
+			self.assertNotEqual(int(tst_err_rslt_a), int(2))
+			self.assertNotEqual(int(tst_err_rslt_b), int(2))
+			self.assertNotEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
+			self.assertNotEqual(int(tst_err_rslt_b), int(tst_err_rslt_a))
+			self.assertNotEqual(int(tst_err_rslt_b), int(3))
+			theResult = (int(tst_err_rslt_b) < int(tst_err_rslt_a))
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -111,27 +120,34 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != 2""")
+		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != exit(2)""")
 		try:
-			with self.assertRaises(SystemExit):
-				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--port", "test"]))
-				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 0)
-				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "test"]), 1)
-				self.assertNotEqual(multicast.__main__.useTool("HEAR", ["--port", "11911", "--group=None"]), 1)
-			theResult = True
+			tst_err_rslt_a = multicast.__main__.useTool("HEAR", ["--port" "test"])
+			tst_err_rslt_b = multicast.__main__.useTool("HEAR", ["--port", "test", "--group=None"])
+			self.assertIsNotNone(tst_err_rslt_a)
+			self.assertIsNotNone(tst_err_rslt_b)
+			self.assertNotEqual(int(tst_err_rslt_a), int(0))
+			self.assertNotEqual(int(tst_err_rslt_b), int(0))
+			self.assertNotEqual(int(tst_err_rslt_a), int(1))
+			self.assertNotEqual(int(tst_err_rslt_b), int(1))
+			self.assertNotEqual(int(tst_err_rslt_a), int(2))
+			self.assertNotEqual(int(tst_err_rslt_b), int(2))
+			self.assertEqual(int(tst_err_rslt_b), int(3))
+			self.assertEqual(int(tst_err_rslt_b), int(tst_err_rslt_a))
+			self.assertEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
+			theResult = (int(tst_err_rslt_b) == int(tst_err_rslt_a))
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
-	def test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_tool(self):
+	def test_hear_is_stable_WHEN_calling_multicast_GIVEN_invalid_tool(self):
 		"""Tests the hexdump argument for failure given future tools"""
 		theResult = False
 		fail_fixture = str("""multicast.__main__.useTool(HEAR, hex) == error""")
 		try:
-			with self.assertRaises(SystemExit):
-				self.assertIsNotNone(multicast.__main__.useTool("HEAR", ["--hex"]))
+			self.assertEqual(int(multicast.__main__.useTool("HEAR", ["--hex"])), int(3))
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -171,14 +187,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""SAY --> HEAR == error""")
 		try:
 			_fixture_SAY_args = [
-				"""--port=19991""",
-				"""--mcast-group='224.0.0.1'""",
-				"""--message='test message'"""
+				"""--port""", """59991""",
+				"""--mcast-group""", """'224.0.0.1'""",
+				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
-				"""--port=19991""",
-				"""--join-mcast-groups='224.0.0.1'""",
-				"""--bind-group='224.0.0.1'"""
+				"""--port""", """59991""",
+				"""--join-mcast-groups""", """'224.0.0.1'""",
+				"""--bind-group""", """'224.0.0.1'"""
 			]
 			p = Process(target=multicast.__main__.useTool, name="HEAR", args=("HEAR", _fixture_HEAR_args,))
 			p.start()
@@ -192,7 +208,36 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
-			theResult = True
+			theResult = (int(p.exitcode) <= int(0))
+		except Exception as err:
+			context.debugtestError(err)
+			# raise unittest.SkipTest(fail_fixture)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	def test_hear_Errors_WHEN_say_not_used(self):
+		"""Tests the basic noop recv test"""
+		theResult = False
+		fail_fixture = str("""NOOP --> HEAR != error""")
+		sub_fail_fixture = str("""NOOP X-> HEAR == Error X-> HEAR :: (Error in NOOP)""")
+		try:
+			_fixture_HEAR_args = [
+				"""--port""", """59992""",
+				"""--join-mcast-groups""", """'224.0.0.1'""",
+				"""--bind-group""", """'224.0.0.1'"""
+			]
+			p = Process(target=multicast.__main__.useTool, name="NOHEAR", args=("HEAR", _fixture_HEAR_args,))
+			p.start()
+			try:
+				self.assertIsNone(multicast.__main__.useTool("NOOP", None))
+			except Exception:
+				p.join()
+				raise unittest.SkipTest(sub_fail_fixture)
+			p.join()
+			self.assertIsNotNone(p.exitcode, fail_fixture)
+			self.assertEqual(int(p.exitcode), int(0))
+			theResult = (int(p.exitcode) <= int(0))
 		except Exception as err:
 			context.debugtestError(err)
 			# raise unittest.SkipTest(fail_fixture)

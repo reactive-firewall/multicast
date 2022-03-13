@@ -119,18 +119,22 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
-	$(QUIET)mkdir test-reports 2>/dev/null >/dev/null || true ;
+	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || python -m pytest --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v . ; wait ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-style: cleanup
+test-style: cleanup must_have_flake
 	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)tests/check_cc_lines 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
+
+must_have_flake:
+	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -F flake` ; \
+	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
 cleanup:
 	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true
