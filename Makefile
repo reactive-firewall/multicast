@@ -119,7 +119,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
-	$(QUIET)mkdir test-reports 2>/dev/null >/dev/null || true ;
+	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports

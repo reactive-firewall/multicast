@@ -247,6 +247,7 @@ def parseArgs(arguments=None):
 		description=__prologue__,
 		epilog=__epilogue__
 	)
+	parser.add_argument("""--use-std""", dest='is_std', default=False, action='store_true')
 	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
 	parser.add_argument(
 		"""--join-mcast-groups""", default=[], nargs='*',
@@ -326,6 +327,9 @@ def hearstep(groups, port, iface=None, bind_group=None):
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 		while True:
 			chunk = sock.recv(1316)
+			if not (chunk is None):  # pragma: no branch
+				msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+				chunk = None  # pragma: no cover
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(__BLANK)
@@ -335,10 +339,9 @@ def hearstep(groups, port, iface=None, bind_group=None):
 			print(__BLANK)
 	finally:
 		sock = endSocket(sock)
-	if not (chunk is None):
-		msgbuffer += str(chunk, encoding='utf8')
-		chunk = None
-		# msgbuffer += unicodedata.lookup("""SOFT HYPHEN""")
+	if not (chunk is None):  # pragma: no branch
+		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+		chunk = None  # pragma: no cover
 	# about 969 bytes in base64 encoded as chars
 	return msgbuffer
 
@@ -406,7 +409,7 @@ def main(*argv):
 	try:
 		args = parseArgs(*argv)
 		response = hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
-		if sys.stdout.isatty() and (len(response) > 0):  # pragma: no cover
+		if (sys.stdout.isatty() or args.is_std) and (len(response) > 0):  # pragma: no cover
 			print(__BLANK)
 			print(str(response))
 			print(__BLANK)
@@ -417,7 +420,7 @@ def main(*argv):
 			print(__BLANK)
 			print(str("""Input has an Argument Error"""))
 		__exit_code = 2
-	except Exception as e:
+	except BaseException as e:
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(str(e))
 		__exit_code = 3

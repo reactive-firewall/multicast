@@ -31,9 +31,6 @@ __doc__ = """
 		>>> import tests.context as context
 		>>>
 
-		>>> from context import os as os
-		>>>
-
 		>>> from context import unittest as _unittest
 		>>>
 
@@ -72,6 +69,15 @@ try:
 		unittest = sys.modules["""unittest"""]
 except Exception:  # pragma: no branch
 	raise ImportError("[CWE-440] unittest Failed to import.")
+
+
+try:
+	if 'Process' not in sys.modules:
+		from multiprocessing import Process as Process
+	else:  # pragma: no branch
+		Process = sys.modules["""Process"""]
+except Exception:  # pragma: no branch
+	raise ImportError("[CWE-440] Process Failed to import.")
 
 
 try:
@@ -451,7 +457,7 @@ def check_exec_command_has_output(test_case, someArgs):
 					fail_msg_fixture
 				)
 				theResult = True
-			except Exception as othererr:
+			except BaseException as othererr:
 				debugtestError(othererr)
 				theResult = False
 	except Exception as err:

@@ -299,7 +299,7 @@ def main(*argv):
 			print(__BLANK)
 			print(str("""Input has an Argument Error"""))
 		__exit_code = 2
-	except Exception as e:  # pragma: no branch
+	except BaseException as e:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(str(e))
 		__exit_code = 3
