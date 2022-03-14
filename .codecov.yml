@@ -1,7 +1,6 @@
 codecov:
   max_report_age: off
 
-
 coverage:
   precision: 2
   range: "80...100"
@@ -12,6 +11,7 @@ coverage:
       default:
         target: auto
         base: auto
+        threshold: 1%
         branches:
           - master
           - stageing
@@ -21,48 +21,19 @@ coverage:
       multicast:
         target: 95%
         threshold: 1%
+        only_pulls: false
         flags:
-          - multicast
+          - "multicast"
         paths:
           - "multicast/"
           - "setup.py"
           - "!tests/"
-      unittests:
+      tests:
         target: 80%
-        threshold: 5%
+        threshold: 1%
         flags:
-          - unittests
+          - "tests"
         paths:
-          - "tests/"
-
-
-flag_management:
-  default_rules: # the rules that will be followed for any flag added, generally
-    carryforward: false
-    statuses:
-      - name_prefix: project-
-        type: project
-        target: auto
-        threshold: 0%
-      - name_prefix: patch-
-        type: patch
-        target: 50%
-  individual_flags:  # exceptions to the default rules above, stated flag by flag
-    - name: multicast  #fill in your own flag name
-      paths:
-        - multicast/*.py  #fill in your own path. Note, accepts globs, not regexes
-        - setup.py
-      carryforward: true
-      statuses:
-        - type: project
-          target: 90%
-    - name: tests
-      paths:
-        - tests/check_*  #fill in your own path. Note, accepts globs, not regexes
-        - tests/*.py  #fill in your own path. Note, accepts globs, not regexes
-        - "!multicast/"
-      carryforward: true
-    - name: unittests
-      paths:
-        - tests/  #fill in your own path. Note, accepts globs, not regexes
-      carryforward: true
+          - tests/
+          - "!multicast/"
+        if_ci_failed: ignore
