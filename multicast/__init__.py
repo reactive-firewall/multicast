@@ -204,7 +204,7 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 
 global __MCAST_DEFAULT_TTL  # noqa
 
-__MCAST_DEFAULT_TTL = int(15)
+__MCAST_DEFAULT_TTL = int(8)
 """
 	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
 
@@ -222,6 +222,10 @@ __MCAST_DEFAULT_TTL = int(15)
 		>>> multicast.__MCAST_DEFAULT_TTL is not None
 		True
 		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
+		True
+		>>> (int(multicast.__MCAST_DEFAULT_TTL) >= int(2))
+		True
+		>>> (int(multicast.__MCAST_DEFAULT_TTL) <= int(126))
 		True
 		>>>
 
@@ -285,6 +289,8 @@ try:
 	import socket
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
+	else:  # pragma: no branch
+		socket.setdefaulttimeout(int(__MCAST_DEFAULT_TTL))
 except Exception as err:
 	raise ImportError(err)
 
