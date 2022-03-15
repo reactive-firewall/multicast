@@ -70,10 +70,15 @@ EXIT_CODE=0
 test -x $(command -v grep) || exit 126 ;
 test -x $(command -v python3) || exit 126 ;
 test -x $(command -v git) || exit 126 ;
+test -x $(command -v make) || exit 126 ;
+test -x $(command -v tee) || exit 126 ;
+
+LOG_FILE="test_log_${PPID}.log"
+ERR_FILE="test_log_errors_${PPID}.log"
 
 function cleanup() {
-	rm -f ./test_log_*.log 2>/dev/null || true ; wait ;
-	rm -f ./test_log_errors_*.log 2>/dev/null || true ; wait ;
+	rm -f ./${LOG_FILE} 2>/dev/null || true ; wait ;
+	rm -f ./${ERR_FILE} 2>/dev/null || true ; wait ;
 	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
 }
 
@@ -88,7 +93,6 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
 		echo "Check Integration Tests Coverage already in progress by "`head ${LOCK_FILE}` ;
-		false ;
 		exit 126 ;
 fi
 
@@ -107,25 +111,28 @@ fi
 
 TEST_PORT=59595;
 TEST_MCAST_GROUP='224.0.0.1' ;
-COVERAGE_CMD=$(echo "$(command -v python3) -m coverage run -p -m") ;
+COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m";
 
-make test-reports || EXIT_CODE=3
-echo "Start of Log:" > ./test_log_$PPID.log ; wait ;
-echo "" >> ./test_log_$PPID.log ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --join-mcast-groups ${TEST_MCAST_GROUP} --bind-group ${TEST_MCAST_GROUP} 2>./test_log_errors_$PPID.log ) >> ./test_log_$PPID.log & true ;
+make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
+echo "Start of Log:" > ./${LOG_FILE} ; wait ;
+echo "" >> ./${LOG_FILE} ; wait ;
+( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --join-mcast-groups ${TEST_MCAST_GROUP} --bind-group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
 	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --mcast-group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
 done ;
 wait ;
 
-$(command -v python3) -m coverage combine ;
+$(command -v python3) -m coverage combine -a 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
 wait ;
-cp -f ./test_log_$PPID.log ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
+cp -f ./${LOG_FILE} ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
 echo "" | tee -a ./test-reports/integration_data_log.log ; wait ;
-echo "Errors: " | tee -a ./test-reports/integration_data_log.log ; wait ;
-cat <./test_log_errors_$PPID.log | tee -a ./test-reports/integration_data_log.log ; wait ;
+
+if [[ ( -r ./${ERR_FILE} ) ]] ; then
+	echo "Errors: " | tee -a ./test-reports/integration_data_log.log ; wait ;
+	cat <./${ERR_FILE} | tee -a ./test-reports/integration_data_log.log ; wait ;
+fi
 
 unset COVERAGE_CMD 2>/dev/null || true ;
 unset TEST_MCAST_GROUP 2>/dev/null || true ;

@@ -234,27 +234,24 @@ jobs:
         pip install coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
-      shell: bash
       run: |
         if [ $OS == macos-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter || true ; fi ;
         if [ $OS == macos-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
         if [ $OS == macos-latest ] ; then ./cc-test-reporter before-build || true ; fi
     - name: Pre-Clean
-      id: clean
-      shell: bash
+      id: clean-prep
       run: make -j1 -f Makefile clean || true ;
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      shell: bash
       run: make -j1 -f Makefile build || true ;
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      shell: bash
       run: make -j1 -f Makefile user-install || true ;
     - name: Re-Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -f Makefile test-pytest ;
-    - name: Generate Extra Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      shell: bash
       run: |
-        ./tests/check_integration_coverage || echo "::warning file=./tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
+        make -f Makefile test-pytest ;
+        cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
+    - name: Generate Extra Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
@@ -273,12 +270,10 @@ jobs:
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
-      shell: bash
       run: |
         if [ $OS == macos-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
     - name: Post-purge
       id: post-uninstall
-      shell: bash
       run: make -j1 -f Makefile purge || true ;
       if: ${{ always() }}
     - name: Post-Clean
