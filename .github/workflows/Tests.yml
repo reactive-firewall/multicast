@@ -21,14 +21,31 @@ jobs:
       id: post
       run: make -j1 -f Makefile purge || true ;
 
+
   BOOTSTRAP:
     if: ${{ always() }}
     needs: BUILD
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.7, 3.8, 3.9]
-        lang-var: ["en_US.UTF-8", "de.UTF-8", "jp.UTF-8"]
+        lang-var: ["en_US.utf-8", "de.utf-8", "jp.utf-8"]
+        experimental: [false]
+        include:
+          - python-version: 3.7
+            lang-var: "de.utf-8"
+            experimental: true
+          - python-version: 3.8
+            lang-var: "de.utf-8"
+            experimental: true
+          - python-version: 3.7
+            lang-var: "jp.utf-8"
+            experimental: true
+          - python-version: 3.8
+            lang-var: "jp.utf-8"
+            experimental: true
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: ${{ matrix.lang-var }}
@@ -47,9 +64,11 @@ jobs:
       run: |
         make -j1 -f Makefile clean || true ;
         make -j1 -f Makefile build ;
+      shell: bash
     - name: Run Tests
       id: test-install
       run: make -j1 -f Makefile user-install ;
+      shell: bash
     - name: Test Info
       id: test-info
       run: python -m setup.py --name --version --license || true ;
@@ -59,6 +78,7 @@ jobs:
         make -j1 -f Makefile purge || true ;
         make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
+      shell: bash
 
 
   MATS:
@@ -70,7 +90,7 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.UTF-8"
+      LANG: "en_US.utf-8"
     steps:
     - uses: actions/checkout@master
     - name: Setup Python
@@ -92,6 +112,7 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
+
   COVERAGE:
     if: ${{ success() }}
     needs: [BUILD, MATS]
@@ -103,7 +124,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.UTF-8"
+      LANG: "en_US.utf-8"
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
@@ -176,7 +197,7 @@ jobs:
 
     env:
       PYTHON_VERSION: '3.9'
-      LANG: "en_US.UTF-8"
+      LANG: "en_US.utf-8"
 
     steps:
     - uses: actions/checkout@v2
@@ -197,6 +218,7 @@ jobs:
     - name: Testing Style
       id: style
       run: make -j1 -f Makefile test-style ;
+      shell: bash
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -214,8 +236,8 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.UTF-8"
-      LC_CTYPE: "en_US.UTF-8"
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
@@ -231,27 +253,31 @@ jobs:
         pip install coverage ;
         pip install pytest ;
         pip install pytest-cov ;
-        pip install coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
+      if: ${{ runner.os }} != "Linux"
       run: |
         if [ $OS == macos-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter || true ; fi ;
         if [ $OS == macos-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
         if [ $OS == macos-latest ] ; then ./cc-test-reporter before-build || true ; fi
+      shell: bash
     - name: Pre-Clean
       id: clean-prep
-      run: make -j1 -f Makefile clean || true ;
+      run: make -j1 -f Makefile clean ;
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build || true ;
+      run: make -j1 -f Makefile build ;
+      if: ${{ success() }}
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile user-install || true ;
+      if: ${{ success() }}
     - name: Re-Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        make -f Makefile test-pytest ;
+        make -j1 -f Makefile test-pytest ;
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
+      shell: bash
     - name: Generate Extra Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
+      shell: bash
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
@@ -289,7 +315,7 @@ jobs:
 
     env:
       PYTHON_VERSION: '3.9'
-      LANG: 'en_US.UTF-8'
+      LANG: 'en_US.utf-8'
 
     steps:
     - uses: actions/checkout@v2
