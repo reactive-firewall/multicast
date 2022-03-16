@@ -260,7 +260,7 @@ def checkCovCommand(args=[None]):
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
 		extra_args = [
-			"""run""", """-p""", """-a""",
+			"""run""", """-p""",
 			"""--context=Integration""", """--source=multicast"""
 		]
 		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
@@ -271,6 +271,7 @@ def checkCovCommand(args=[None]):
 
 
 def checkStrOrByte(theInput):
+	"""Checks for bytes that need decoded before always returning a string."""
 	theOutput = None
 	if theInput is not None:  # pragma: no branch
 		theOutput = theInput
@@ -283,7 +284,7 @@ def checkStrOrByte(theInput):
 
 
 def checkPythonCommand(args, stderr=None):
-	"""function for backend subprocess check_output command"""
+	"""function for backend subprocess check_output command."""
 	theOutput = None
 	try:
 		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
