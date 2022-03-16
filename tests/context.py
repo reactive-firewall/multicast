@@ -259,7 +259,10 @@ def checkCovCommand(args=[None]):
 			i += 2
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
-		extra_args = ["""run""", """-p""", """--source=multicast"""]
+		extra_args = [
+			"""run""", """-p""", """-a""",
+			"""--context=Integration""", """--source=multicast"""
+		]
 		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
 		for k, ktem in enumerate(extra_args):
 			offset = i + k
@@ -269,12 +272,12 @@ def checkCovCommand(args=[None]):
 
 def checkStrOrByte(theInput):
 	theOutput = None
-	if theInput is not None:
+	if theInput is not None:  # pragma: no branch
 		theOutput = theInput
 	try:
 		if isinstance(theInput, bytes):
 			theOutput = theInput.decode("""UTF-8""")
-	except UnicodeDecodeError:
+	except UnicodeDecodeError:  # pragma: no branch
 		theOutput = bytes(theInput)
 	return theOutput
 

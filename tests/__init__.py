@@ -26,6 +26,7 @@
 		>>> import tests as _tests
 		>>> _tests.__module__ is not None
 		True
+		>>>
 
 
 """
