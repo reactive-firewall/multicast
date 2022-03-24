@@ -30,22 +30,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9]
-        lang-var: ["en_US.utf-8", "de.utf-8", "jp.utf-8"]
-        experimental: [false]
+        python-version: [3.7, 3.8]
+        lang-var: ["de.utf-8", "jp.utf-8"]
+        experimental: [true]
         include:
           - python-version: 3.7
-            lang-var: "de.utf-8"
-            experimental: true
+            lang-var: "en_US.utf-8"
+            experimental: false
           - python-version: 3.8
+            lang-var: "en_US.utf-8"
+            experimental: false
+          - python-version: 3.9
             lang-var: "de.utf-8"
-            experimental: true
-          - python-version: 3.7
+            experimental: false
+          - python-version: 3.9
             lang-var: "jp.utf-8"
-            experimental: true
-          - python-version: 3.8
-            lang-var: "jp.utf-8"
-            experimental: true
+            experimental: false
+          - python-version: 3.9
+            lang-var: "en_US.utf-8"
+            experimental: false
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: ${{ matrix.lang-var }}
@@ -93,11 +96,10 @@ jobs:
       LANG: "en_US.utf-8"
     steps:
     - uses: actions/checkout@master
-    - name: Setup Python
-      uses: actions/setup-python@v2
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Setup dependencies
       run: |
         pip install -r ./requirements.txt ;
         pip install coverage || true ;
@@ -130,12 +132,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for ${{ matrix.python-version }}
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
         pip install coverage ;
         pip install pytest ;
@@ -200,14 +201,13 @@ jobs:
       LANG: "en_US.utf-8"
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
     - name: Setup Python
       uses: actions/setup-python@master
       with:
         python-version: 3.9
-    - name: Setup Linters
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
         pip install flake8 ;
         pip install pyflakes ;
@@ -243,12 +243,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install ${{ matrix.os }} dependencies for ${{ matrix.python-version }}
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
         pip install coverage ;
         pip install pytest ;
@@ -323,17 +322,16 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.9
-    - name: install TOX
       run: |
-        python -m pip install --upgrade pip setuptools wheel tox
+        pip install --upgrade pip setuptools wheel tox
         pip install -r ./requirements.txt ;
-        pip install coverage || true ;
-        pip install codecov || true ;
-        pip install flake8 || true ;
-        pip install pyflakes || true ;
-        pip install pep8 || true ;
-        pip install tox || true ;
-        pip install six || true ;
+        pip install coverage ;
+        pip install codecov ;
+        pip install flake8 ;
+        pip install pyflakes ;
+        pip install pep8 ;
+        pip install tox ;
+        pip install six ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;

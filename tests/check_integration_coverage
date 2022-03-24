@@ -64,6 +64,9 @@ ulimit -t 600
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
+
+export LC_CTYPE="${LC_CTYPE:-'en_US.UTF-8'}"
+
 LOCK_FILE="${TMPDIR:-/tmp}/cov_integration_test_script_lock"
 EXIT_CODE=0
 
@@ -111,7 +114,7 @@ fi
 
 TEST_PORT=59595;
 TEST_MCAST_GROUP='224.0.0.1' ;
-COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m";
+export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m"
 
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 echo "Start of Log:" > ./${LOG_FILE} ; wait ;
@@ -123,7 +126,7 @@ for PCOUNT in $(seq 1 5) ; do
 done ;
 wait ;
 
-$(command -v python3) -m coverage combine -a 2>/dev/null || EXIT_CODE=2 ;
+$(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
 wait ;
 cp -f ./${LOG_FILE} ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
