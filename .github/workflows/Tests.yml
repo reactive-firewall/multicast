@@ -100,6 +100,7 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for ${{ matrix.python-version }}
       run: |
         pip install -r ./requirements.txt ;
         pip install coverage || true ;
@@ -135,6 +136,7 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
@@ -206,6 +208,7 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.9
+    - name: Install dependencies for python Linters
       run: |
         pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
@@ -246,6 +249,7 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         pip install --upgrade pip setuptools wheel
         pip install -r ./requirements.txt ;
@@ -322,6 +326,7 @@ jobs:
       uses: actions/setup-python@master
       with:
         python-version: 3.9
+    - name: Install dependencies for Tox
       run: |
         pip install --upgrade pip setuptools wheel tox
         pip install -r ./requirements.txt ;
