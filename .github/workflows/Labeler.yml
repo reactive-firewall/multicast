@@ -2,12 +2,18 @@ name: "Pull Request Labeler"
 on:
   pull_request_target:
     types: [opened, reopened]
-    branches: ['master', 'stable']
+    branches: [ master, stable ]
 
 jobs:
   triage:
+    permissions:
+      actions: read
+      contents: read
+      packages: none
+      pull-requests: write
+      security-events: none
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v3
+    - uses: actions/labeler@v4
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
