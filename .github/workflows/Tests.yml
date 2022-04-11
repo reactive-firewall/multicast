@@ -6,6 +6,7 @@ on:
       - stable
     tags:
       - v*
+
 jobs:
   BUILD:
     if: github.repository == 'reactive-firewall/multicast'
@@ -299,6 +300,7 @@ jobs:
       shell: bash
     - name: Generate Extra Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
+        hash -p ./.github/tool_shlock_helper.sh shlock
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
