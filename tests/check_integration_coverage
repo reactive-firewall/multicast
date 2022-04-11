@@ -61,7 +61,8 @@
 ################################################################################
 
 ulimit -t 600
-PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+# setting the path may break brain-dead CI that uses crazy paths
+# PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
 
@@ -114,7 +115,7 @@ fi
 
 TEST_PORT=59595;
 TEST_MCAST_GROUP='224.0.0.1' ;
-export COVERAGE_CMD="python3 -m coverage run --source=multicast -p -m"
+export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m"
 
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 echo "Start of Log:" > ./${LOG_FILE} ; wait ;
