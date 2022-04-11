@@ -204,9 +204,13 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 
 global __MCAST_DEFAULT_TTL  # noqa
 
-__MCAST_DEFAULT_TTL = int(8)
+__MCAST_DEFAULT_TTL = int(1)
 """
-	Arbitrary TTL time to live to use by default, though any small (2-126) TTL would work.
+	Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
+	A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
+	explicit value that could travers byone the local connected network should be
+	chosen by the caller rather than the default vaule. This is inline with the principle
+	of none, one or many.
 
 	Minimal Testing:
 
@@ -218,14 +222,15 @@ __MCAST_DEFAULT_TTL = int(8)
 	Testcase 0: Multicast should have a default TTL.
 		A: Test that the __MCAST_DEFAULT_TTL attribute is initialized.
 		B: Test that the __MCAST_DEFAULT_TTL attribute is an int.
+		c: Test that the __MCAST_DEFAULT_TTL attribute is default of 1.
 
 		>>> multicast.__MCAST_DEFAULT_TTL is not None
 		True
 		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
 		True
-		>>> (int(multicast.__MCAST_DEFAULT_TTL) >= int(2))
+		>>> (int(multicast.__MCAST_DEFAULT_TTL) >= int(0))
 		True
-		>>> (int(multicast.__MCAST_DEFAULT_TTL) <= int(126))
+		>>> (int(multicast.__MCAST_DEFAULT_TTL) <= int(2))
 		True
 		>>>
 
