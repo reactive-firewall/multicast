@@ -232,7 +232,7 @@ def parseArgs(arguments=None):
 		True
 		>>> multicast.recv.parseArgs is not None
 		True
-		>>> tst_fxtr_args = ['''--port=1234''', '''--iface=127.0.0.1''']
+		>>> tst_fxtr_args = ['''--port=12345''', '''--iface=127.0.0.1''']
 		>>> test_fixture = multicast.recv.parseArgs(tst_fxtr_args)
 		>>> test_fixture is not None
 		True
@@ -263,7 +263,7 @@ def parseArgs(arguments=None):
 	__tmp_help += """should be one of the multicast groups joined globally """
 	__tmp_help += """(not necessarily joined in this python program) """
 	__tmp_help += """in the interface specified by --iface. """
-	__tmp_help += """If unspecified, bind to 0.0.0.0 """
+	__tmp_help += """If unspecified, bind to 224.0.0.1 """
 	__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
 	parser.add_argument(
 		"""--bind-group""", default=None,
@@ -317,7 +317,7 @@ def hearstep(groups, port, iface=None, bind_group=None):
 	msgbuffer = str(__BLANK)
 	chunk = None
 	try:
-		sock.bind(('' if bind_group is None else bind_group, port))
+		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
 		for group in groups:
 			mreq = struct.pack(
 				'4sl' if iface is None else '4s4s',
