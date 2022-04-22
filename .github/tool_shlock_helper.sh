@@ -73,7 +73,6 @@ while [ $# -gt $MINPARAMS ]; do    # Until you run out of parameters . . .
 
 case "$1" in
   -p|--pid) shift ; export PID_VALUE="${1}" ;;
-  -v|--verbose) IS_VERBOSE_MODE=1 ;;
   -f|--file) shift ; export LOCK_FILE="${1}" ;;
   -*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
 esac
@@ -89,7 +88,7 @@ if [[ ( -e "${LOCK_FILE}" ) ]] ; then
 	fi
 fi
 
-if [[ $# -eq 0 ]] ; then
+if [[ ( $# -eq 0 ) ]] ; then
 	echo -n "${PID_VALUE:-$PPID}" > "${LOCK_FILE}" ; wait ;
 	test -e "${LOCK_FILE}" || false  ;
 	EXIT_CODE=0 ;
