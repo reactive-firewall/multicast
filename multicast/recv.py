@@ -323,8 +323,6 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		sock = genSocket()
 	else:
 		sock = isock.dup()
-	msgbuffer = str(__BLANK)
-	chunk = None
 	try:
 		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
 		for group in groups:
@@ -335,7 +333,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 			)
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
-		raise NotImplementedError("""[CWE-440] Not Implemented.""", err) # pragma: no cover
+		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
 	return sock
 
 
