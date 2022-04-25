@@ -272,6 +272,73 @@ def parseArgs(arguments=None):
 	return parser.parse_args(arguments)
 
 
+def joinstep(groups, port, iface=None, bind_group=None, isock=None):
+	"""Will join the given multicast group(s).
+
+	The JOIN function. Will start to listen on the given port of an interface for multicast
+	messages to the given group(s).
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.recv is not None
+		True
+		>>>
+
+	Testcase 1: Stability testing.
+
+		>>> import multicast
+		>>>
+		>>> multicast.recv is None
+		False
+		>>>
+		>>> multicast.recv.joinstep is None
+		False
+		>>> type(multicast.recv.joinstep)
+		<class 'function'>
+		>>> multicast.recv.joinstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...>
+		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
+		>>> multicast.recv.joinstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...>
+		>>> multicast.recv.joinstep(
+		... 		[tst_fxtr], 59991, None, tst_fxtr
+		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...>
+		>>> sk_fxtr = genSocket()
+		>>> multicast.recv.joinstep(
+		... 		[tst_fxtr], 59991, None, tst_fxtr, sk_fxtr
+		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...>
+		>>> sk_fxtr.close()
+		>>>
+
+
+	"""
+	if groups is None:
+		groups = []
+	if isock is None:
+		sock = genSocket()
+	else:
+		sock = isock.dup()
+	msgbuffer = str(__BLANK)
+	chunk = None
+	try:
+		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
+		for group in groups:
+			mreq = struct.pack(
+				'4sl' if iface is None else '4s4s',
+				socket.inet_aton(group),
+				socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
+			)
+			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+	except Exception as err:  # pragma: no branch
+		raise NotImplementedError("""[CWE-440] Not Implemented.""", err) # pragma: no cover
+	return sock
+
+
 def hearstep(groups, port, iface=None, bind_group=None):
 	"""Will listen on the given port of an interface for multicast messages to the given group(s).
 
@@ -313,18 +380,10 @@ def hearstep(groups, port, iface=None, bind_group=None):
 	"""
 	if groups is None:
 		groups = []
-	sock = genSocket()
+	sock = joinstep(groups, port, iface, bind_group, None)
 	msgbuffer = str(__BLANK)
 	chunk = None
 	try:
-		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
-		for group in groups:
-			mreq = struct.pack(
-				'4sl' if iface is None else '4s4s',
-				socket.inet_aton(group),
-				socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
-			)
-			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 		while True:
 			chunk = sock.recv(1316)
 			if not (chunk is None):  # pragma: no branch
