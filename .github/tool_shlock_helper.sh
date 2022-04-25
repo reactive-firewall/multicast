@@ -81,7 +81,7 @@ done
 fi
 
 if [[ ( -e "${LOCK_FILE}" ) ]] ; then
-	if [[ ( "$PID_VALUE}" -eq $(head -n 1 "${LOCK_FILE}") ) ]] ; then
+	if [[ ( "${PID_VALUE}" -eq $(head -n 1 "${LOCK_FILE}") ) ]] ; then
 		EXIT_CODE=0 ;
 	else
 		EXIT_CODE=$(head -n 1 "${LOCK_FILE}") ;
