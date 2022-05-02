@@ -32,9 +32,17 @@ Minimal Acceptance Testing:
 """
 
 try:
+	import os, warnings
+	warnings.simplefilter("default") # Change the filter in this process
+	os.environ["PYTHONWARNINGS"] = "default" # Also affect subprocesses
 	from setuptools import setup
 	from setuptools import find_packages
-	from setuptools.config import read_configuration
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		try:
+			from setuptools.config import read_configuration
+		except Exception:
+			from setuptools.config.setupcfg import read_configuration
 except Exception:
 	raise NotImplementedError("""[CWE-440] Not Implemented.""")
 
@@ -78,7 +86,12 @@ except Exception:
 	requirements = None
 
 
-conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
+conf_dict = None
+
+
+with warnings.catch_warnings():
+	warnings.simplefilter("ignore")
+	conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
 
 
 readme = readFile("""README.md""")

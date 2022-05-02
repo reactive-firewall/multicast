@@ -78,8 +78,8 @@ PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
-	$(QUIET)$(PYTHON) setup.py build
-	$(QUIET)$(PYTHON) setup.py bdist_wheel --universal
+	$(QUIET)$(PYTHON) -W ignore setup.py build
+	$(QUIET)$(PYTHON) -W ignore setup.py bdist_wheel --universal
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
@@ -98,8 +98,8 @@ uninstall:
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)$(PYTHON) ./setup.py uninstall 2>/dev/null || true
-	$(QUIET)$(PYTHON) ./setup.py clean || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>/dev/null || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py clean || true
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
