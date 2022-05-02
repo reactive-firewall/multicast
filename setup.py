@@ -32,9 +32,10 @@ Minimal Acceptance Testing:
 """
 
 try:
-	import os, warnings
-	warnings.simplefilter("default") # Change the filter in this process
-	os.environ["PYTHONWARNINGS"] = "default" # Also affect subprocesses
+	import os
+	import warnings
+	warnings.simplefilter("default")  # Change the filter in this process
+	os.environ["PYTHONWARNINGS"] = "default"  # Also affect subprocesses
 	from setuptools import setup
 	from setuptools import find_packages
 	with warnings.catch_warnings():
