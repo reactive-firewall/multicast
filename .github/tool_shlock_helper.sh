@@ -1,4 +1,4 @@
-#! /bin/bash --posix
+#! /bin/bash
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -73,7 +73,6 @@ while [ $# -gt $MINPARAMS ]; do    # Until you run out of parameters . . .
 
 case "$1" in
   -p|--pid) shift ; export PID_VALUE="${1}" ;;
-  -v|--verbose) IS_VERBOSE_MODE=1 ;;
   -f|--file) shift ; export LOCK_FILE="${1}" ;;
   -*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
 esac
@@ -82,14 +81,14 @@ done
 fi
 
 if [[ ( -e "${LOCK_FILE}" ) ]] ; then
-	if [[ ( "$PID_VALUE}" -eq $(head -n 1 "${LOCK_FILE}") ) ]] ; then
+	if [[ ( "${PID_VALUE}" -eq $(head -n 1 "${LOCK_FILE}") ) ]] ; then
 		EXIT_CODE=0 ;
 	else
 		EXIT_CODE=$(head -n 1 "${LOCK_FILE}") ;
 	fi
 fi
 
-if [[ $# -eq 0 ]] ; then
+if [[ ( $# -eq 0 ) ]] ; then
 	echo -n "${PID_VALUE:-$PPID}" > "${LOCK_FILE}" ; wait ;
 	test -e "${LOCK_FILE}" || false  ;
 	EXIT_CODE=0 ;

@@ -182,6 +182,10 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
 	Arbitrary group to use by default, though any mcst grp would work.
 
+	The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
+	on the rational that this group address will be treated as a local-net multicast
+	(caveat: one should use link-local for ipv6)
+
 	Minimal Testing:
 
 	First setup test fixtures by importing multicast.
