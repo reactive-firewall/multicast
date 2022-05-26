@@ -20,8 +20,9 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """__BLANK""", """__MCAST_DEFAULT_PORT""", """__MCAST_DEFAULT_GROUP""",
-	"""__MCAST_DEFAULT_TTL""", """recv""", """send"""
+	"""__doc__""", """_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
+	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
+	"""recv.McastRECV""", """send.McastSAY"""
 ]
 
 __package__ = """multicast"""
@@ -148,9 +149,9 @@ __doc__ = __prologue__ + """
 """
 
 
-global __MCAST_DEFAULT_PORT  # noqa
+global _MCAST_DEFAULT_PORT  # noqa
 
-__MCAST_DEFAULT_PORT = 44244
+_MCAST_DEFAULT_PORT = 44244
 """
 	Arbitrary port to use by default, though any dynamic and free port would work.
 
@@ -162,23 +163,23 @@ __MCAST_DEFAULT_PORT = 44244
 		>>>
 
 	Testcase 0: Multicast should have a default port.
-		A: Test that the __MCAST_DEFAULT_PORT attribute is initialized.
-		B: Test that the __MCAST_DEFAULT_PORT attribute is an int.
+		A: Test that the _MCAST_DEFAULT_PORT attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_PORT attribute is an int.
 
-		>>> multicast.__MCAST_DEFAULT_PORT is not None
+		>>> multicast._MCAST_DEFAULT_PORT is not None
 		True
-		>>> type(multicast.__MCAST_DEFAULT_PORT) is type(1)
+		>>> type(multicast._MCAST_DEFAULT_PORT) is type(1)
 		True
 		>>>
-		>>> multicast.__MCAST_DEFAULT_PORT > int(1024)
+		>>> multicast._MCAST_DEFAULT_PORT > int(1024)
 		True
 		>>>
 
 """
 
-global __MCAST_DEFAULT_GROUP  # noqa
+global _MCAST_DEFAULT_GROUP  # noqa
 
-__MCAST_DEFAULT_GROUP = """224.0.0.1"""
+_MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
 	Arbitrary group to use by default, though any mcst grp would work.
 
@@ -194,21 +195,21 @@ __MCAST_DEFAULT_GROUP = """224.0.0.1"""
 		>>>
 
 	Testcase 0: Multicast should have a default port.
-		A: Test that the __MCAST_DEFAULT_GROUP attribute is initialized.
-		B: Test that the __MCAST_DEFAULT_GROUP attribute is an IP string.
+		A: Test that the _MCAST_DEFAULT_GROUP attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_GROUP attribute is an IP string.
 
-		>>> multicast.__MCAST_DEFAULT_GROUP is not None
+		>>> multicast._MCAST_DEFAULT_GROUP is not None
 		True
-		>>> type(multicast.__MCAST_DEFAULT_GROUP) is type(str)
+		>>> type(multicast._MCAST_DEFAULT_GROUP) is type(str)
 		True
 		>>>
 
 """
 
 
-global __MCAST_DEFAULT_TTL  # noqa
+global _MCAST_DEFAULT_TTL  # noqa
 
-__MCAST_DEFAULT_TTL = int(1)
+_MCAST_DEFAULT_TTL = int(1)
 """
 	Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
 	A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
@@ -224,26 +225,26 @@ __MCAST_DEFAULT_TTL = int(1)
 		>>>
 
 	Testcase 0: Multicast should have a default TTL.
-		A: Test that the __MCAST_DEFAULT_TTL attribute is initialized.
-		B: Test that the __MCAST_DEFAULT_TTL attribute is an int.
-		c: Test that the __MCAST_DEFAULT_TTL attribute is default of 1.
+		A: Test that the _MCAST_DEFAULT_TTL attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_TTL attribute is an int.
+		c: Test that the _MCAST_DEFAULT_TTL attribute is default of 1.
 
-		>>> multicast.__MCAST_DEFAULT_TTL is not None
+		>>> multicast._MCAST_DEFAULT_TTL is not None
 		True
-		>>> type(multicast.__MCAST_DEFAULT_TTL) is type(1)
+		>>> type(multicast._MCAST_DEFAULT_TTL) is type(1)
 		True
-		>>> (int(multicast.__MCAST_DEFAULT_TTL) >= int(0))
+		>>> (int(multicast._MCAST_DEFAULT_TTL) >= int(0))
 		True
-		>>> (int(multicast.__MCAST_DEFAULT_TTL) <= int(2))
+		>>> (int(multicast._MCAST_DEFAULT_TTL) <= int(2))
 		True
 		>>>
 
 """
 
 
-global __BLANK  # noqa
+global _BLANK  # noqa
 
-__BLANK = str("""""")
+_BLANK = str("""""")
 """
 	Arbitrary blank string.
 
@@ -252,18 +253,18 @@ __BLANK = str("""""")
 	First setup test fixtures by importing multicast.
 
 		>>> import multicast
-		>>> __BLANK = multicast.__BLANK
+		>>> _BLANK = multicast._BLANK
 
 	Testcase 0: Multicast should have a default port.
-		A: Test that the __BLANK attribute is initialized.
-		B: Test that the __BLANK attribute is an empty string.
+		A: Test that the _BLANK attribute is initialized.
+		B: Test that the _BLANK attribute is an empty string.
 
-		>>> __BLANK is not None
+		>>> _BLANK is not None
 		True
-		>>> type(__BLANK) is type(str)
+		>>> type(_BLANK) is type(str)
 		True
 		>>>
-		>>> len(__BLANK) <= 0
+		>>> len(_BLANK) <= 0
 		True
 		>>>
 
@@ -299,7 +300,7 @@ try:
 	if socket.__name__ is None:
 		raise ImportError("FAIL: we could not import socket. ABORT.")
 	else:  # pragma: no branch
-		socket.setdefaulttimeout(int(__MCAST_DEFAULT_TTL))
+		socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
 except Exception as err:
 	raise ImportError(err)
 
@@ -310,6 +311,236 @@ try:
 		raise ImportError("FAIL: we could not import struct. ABORT.")
 except Exception as err:
 	raise ImportError(err)
+
+
+try:
+	import abc
+	if abc.__name__ is None:
+		raise ImportError("FAIL: we could not import Abstract base class. ABORT.")
+except Exception as err:
+	raise ImportError(err)
+
+
+class mtool(abc.ABC):
+	"""Class for Multicast tools.
+
+		Utility class for CLI tools of the Multicast package. setupArgs() and doStep() are
+		abstract and need to be implemented by subclasses.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.mtool is not None
+			True
+			>>>
+
+
+	"""
+
+	__module__ = """multicast"""
+
+	__proc__ = None
+
+	__prologue__ = """Add a prologue here."""
+
+	__epilogue__ = """Add an epilogue here."""
+
+	@classmethod
+	def buildArgs(cls, calling_parser_group=None):
+		"""Will build the argparse parser.
+
+		Utility Function to build the argparse parser; see argparse.ArgumentParser for more.
+		returns argparse.ArgumentParser - the ArgumentParser to use.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.mtool is not None
+			True
+			>>>
+
+		Testcase 0: buildArgs should return an ArgumentParser.
+			A: Test that the multicast.mtool component is initialized.
+			B: Test that the mtool.buildArgs component is initialized.
+
+			>>> multicast.mtool is not None
+			True
+			>>> type(multicast.mtool) #doctest: +ELLIPSIS
+			<...abc.ABCMeta...>
+			>>> multicast.mtool.buildArgs is not None
+			True
+			>>> class test_tool_fixture(multicast.mtool):
+			...	def doStep(self, *args):
+			...		pass
+			...
+			...	@classmethod
+			...	def setupArgs(cls, parser):
+			...		return parser
+			...
+			>>>
+			>>> type(test_tool_fixture.buildArgs(None)) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...ArgumentParser...>
+			>>>
+			>>>
+
+
+		"""
+		if calling_parser_group is None:
+			calling_parser_group = argparse.ArgumentParser(
+				prog=str( cls.__name__ if cls.__proc__ is None else cls.__proc__ ),
+				description=cls.__prologue__,
+				epilog=cls.__epilogue__,
+				add_help=False
+			)
+			group = calling_parser_group.add_mutually_exclusive_group(required=False)
+			group.add_argument('-h', '--help', action='help')
+			group.add_argument(
+				'-V', '--version',
+				action='version', version=str(
+					"%(prog)s {version}"
+				).format(version=str(__version__))
+			)
+			calling_parser_group.add_argument(
+				"""--use-std""", dest='is_std', default=False, action='store_true'
+			)
+			calling_parser_group.add_argument(
+				"""--deamon""", dest='is_deamon', default=False, action='store_true'
+			)
+		subparsers = calling_parser_group.add_subparsers(
+				title="Tools", dest='cmd_tool',
+				help=str("""Sub-Commands."""), metavar="CMD"
+			)
+		if mtool.__class__.__subclasscheck__(mtool, cls):
+			cls.setupArgs(subparsers)
+		return calling_parser_group
+#		parser.add_argument(
+#			'some_task', nargs='?', choices=TASK_OPTIONS.keys(),
+#			help='the action and any action arguments to pass.'
+#		)
+#		return parser
+
+	@classmethod
+	def dumpUsage(*args, **kwargs):
+		"""Will print the tool's help usage."""
+		cls.buildArgs(None).print_help()
+		return None  # noqa
+
+	@classmethod
+	def parseArgs(cls, arguments=None):
+		"""Will attempt to parse the given CLI arguments.
+
+		See argparse.ArgumentParser for more.
+		param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
+		returns argparse.Namespace - the Namespace parsed with the key-value pairs.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.mtool is not None
+			True
+			>>>
+
+		Testcase 0: parseArgs should return a namespace.
+			A: Test that the multicast.mtool component is initialized.
+			B: Test that the multicast.mtool.parseArgs component is initialized.
+
+			>>> multicast.mtool is not None
+			True
+			>>> multicast.mtool.parseArgs is not None
+			True
+			>>> class test_tool_fixture(multicast.mtool):
+			...	def doStep(self, *args):
+			...		pass
+			...
+			...	@classmethod
+			...	def setupArgs(cls, parser):
+			...		parser.add_parser("NOOP", help="Does Nothing.")
+			...		return parser
+			...
+			>>>
+			>>> tst_fxtr_args = ['''NOOP''', '''--port=1234''', '''--iface=127.0.0.1''']
+			>>> test_fixture = test_tool_fixture.parseArgs(tst_fxtr_args)
+			>>> test_fixture is not None
+			True
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...tuple...>
+			>>> tst_fxtr_args_2 = ['''NOOP''', '''--junk''', '''--more-trash=stuff''']
+			>>> (test_fixture_2, test_ignore_extras) = test_tool_fixture.parseArgs(tst_fxtr_args_2)
+			>>> test_fixture_2 is not None
+			True
+			>>> type(test_fixture_2) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...Namespace...>
+			>>>
+
+
+		"""
+		arguments = cls.checkToolArgs(arguments)
+		return cls.buildArgs(None).parse_known_args(arguments)
+
+	@classmethod
+	def checkToolArgs(cls, args):
+		"""Will handle the None case for arguments.
+
+		Used as a helper function.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>>
+
+		Testcase 0: multicast.mtool should have a doctests.
+
+			>>> import multicast
+			>>> multicast.mtool is not None
+			True
+			>>> multicast.mtool.__class__ is not None
+			True
+			>>>
+			>>> multicast.mtool.__doc__ is not None
+			True
+			>>>
+
+		Testcase 1: multicast.checkToolArgs should return an array.
+
+			>>> import multicast
+			>>> multicast.mtool.checkToolArgs(None) is not None
+			True
+			>>> type(multicast.mtool.checkToolArgs(None)) is type([None])
+			True
+			>>>
+
+		Testcase 2: multicast.checkToolArgs should return an array.
+
+			>>> import multicast
+			>>> type(multicast.mtool.checkToolArgs(["arg1", "arg2"])) is type(["strings"])
+			True
+			>>> type(multicast.mtool.checkToolArgs([0, 42])) is type([int(1)])
+			True
+			>>>
+
+
+		"""
+		return [None] if args is None else args
+
+	def __call__(self, *args, **kwargs):
+		return self.doStep(*args, **kwargs)
+
+	@classmethod
+	@abc.abstractmethod
+	def setupArgs(cls, parser):  # pragma: no cover
+		pass
+
+	@abc.abstractmethod
+	def doStep(self, *args):  # pragma: no cover
+		pass
 
 
 try:
@@ -330,6 +561,16 @@ try:
 except Exception as importErr:
 	del importErr
 	import multicast.send as send
+
+
+try:
+	if 'multicast.hear' not in sys.modules:
+		from . import hear as hear
+	else:  # pragma: no branch
+		hear = sys.modules["""multicast.hear"""]
+except Exception as importErr:
+	del importErr
+	import multicast.hear as hear
 
 
 try:

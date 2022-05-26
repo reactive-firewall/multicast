@@ -17,39 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The Main Entrypoint."""
-
-
-__all__ = [
-	"""__package__""", """__module__""", """__name__""", """__proc__""",
-	"""__prologue__""", """__epilogue__""", """__doc__""", """__checkToolArgs""",
-	"""NoOp""", """SendMCast""", """joinMCast""", """dumpUsage""",
-	"""buildArgs""", """main"""
-]
-
-
-__package__ = """multicast"""
-
-
-__module__ = """multicast.__main__"""
-
-
-__file__ = """multicast/__main__.py"""
-
-
-# __name__ = """multicast.__main__"""
-
-
-__proc__ = """multicast"""
-
-
-__prologue__ = """The Main Entrypoint."""
-
-
-__epilogue__ = """Add an epilogue here."""
-
-
-__doc__ = __prologue__ + """
+"""The Main Entrypoint.
 
 	Minimal Acceptance Testing:
 
@@ -89,6 +57,25 @@ __doc__ = __prologue__ + """
 """
 
 
+__all__ = [
+	"""__package__""", """__module__""", """__name__""", """__proc__""",
+	"""__prologue__""", """__epilogue__""", """__doc__""",
+	"""NoOp""", """McastNope""", """McastDispatch""",
+]
+
+
+__package__ = """multicast"""
+
+
+__module__ = """multicast.__main__"""
+
+
+__file__ = """multicast/__main__.py"""
+
+
+# __name__ = """multicast.__main__"""
+
+
 try:
 	import sys
 	import argparse
@@ -114,6 +101,35 @@ except Exception as importErr:
 	del importErr
 	import multicast.__version__ as __version__
 
+try:
+	if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
+		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT
+	else:  # pragma: no branch
+		_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
+except Exception as importErr:
+	del importErr
+	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT
+
+
+try:
+	if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
+		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP
+	else:  # pragma: no branch
+		_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
+except Exception as importErr:
+	del importErr
+	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP
+
+
+try:
+	if 'multicast.mtool' not in sys.modules:
+		from . import mtool as mtool
+	else:  # pragma: no branch
+		mtool = sys.modules["""multicast.mtool"""]
+except Exception as importErr:
+	del importErr
+	import multicast.mtool as mtool
+
 
 try:
 	if 'multicast.recv' not in sys.modules:
@@ -133,6 +149,16 @@ try:
 except Exception as importErr:
 	del importErr
 	import multicast.send as send
+
+
+try:
+	if 'multicast.hear' not in sys.modules:
+		from . import hear as hear
+	else:  # pragma: no branch
+		hear = sys.modules["""multicast.hear"""]
+except Exception as importErr:
+	del importErr
+	import multicast.hear as hear
 
 
 def NoOp(*args, **kwargs):
@@ -168,210 +194,299 @@ def NoOp(*args, **kwargs):
 	return None  # noqa
 
 
-def SendMCast(*args, **kwargs):
-	"""Will Send a multicast message."""
-	return send.main(*args, **kwargs)
+class McastNope(mtool):
+	"""
+
+		Testing:
+
+		Testcase 0: First setup test fixtures by importing multicast.
+
+			>>> import multicast.__main__ as _multicast
+			>>> _multicast.McastNope is not None
+			True
+			>>>
+		
+		Testcase 1: Recv should be detailed with some metadata.
+			A: Test that the __MAGIC__ variables are initialized.
+			B: Test that the __MAGIC__ variables are strings.
+
+			>>> multicast.__main__ is not None
+			True
+			>>> multicast.__main__.McastNope is not None
+			True
+			>>> multicast.recv.McastRECV.__module__ is not None
+			True
+			>>> multicast.recv.McastRECV.__proc__ is not None
+			True
+			>>> multicast.recv.McastRECV.__epilogue__ is not None
+			True
+			>>> multicast.recv.McastRECV.__prologue__ is not None
+			True
+			>>>
 
 
-def joinMCast(*args, **kwargs):
-	"""Will listen for multicast messages."""
-	return recv.main(*args, **kwargs)
+	"""
+
+	__module__ = """multicast.__main__"""
+
+	__name__ = """multicast.__main__.McastNope"""
+
+	__proc__ = """NOOP"""  # NOT "Nope" rather "NoOp"
+
+	__prologue__ = """No Operation."""
+
+	@classmethod
+	def setupArgs(cls, parser):
+		pass
+
+	def doStep(self, *args, **kwargs):
+		return NoOp(*args, **kwargs)
 
 
-def dumpUsage(*args, **kwargs):
-	"""Will prints help usage."""
-	buildArgs().print_help()
-	return None  # noqa
+class McastRecvHearDispatch(mtool):
+
+	__module__ = """multicast.__main__"""
+
+	__name__ = """multicast.__main__.McastRecvHearDispatch"""
+
+	__proc__ = """HEAR"""
+
+	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
+		this module/instance, but it is also possible to bind to group which
+		is added by some other programs (like another python program instance of this)
+	"""
+
+	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
+
+
+	@classmethod
+	def setupArgs(cls, parser):
+		"""Will attempt add send args.
+
+			Testing:
+
+			Testcase 0: First setup test fixtures by importing multicast.
+
+				>>> import multicast
+				>>> multicast.hear is not None
+				True
+				>>> multicast.hear.McastHEAR is not None
+				True
+				>>>
+
+			Testcase 1: main should return an int.
+				A: Test that the multicast component is initialized.
+				B: Test that the hear component is initialized.
+				C: Test that the main(hear) function is initialized.
+				D: Test that the main(hear) function returns an int 0-3.
+
+				>>> multicast.hear is not None
+				True
+				>>> multicast.__main__.main is not None
+				True
+				>>> tst_fxtr_args = ['''HEAR''', '''--deamon''', '''--port=1234''']
+				>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+				>>> test_fixture is not None
+				True
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...int...>
+				>>> int(test_fixture) >= int(0)
+				True
+				>>> int(test_fixture) < int(4)
+				True
+				>>>
+		"""
+		if parser is not None:
+			parser.add_argument("""--port""", type=int, default=_MCAST_DEFAULT_PORT)
+			__tmp_help = """local interface to use for listening to multicast data; """
+			__tmp_help += """if unspecified, any one interface may be chosen."""
+			parser.add_argument(
+				"""--iface""", default=None,
+				help=str(__tmp_help)
+			)
+			__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
+			__tmp_help += """should be one of the multicast groups joined globally """
+			__tmp_help += """(not necessarily joined in this python program) """
+			__tmp_help += """in the interface specified by --iface. """
+			__tmp_help += """If unspecified, bind to 224.0.0.1 """
+			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
+			parser.add_argument(
+				"""--group""", default=_MCAST_DEFAULT_GROUP,
+				help=str(__tmp_help)
+			)
+			parser.add_argument(
+				"""--groups""", default=[], nargs='*',
+				help="""multicast groups (ip addrs) to listen to join."""
+			)
+
+	def _help_deamon_dispatch(self, *args, **kwargs):
+		_useHear = False if "is_deamon" not in kwargs.keys() else kwargs["is_deamon"]
+		return _useHear
+
+	def doStep(self, *args, **kwargs):
+		if self._help_deamon_dispatch(*args, **kwargs):
+			return hear.McastHEAR().doStep(*args, **kwargs)
+		else:
+			return recv.McastRECV().doStep(*args, **kwargs)
 
 
 # More boiler-plate-code
 
 
 TASK_OPTIONS = dict({
-	'NOOP': NoOp,
-	'SAY': SendMCast,
-	'HEAR': joinMCast,
-	'HELP': dumpUsage
+	'NOOP': McastNope(),
+	'RECV': McastRecvHearDispatch(),
+	'SAY': send.McastSAY(),
+	'HEAR': McastRecvHearDispatch(),
 })
-"""The callable function tasks of this program."""
+"""The callable function tasks of this program. will add."""
 
+class McastDispatch(mtool):
 
-def buildArgs():
-	"""Will build the argparse parser.
+	__proc__ = """multicast"""
 
-	Utility Function to build the argparse parser; see argparse.ArgumentParser for more.
-	returns argparse.ArgumentParser - the ArgumentParser to use.
+	__prologue__ = """The Main Entrypoint."""
 
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> import multicast.__main__
-		>>> multicast.__main__ is not None
-		True
-		>>>
-
-	Testcase 0: buildArgs should return an ArgumentParser.
-		A: Test that the multicast.__main__ component is initialized.
-		B: Test that the recv.buildArgs component is initialized.
-
-		>>> multicast.__main__ is not None
-		True
-		>>> multicast.__main__.buildArgs is not None
-		True
-		>>> type(multicast.__main__.buildArgs()) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...ArgumentParser...>
-		>>>
-
-
-	"""
-	parser = argparse.ArgumentParser(
-		prog=__proc__,
-		description=__prologue__,
-		epilog=__epilogue__,
-		add_help=False
+	__epilogue__ = str(
+		"""When called from the command line the __main__ component handles the CLI dispatch."""
 	)
-	group = parser.add_mutually_exclusive_group(required=False)
-	group.add_argument('-h', '--help', action='help')
-	group.add_argument(
-		'-V', '--version',
-		action='version', version=str(
-			"%(prog)s {version}"
-		).format(version=str(__version__))
-	)
-	parser.add_argument(
-		'some_task', nargs='?', choices=TASK_OPTIONS.keys(),
-		help='the action and any action arguments to pass.'
-	)
-	return parser
 
+	@classmethod
+	def setupArgs(cls, parser):
+		if parser is not None:
+			for sub_tool in sorted(TASK_OPTIONS.keys()):
+				sub_parser = parser.add_parser(sub_tool, help="...")
+				type(TASK_OPTIONS[sub_tool]).setupArgs(sub_parser)
 
-def parseArgs(arguments=None):
-	"""Will attempt to parse the given CLI arguments.
+	def useTool(self, tool, **kwargs):
+		"""Will Handle launching the actual task functions."""
+		theResult = None
+		cached_list = sorted(TASK_OPTIONS.keys())
+		_is_done = False
+		if (tool is not None) and (tool in cached_list):
+			try:
+				theResult = TASK_OPTIONS[tool].__call__([], **kwargs)
+				_is_done = True
+			except Exception as e:  # pragma: no branch
+				theResult = str(
+					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {errs}"""
+				).format(
+					t=tool, args=kwargs, errs=e
+				)
+		return (_is_done, theResult)  # noqa
 
-	See argparse.ArgumentParser for more.
-	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
-	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> import multicast.__main__
-		>>> multicast.__main__ is not None
-		True
-		>>>
-
-	Testcase 0: parseArgs should return a namespace.
-		A: Test that the multicast.__main__ component is initialized.
-		B: Test that the __main__ component is initialized.
-		C: Test that the __main__.parseArgs component is initialized.
-
-		>>> multicast.__main__ is not None
-		True
-		>>> multicast.__main__.parseArgs is not None
-		True
-		>>> tst_fxtr_args = ['''NOOP''', '''--port=1234''', '''--iface=127.0.0.1''']
-		>>> test_fixture = multicast.__main__.parseArgs(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...Namespace...>
-		>>>
-
-
-	"""
-	arguments = __checkToolArgs(arguments)
-	return buildArgs().parse_known_intermixed_args(arguments)
-
-
-def __checkToolArgs(args):
-	"""Will handle the None case for arguments.
-
-	Used as a helper function.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>>
-
-	Testcase 0: multicast.__main__ should have a doctests.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.__module__ is not None
-		True
-		>>>
-
-	Testcase 1: multicast.__checkToolArgs should return an array.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.__checkToolArgs(None) is not None
-		True
-		>>> type(multicast.__main__.__checkToolArgs(None)) is type([None])
-		True
-		>>>
-
-	Testcase 2: multicast.__checkToolArgs should return an array.
-
-		>>> import multicast.__main__
-		>>> type(multicast.__main__.__checkToolArgs(["arg1", "arg2"])) is type(["strings"])
-		True
-		>>> type(multicast.__main__.__checkToolArgs([0, 42])) is type([int(1)])
-		True
-		>>>
-
-
-	"""
-	return [None] if args is None else args
-
-
-def useTool(tool, *arguments):
-	"""Will Handle launching the actual task functions."""
-	theResult = None
-	arguments = __checkToolArgs(arguments)
-	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
+	def doStep(self, *args):
+		__EXIT_MSG = tuple((1, "Unknown"))
 		try:
-			theResult = TASK_OPTIONS[tool](*arguments)
-		except Exception:  # pragma: no branch
-			raise NotImplementedError("""[CWE-440] Not Implemented.""")
-	return theResult  # noqa
+			try:
+				(argz, extra) = type(self).parseArgs(*args)
+				service_cmd = argz.cmd_tool
+				argz.__dict__.__delitem__("""cmd_tool""")
+				_TOOL_MSG = tuple(self.useTool(service_cmd, **argz.__dict__))
+				if _TOOL_MSG[0]:
+					__EXIT_MSG = tuple((0, _TOOL_MSG))
+				elif (sys.stdout.isatty()):  # pragma: no cover
+					print(_TOOL_MSG)
+			except Exception as inerr:  # pragma: no branch
+				w = str("WARNING - An error occured while")
+				w += str(" handling the arguments.")
+				w += str(" Refused.")
+				if (sys.stdout.isatty()):  # pragma: no cover
+					print(w)
+					print(str(inerr))
+					print(str(inerr.args()))
+				del inerr
+				__EXIT_MSG = tuple((2, "NoOp"))
+		except BaseException:  # pragma: no branch
+			e = str("CRITICAL - An error occured while handling")
+			e += str(" the dispatch.")
+			if (sys.stdout.isatty()):  # pragma: no cover
+				print(str(e))
+			__EXIT_MSG = tuple((3, "STOP"))
+		return __EXIT_MSG  # noqa
 
 
 def main(*argv):
-	"""Do main event stuff."""
-	__EXIT_CODE = 1
-	try:
-		try:
-			(args, extra) = parseArgs(*argv)
-			service_cmd = args.some_task
-			__EXIT_CODE = useTool(service_cmd, extra)
-		except Exception as inerr:  # pragma: no branch
-			w = str("WARNING - An error occured while")
-			w += str(" handling the arguments.")
-			w += str(" Cascading failure.")
-			if (sys.stdout.isatty()):  # pragma: no cover
-				print(w)
-				print(str(inerr))
-				print(str(inerr.args()))
-			del inerr
-			__EXIT_CODE = 2
-	except BaseException:  # pragma: no branch
-		e = str("CRITICAL - An error occured while handling")
-		e += str(" the cascading failure.")
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(str(e))
-		__EXIT_CODE = 3
-	return __EXIT_CODE  # noqa
+	"""Do main event stuff.
+
+	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
+	Regardles of errors the result as an 'exit code' (int) is returned.
+	The only exception is multicast.__main__.main(*args) which will exit with the underlying
+	return codes.
+	The expected return codes are as follows:
+		= 0:  Any nominal state (i.e. no errors and possibly success)
+		<=1:  Any erroneous state (caveat: includes simple failure)
+		= 2:  Any failed state
+		= 3:  Any undefined (but assumed erroneous) state
+		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
+
+	param iterable - argv - the array of arguments. Usually sys.argv[1:]
+	returns int - the Namespace parsed with the key-value pairs.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+		>>> import multicast
+		>>> multicast.send is not None
+		True
+		>>>
+
+	Testcase 0: main should return an int.
+		A: Test that the multicast component is initialized.
+		B: Test that the send component is initialized.
+		C: Test that the send.main function is initialized.
+		D: Test that the send.main function returns an int 0-3.
+
+		>>> multicast.send is not None
+		True
+		>>> multicast.__main__.main is not None
+		True
+		>>> tst_fxtr_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
+		>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...int...>
+		>>> int(test_fixture) >= int(0)
+		True
+		>>> int(test_fixture) < int(4)
+		True
+		>>>
+
+
+	Testcase 1: main should return an int.
+		A: Test that the multicast component is initialized.
+		B: Test that the recv component is initialized.
+		C: Test that the main(recv) function is initialized.
+		D: Test that the main(recv) function returns an int 0-3.
+
+		>>> multicast.recv is not None
+		True
+		>>> multicast.__main__.main is not None
+		True
+		>>> tst_fxtr_args = ['''RECV''', '''--port=1234''', '''--group''', '''224.0.0.1''']
+		>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...int...>
+		>>> int(test_fixture) >= int(0)
+		True
+		>>> int(test_fixture) < int(4)
+		True
+		>>>
+
+
+	"""
+	dispatch = McastDispatch()
+	return dispatch(*argv)
 
 
 if __name__ in '__main__':
-	__EXIT_CODE = 2
+	__EXIT_CODE = tuple((2, "NoOp"))
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):
 		__EXIT_CODE = main([str(__proc__), """-h"""])
-	exit(__EXIT_CODE)
+	exit(__EXIT_CODE[0])

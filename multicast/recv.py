@@ -30,45 +30,168 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast HEAR ..."""
+"""multicast RECV Features.
 
-__all__ = [
-	"""__package__""", """genSocket""", """endSocket""", """parseArgs""", """hearstep""", """main""",
-	"""__module__""", """__name__""", """__proc__""", """__prologue__""",
-	"""__epilogue__""", """__doc__"""
-]
+	Minimal Acceptance Testing:
 
+	First setup test fixtures by importing multicast.
 
-__package__ = """multicast"""
+	Testcase 0: Multicast should be importable.
 
+		>>> import multicast
+		>>> multicast.recv is not None
+		True
+		>>> multicast.__doc__ is not None
+		True
+		>>>
 
-__module__ = """multicast"""
+	Testcase 1: Recv should be automaticly imported.
+		A: Test that the multicast component is initialized.
+		B: Test that the recv component is initialized.
+		C: Test that the recv component has __doc__
 
+		>>> multicast is not None
+		True
+		>>> multicast.recv is not None
+		True
+		>>> multicast.recv.__doc__ is not None
+		True
+		>>> type(multicast.recv.__doc__) == type(str(''''''))
+		True
+		>>>
 
-__file__ = """multicast/recv.py"""
+	Testcase 2: Recv should be detailed with some metadata.
+		A: Test that the __MAGIC__ variables are initialized.
+		B: Test that the __MAGIC__ variables are strings.
 
+		>>> multicast.recv is not None
+		True
+		>>> multicast.recv.__module__ is not None
+		True
+		>>> multicast.recv.__package__ is not None
+		True
+		>>> type(multicast.recv.__doc__) == type(multicast.recv.__module__)
+		True
+		>>>
 
-__name__ = """multicast.recv"""
+	Testcase 3: main should return an int.
+		A: Test that the multicast component is initialized.
+		B: Test that the recv component is initialized.
+		C: Test that the main(RECV) function-flow is initialized.
+		D: Test that the main(RECV) function-flow returns an int 0-3.
 
+		>>> multicast.__main__ is not None
+		True
+		>>> multicast.__main__.main is not None
+		True
+		>>> tst_fxtr_args = ['''RECV''', '''--port=1234''']
+		>>> (test_fixture, ignored_value) = multicast.__main__.main(tst_fxtr_args)
+		>>> test_fixture is not None
+		True
+		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<...int...>
+		>>> int(test_fixture) >= int(0)
+		True
+		>>> type(test_fixture) is type(0)
+		True
+		>>> int(test_fixture) < int(4)
+		True
+		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(4))
+		True
+		>>>
 
-__proc__ = """multicast HEAR"""
-
-
-__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
-	this module/instance, but it is also possible to bind to group which
-	is added by some other programs (like another python program instance of this)
 """
 
 
-__prologue__ = """Python Multicast Receiver. Spawns a listener for multicast based on arguments."""
+__package__ = """multicast"""
+"""The package of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Recv should be automaticly imported.
+
+		>>> multicast.recv.__package__ is not None
+		True
+		>>>
+		>>> multicast.recv.__package__ == multicast.__package__
+		True
+		>>>
+
+"""
+
+
+__module__ = """multicast"""
+"""The module of this program.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Recv should be automaticly imported.
+
+		>>> multicast.recv.__module__ is not None
+		True
+		>>>
+
+"""
+
+
+__file__ = """multicast/recv.py"""
+"""The file of this component."""
+
+
+__name__ = """multicast.recv"""
+"""The name of this component.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: Recv should be automaticly imported.
+
+		>>> multicast.recv.__name__ is not None
+		True
+		>>>
+
+"""
+
+
+import sys
 
 
 try:
-	import sys
-	import argparse
-	import unicodedata
-	import socket
-	import struct
+	if 'multicast' not in sys.modules:
+		from . import multicast as multicast
+	else:  # pragma: no branch
+		multicast = sys.modules["""multicast"""]
+	_BLANK = multicast._BLANK
+except Exception as importErr:
+	del importErr
+	import multicast as multicast
+
+
+try:
+	from multicast import argparse as argparse
+	from multicast import unicodedata as unicodedata
+	from multicast import socket as socket
+	from multicast import struct as struct
 	depends = [
 		unicodedata, socket, struct, argparse
 	]
@@ -82,17 +205,6 @@ try:
 			raise ImportError(str("[CWE-758] Module failed completely."))
 except Exception as err:
 	raise ImportError(err)
-
-
-try:
-	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
-	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
-	__BLANK = multicast.__BLANK
-except Exception as importErr:
-	del importErr
-	import multicast as multicast
 
 
 def genSocket():
@@ -138,7 +250,7 @@ def genSocket():
 	"""
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	sock.settimeout(multicast.__MCAST_DEFAULT_TTL)
+	sock.settimeout(multicast._MCAST_DEFAULT_TTL)
 	return sock
 
 
@@ -207,71 +319,6 @@ def endSocket(sock=None):
 			sock = None
 
 
-def parseArgs(arguments=None):
-	"""Will attempt to parse the given CLI arguments.
-
-	See argparse.ArgumentParser for more.
-	param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
-	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.recv is not None
-		True
-		>>>
-
-	Testcase 0: parseArgs should return a namespace.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-		C: Test that the recv.parseArgs component is initialized.
-
-		>>> multicast.recv is not None
-		True
-		>>> multicast.recv.parseArgs is not None
-		True
-		>>> tst_fxtr_args = ['''--port=12345''', '''--iface=127.0.0.1''']
-		>>> test_fixture = multicast.recv.parseArgs(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...Namespace...>
-		>>>
-
-
-	"""
-	parser = argparse.ArgumentParser(
-		prog=__proc__,
-		description=__prologue__,
-		epilog=__epilogue__
-	)
-	parser.add_argument("""--use-std""", dest='is_std', default=False, action='store_true')
-	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
-	parser.add_argument(
-		"""--join-mcast-groups""", default=[], nargs='*',
-		help="""multicast groups (ip addrs) to listen to join."""
-	)
-	__tmp_help = """local interface to use for listening to multicast data; """
-	__tmp_help += """if unspecified, any one interface may be chosen."""
-	parser.add_argument(
-		"""--iface""", default=None,
-		help=str(__tmp_help)
-	)
-	__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
-	__tmp_help += """should be one of the multicast groups joined globally """
-	__tmp_help += """(not necessarily joined in this python program) """
-	__tmp_help += """in the interface specified by --iface. """
-	__tmp_help += """If unspecified, bind to 224.0.0.1 """
-	__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
-	parser.add_argument(
-		"""--bind-group""", default=None,
-		help=str(__tmp_help)
-	)
-	return parser.parse_args(arguments)
-
-
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	"""Will join the given multicast group(s).
 
@@ -300,7 +347,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		<class 'function'>
 		>>> multicast.recv.joinstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
-		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
+		>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP
 		>>> multicast.recv.joinstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
 		>>> multicast.recv.joinstep(
@@ -337,73 +384,6 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	return sock
 
 
-def hearstep(groups, port, iface=None, bind_group=None):
-	"""Will listen on the given port of an interface for multicast messages to the given group(s).
-
-	The work-horse function.
-
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.recv is not None
-		True
-		>>>
-
-	Testcase 1: Stability testing.
-
-		>>> import multicast
-		>>>
-		>>> multicast.recv is None
-		False
-		>>>
-		>>> multicast.recv.hearstep is None
-		False
-		>>> type(multicast.recv.hearstep)
-		<class 'function'>
-		>>> multicast.recv.hearstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		'...'
-		>>> tst_fxtr = multicast.__MCAST_DEFAULT_GROUP
-		>>> multicast.recv.hearstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		'...'
-		>>> multicast.recv.hearstep(
-		... 		[tst_fxtr], 59991, None, tst_fxtr
-		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		'...'
-		>>>
-
-
-	"""
-	if groups is None:
-		groups = []
-	sock = joinstep(groups, port, iface, bind_group, None)
-	msgbuffer = str(__BLANK)
-	chunk = None
-	try:
-		while True:
-			chunk = sock.recv(1316)
-			if not (chunk is None):  # pragma: no branch
-				msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
-				chunk = None  # pragma: no cover
-	except KeyboardInterrupt:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(__BLANK)
-			print(str("""User Interrupted"""))
-	except OSError:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(__BLANK)
-	finally:
-		sock = endSocket(sock)
-	if not (chunk is None):  # pragma: no branch
-		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
-		chunk = None  # pragma: no cover
-	# about 969 bytes in base64 encoded as chars
-	return msgbuffer
-
-
-def main(*argv):
 	"""Will handle the Main Event from multicast.__main__ when called.
 
 	This does two things:
@@ -430,22 +410,22 @@ def main(*argv):
 	First setup test fixtures by importing multicast.
 
 		>>> import multicast
-		>>> multicast.send is not None
+		>>> multicast.recv is not None
 		True
 		>>>
 
 	Testcase 0: main should return an int.
 		A: Test that the multicast component is initialized.
-		B: Test that the send component is initialized.
-		C: Test that the send.main function is initialized.
-		D: Test that the send.main function returns an int 0-3.
+		B: Test that the recv component is initialized.
+		C: Test that the recv.main function is initialized.
+		D: Test that the recv.main function returns an int 0-3.
 
-		>>> multicast.send is not None
+		>>> multicast.recv is not None
 		True
-		>>> multicast.send.main is not None
+		>>> multicast.recv.main is not None
 		True
-		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
-		>>> test_fixture = multicast.send.main(tst_fxtr_args)
+		>>> tst_fxtr_args = ['''--port=1234''']
+		>>> test_fixture = multicast.recv.main(tst_fxtr_args)
 		>>> test_fixture is not None
 		True
 		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
@@ -462,84 +442,203 @@ def main(*argv):
 
 
 	"""
-	__exit_code = 1
-	try:
-		args = parseArgs(*argv)
-		response = hearstep(args.join_mcast_groups, int(args.port), args.iface, args.bind_group)
-		if (sys.stdout.isatty() or args.is_std) and (len(response) > 0):  # pragma: no cover
-			print(__BLANK)
+
+
+class McastRECV(multicast.mtool):
+	"""
+
+		Testing:
+
+		Testcase 0: First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.recv is not None
+			True
+			>>> multicast._MCAST_DEFAULT_PORT is not None
+			True
+			>>> multicast._MCAST_DEFAULT_GROUP is not None
+			True
+			>>> multicast._MCAST_DEFAULT_TTL is not None
+			True
+			>>> multicast.recv.McastRECV is not None
+			True
+			>>>
+		
+		Testcase 2: Recv should be detailed with some metadata.
+			A: Test that the __MAGIC__ variables are initialized.
+			B: Test that the __MAGIC__ variables are strings.
+
+			>>> multicast.recv is not None
+			True
+			>>> multicast.recv.McastRECV is not None
+			True
+			>>> multicast.recv.McastRECV.__module__ is not None
+			True
+			>>> multicast.recv.McastRECV.__proc__ is not None
+			True
+			>>> multicast.recv.McastRECV.__epilogue__ is not None
+			True
+			>>> multicast.recv.McastRECV.__prologue__ is not None
+			True
+			>>>
+
+
+	"""
+
+	__module__ = """multicast.recv"""
+
+	__name__ = """multicast.recv.McastRECV"""
+
+	__proc__ = """RECV"""
+
+	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
+		this module/instance, but it is also possible to bind to group which
+		is added by some other programs (like another python program instance of this)
+	"""
+
+	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
+
+	@classmethod
+	def setupArgs(cls, parser):
+		"""Will attempt add send args.
+
+			Testing:
+
+			Testcase 0: First setup test fixtures by importing multicast.
+
+				>>> import multicast
+				>>> multicast.recv is not None
+				True
+				>>> multicast.recv.McastRECV is not None
+				True
+				>>>
+
+			Testcase 1: main should return an int.
+				A: Test that the multicast component is initialized.
+				B: Test that the recv component is initialized.
+				C: Test that the main(recv) function is initialized.
+				D: Test that the main(recv) function returns an int 0-3.
+
+				>>> multicast.recv is not None
+				True
+				>>> multicast.__main__.main is not None
+				True
+				>>> tst_fxtr_args = ['''RECV''', '''--port=1234''', '''--group''', '''224.0.0.1''']
+				>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+				>>> test_fixture is not None
+				True
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...int...>
+				>>> int(test_fixture) >= int(0)
+				True
+				>>> int(test_fixture) < int(4)
+				True
+				>>>
+		"""
+		if parser is not None:
+			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
+			__tmp_help = """local interface to use for listening to multicast data; """
+			__tmp_help += """if unspecified, any one interface may be chosen."""
+			parser.add_argument(
+				"""--iface""", default=None,
+				help=str(__tmp_help)
+			)
+			__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
+			__tmp_help += """should be one of the multicast groups joined globally """
+			__tmp_help += """(not necessarily joined in this python program) """
+			__tmp_help += """in the interface specified by --iface. """
+			__tmp_help += """If unspecified, bind to 224.0.0.1 """
+			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
+			parser.add_argument(
+				"""--group""", default=multicast._MCAST_DEFAULT_GROUP,
+				help=str(__tmp_help)
+			)
+			parser.add_argument(
+				"""--groups""", default=[], nargs='*',
+				help="""multicast groups (ip addrs) to listen to join."""
+			)
+
+	def _hearstep(self, groups, port, iface=None, bind_group=None):
+		"""Will listen on the given port of an interface for multicast messages to the given group(s).
+
+		The work-horse function.
+
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.recv is not None
+			True
+			>>> multicast.recv.McastRECV is not None
+			True
+			>>>
+
+		Testcase 1: Stability testing.
+
+			>>> import multicast
+			>>>
+			>>> multicast.recv is None
+			False
+			>>> multicast.recv.McastRECV is None
+			False
+			>>> test_RCEV = multicast.recv.McastRECV()
+			>>> type(test_RCEV) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<class ...McastRECV...>
+			>>> type(test_RCEV._hearstep)
+			<class 'method'>
+			>>> test_RCEV._hearstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'...'
+			>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP
+			>>> test_RCEV._hearstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'...'
+			>>> test_RCEV._hearstep(
+			... 	[tst_fxtr], 59991, None, tst_fxtr
+			... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'...'
+			>>>
+
+
+		"""
+		if groups is None:
+			groups = []
+		sock = joinstep(groups, port, iface, bind_group, None)
+		msgbuffer = str(multicast._BLANK)
+		chunk = None
+		try:
+			while True:
+				chunk = sock.recv(1316)
+				if not (chunk is None):  # pragma: no branch
+					msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+					chunk = None  # pragma: no cover
+		except KeyboardInterrupt:  # pragma: no branch
+			if (sys.stdout.isatty()):  # pragma: no cover
+				print(multicast._BLANK)
+				print(str("""User Interrupted"""))
+		except OSError:  # pragma: no branch
+			if (sys.stdout.isatty()):  # pragma: no cover
+				print(multicast._BLANK)
+		finally:
+			sock = endSocket(sock)
+		if not (chunk is None):  # pragma: no branch
+			msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+			chunk = None  # pragma: no cover
+		# about 969 bytes in base64 encoded as chars
+		return msgbuffer
+
+	def doStep(self, *args, **kwargs):
+		response = self._hearstep(
+			[multicast._MCAST_DEFAULT_GROUP] if "groups" not in kwargs.keys() else kwargs["groups"],
+			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
+			None if "iface" not in kwargs.keys() else str(kwargs["iface"]),
+			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
+		)
+		_is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
+		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
+			print(multicast._BLANK)
 			print(str(response))
-			print(__BLANK)
-		del response
-		__exit_code = 0
-	except argparse.ArgumentError:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(__BLANK)
-			print(str("""Input has an Argument Error"""))
-		__exit_code = 2
-	except BaseException as e:
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(str(e))
-		__exit_code = 3
-	return int(__exit_code)
+			print(multicast._BLANK)
+		_result = (len(response) > 0) is True
+		return tuple((_result, None if not _result else response))
 
-
-__doc__ = str(
-	__prologue__ + """
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-	Testcase 0: Multicast should be importable.
-
-		>>> import multicast
-		>>>
-		>>> multicast.__doc__ is not None
-		True
-		>>>
-
-	Testcase 1: Recv should be automaticly imported.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-		C: Test that the recv component has __doc__
-
-		>>> multicast is not None
-		True
-		>>> multicast.recv is not None
-		True
-		>>> multicast.recv.__doc__ is not None
-		True
-		>>> type(multicast.recv.__doc__) == type(str(''''''))
-		True
-		>>>
-
-	Testcase 2: Recv should be detailed with some metadata.
-		A: Test that the __MAGIC__ variables are initialized.
-		B: Test that the __MAGIC__ variables are strings.
-
-		>>> multicast.recv is not None
-		True
-		>>> multicast.recv.__module__ is not None
-		True
-		>>> multicast.recv.__package__ is not None
-		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__module__)
-		True
-		>>> multicast.recv.__prologue__ is not None
-		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__prologue__)
-		True
-		>>> multicast.recv.__epilogue__ is not None
-		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__epilogue__)
-		True
-		>>> type(multicast.recv.__doc__) == type(multicast.recv.__proc__)
-		True
-		>>>
-
-
-""" + __epilogue__ + str(
-		genSocket.__doc__ + endSocket.__doc__ + parseArgs.__doc__ + hearstep.__doc__
-	) + main.__doc__
-)
