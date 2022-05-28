@@ -172,11 +172,8 @@ __name__ = """multicast.recv"""
 
 """
 
-
-import sys
-
-
 try:
+	import sys
 	if 'multicast' not in sys.modules:
 		from . import multicast as multicast
 	else:  # pragma: no branch
@@ -382,66 +379,6 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	except Exception as err:  # pragma: no branch
 		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
 	return sock
-
-
-	"""Will handle the Main Event from multicast.__main__ when called.
-
-	This does two things:
-
-	1: calls parseArgs() and passes the given arguments, handling any errors if needed.
-	2: calls hearstep with the parsed args if able and handles any errors regardles
-
-	Every main(*args) function in multicast is expected to return an int().
-	Regardles of errors the result as an 'exit code' (int) is returned.
-	The only exception is multicast.__main__.main(*args) which will exit with the underlying
-	return codes.
-	The expected return codes are as follows:
-		= 0:  Any nominal state (i.e. no errors and possibly success)
-		<=1:  Any erroneous state (caveat: includes simple failure)
-		= 2:  Any failed state
-		= 3:  Any undefined (but assumed erroneous) state
-		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
-
-	param iterable - argv - the array of arguments. Usually sys.argv[1:]
-	returns int - the Namespace parsed with the key-value pairs.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.recv is not None
-		True
-		>>>
-
-	Testcase 0: main should return an int.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-		C: Test that the recv.main function is initialized.
-		D: Test that the recv.main function returns an int 0-3.
-
-		>>> multicast.recv is not None
-		True
-		>>> multicast.recv.main is not None
-		True
-		>>> tst_fxtr_args = ['''--port=1234''']
-		>>> test_fixture = multicast.recv.main(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...int...>
-		>>> int(test_fixture) >= int(0)
-		True
-		>>> type(test_fixture) is type(0)
-		True
-		>>> int(test_fixture) < int(4)
-		True
-		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(4))
-		True
-		>>>
-
-
-	"""
 
 
 class McastRECV(multicast.mtool):

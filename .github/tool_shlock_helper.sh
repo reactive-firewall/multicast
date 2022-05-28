@@ -76,7 +76,7 @@ case "$1" in
   -f|--file) shift ; export LOCK_FILE="${1}" ;;
   -*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
 esac
-shift       # Check next set of parameters.
+if [[ $# -gt "$MINPARAMS" ]] ; then shift ; fi    # Check next set of parameters.
 done
 fi
 

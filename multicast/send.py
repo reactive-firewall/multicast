@@ -135,11 +135,8 @@ __name__ = """multicast.send"""
 
 """
 
-
-import sys
-
-
 try:
+	import sys
 	if 'multicast' not in sys.modules:
 		from . import multicast as multicast
 	else:  # pragma: no branch

@@ -120,10 +120,10 @@ export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 echo "Start of Log:" > ./${LOG_FILE} ; wait ;
 echo "" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --join-mcast-groups ${TEST_MCAST_GROUP} --bind-group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
+( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
-	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --mcast-group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
+	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
 done ;
 wait ;
 

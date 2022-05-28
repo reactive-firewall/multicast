@@ -38,4 +38,5 @@ if __name__ == "__main__":
 	tsts_fxr = MCastClient()
 	print(str((HOST, PORT)))
 	tsts_fxr.say(HOST, PORT, sock, data)
+	tsts_fxr.say(HOST, PORT, sock, str("""STOP"""))
 	exit(0)

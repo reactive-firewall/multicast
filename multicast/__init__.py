@@ -22,7 +22,7 @@ __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
-	"""recv.McastRECV""", """send.McastSAY"""
+	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""", """hear.McastHEAR""",
 ]
 
 __package__ = """multicast"""
@@ -348,7 +348,7 @@ class mtool(abc.ABC):
 	__epilogue__ = """Add an epilogue here."""
 
 	@classmethod
-	def buildArgs(cls, calling_parser_group=None):
+	def buildArgs(cls, calling_parser_group):
 		"""Will build the argparse parser.
 
 		Utility Function to build the argparse parser; see argparse.ArgumentParser for more.
@@ -389,9 +389,9 @@ class mtool(abc.ABC):
 
 
 		"""
-		if calling_parser_group is None:
+		if calling_parser_group is None:  # pragma: no branch
 			calling_parser_group = argparse.ArgumentParser(
-				prog=str( cls.__name__ if cls.__proc__ is None else cls.__proc__ ),
+				prog=str(cls.__name__ if cls.__proc__ is None else cls.__proc__),
 				description=cls.__prologue__,
 				epilog=cls.__epilogue__,
 				add_help=False
@@ -411,23 +411,13 @@ class mtool(abc.ABC):
 				"""--deamon""", dest='is_deamon', default=False, action='store_true'
 			)
 		subparsers = calling_parser_group.add_subparsers(
-				title="Tools", dest='cmd_tool',
-				help=str("""Sub-Commands."""), metavar="CMD"
-			)
-		if mtool.__class__.__subclasscheck__(mtool, cls):
+			title="Tools", dest='cmd_tool',
+			help=str("""Sub-Commands."""), metavar="CMD"
+		)
+		if mtool.__class__.__subclasscheck__(mtool, cls):  # pragma: no branch
 			cls.setupArgs(subparsers)
 		return calling_parser_group
-#		parser.add_argument(
-#			'some_task', nargs='?', choices=TASK_OPTIONS.keys(),
-#			help='the action and any action arguments to pass.'
-#		)
-#		return parser
 
-	@classmethod
-	def dumpUsage(*args, **kwargs):
-		"""Will print the tool's help usage."""
-		cls.buildArgs(None).print_help()
-		return None  # noqa
 
 	@classmethod
 	def parseArgs(cls, arguments=None):

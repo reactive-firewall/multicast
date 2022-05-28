@@ -159,11 +159,8 @@ __name__ = """multicast.hear"""
 
 """
 
-
-import sys
-
-
 try:
+	import sys
 	if 'multicast' not in sys.modules:
 		from . import multicast as multicast
 	else:  # pragma: no branch
@@ -284,7 +281,7 @@ class McastHEAR(multicast.mtool):
 			>>> multicast.hear.McastHEAR is not None
 			True
 			>>>
-		
+
 		Testcase 2: Recv should be detailed with some metadata.
 			A: Test that the __MAGIC__ variables are initialized.
 			B: Test that the __MAGIC__ variables are strings.
@@ -319,65 +316,12 @@ class McastHEAR(multicast.mtool):
 
 	__prologue__ = """Python Multicast Server for multicast input."""
 
-
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
-
-			Testing:
-
-			Testcase 0: First setup test fixtures by importing multicast.
-
-				>>> import multicast
-				>>> multicast.hear is not None
-				True
-				>>> multicast.hear.McastHEAR is not None
-				True
-				>>>
-
-			Testcase 1: main should return an int.
-				A: Test that the multicast component is initialized.
-				B: Test that the hear component is initialized.
-				C: Test that the main(hear) function is initialized.
-				D: Test that the main(hear) function returns an int 0-3.
-
-				>>> multicast.hear is not None
-				True
-				>>> multicast.__main__.main is not None
-				True
-				>>> tst_fxtr_args = ['''HEAR''', '''--deamon''', '''--port=1234''']
-				>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
-				>>> test_fixture is not None
-				True
-				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-				<...int...>
-				>>> int(test_fixture) >= int(0)
-				True
-				>>> int(test_fixture) < int(4)
-				True
-				>>>
-		"""
-		if parser is not None:
-			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
-			__tmp_help = """local interface to use for listening to multicast data; """
-			__tmp_help += """if unspecified, any one interface may be chosen."""
-			parser.add_argument(
-				"""--iface""", default=None,
-				help=str(__tmp_help)
-			)
-			__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
-			__tmp_help += """should be one of the multicast groups joined globally """
-			__tmp_help += """(not necessarily joined in this python program) """
-			__tmp_help += """in the interface specified by --iface. """
-			__tmp_help += """If unspecified, bind to 224.0.0.1 """
-			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
-			parser.add_argument(
-				"""--group""", default=multicast._MCAST_DEFAULT_GROUP,
-				help=str(__tmp_help)
-			)
+		pass
 
 	def doStep(self, *args, **kwargs):
-		_is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
+		#  _is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
 		HOST = multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"]
 		PORT = multicast._MCAST_DEFAULT_PORT if "port" not in kwargs.keys() else kwargs["port"]
 		with McastServer((HOST, PORT), HearUDPHandler) as server:

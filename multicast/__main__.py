@@ -58,9 +58,8 @@
 
 
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__proc__""",
-	"""__prologue__""", """__epilogue__""", """__doc__""",
-	"""NoOp""", """McastNope""", """McastDispatch""",
+	"""__package__""", """__module__""", """__name__""", """__doc__""",
+	"""NoOp""", """McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
 ]
 
 
@@ -78,16 +77,7 @@ __file__ = """multicast/__main__.py"""
 
 try:
 	import sys
-	import argparse
-except Exception as err:
-	# Show Error Info
-	print(str(type(err)))
-	print(str(err))
-	print(str(err.args))
-	print(str(""))
-	# Clean up Error
-	err = None
-	del(err)
+except Exception:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python"))
 
@@ -258,7 +248,6 @@ class McastRecvHearDispatch(mtool):
 
 	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
 
-
 	@classmethod
 	def setupArgs(cls, parser):
 		"""Will attempt add send args.
@@ -340,6 +329,7 @@ TASK_OPTIONS = dict({
 	'HEAR': McastRecvHearDispatch(),
 })
 """The callable function tasks of this program. will add."""
+
 
 class McastDispatch(mtool):
 
