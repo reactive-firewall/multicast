@@ -39,7 +39,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: 10
+    timeout-minutes: 5
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
@@ -82,13 +82,25 @@ jobs:
         make -j1 -f Makefile clean || true ;
         make -j1 -f Makefile build ;
       shell: bash
+    - name: Summerize Building
+      id: sumerize-py-build
+      run: |
+        echo "- Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+      if: ${{ success() }}
+      shell: bash
     - name: Run Tests
       id: test-install
       run: make -j1 -f Makefile user-install ;
       shell: bash
+    - name: Summerize Install
+      id: sumerize-user-install
+      run: |
+        echo "- User Installing works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+      if: ${{ success() }}
+      shell: bash
     - name: Test Info
       id: test-info
-      run: python -m setup.py --name --version --license || true ;
+      run: python -m setup --name --version --license || true ;
     - name: Post-Clean
       id: post
       run: |
@@ -108,7 +120,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, 3.10]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
@@ -125,9 +137,15 @@ jobs:
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests
+    - name: Run Tests for python ${{ matrix.python-version }}
       id: tests
       run: make -j1 -f Makefile test ;
+    - name: Summerize MATs for python ${{ matrix.python-version }}
+      id: sumerize-mats
+      run: |
+        echo "- MATS works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+      if: ${{ success() }}
+      shell: bash
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;

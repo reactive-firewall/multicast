@@ -10,6 +10,7 @@ exclude_lines =
 	# Have to re-enable the standard pragma
 	pragma: no cover
 	from . import
+	pass
 	except Exception
 	except BaseException:
 	# Don't complain if tests don't hit defensive assertion code:
@@ -33,6 +34,7 @@ partial_branches =
 	# Have to re-enable the standard pragma rules
 	pragma: no branch
 	finally:
+	@
 	except unittest.SkipTest
 	# Don't complain if non-runnable code isn't run:
 	if __name__ in u'__main__':

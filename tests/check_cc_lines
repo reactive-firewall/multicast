@@ -95,10 +95,10 @@ fi
 
 # THIS IS THE ACTUAL TEST
 _TEST_ROOT_DIR="./" ;
-if [[ -d ./multicast ]] ; then
+if [[ -d ./.git ]] ; then
 	_TEST_ROOT_DIR="./" ;
 elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+	_TEST_ROOT_DIR=$(pwd) ;
 else
 	echo "FAIL: missing valid folder or file"
 	EXIT_CODE=1

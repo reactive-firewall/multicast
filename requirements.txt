@@ -21,7 +21,7 @@
 # argparse - builtin - PSF licence
 # socket - builtin - PSF licence
 # struct - builtin - PSF licence
-argparse>=1.4.0
+# argparse>=1.4.0
 # argparse - builtin - PSF licence
 setuptools>=45.0
 # virtualenv - MIT

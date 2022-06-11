@@ -93,8 +93,14 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 			if multicast.__name__ is None:
 				theResult = False
 			from multicast import __main__ as multicast
-			self.assertIsNone(multicast.useTool(None))
-			self.assertIsNone(multicast.useTool("JunkInput"))
+			tst_dispatch = multicast.McastDispatch()
+			test_junk_values = [None, "JunkInput", "--Junk"]
+			for tst_in in test_junk_values:
+				(_ignored_code, test_fixture) = tst_dispatch.useTool(tst_in)
+				self.assertIsNone(
+					test_fixture,
+					str("""multicast.McastDispatch().useTool({}) == ERROR""").format(str(tst_in))
+				)
 			theResult = True
 		except Exception:
 			theResult = False
