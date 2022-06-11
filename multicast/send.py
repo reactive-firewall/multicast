@@ -268,10 +268,7 @@ class McastSAY(multicast.mtool):
 			sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, multicast._MCAST_DEFAULT_TTL)
 			sock.sendto(data.encode('utf8'), (group, port))
 		finally:
-			try:
-				sock.close()
-			except OSError:  # pragma: no branch
-				sock = None
+			multicast.endSocket(sock)
 
 	def doStep(self, *args, **kwargs):
 		return self._sayStep(

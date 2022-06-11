@@ -193,127 +193,18 @@ try:
 		unicodedata, socket, struct, argparse
 	]
 	for unit in depends:
-		try:
-			if unit.__name__ is None:  # pragma: no branch
-				raise ImportError(
-					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
-		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+		if unit.__name__ is None:  # pragma: no branch
+			baton = ImportError(
+				str("[CWE-440] module failed to import {}.").format(str(unit))
+			)
+			baton.module = unit
+			raise baton
 except Exception as err:
-	raise ImportError(err)
-
-
-def genSocket():
-	"""Will generate an unbound socket.socket object ready to receive network traffic.
-
-	Implementation allows reuse of socket (to allow another instance of python running
-	this script binding to the same ip/port).
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.__doc__ is not None
-		True
-		>>>
-
-	Testcase 0: Recv should be automaticly imported.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-
-		>>> multicast is not None
-		True
-		>>> multicast.recv is not None
-		True
-		>>>
-
-	Testcase 1: Recv should have genSocket() function that returns a socket.socket object.
-		A: Test that the recv component has the function 'genSocket'
-		B: Test that the 'genSocket' function returns a socket
-
-		>>> multicast.recv.genSocket is not None
-		True
-		>>> multicast.recv.genSocket #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<function genSocket at ...>
-		>>> type(multicast.recv.genSocket)
-		<class 'function'>
-		>>> type(multicast.recv.genSocket())
-		<class 'socket.socket'>
-		>>>
-
-
-	"""
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-	sock.settimeout(multicast._MCAST_DEFAULT_TTL)
-	return sock
-
-
-def endSocket(sock=None):
-	"""Will generates an unbound socket.socket object ready to receive network traffic.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.__doc__ is not None
-		True
-		>>>
-
-	Testcase 0: Recv should be automaticly imported.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-
-		>>> multicast is not None
-		True
-		>>> multicast.recv is not None
-		True
-		>>>
-
-	Testcase 1: Recv should have endSocket() function that takes a socket.socket and closes it.
-		A: Test that the recv component has the function 'genSocket'
-		B: Test that the recv component has the function 'endSocket'
-		C: Test that the 'endSocket' function returns None when given the genSocket
-
-		>>> multicast.recv.genSocket is not None
-		True
-		>>> multicast.recv.endSocket is not None
-		True
-		>>> multicast.recv.endSocket #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<function endSocket at ...>
-		>>> type(multicast.recv.endSocket)
-		<class 'function'>
-		>>> temp_fxtr = multicast.recv.endSocket(multicast.recv.genSocket())
-		>>> temp_fxtr is None
-		True
-		>>>
-
-	Testcase 2: Recv should have endSocket() function that takes a socket.socket object,
-		otherwise does nothing.
-		A: Test that the recv component has the function 'endSocket' (see testcase 1)
-		B: Test that the 'endSocket' function returns nothing
-
-		>>> multicast.recv.endSocket is not None
-		True
-		>>> multicast.recv.endSocket #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<function endSocket at ...>
-		>>> type(multicast.recv.endSocket)
-		<class 'function'>
-		>>> multicast.recv.endSocket(None) is None
-		True
-		>>>
-
-
-	"""
-	if not (sock is None):  # pragma: no branch
-		try:
-			sock.close()
-			sock.shutdown(socket.SHUT_RD)  # pragma: no cover
-		except OSError:  # pragma: no branch
-			sock = None
+	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = err
+	raise baton
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
@@ -351,7 +242,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		... 		[tst_fxtr], 59991, None, tst_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
-		>>> sk_fxtr = genSocket()
+		>>> sk_fxtr = multicast.genSocket()
 		>>> multicast.recv.joinstep(
 		... 		[tst_fxtr], 59991, None, tst_fxtr, sk_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
@@ -364,7 +255,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	if groups is None:
 		groups = []
 	if isock is None:
-		sock = genSocket()
+		sock = multicast.genSocket()
 	else:
 		sock = isock.dup()
 	try:
@@ -557,7 +448,7 @@ class McastRECV(multicast.mtool):
 			if (sys.stdout.isatty()):  # pragma: no cover
 				print(multicast._BLANK)
 		finally:
-			sock = endSocket(sock)
+			sock = multicast.endSocket(sock)
 		if not (chunk is None):  # pragma: no branch
 			msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
 			chunk = None  # pragma: no cover

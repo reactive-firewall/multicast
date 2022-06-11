@@ -20,7 +20,10 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
+	"""__doc__""", """skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
+	"""skt.__file__""", """skt.genSocket""", """skt.genSocket.__func__""", """genSocket""",
+	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
+	"""_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
 	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""", """hear.McastHEAR""",
 ]
@@ -531,6 +534,21 @@ class mtool(abc.ABC):
 	@abc.abstractmethod
 	def doStep(self, *args):  # pragma: no cover
 		pass
+
+
+try:
+	if 'multicast.skt' not in sys.modules:
+		from . import skt
+	else:  # pragma: no branch
+		skt = sys.modules["""multicast.skt"""]
+except Exception as importErr:
+	del importErr
+	import multicast.skt
+
+
+genSocket = skt.genSocket
+
+endSocket = skt.endSocket
 
 
 try:

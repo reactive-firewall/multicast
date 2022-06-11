@@ -195,23 +195,44 @@ class McastNope(mtool):
 			>>> _multicast.McastNope is not None
 			True
 			>>>
-		
-		Testcase 1: Recv should be detailed with some metadata.
+
+		Testcase 1: McastNope should be detailed with some metadata.
 			A: Test that the __MAGIC__ variables are initialized.
 			B: Test that the __MAGIC__ variables are strings.
 
-			>>> multicast.__main__ is not None
+			>>> _multicast.McastNope is not None
 			True
-			>>> multicast.__main__.McastNope is not None
+			>>> _multicast.McastNope is not None
 			True
-			>>> multicast.recv.McastRECV.__module__ is not None
+			>>> _multicast.McastNope.__module__ is not None
 			True
-			>>> multicast.recv.McastRECV.__proc__ is not None
+			>>> _multicast.McastNope.__proc__ is not None
 			True
-			>>> multicast.recv.McastRECV.__epilogue__ is not None
+			>>> _multicast.McastNope.__prologue__ is not None
 			True
-			>>> multicast.recv.McastRECV.__prologue__ is not None
+			>>>
+
+
+		Testcase 2: parseArgs should return a namespace.
+			A: Test that the multicast.mtool component is initialized.
+			B: Test that the multicast.mtool.parseArgs component is initialized.
+
+			>>> multicast.mtool is not None
 			True
+			>>> _multicast.McastNope.parseArgs is not None
+			True
+			>>> tst_fxtr_args = ['''NOOP''', '''--port=1234''', '''--iface=127.0.0.1''']
+			>>> test_fixture = _multicast.McastNope.parseArgs(tst_fxtr_args)
+			>>> test_fixture is not None
+			True
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...tuple...>
+			>>> tst_args_2 = ['''NOOP''', '''--junk''', '''--more-trash=stuff''']
+			>>> (test_fixture_2, test_ignore_extras) = _multicast.McastNope.parseArgs(tst_args_2)
+			>>> test_fixture_2 is not None
+			True
+			>>> type(test_fixture_2) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...Namespace...>
 			>>>
 
 
@@ -234,6 +255,60 @@ class McastNope(mtool):
 
 
 class McastRecvHearDispatch(mtool):
+	"""
+
+		Testing:
+
+		Testcase 0: First setup test fixtures by importing multicast.
+
+			>>> import multicast.__main__ as _multicast
+			>>> _multicast.McastNope is not None
+			True
+			>>>
+
+		Testcase 1: Recv should be detailed with some metadata.
+			A: Test that the __MAGIC__ variables are initialized.
+			B: Test that the __MAGIC__ variables are strings.
+
+			>>> multicast.__main__ is not None
+			True
+			>>> multicast.__main__.McastNope is not None
+			True
+			>>> multicast.recv.McastRECV.__module__ is not None
+			True
+			>>> multicast.recv.McastRECV.__proc__ is not None
+			True
+			>>> multicast.recv.McastRECV.__epilogue__ is not None
+			True
+			>>> multicast.recv.McastRECV.__prologue__ is not None
+			True
+			>>>
+
+
+		Testcase 2: parseArgs should return a namespace.
+			A: Test that the multicast.mtool component is initialized.
+			B: Test that the multicast.mtool.parseArgs component is initialized.
+
+			>>> multicast.mtool is not None
+			True
+			>>> _multicast.McastRecvHearDispatch.parseArgs is not None
+			True
+			>>> tst_fxtr_args = ['''NOOP''', '''--port=1234''', '''--iface=127.0.0.1''']
+			>>> test_fixture = _multicast.McastRecvHearDispatch.parseArgs(tst_fxtr_args)
+			>>> test_fixture is not None
+			True
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...tuple...>
+			>>> tst_args_2 = ['''NOOP''', '''--junk''', '''--more-trash=stuff''']
+			>>> (test_fixture_2, t_ig_ext) = _multicast.McastRecvHearDispatch.parseArgs(tst_args_2)
+			>>> test_fixture_2 is not None
+			True
+			>>> type(test_fixture_2) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...Namespace...>
+			>>>
+
+
+	"""
 
 	__module__ = """multicast.__main__"""
 
@@ -478,5 +553,5 @@ if __name__ in '__main__':
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):
-		__EXIT_CODE = main([str(__proc__), """-h"""])
+		__EXIT_CODE = main([str(__name__), """-h"""])
 	exit(__EXIT_CODE[0])

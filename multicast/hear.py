@@ -208,8 +208,8 @@ class McastServer(socketserver.UDPServer):
 		print(str("open_request"))
 		old_socket = self.socket
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
-		recv.endSocket(old_socket)
-		self.socket = recv.joinstep([tmp_addr], tmp_prt, None, tmp_addr, recv.genSocket())
+		multicast.endSocket(old_socket)
+		self.socket = recv.joinstep([tmp_addr], tmp_prt, None, tmp_addr, multicast.genSocket())
 
 	def server_bind(self):
 		print(str("server_bind"))
