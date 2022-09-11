@@ -166,6 +166,8 @@ try:
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
+	from . import recv as recv
+	from . import send as send
 except Exception as importErr:
 	del importErr
 	import multicast as multicast
@@ -191,10 +193,6 @@ try:
 			raise ImportError(str("[CWE-758] Module failed completely."))
 except Exception as err:
 	raise ImportError(err)
-
-
-from . import recv as recv
-from . import send as send
 
 
 class McastServer(socketserver.UDPServer):
@@ -235,6 +233,28 @@ class McastServer(socketserver.UDPServer):
 
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
+	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	
+	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	data, after printing the sender's ip out.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast.hear.MyUDPHandler as MyUDPHandler
+		>>>
+
+	Testcase 1: MyUDPHandler should be automaticly imported.
+
+		>>> MyUDPHandler.__name__ is not None
+		True
+		>>>
+
+	"""
+
 	def handle(self):
 		data = self.request[0].strip()
 		socket = self.request[1]
@@ -244,6 +264,12 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
+	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	
+	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	data, after printing the sender's ip out.
+	"""
+
 	def handle(self):
 		data = self.request[0].strip()
 		socket = self.request[1]
@@ -252,11 +278,21 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		))
 		if data is not None:
 			myID = str(socket.getsockname()[0])
-			print(str("{me} HEAR: [{you} SAID {what}]").format(me=myID, you=self.client_address, what=str(data)))
-			print(str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(me=myID, you=self.client_address, what=str(data)))
+			print(
+				str("{me} HEAR: [{you} SAID {what}]").format(
+					me=myID, you=self.client_address, what=str(data)
+				)
+			)
+			print(
+				str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(
+					me=myID, you=self.client_address, what=str(data)
+				)
+			)
 			send.McastSAY()._sayStep(
 				self.client_address[0], self.client_address[1],
-				str("HEAR [ {what} SAID {you} ] from {me}").format(me=myID, you=self.client_address, what=data.upper())
+				str("HEAR [ {what} SAID {you} ] from {me}").format(
+					me=myID, you=self.client_address, what=data.upper()
+				)
 			)
 			if """STOP""" in str(data):
 				raise RuntimeError("SHUTDOWN")

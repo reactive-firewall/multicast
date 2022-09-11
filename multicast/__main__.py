@@ -89,7 +89,8 @@ try:
 		__version__ = sys.modules["""multicast.__version__"""]
 except Exception as importErr:
 	del importErr
-	import multicast.__version__ as __version__
+	import multicast.__version__ as __version__  # noqa  -  used by --version argument.
+
 
 try:
 	if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:

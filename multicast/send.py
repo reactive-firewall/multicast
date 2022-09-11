@@ -184,7 +184,7 @@ class McastSAY(multicast.mtool):
 			>>> multicast._MCAST_DEFAULT_TTL is not None
 			True
 			>>>
-		
+
 		Testcase 1: Recv should be detailed with some metadata.
 			A: Test that the __MAGIC__ variables are initialized.
 			B: Test that the __MAGIC__ variables are strings.

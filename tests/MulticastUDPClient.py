@@ -1,6 +1,6 @@
 import socket
-import sys
 import random
+
 
 class MCastClient(object):
 

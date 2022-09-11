@@ -314,7 +314,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					test_cls.doStep("NOOP", []),
 					tuple((int(2), "NoOp")),
 					sub_fail_fixture
-			)
+				)
 			except Exception:
 				p.join()
 				raise unittest.SkipTest(sub_fail_fixture)

@@ -291,7 +291,7 @@ class McastRECV(multicast.mtool):
 			>>> multicast.recv.McastRECV is not None
 			True
 			>>>
-		
+
 		Testcase 2: Recv should be detailed with some metadata.
 			A: Test that the __MAGIC__ variables are initialized.
 			B: Test that the __MAGIC__ variables are strings.
@@ -362,6 +362,7 @@ class McastRECV(multicast.mtool):
 				>>> int(test_fixture) < int(4)
 				True
 				>>>
+
 		"""
 		if parser is not None:
 			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)

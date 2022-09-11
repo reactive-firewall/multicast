@@ -421,7 +421,6 @@ class mtool(abc.ABC):
 			cls.setupArgs(subparsers)
 		return calling_parser_group
 
-
 	@classmethod
 	def parseArgs(cls, arguments=None):
 		"""Will attempt to parse the given CLI arguments.
@@ -543,7 +542,7 @@ try:
 		skt = sys.modules["""multicast.skt"""]
 except Exception as importErr:
 	del importErr
-	import multicast.skt
+	import multicast.skt as skt
 
 
 genSocket = skt.genSocket

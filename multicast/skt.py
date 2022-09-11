@@ -152,7 +152,7 @@ __name__ = """multicast.skt"""
 
 try:
 	from . import socket as _socket
-	from . import struct as _struct
+	from . import struct as _struct  # noqa  -  no used directly.
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))

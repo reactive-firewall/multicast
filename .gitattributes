@@ -1,12 +1,12 @@
 *			text=auto
 *.cfg			text diff=config
 *.txt			text
-*.py			text working-tree-encoding=UTF-8 diff=python
-multicast/*.py	text working-tree-encoding=UTF-8 diff=python
-tests/*.py	text working-tree-encoding=UTF-8 diff=python
+*.py			text working-tree-encoding=UTF-8 diff=python merge=python
+multicast/*.py	text working-tree-encoding=UTF-8 diff=python merge=python
+tests/*.py		text working-tree-encoding=UTF-8 diff=python merge=python
 *.pyc			-text
-*.sh			text
-*.bash			text diff=shell
+*.sh			text working-tree-encoding=UTF-8 diff=shell merge=shell
+*.bash			text working-tree-encoding=UTF-8 diff=shell merge=shell
 *.ini			text
 *.md			text working-tree-encoding=UTF-8
 *.yml			text
@@ -15,5 +15,5 @@ tests/*.py	text working-tree-encoding=UTF-8 diff=python
 *.conf			text diff=config
 *.bat			text
 *.rst			text
-tests/check_*	text working-tree-encoding=UTF-8 diff=shell
-Makefile		text diff=makefile
+tests/check_*	text working-tree-encoding=UTF-8 diff=shell merge=shell
+Makefile		text working-tree-encoding=UTF-8 diff=makefile merge=makefile
