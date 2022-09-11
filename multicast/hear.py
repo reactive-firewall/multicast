@@ -234,7 +234,7 @@ class McastServer(socketserver.UDPServer):
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
 	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
-	
+
 	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
 
@@ -244,7 +244,10 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 	Testcase 0: Multicast should be importable.
 
-		>>> import multicast.hear.MyUDPHandler as MyUDPHandler
+		>>> import multicast
+		>>> multicast.hear is not None
+		True
+		>>> from multicast.hear import MyUDPHandler as MyUDPHandler
 		>>>
 
 	Testcase 1: MyUDPHandler should be automaticly imported.
@@ -265,7 +268,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
 	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
-	
+
 	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
 	"""
