@@ -92,11 +92,13 @@ else
 fi
 
 # this is how test files are found:
+_TEST_FILE_VALIDATOR="echo "
 
 # THIS IS THE ACTUAL TEST
 _TEST_ROOT_DIR="./" ;
 if [[ -d ./.git ]] ; then
 	_TEST_ROOT_DIR="./" ;
+	_TEST_FILE_VALIDATOR="git ls-files"
 elif [[ -d ./tests ]] ; then
 	_TEST_ROOT_DIR=$(pwd) ;
 else
@@ -106,7 +108,7 @@ fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
-for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 | xargs -0 -L1 -I{} git ls-files "{}" ; wait ;) ; do
+for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 | xargs -0 -L1 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -ne 0) ]] ; then
 		echo "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126

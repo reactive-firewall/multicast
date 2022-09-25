@@ -125,7 +125,7 @@ test-pytest: cleanup test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
+	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
 	$(QUIET)tests/check_spelling || true
 	$(QUIET)tests/check_cc_lines || true
 	$(QUIET)$(ECHO) "$@: Done."
