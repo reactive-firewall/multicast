@@ -60,7 +60,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 600
+ulimit -t 60
 # setting the path may break brain-dead CI that uses crazy paths
 # PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
@@ -120,12 +120,32 @@ export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 echo "Start of Log:" > ./${LOG_FILE} ; wait ;
 echo "" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --join-mcast-groups ${TEST_MCAST_GROUP} --bind-group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
+echo "Start of Integration Test one-shot:" >> ./${LOG_FILE} ; wait ;
+echo "" >> ./${LOG_FILE} ; wait ;
+( sleep 1 ; ${COVERAGE_CMD} multicast RECV --use-std --port ${TEST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
 	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --mcast-group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
 done ;
+
+${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
+${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
+echo "End of Integration Test one-shot" >> ./${LOG_FILE} ; wait ;
+echo "" >> ./${LOG_FILE} ; wait ;
+
+echo "Start of Integration Test deamon:" >> ./${LOG_FILE} ; wait ;
+echo "" >> ./${LOG_FILE} ; wait ;
+( sleep 1 ; ${COVERAGE_CMD} multicast --deamon HEAR --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
+
+for PCOUNT in $(seq 1 5) ; do
+	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & true ;
+done ;
+
+${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
+${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
 wait ;
+echo "End of Integration Test deamon" >> ./${LOG_FILE} ; wait ;
+echo "" >> ./${LOG_FILE} ; wait ;
 
 $(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
