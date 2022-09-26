@@ -272,6 +272,14 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	return sock
 
 
+def tryrecv(msgbuffer, chunk, sock):
+	chunk = sock.recv(1316)
+	if not (chunk is None):  # pragma: no branch
+		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+		chunk = None  # pragma: no cover
+	return msgbuffer
+
+
 class McastRECV(multicast.mtool):
 	"""
 
@@ -430,17 +438,11 @@ class McastRECV(multicast.mtool):
 
 
 		"""
-		if groups is None:
-			groups = []
 		sock = joinstep(groups, port, iface, bind_group, None)
 		msgbuffer = str(multicast._BLANK)
 		chunk = None
 		try:
-			while True:
-				chunk = sock.recv(1316)
-				if not (chunk is None):  # pragma: no branch
-					msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
-					chunk = None  # pragma: no cover
+			msgbuffer = tryrecv(msgbuffer, chunk, sock)
 		except KeyboardInterrupt:  # pragma: no branch
 			if (sys.stdout.isatty()):  # pragma: no cover
 				print(multicast._BLANK)
