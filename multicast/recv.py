@@ -280,6 +280,25 @@ def tryrecv(msgbuffer, chunk, sock):
 	return msgbuffer
 
 
+def recvstep(msgbuffer, chunk, sock):
+	try:
+		msgbuffer = tryrecv(msgbuffer, chunk, sock)
+	except KeyboardInterrupt:  # pragma: no branch
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(multicast._BLANK)
+			print(str("""User Interrupted"""))
+	except OSError:  # pragma: no branch
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(multicast._BLANK)
+	finally:
+		sock = multicast.endSocket(sock)
+	if not (chunk is None):  # pragma: no branch
+		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
+		chunk = None  # pragma: no cover
+	# about 969 bytes in base64 encoded as chars
+	return msgbuffer
+
+
 class McastRECV(multicast.mtool):
 	"""
 
@@ -441,20 +460,7 @@ class McastRECV(multicast.mtool):
 		sock = joinstep(groups, port, iface, bind_group, None)
 		msgbuffer = str(multicast._BLANK)
 		chunk = None
-		try:
-			msgbuffer = tryrecv(msgbuffer, chunk, sock)
-		except KeyboardInterrupt:  # pragma: no branch
-			if (sys.stdout.isatty()):  # pragma: no cover
-				print(multicast._BLANK)
-				print(str("""User Interrupted"""))
-		except OSError:  # pragma: no branch
-			if (sys.stdout.isatty()):  # pragma: no cover
-				print(multicast._BLANK)
-		finally:
-			sock = multicast.endSocket(sock)
-		if not (chunk is None):  # pragma: no branch
-			msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
-			chunk = None  # pragma: no cover
+		msgbuffer = recvstep(msgbuffer, chunk, sock)
 		# about 969 bytes in base64 encoded as chars
 		return msgbuffer
 
