@@ -96,7 +96,7 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		echo "Check Integration Tests Coverage already in progress by "`head ${LOCK_FILE}` 1>&2 ;
+		echo "Check Integration Tests Coverage already in progress by "`head ${LOCK_FILE}` ;
 		exit 126 ;
 fi
 
@@ -113,36 +113,19 @@ else
 	EXIT_CODE=1
 fi
 
-TEST_PORT=$((($RANDOM % 999)+59000));
+TEST_PORT=59595;
 TEST_MCAST_GROUP='224.0.0.1' ;
 export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m"
 
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 echo "Start of Log:" > ./${LOG_FILE} ; wait ;
 echo "" >> ./${LOG_FILE} ; wait ;
-echo "Start of Integration Test one-shot:" > ./${LOG_FILE} ; wait ;
-echo "" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast RECV --use-std --port ${TEST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
+( sleep 1 ; ${COVERAGE_CMD} multicast HEAR --use-std --port ${TEST_PORT} --join-mcast-groups ${TEST_MCAST_GROUP} --bind-group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
-	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
+	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --mcast-group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
 done ;
 wait ;
-echo "End of Integration Test one-shot:" > ./${LOG_FILE} ; wait ;
-echo "" >> ./${LOG_FILE} ; wait ;
-
-echo "Start of Integration Test deamon:" > ./${LOG_FILE} ; wait ;
-echo "" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast --deamon HEAR --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} 2>>./${ERR_FILE} ) >> ./${LOG_FILE} & true ;
-
-for PCOUNT in $(seq 1 5) ; do
-	${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & true ;
-done ;
-${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
-${COVERAGE_CMD} multicast SAY --port ${TEST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
-wait ;
-echo "End of Integration Test deamon:" > ./${LOG_FILE} ; wait ;
-echo "" >> ./${LOG_FILE} ; wait ;
 
 $(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
@@ -151,13 +134,8 @@ cp -f ./${LOG_FILE} ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
 echo "" | tee -a ./test-reports/integration_data_log.log ; wait ;
 
 if [[ ( -r ./${ERR_FILE} ) ]] ; then
-	if [[ ( $( wc -l <./${ERR_FILE} ) -gt 1 ) ]] ; then
-		echo "Errors: " | tee -a ./test-reports/integration_data_log.log ; wait ;
-		cat <./${ERR_FILE} | tee -a ./test-reports/integration_data_log.log ; wait ;
-		EXIT_CODE=2 ;
-	else
-		echo "OK: Compleate" | tee -a ./test-reports/integration_data_log.log ; wait ;
-	fi
+	echo "Errors: " | tee -a ./test-reports/integration_data_log.log ; wait ;
+	cat <./${ERR_FILE} | tee -a ./test-reports/integration_data_log.log ; wait ;
 fi
 
 unset COVERAGE_CMD 2>/dev/null || true ;
