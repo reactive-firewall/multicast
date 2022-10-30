@@ -131,7 +131,7 @@ test-style: cleanup must_have_flake
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_have_flake:
-	$(QUIET)runner=`python3 -m pip freeze --all | grep --count -F flake` ; \
+	$(QUIET)runner=`python3 -m pip freeze --all | grep --count -oF flake` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
 cleanup:

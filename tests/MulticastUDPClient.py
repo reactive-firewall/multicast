@@ -1,4 +1,24 @@
-#! /bin/bash
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Python Test Repo Template
+# ..................................
+# Copyright (c) 2017-2022, Kendrick Walls
+# ..................................
+# Licensed under MIT (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# THIS FILE IS A TEST FILE ONLY.
+
 # Disclaimer of Warranties.
 # A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
 #    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
@@ -7,7 +27,7 @@
 #    EFFORT IS WITH YOU.
 #
 # B. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SHELL SCRIPT
-#    AND SERVICES ARE PROVIDED "AS IS" AND “AS AVAILABLE”, WITH ALL FAULTS AND
+#    AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITH ALL FAULTS AND
 #    WITHOUT WARRANTY OF ANY KIND, AND THE AUTHOR OF THIS SHELL SCRIPT'S LICENSORS
 #    (COLLECTIVELY REFERRED TO AS "THE AUTHOR" FOR THE PURPOSES OF THIS DISCLAIMER)
 #    HEREBY DISCLAIM ALL WARRANTIES AND CONDITIONS WITH RESPECT TO THIS SHELL SCRIPT
@@ -60,83 +80,46 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 600
-PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
-umask 137
+import socket
+import sys
+import random
 
-LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
-EXIT_CODE=0
 
-test -x $(command -v grep) || exit 126 ;
-test -x $(command -v curl) || exit 126 ;
-test -x $(command -v find) || exit 126 ;
-test -x $(command -v git) || exit 126 ;
+class MCastClient(object):
 
-function cleanup() {
-	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
-}
+	_group_addr = None
+	_source_port = None
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
-		trap 'cleanup ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
-		trap 'cleanup ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
-		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		# trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
-		trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
-		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
-else
-		echo "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
-		false ;
-		exit 126 ;
-fi
+	def __init__(self, *args, **kwargs):
+		if str("""grp_addr""") in kwargs:
+			self._group_addr = kwargs.grp_addr
+		if str("""src_port""") in kwargs:
+			self._source_port = kwargs.src_port
+		else:
+			self._source_port = int(
+				50000 + (
+					int(
+						random.SystemRandom().randbytes(
+							int(60000).__sizeof__()
+						).hex(),
+						16
+					) % 9999
+				)
+			)
 
-# this is how test files are found:
-_TEST_FILE_VALIDATOR="echo "
+	def say(self, address, port, conn, msg):
+		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
+		received = str(conn.recv(1024), "utf-8")
+		print("Sent:     {}".format(msg))
+		print("Received: {}".format(received))
 
-# THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR="./" ;
-	_TEST_FILE_VALIDATOR="git ls-files"
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR=$(pwd) ;
-else
-	echo "FAIL: missing valid folder or file"
-	EXIT_CODE=1
-fi
 
-_TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
-
-for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 | xargs -0 -L1 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
-	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -ne 0) ]] ; then
-		echo "SKIP: ${_TEST_DOC} is disclaimed." ;
-		EXIT_CODE=126
-	else
-		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -le 0) ]] ; then
-			echo "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
-			EXIT_CODE=127
-		fi
-		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
-			echo "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
-		fi
-		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt ${_TEST_YEAR}) ]] ; then
-			echo "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" ;
-		fi
-		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
-			case "$EXIT_CODE" in
-				0) true ;;
-				*) echo "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
-			esac
-		fi
-	fi
-done
-
-unset _TEST_ROOT_DIR 2>/dev/null || true ;
-unset _TEST_DOC 2>/dev/null || true ;
-unset _TEST_YEAR 2>/dev/null || true ;
-
-rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
-
-# goodbye
-exit ${EXIT_CODE:-255} ;
+if __name__ == "__main__":
+	HOST, PORT = "224.0.0.1", 59991
+	data = "This is a test"
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+	tsts_fxr = MCastClient()
+	print(str((HOST, PORT)))
+	tsts_fxr.say(HOST, PORT, sock, data)
+	tsts_fxr.say(HOST, PORT, sock, str("""STOP"""))
+	exit(0)
