@@ -273,6 +273,42 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 def tryrecv(msgbuffer, chunk, sock):
+	"""Will try to listen on the given socket directly into the given chunk for decoding.
+
+		If the read into the chunk results in content, the chunk will be decoded into the given
+		message buffer. Either way the message buffer will be returned.
+
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.recv is not None
+			True
+			>>> multicast.recv.tryrecv is not None
+			True
+			>>>
+
+		Testcase 1: Stability testing.
+
+			>>> import multicast
+			>>>
+			>>> multicast.recv is None
+			False
+			>>> multicast.recv.tryrecv is None
+			False
+			>>> type(multicast.recv.tryrecv) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<class 'function'>
+			>>> sk_fxtr = multicast.genSocket()
+			>>> ulticast.recv.tryrecv(
+			... 	test pass-through", None, sk_fxtr
+			... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			Traceback...socket.timeout...timed out...
+			>>> sk_fxtr.close()
+			>>>
+
+	"""
 	chunk = sock.recv(1316)
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
