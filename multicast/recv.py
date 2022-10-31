@@ -302,7 +302,7 @@ def tryrecv(msgbuffer, chunk, sock):
 			<class 'function'>
 			>>> sk_fxtr = multicast.genSocket()
 			>>> ulticast.recv.tryrecv(
-			... 	test pass-through", None, sk_fxtr
+			... 	"test pass-through", None, sk_fxtr
 			... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			Traceback...socket.timeout...timed out...
 			>>> sk_fxtr.close()
