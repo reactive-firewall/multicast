@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""multicast HEAR Features.
+"""Provides multicast HEAR Features.
 
 	Minimal Acceptance Testing:
 
@@ -91,7 +91,7 @@
 
 
 __package__ = """multicast"""
-"""The package of this program.
+"""Names the package of this program.
 
 	Minimal Acceptance Testing:
 
@@ -115,7 +115,7 @@ __package__ = """multicast"""
 
 
 __module__ = """multicast"""
-"""The module of this program.
+"""Names the module of this program.
 
 	Minimal Acceptance Testing:
 
@@ -136,11 +136,11 @@ __module__ = """multicast"""
 
 
 __file__ = """multicast/hear.py"""
-"""The file of this component."""
+"""Names the file of this component."""
 
 
 __name__ = """multicast.hear"""
-"""The name of this component.
+"""Names this component.
 
 	Minimal Acceptance Testing:
 
@@ -302,7 +302,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 
 class McastHEAR(multicast.mtool):
-	"""
+	"""Subclasses multicast.mtool to provide the HEAR tooling.
 
 		Testing:
 

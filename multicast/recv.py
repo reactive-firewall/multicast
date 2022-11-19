@@ -301,10 +301,9 @@ def tryrecv(msgbuffer, chunk, sock):
 			>>> type(multicast.recv.tryrecv) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			<class 'function'>
 			>>> sk_fxtr = multicast.genSocket()
-			>>> multicast.recv.tryrecv(
-			... 	"test pass-through", None, sk_fxtr
-			... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-			Traceback...socket.timeout...timed out...
+			>>> tst_args = ("test pass-through", None, sk_fxtr)
+			>>> multicast.recv.recvstep(*tst_args) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'test pass-through'
 			>>> sk_fxtr.close()
 			>>>
 
@@ -336,7 +335,7 @@ def recvstep(msgbuffer, chunk, sock):
 
 
 class McastRECV(multicast.mtool):
-	"""
+	"""Subclasses the multicast.mtool to provide the RECV functions.
 
 		Testing:
 
@@ -424,6 +423,20 @@ class McastRECV(multicast.mtool):
 				True
 				>>> int(test_fixture) < int(4)
 				True
+				>>>
+
+			Testcase 2: setupArgs should not error given valid input.
+				A: Test that the multicast component is initialized.
+				B: Test that the recv component is initialized.
+				C: Test that the McastRECV class is initialized.
+				D: Test that the setupArgs function returns without error.
+
+				>>> multicast.recv is not None
+				True
+				>>> multicast.__main__.main is not None
+				True
+				>>> tst_fxtr_args = argparse.ArgumentParser(prog="testcase")
+				>>> multicast.recv.McastRECV.setupArgs(parser=tst_fxtr_args)
 				>>>
 
 		"""

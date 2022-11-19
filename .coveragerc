@@ -17,6 +17,9 @@ exclude_lines =
 	raise AssertionError
 	raise NotImplementedError
 	raise ImportError
+	raise baton
+	baton = ImportError
+	baton.module
 	except subprocess.CalledProcessError
 	except ..Error
 	# don't complain about sys.modules

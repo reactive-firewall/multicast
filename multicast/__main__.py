@@ -76,7 +76,7 @@ __file__ = """multicast/__main__.py"""
 
 
 try:
-	import sys
+	from . import sys as sys
 except Exception:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python"))
@@ -360,6 +360,21 @@ class McastRecvHearDispatch(mtool):
 				>>> int(test_fixture) < int(4)
 				True
 				>>>
+
+			Testcase 2: setupArgs should not error given valid input.
+				A: Test that the multicast component is initialized.
+				B: Test that the __main__ component is initialized.
+				C: Test that the McastRecvHearDispatch class is initialized.
+				D: Test that the setupArgs function returns without error.
+
+				>>> multicast.__main__ is not None
+				True
+				>>> multicast.__main__.McastRecvHearDispatch is not None
+				True
+				>>> tst_fxtr_args = argparse.ArgumentParser(prog="testcase")
+				>>> multicast.__main__.McastRecvHearDispatch.setupArgs(parser=tst_fxtr_args)
+				>>>
+
 		"""
 		if parser is not None:
 			parser.add_argument("""--port""", type=int, default=_MCAST_DEFAULT_PORT)
@@ -419,7 +434,7 @@ class McastDispatch(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		if parser is not None:
+		if parser is not None:  # pragma: no branch
 			for sub_tool in sorted(TASK_OPTIONS.keys()):
 				sub_parser = parser.add_parser(sub_tool, help="...")
 				type(TASK_OPTIONS[sub_tool]).setupArgs(sub_parser)
