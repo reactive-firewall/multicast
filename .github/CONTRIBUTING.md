@@ -132,7 +132,7 @@ This is the checklist that I try to go through for every single pull request tha
 
 - [ ] reads:
 
-> Copyright (c) 2017-2022, Author
+> Copyright (c) 2017-2023, Author
 
 
 ## Close Issues
