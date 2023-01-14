@@ -3,7 +3,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2022, Kendrick Walls
+# Copyright (c) 2017-2023, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ __name__ = """multicast.skt"""
 
 try:
 	from . import socket as _socket
-	from . import struct as _struct  # pragma: no cover
+	from . import struct as _struct  # noqa
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
