@@ -1,6 +1,6 @@
 *			text=auto
-*.cfg			text diff=config
-*.txt			text
+*.cfg,*.conf	text working-tree-encoding=UTF-8 diff=config
+*.txt			text working-tree-encoding=UTF-8
 *.py			text working-tree-encoding=UTF-8 diff=python merge=python
 multicast/*.py	text working-tree-encoding=UTF-8 diff=python merge=python
 tests/*.py		text working-tree-encoding=UTF-8 diff=python merge=python
@@ -8,7 +8,7 @@ tests/*.py		text working-tree-encoding=UTF-8 diff=python merge=python
 *.sh			text working-tree-encoding=UTF-8 diff=shell merge=shell
 *.bash			text working-tree-encoding=UTF-8 diff=shell merge=shell
 *.ini			text
-*.md			text working-tree-encoding=UTF-8
+*.md			text working-tree-encoding=UTF-8 diff=markdown merge=markdown
 *.yml			text
 *.jpg			-text
 *.png			-text

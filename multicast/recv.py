@@ -273,6 +273,41 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 def tryrecv(msgbuffer, chunk, sock):
+	"""Will try to listen on the given socket directly into the given chunk for decoding.
+
+		If the read into the chunk results in content, the chunk will be decoded into the given
+		message buffer. Either way the message buffer will be returned.
+
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.recv is not None
+			True
+			>>> multicast.recv.tryrecv is not None
+			True
+			>>>
+
+		Testcase 1: Stability testing.
+
+			>>> import multicast
+			>>>
+			>>> multicast.recv is None
+			False
+			>>> multicast.recv.tryrecv is None
+			False
+			>>> type(multicast.recv.tryrecv) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<class 'function'>
+			>>> sk_fxtr = multicast.genSocket()
+			>>> tst_args = ("test pass-through", None, sk_fxtr)
+			>>> multicast.recv.recvstep(*tst_args) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'test pass-through'
+			>>> sk_fxtr.close()
+			>>>
+
+	"""
 	chunk = sock.recv(1316)
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
@@ -300,7 +335,7 @@ def recvstep(msgbuffer, chunk, sock):
 
 
 class McastRECV(multicast.mtool):
-	"""
+	"""Subclasses the multicast.mtool to provide the RECV functions.
 
 		Testing:
 
@@ -388,6 +423,20 @@ class McastRECV(multicast.mtool):
 				True
 				>>> int(test_fixture) < int(4)
 				True
+				>>>
+
+			Testcase 2: setupArgs should not error given valid input.
+				A: Test that the multicast component is initialized.
+				B: Test that the recv component is initialized.
+				C: Test that the McastRECV class is initialized.
+				D: Test that the setupArgs function returns without error.
+
+				>>> multicast.recv is not None
+				True
+				>>> multicast.__main__.main is not None
+				True
+				>>> tst_fxtr_args = argparse.ArgumentParser(prog="testcase")
+				>>> multicast.recv.McastRECV.setupArgs(parser=tst_fxtr_args)
 				>>>
 
 		"""
