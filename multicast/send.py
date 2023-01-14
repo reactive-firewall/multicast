@@ -168,7 +168,7 @@ except Exception as err:
 
 
 class McastSAY(multicast.mtool):
-	"""
+	"""Multicast Broacaster tool.
 
 		Testing:
 

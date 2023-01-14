@@ -196,9 +196,9 @@ try:
 		if unit.__name__ is None:  # pragma: no branch
 			baton = ImportError(
 				str("[CWE-440] module failed to import {}.").format(str(unit))
-			)
-			baton.module = unit
-			raise baton
+			)  # pragma: no cover
+			baton.module = unit  # pragma: no cover
+			raise baton  # pragma: no cover
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__

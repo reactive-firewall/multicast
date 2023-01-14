@@ -183,8 +183,7 @@ _MCAST_DEFAULT_PORT = 44244
 global _MCAST_DEFAULT_GROUP  # noqa
 
 _MCAST_DEFAULT_GROUP = """224.0.0.1"""
-"""
-	Arbitrary group to use by default, though any mcst grp would work.
+"""Arbitrary group to use by default, though any mcst grp would work.
 
 	The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
 	on the rational that this group address will be treated as a local-net multicast
@@ -213,8 +212,7 @@ _MCAST_DEFAULT_GROUP = """224.0.0.1"""
 global _MCAST_DEFAULT_TTL  # noqa
 
 _MCAST_DEFAULT_TTL = int(1)
-"""
-	Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
+"""Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
 	A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
 	explicit value that could travers byone the local connected network should be
 	chosen by the caller rather than the default vaule. This is inline with the principle
@@ -248,8 +246,7 @@ _MCAST_DEFAULT_TTL = int(1)
 global _BLANK  # noqa
 
 _BLANK = str("""""")
-"""
-	Arbitrary blank string.
+"""Arbitrary blank string.
 
 	Minimal Testing:
 
@@ -523,15 +520,26 @@ class mtool(abc.ABC):
 		return [None] if args is None else args
 
 	def __call__(self, *args, **kwargs):
+		"""Call self as a function.
+
+			Default implementation simply calls the abstract function doStep
+			and passes the given positional arguments, thus key-word arguments
+			will be silently ignored.
+
+			Subclasses should not reimplement __call__ directly and instead
+			should implement nessasary logic in the abstract doStep() function.
+		"""
 		return self.doStep(*args, **kwargs)
 
 	@classmethod
 	@abc.abstractmethod
 	def setupArgs(cls, parser):  # pragma: no cover
+		"""Abstract hook for setting up the tool's arguments."""
 		pass
 
 	@abc.abstractmethod
 	def doStep(self, *args):  # pragma: no cover
+		"""Abstracts the __call__ behavior for sub-classing the tool."""
 		pass
 
 
@@ -546,6 +554,7 @@ except Exception as importErr:
 
 
 genSocket = skt.genSocket
+
 
 endSocket = skt.endSocket
 
