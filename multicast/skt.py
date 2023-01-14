@@ -32,49 +32,49 @@
 
 """multicast socket Utility Functions.
 
-	NOT intended for DIRECT use!
+NOT intended for DIRECT use!
 
-	Minimal Acceptance Testing:
+Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+First setup test fixtures by importing multicast.
 
-	Testcase 0: Multicast should be importable.
+Testcase 0: Multicast should be importable.
 
-		>>> import multicast
-		>>> multicast.skt is not None
-		True
-		>>> multicast.skt.__doc__ is not None
-		True
-		>>>
+	>>> import multicast
+	>>> multicast.skt is not None
+	True
+	>>> multicast.skt.__doc__ is not None
+	True
+	>>>
 
-	Testcase 1: SKT utils should be automaticly imported.
-		A: Test that the multicast.skt component is initialized.
-		B: Test that the skt component is initialized.
-		C: Test that the skt component has __doc__
+Testcase 1: SKT utils should be automaticly imported.
+	A: Test that the multicast.skt component is initialized.
+	B: Test that the skt component is initialized.
+	C: Test that the skt component has __doc__
 
-		>>> multicast is not None
-		True
-		>>> multicast.skt is not None
-		True
-		>>> multicast.skt.__doc__ is not None
-		True
-		>>> type(multicast.skt.__doc__) == type(str(''''''))
-		True
-		>>>
+	>>> multicast is not None
+	True
+	>>> multicast.skt is not None
+	True
+	>>> multicast.skt.__doc__ is not None
+	True
+	>>> type(multicast.skt.__doc__) == type(str(''''''))
+	True
+	>>>
 
-	Testcase 2: SKT utils should be detailed with some metadata.
-		A: Test that the __MAGIC__ variables are initialized.
-		B: Test that the __MAGIC__ variables are strings.
+Testcase 2: SKT utils should be detailed with some metadata.
+	A: Test that the __MAGIC__ variables are initialized.
+	B: Test that the __MAGIC__ variables are strings.
 
-		>>> multicast.skt is not None
-		True
-		>>> multicast.skt.__module__ is not None
-		True
-		>>> multicast.skt.__package__ is not None
-		True
-		>>> type(multicast.skt.__doc__) == type(multicast.skt.__module__)
-		True
-		>>>
+	>>> multicast.skt is not None
+	True
+	>>> multicast.skt.__module__ is not None
+	True
+	>>> multicast.skt.__package__ is not None
+	True
+	>>> type(multicast.skt.__doc__) == type(multicast.skt.__module__)
+	True
+	>>>
 
 
 """
@@ -152,7 +152,7 @@ __name__ = """multicast.skt"""
 
 try:
 	from . import socket as _socket
-	from . import struct as _struct  # noqa  -  no used directly.
+	from . import struct as _struct  # pragma: no cover
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
