@@ -3,7 +3,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2022, Kendrick Walls
+# Copyright (c) 2017-2023, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@
 
 # Third-party Acknowledgement:
 # ..........................................
-# Some code (namely: run, and parseArgs) was modified/derived from:
+# Some code (less than 10%) was modified/derived from:
 # https://stackoverflow.com/a/52791404
 # Copyright (c) 2019, "pterodragon" (https://stackoverflow.com/users/5256940/pterodragon)
 # which was under CC-by-sa-4 license.
 # see https://creativecommons.org/licenses/by-sa/4.0/ for details
-# The components in parseArgs, run, and main are thus also under
+# The Code in McastSAY.setupArgs (previously parseArgs), and McastSAY.doStep (previously main)
+# are thus also under
 # CC-by-sa-4 https://creativecommons.org/licenses/by-sa/4.0/
 # ..........................................
 # NO ASSOCIATION
@@ -57,7 +58,7 @@ Minimal Acceptance Testing:
 		True
 		>>>
 
-		>>> multicast.send.__proc__ is not None
+		>>> multicast.send.McastSAY is not None
 		True
 		>>>
 
@@ -80,6 +81,9 @@ __package__ = """multicast"""
 	Testcase 1: Send should be automaticly imported.
 
 		>>> multicast.send.__package__ is not None
+		True
+		>>>
+		>>> multicast.send.__package__ == multicast.__package__
 		True
 		>>>
 
@@ -131,18 +135,25 @@ __name__ = """multicast.send"""
 
 """
 
-
-__proc__ = """multicast SAY"""
-"""The name of this program."""
+try:
+	import sys
+	if 'multicast' not in sys.modules:
+		from . import multicast as multicast
+	else:  # pragma: no branch
+		multicast = sys.modules["""multicast"""]
+	_BLANK = multicast._BLANK
+except Exception as importErr:
+	del importErr
+	import multicast as multicast
 
 
 try:
-	import sys
-	import argparse
-	import unicodedata
-	import socket
+	from multicast import argparse as argparse
+	from multicast import unicodedata as unicodedata
+	from multicast import socket as socket
+	from multicast import struct as struct
 	depends = [
-		unicodedata, socket, argparse
+		unicodedata, socket, struct, argparse
 	]
 	for unit in depends:
 		try:
@@ -156,152 +167,113 @@ except Exception as err:
 	raise ImportError(err)
 
 
-try:
-	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
-	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
-	__BLANK = multicast.__BLANK
-except Exception as importErr:
-	del importErr
-	import multicast as multicast
+class McastSAY(multicast.mtool):
+	"""Multicast Broacaster tool.
 
+		Testing:
 
-def parseArgs(*arguments):
-	"""Will attempt to parse the given CLI arguments.
+		Testcase 0: First setup test fixtures by importing multicast.
 
-	See argparse.ArgumentParser for more.
-	param str - arguments - the array of arguments to parse. (Usually sys.argv[1:])
-	returns argparse.Namespace - the Namespace parsed with the key-value pairs.
+			>>> import multicast
+			>>> multicast.send is not None
+			True
+			>>> multicast._MCAST_DEFAULT_PORT is not None
+			True
+			>>> multicast._MCAST_DEFAULT_GROUP is not None
+			True
+			>>> multicast._MCAST_DEFAULT_TTL is not None
+			True
+			>>>
 
-	Testing:
+		Testcase 1: Recv should be detailed with some metadata.
+			A: Test that the __MAGIC__ variables are initialized.
+			B: Test that the __MAGIC__ variables are strings.
 
-	Testcase 0: First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.send is not None
-		True
-		>>>
-
-	Testcase 1: parseArgs should return a namespace.
-		A: Test that the multicast component is initialized.
-		B: Test that the send component is initialized.
-		C: Test that the send.parseArgs component is initialized.
-
-		>>> multicast.send is not None
-		True
-		>>> multicast.send.parseArgs is not None
-		True
-		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
-		>>> test_fixture = multicast.send.parseArgs(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...Namespace...>
-		>>>
-
+			>>> multicast.send is not None
+			True
+			>>> multicast.send.McastSAY is not None
+			True
+			>>> multicast.send.McastSAY.__module__ is not None
+			True
+			>>> multicast.send.McastSAY.__proc__ is not None
+			True
+			>>> multicast.send.McastSAY.__prologue__ is not None
+			True
+			>>>
 
 	"""
-	__epilogue__ = """- WIP -"""
-	__description__ = """Python Multicast Broadcaster."""
-	parser = argparse.ArgumentParser(
-		prog=__proc__,
-		description=__description__,
-		epilog=__epilogue__
-	)
-	parser.add_argument("""--port""", type=int, default=multicast.__MCAST_DEFAULT_PORT)
-	parser.add_argument("""--mcast-group""", default=multicast.__MCAST_DEFAULT_GROUP)
-	parser.add_argument(
-		"""--message""", nargs='+', dest="""message""",
-		default=str("""PING from {name}: group: {group}, port: {port}""")
-	)
-	return parser.parse_args(*arguments)
+
+	__module__ = """multicast.send"""
+
+	__name__ = """multicast.send.McastSAY"""
+
+	__proc__ = """SAY"""
+
+	__prologue__ = """Python Multicast Broadcaster."""
+
+	@classmethod
+	def setupArgs(cls, parser):
+		"""Will attempt add send args.
+
+			Testing:
+
+			Testcase 0: First setup test fixtures by importing multicast.
+
+				>>> import multicast
+				>>> multicast.send is not None
+				True
+				>>> multicast.send.McastSAY is not None
+				True
+				>>>
+
+			Testcase 1: main should return an int.
+				A: Test that the multicast component is initialized.
+				B: Test that the send component is initialized.
+				C: Test that the main(say) function is initialized.
+				D: Test that the main(say) function returns an int 0-3.
+
+				>>> multicast.send is not None
+				True
+				>>> multicast.__main__.main is not None
+				True
+				>>> tst_fxtr_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
+				>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+				>>> test_fixture is not None
+				True
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...int...>
+				>>> int(test_fixture) >= int(0)
+				True
+				>>> int(test_fixture) < int(4)
+				True
+				>>>
 
 
-def saystep(group, port, data):
-	"""Will send the given data over the given port to the given group.
+		"""
+		if parser is not None:
+			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
+			parser.add_argument("""--group""", default=multicast._MCAST_DEFAULT_GROUP)
+			parser.add_argument(
+				"""-m""", """--message""", nargs='+', dest="""data""",
+				default=str("""PING from {name}: group: {group}, port: {port}""")
+			)
 
-	The actual magic is handeled here.
-	"""
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	try:
-		sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, multicast.__MCAST_DEFAULT_TTL)
-		sock.sendto(data.encode('utf8'), (group, port))
-	finally:
+	def _sayStep(self, group, port, data):
+		"""Will send the given data over the given port to the given group.
+
+		The actual magic is handeled here.
+		"""
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 		try:
-			sock.close()
-		except OSError:  # pragma: no branch
-			sock = None
+			sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, multicast._MCAST_DEFAULT_TTL)
+			sock.sendto(data.encode('utf8'), (group, port))
+		finally:
+			multicast.endSocket(sock)
 
-
-def main(*argv):
-	"""Will handle the Main Event from multicast.__main__ when called.
-
-	Every main(*args) function in multicast is expected to return an int().
-	Regardles of errors the result as an 'exit code' (int) is returned.
-	The only exception is multicast.__main__.main(*args) which will exit with the underlying
-	return codes.
-	The expected return codes are as follows:
-		= 0:  Any nominal state (i.e. no errors and possibly success)
-		<=1:  Any erroneous state (caveat: includes simple failure)
-		= 2:  Any failed state
-		= 3:  Any undefined (but assumed erroneous) state
-		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
-
-	param iterable - argv - the array of arguments. Usually sys.argv[1:]
-	returns int - the Namespace parsed with the key-value pairs.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast
-		>>> multicast.send is not None
-		True
-		>>>
-
-	Testcase 0: main should return an int.
-		A: Test that the multicast component is initialized.
-		B: Test that the send component is initialized.
-		C: Test that the send.main function is initialized.
-		D: Test that the send.main function returns an int 0-3.
-
-		>>> multicast.send is not None
-		True
-		>>> multicast.send.main is not None
-		True
-		>>> tst_fxtr_args = ['''--port=1234''', '''--message''', '''is required''']
-		>>> test_fixture = multicast.send.main(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...int...>
-		>>> int(test_fixture) >= int(0)
-		True
-		>>> int(test_fixture) < int(4)
-		True
-		>>>
-
-
-	"""
-	__exit_code = 1
-	try:
-		args = parseArgs(*argv)
-		_payload = str(args.message).format(
-			name=str(__name__),
-			group=str(args.mcast_group),
-			port=int(args.port)
+	def doStep(self, *args, **kwargs):
+		return self._sayStep(
+			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
+			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
+			None if "data" not in kwargs.keys() else str(kwargs["data"]),
 		)
-		saystep(args.mcast_group, int(args.port), _payload)
-		__exit_code = 0
-	except argparse.ArgumentError:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(__BLANK)
-			print(str("""Input has an Argument Error"""))
-		__exit_code = 2
-	except BaseException as e:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(str(e))
-		__exit_code = 3
-		del e
-	return int(__exit_code)
+

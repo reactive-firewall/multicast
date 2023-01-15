@@ -4,7 +4,7 @@ linters:
   flake8:
     max-line-length: 100
     max-complexity: 10
-    ignore: 'W191,W391'
+    ignore: 'W191,W391,E117,D208'
     exclude: ['.git', '__pycache__', 'docs', '.tox', 'build']
     format: default
 files:

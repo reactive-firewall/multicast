@@ -2,7 +2,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2022, Mr. Walls
+# Copyright (c) 2017-2023, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ endif
 
 PHONY: must_be_root cleanup
 
-build:
+build: init
 	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
 	$(QUIET)$(PYTHON) -W ignore setup.py build
 	$(QUIET)$(PYTHON) -W ignore setup.py bdist_wheel --universal
@@ -88,7 +88,8 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -W ignore setup.py install_lib || $(QUIET)$(PYTHON) -W ignore setup.py install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -109,8 +110,6 @@ purge: clean uninstall
 
 test: cleanup
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
-	$(QUIET)$(COVERAGE) combine 2>/dev/null || true ;
-	$(QUIET)$(COVERAGE) report --include=multicast* 2>/dev/null || true ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -127,13 +126,13 @@ test-pytest: cleanup test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini || true
-	$(QUIET)tests/check_spelling 2>/dev/null || true
-	$(QUIET)tests/check_cc_lines 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
+	$(QUIET)tests/check_spelling || true
+	$(QUIET)tests/check_cc_lines || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_have_flake:
-	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -F flake` ; \
+	$(QUIET)runner=`python3 -m pip freeze --all | grep --count -oF flake` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
 cleanup:
@@ -189,7 +188,7 @@ must_be_root:
 
 user-install: build
 	$(QUIET)$(PYTHON) -m pip install --user --upgrade pip setuptools wheel || true
-	$(QUIET)$(PYTHON) -m pip install --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/master/requirements.txt"
+	$(QUIET)$(PYTHON) -m pip install --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
 	$(QUIET)$(PYTHON) -m pip install --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."

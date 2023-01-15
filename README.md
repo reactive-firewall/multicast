@@ -172,7 +172,7 @@ make clean ; # cleans up for next test
 (WIP) might expand the documentation to be more user friendly to the non-network guru
 (WIP) might add tcp multicast ... who knows?
 
-#### Copyright (c) 2021-2022, Mr. Walls
+#### Copyright (c) 2021-2023, Mr. Walls
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
 

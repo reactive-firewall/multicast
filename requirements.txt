@@ -1,12 +1,12 @@
 # Python Multicast Repo req file
 # ..................................
-# Copyright (c) 2017-2022, Mr. Walls
+# Copyright (c) 2017-2023, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-reop/LICENSE.md
+# http://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@
 # argparse - builtin - PSF licence
 # socket - builtin - PSF licence
 # struct - builtin - PSF licence
-argparse>=1.4.0
+# argparse>=1.4.0
 # argparse - builtin - PSF licence
 setuptools>=45.0
 # virtualenv - MIT

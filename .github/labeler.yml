@@ -1,46 +1,46 @@
 # Add 'Multicast' label to any root file changes
 Multicast:
-  - ./setup.py
-  - ./multicast/*.py
+  - setup.py
+  - multicast/*.py
 
 # Add 'Lint' label to any lint file changes
 Linter:
-  - ./.stickler.yml
-  - ./.hound.yml
-  - ./.yamllint.conf
-  - ./.flake8.ini
-  - ./.deepsource.toml
-  - ./tests/check_*
+  - .stickler.yml
+  - .hound.yml
+  - .yamllint.conf
+  - .flake8.ini
+  - .deepsource.toml
+  - tests/check_*
 
 # Add 'Lang' label to any python file changes
 Python Lang:
-  - ./**/*.py
-  - ./*.py
+  - **/*.py
+  - *.py
 
 Configs:
-  - ./*.yml
+  - *.yml
   - ./**/*.yml
-  - ./*.ini
-  - ./*.toml
-  - ./*.cfg
-  - ./requirements.txt
+  - *.ini
+  - *.toml
+  - *.cfg
+  - requirements.txt
 
 # Add 'test' label
 Testing:
   - tests/**/*.py
   - tests/*
-  - ./.circleci/*
+  - .circleci/*
 
 CI:
   - tests/*.py
-  - ./.stickler.yml
-  - ./.hound.yml
-  - ./.travis.yml
-  - ./.appveyor.yml
-  - ./.github/workflows/*
-  - ./.circleci/*
+  - .stickler.yml
+  - .hound.yml
+  - .travis.yml
+  - .appveyor.yml
+  - .github/workflows/*
+  - .circleci/*
 
 Github:
-  - ./.github/**/*
-  - ./.github/*
-  - ./README.md
+  - .github/**/*
+  - .github/*
+  - README.md

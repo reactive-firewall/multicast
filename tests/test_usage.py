@@ -3,7 +3,7 @@
 
 # Python Test Repo Template
 # ..................................
-# Copyright (c) 2017-2022, Kendrick Walls
+# Copyright (c) 2017-2023, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,10 +82,17 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_aborts_WHEN_calling_multicast_GIVEN_invalid_tools(self):
 		"""Tests the imposible state for CLI tools given bad tools"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(JUNK) == error""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(JUNK) == error""")
+		tst_dispatch = multicast.__main__.McastDispatch()
+		test_junk_values = ["", "NoSuchTool", None]
 		try:
-			self.assertIsNone(multicast.__main__.useTool("NoSuchTool"))
-			self.assertIsNone(multicast.__main__.useTool(None))
+			for tst_in in test_junk_values:
+				(test_code, test_fixture) = tst_dispatch.useTool(tst_in)
+				self.assertTupleEqual(
+					tst_dispatch.useTool(tst_in),
+					tuple((False, None)),
+					fail_fixture
+				)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -96,21 +103,63 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_say_is_stable_WHEN_calling_multicast_GIVEN_say_tool(self):
 		"""Tests the message argument for expected syntax given simple args"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(SAY, message) != valid exit(0..3)""")
+		fail_fixture = str(
+			"""multicast.__main__.McastDispatch().useTool(SAY, message) != valid exit(0..3)"""
+		)
 		try:
-			tst_err_rslt_a = multicast.__main__.useTool("SAY", ["--message"])
-			tst_err_rslt_b = multicast.__main__.useTool("SAY", ["--message", "test"])
+			(tst_err_rslt_a, rtn_val_a) = multicast.__main__.main(
+				["SAY", "--message"]
+			)
+			(tst_err_rslt_b, rtn_val_b) = multicast.__main__.main(
+				["SAY", "--message", "test"]
+			)
 			self.assertIsNotNone(tst_err_rslt_a)
 			self.assertIsNotNone(tst_err_rslt_b)
+			self.assertIsNotNone(rtn_val_a)
+			self.assertIsNotNone(rtn_val_b)
 			self.assertNotEqual(int(tst_err_rslt_a), int(0))
 			self.assertNotEqual(int(tst_err_rslt_a), int(1))
 			self.assertNotEqual(int(tst_err_rslt_b), int(1))
 			self.assertNotEqual(int(tst_err_rslt_a), int(2))
 			self.assertNotEqual(int(tst_err_rslt_b), int(2))
-			self.assertNotEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
+			self.assertNotEqual(rtn_val_a, rtn_val_b)
 			self.assertNotEqual(int(tst_err_rslt_b), int(tst_err_rslt_a))
+			self.assertNotEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
 			self.assertNotEqual(int(tst_err_rslt_b), int(3))
 			theResult = (int(tst_err_rslt_b) < int(tst_err_rslt_a))
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	def test_recv_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
+		"""Tests the message argument for failure given invalid input"""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(2)""")
+		try:
+			(tst_err_rslt_c, rtn_val_c) = multicast.__main__.McastDispatch().doStep(
+				"RECV", ["--port", "test"]
+			)
+			(tst_err_rslt_d, rtn_val_d) = multicast.__main__.McastDispatch().doStep(
+				"RECV", ["--port=test", "group=None"]
+			)
+			self.assertIsNotNone(tst_err_rslt_c)
+			self.assertIsNotNone(tst_err_rslt_d)
+			self.assertIsNotNone(rtn_val_c)
+			self.assertIsNotNone(rtn_val_d)
+			self.assertIsNotNone(rtn_val_c[0])
+			self.assertIsNotNone(rtn_val_d[0])
+			self.assertNotEqual(int(tst_err_rslt_c), int(0))
+			self.assertNotEqual(int(tst_err_rslt_c), int(1))
+			self.assertNotEqual(int(tst_err_rslt_d), int(1))
+			self.assertEqual(int(tst_err_rslt_c), int(2))
+			self.assertEqual(int(tst_err_rslt_d), int(2))
+			self.assertEqual(int(tst_err_rslt_d), int(tst_err_rslt_c))
+			self.assertEqual(int(tst_err_rslt_c), int(tst_err_rslt_d))
+			self.assertNotEqual(int(tst_err_rslt_d), int(3))
+			self.assertEqual(rtn_val_c, rtn_val_d)
+			theResult = (int(tst_err_rslt_d) == int(tst_err_rslt_c))
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -120,22 +169,28 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(HEAR, junk) != exit(2)""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(2)""")
 		try:
-			tst_err_rslt_a = multicast.__main__.useTool("HEAR", ["--port" "test"])
-			tst_err_rslt_b = multicast.__main__.useTool("HEAR", ["--port", "test", "--group=None"])
-			self.assertIsNotNone(tst_err_rslt_a)
-			self.assertIsNotNone(tst_err_rslt_b)
-			self.assertNotEqual(int(tst_err_rslt_a), int(0))
-			self.assertNotEqual(int(tst_err_rslt_b), int(0))
-			self.assertNotEqual(int(tst_err_rslt_a), int(1))
-			self.assertNotEqual(int(tst_err_rslt_b), int(1))
-			self.assertNotEqual(int(tst_err_rslt_a), int(2))
-			self.assertNotEqual(int(tst_err_rslt_b), int(2))
-			self.assertEqual(int(tst_err_rslt_b), int(3))
-			self.assertEqual(int(tst_err_rslt_b), int(tst_err_rslt_a))
-			self.assertEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
-			theResult = (int(tst_err_rslt_b) == int(tst_err_rslt_a))
+			(tst_err_rslt_e, rtn_val_e) = multicast.__main__.main(
+				["HEAR", "--port", "test"]
+			)
+			(tst_err_rslt_f, rtn_val_f) = multicast.__main__.main(
+				["HEAR", "--group", "None", "--iface=None"]
+			)
+			self.assertIsNotNone(tst_err_rslt_e)
+			self.assertIsNotNone(tst_err_rslt_f)
+			self.assertIsNotNone(rtn_val_e)
+			self.assertIsNotNone(rtn_val_f)
+			self.assertNotEqual(int(tst_err_rslt_e), int(0))
+			self.assertNotEqual(int(tst_err_rslt_e), int(1))
+			self.assertNotEqual(int(tst_err_rslt_f), int(0))
+			self.assertNotEqual(int(tst_err_rslt_e), int(2))
+			self.assertNotEqual(int(tst_err_rslt_f), int(2))
+			self.assertNotEqual(rtn_val_e, rtn_val_f)
+			self.assertNotEqual(int(tst_err_rslt_f), int(tst_err_rslt_e))
+			self.assertNotEqual(int(tst_err_rslt_e), int(tst_err_rslt_f))
+			self.assertNotEqual(int(tst_err_rslt_f), int(3))
+			theResult = (int(tst_err_rslt_f) < int(tst_err_rslt_e))
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -145,9 +200,12 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_is_stable_WHEN_calling_multicast_GIVEN_invalid_tool(self):
 		"""Tests the hexdump argument for failure given future tools"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(HEAR, hex) == error""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HEAR, hex) == error""")
 		try:
-			self.assertEqual(int(multicast.__main__.useTool("HEAR", ["--hex"])), int(3))
+			self.assertTupleEqual(
+				multicast.__main__.main(["HEAR", "--hex"]),
+				tuple((0, (True, (False, None))))
+			)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -158,9 +216,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_noop_stable_WHEN_calling_multicast_GIVEN_noop_args(self):
 		"""Tests the NOOP state for multicast given bad input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.main(NOOP) == empty""")
+		fail_fixture = str("""multicast.__main__.main(NOOP) == Error""")
 		try:
-			self.assertIsNone(multicast.__main__.main(["NOOP"]))
+			self.assertIsNotNone(multicast.__main__.main(["NOOP"]), fail_fixture)
+			self.assertIsNotNone(tuple(multicast.__main__.main(["NOOP"]))[0])
+			self.assertTupleEqual(
+				multicast.__main__.main(["NOOP"]),
+				tuple((0, tuple((True, None)))),
+			)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -171,9 +234,13 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_help_works_WHEN_calling_multicast_GIVEN_help_tool(self):
 		"""Tests the HELP argument for help usage"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.useTool(HELP, []) == error""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HELP, []) == Empty""")
 		try:
-			self.assertIsNone(multicast.__main__.useTool("HELP", []))
+			self.assertIsNotNone(multicast.__main__.McastDispatch().doStep("HELP", []))
+			self.assertTupleEqual(
+				multicast.__main__.McastDispatch().doStep(["HELP"], []),
+				tuple((int(2), "NoOp")),
+			)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -196,12 +263,21 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				"""--join-mcast-groups""", """'224.0.0.1'""",
 				"""--bind-group""", """'224.0.0.1'"""
 			]
-			p = Process(target=multicast.__main__.useTool, name="HEAR", args=("HEAR", _fixture_HEAR_args,))
+			p = Process(
+				target=multicast.__main__.McastDispatch().doStep,
+				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+			)
 			p.start()
 			try:
-				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
-				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
-				self.assertIsNotNone(multicast.__main__.useTool("SAY", _fixture_SAY_args))
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
 			except Exception:
 				p.join()
 				raise unittest.SkipTest(fail_fixture)
@@ -216,21 +292,29 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
-	def test_hear_Errors_WHEN_say_not_used(self):
+	def test_recv_Errors_WHEN_say_not_used(self):
 		"""Tests the basic noop recv test"""
 		theResult = False
-		fail_fixture = str("""NOOP --> HEAR != error""")
-		sub_fail_fixture = str("""NOOP X-> HEAR == Error X-> HEAR :: (Error in NOOP)""")
+		fail_fixture = str("""NOOP --> RECV != error""")
+		sub_fail_fixture = str("""NOOP X-> RECV == Error X-> RECV :: (Error in NOOP)""")
 		try:
 			_fixture_HEAR_args = [
 				"""--port""", """59992""",
 				"""--join-mcast-groups""", """'224.0.0.1'""",
 				"""--bind-group""", """'224.0.0.1'"""
 			]
-			p = Process(target=multicast.__main__.useTool, name="NOHEAR", args=("HEAR", _fixture_HEAR_args,))
+			p = Process(
+				target=multicast.__main__.McastDispatch().doStep,
+				name="NOHEAR", args=("RECV", _fixture_HEAR_args,)
+			)
 			p.start()
 			try:
-				self.assertIsNone(multicast.__main__.useTool("NOOP", None))
+				test_cls = multicast.__main__.McastDispatch()
+				self.assertTupleEqual(
+					test_cls.doStep("NOOP", []),
+					tuple((int(2), "NoOp")),
+					sub_fail_fixture
+				)
 			except Exception:
 				p.join()
 				raise unittest.SkipTest(sub_fail_fixture)

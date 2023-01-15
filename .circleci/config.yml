@@ -1,10 +1,8 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
-      - image: circleci/python:3.9
+      - image: circleci/python:3.10
     resource_class: medium
     environment:
       CI: cicleci
@@ -42,9 +40,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
-      - image: circleci/python:3.9
+      - image: circleci/python:3.10
     parallelism: 2
     resource_class: medium
     environment:
@@ -96,9 +92,7 @@ jobs:
 
   pytest:
     docker:
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
-      - image: circleci/python:3.9
+      - image: circleci/python:3.10
     parallelism: 2
     resource_class: medium
     environment:
@@ -168,7 +162,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.9
+      - image: circleci/python:3.10
     resource_class: medium
     environment:
       CI: cicleci

@@ -7,7 +7,7 @@
 #    EFFORT IS WITH YOU.
 #
 # B. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SHELL SCRIPT
-#    AND SERVICES ARE PROVIDED "AS IS" AND “AS AVAILABLE”, WITH ALL FAULTS AND
+#    AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITH ALL FAULTS AND
 #    WITHOUT WARRANTY OF ANY KIND, AND THE AUTHOR OF THIS SHELL SCRIPT'S LICENSORS
 #    (COLLECTIVELY REFERRED TO AS "THE AUTHOR" FOR THE PURPOSES OF THIS DISCLAIMER)
 #    HEREBY DISCLAIM ALL WARRANTIES AND CONDITIONS WITH RESPECT TO THIS SHELL SCRIPT
@@ -60,7 +60,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-# version 20220408
+# version 20230115
 
 umask 137
 
@@ -69,15 +69,16 @@ declare LOCK_FILE="/tmp/GIL.lock"
 declare -i PID_VALUE="${PPID:-$$}"
 
 if [[ $# -gt "$MINPARAMS" ]] ; then
-while [ $# -gt $MINPARAMS ]; do    # Until you run out of parameters . . .
+	while [ $# -gt $MINPARAMS ]; do    # Until you run out of parameters . . .
 
-case "$1" in
-  -p|--pid) shift ; export PID_VALUE="${1}" ;;
-  -f|--file) shift ; export LOCK_FILE="${1}" ;;
-  -*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
-esac
-shift       # Check next set of parameters.
-done
+		case "$1" in
+			-p|--pid) shift ; export PID_VALUE="${1}" ;;
+			-f|--file) shift ; export LOCK_FILE="${1}" ;;
+			-*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
+			*) export LOCK_FILE="${1}" || false ;;
+		esac
+		shift
+	done
 fi
 
 if [[ ( -e "${LOCK_FILE}" ) ]] ; then
