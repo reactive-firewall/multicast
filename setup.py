@@ -3,7 +3,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2022, Kendrick Walls
+# Copyright (c) 2017-2023, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,6 +111,8 @@ try:
 		str("""License :: OSI Approved :: MIT License"""),
 		str("""Programming Language :: Python :: 3"""),
 		str("""Programming Language :: Python :: 3 :: Only"""),
+		str("""Programming Language :: Python :: 3.11"""),
+		str("""Programming Language :: Python :: 3.10"""),
 		str("""Programming Language :: Python :: 3.9"""),
 		str("""Programming Language :: Python :: 3.8"""),
 		str("""Programming Language :: Python :: 3.7"""),

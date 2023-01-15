@@ -405,9 +405,10 @@ class McastRecvHearDispatch(mtool):
 
 	def doStep(self, *args, **kwargs):
 		if self._help_deamon_dispatch(*args, **kwargs):
-			return hear.McastHEAR().doStep(*args, **kwargs)
+			__stub_class = hear.McastHEAR
 		else:
-			return recv.McastRECV().doStep(*args, **kwargs)
+			__stub_class = recv.McastRECV
+		return __stub_class().doStep(*args, **kwargs)
 
 
 # More boiler-plate-code
@@ -457,15 +458,15 @@ class McastDispatch(mtool):
 		return (_is_done, theResult)  # noqa
 
 	def doStep(self, *args):
-		__EXIT_MSG = tuple((1, "Unknown"))
+		__EXIT_MSG = (1, "Unknown")
 		try:
 			try:
 				(argz, extra) = type(self).parseArgs(*args)
 				service_cmd = argz.cmd_tool
 				argz.__dict__.__delitem__("""cmd_tool""")
-				_TOOL_MSG = tuple(self.useTool(service_cmd, **argz.__dict__))
+				_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
 				if _TOOL_MSG[0]:
-					__EXIT_MSG = tuple((0, _TOOL_MSG))
+					__EXIT_MSG = (0, _TOOL_MSG)
 				elif (sys.stdout.isatty()):  # pragma: no cover
 					print(_TOOL_MSG)
 			except Exception as inerr:  # pragma: no branch
@@ -477,13 +478,13 @@ class McastDispatch(mtool):
 					print(str(inerr))
 					print(str(inerr.args()))
 				del inerr
-				__EXIT_MSG = tuple((2, "NoOp"))
+				__EXIT_MSG = (2, "NoOp")
 		except BaseException:  # pragma: no branch
 			e = str("CRITICAL - An error occured while handling")
 			e += str(" the dispatch.")
 			if (sys.stdout.isatty()):  # pragma: no cover
 				print(str(e))
-			__EXIT_MSG = tuple((3, "STOP"))
+			__EXIT_MSG = (3, "STOP")
 		return __EXIT_MSG  # noqa
 
 
@@ -565,7 +566,7 @@ def main(*argv):
 
 
 if __name__ in '__main__':
-	__EXIT_CODE = tuple((2, "NoOp"))
+	__EXIT_CODE = (2, "NoOp")
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):

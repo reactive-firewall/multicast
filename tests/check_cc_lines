@@ -102,7 +102,7 @@ if [[ -d ./.git ]] ; then
 elif [[ -d ./tests ]] ; then
 	_TEST_ROOT_DIR=$(pwd) ;
 else
-	echo "FAIL: missing valid folder or file"
+	echo "FAIL: missing valid folder or file" >&2 ;
 	EXIT_CODE=1
 fi
 

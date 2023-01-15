@@ -5,6 +5,8 @@ jobs:
       - image: circleci/python:3.7
       - image: circleci/python:3.8
       - image: circleci/python:3.9
+      - image: circleci/python:3.10
+      - image: circleci/python:3.11
     resource_class: medium
     environment:
       CI: cicleci
@@ -45,6 +47,8 @@ jobs:
       - image: circleci/python:3.7
       - image: circleci/python:3.8
       - image: circleci/python:3.9
+      - image: circleci/python:3.10
+      - image: circleci/python:3.11
     parallelism: 2
     resource_class: medium
     environment:
@@ -99,6 +103,8 @@ jobs:
       - image: circleci/python:3.7
       - image: circleci/python:3.8
       - image: circleci/python:3.9
+      - image: circleci/python:3.10
+      - image: circleci/python:3.11
     parallelism: 2
     resource_class: medium
     environment:
@@ -168,7 +174,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.9
+      - image: circleci/python:3.10
     resource_class: medium
     environment:
       CI: cicleci

@@ -60,7 +60,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-# version 20221118
+# version 20230115
 
 umask 137
 
@@ -75,8 +75,9 @@ if [[ $# -gt "$MINPARAMS" ]] ; then
 			-p|--pid) shift ; export PID_VALUE="${1}" ;;
 			-f|--file) shift ; export LOCK_FILE="${1}" ;;
 			-*) echo "$0: \"${1}\" Argument Unrecognized!" 1>&2 || false ;;
+			*) export LOCK_FILE="${1}" || false ;;
 		esac
-		if [[ $# -gt "$MINPARAMS" ]] ; then shift ; fi    # Check next set of parameters.
+		shift
 	done
 fi
 

@@ -2,7 +2,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2022, Mr. Walls
+# Copyright (c) 2017-2023, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ endif
 
 PHONY: must_be_root cleanup
 
-build:
+build: init
 	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
 	$(QUIET)$(PYTHON) -W ignore setup.py build
 	$(QUIET)$(PYTHON) -W ignore setup.py bdist_wheel --universal
@@ -88,7 +88,8 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -W ignore setup.py install_lib || $(QUIET)$(PYTHON) -W ignore setup.py install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
