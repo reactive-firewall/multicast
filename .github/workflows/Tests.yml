@@ -163,7 +163,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -175,16 +175,17 @@ jobs:
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
+        os: ${{ matrix.os }}
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade pip setuptools wheel
-        pip install -r ./requirements.txt ;
+        pip install --upgrade --upgrade-strategy eager pip setuptools wheel
+        pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
         pip install --upgrade coverage ;
-        pip install pytest ;
-        pip install --upgrade pytest-cov
-        pip install --upgrade pytest-xdist
-        pip install --upgrade coverage ;
+        pip install --upgrade --upgrade-strategy eager pytest ;
+        pip install --upgrade --upgrade-strategy eager pytest-cov
+        pip install --upgrade --upgrade-strategy eager pytest-xdist
+        pip install --upgrade --upgrade-strategy eager coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -203,7 +204,6 @@ jobs:
     - name: Generate Coverage for py${{ matrix.python-version }}
       run: make -j1 -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      if: ${{ runner.os }} >= "3.9"
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

@@ -84,17 +84,18 @@ build: init
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install --upgrade pip setuptools wheel 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager pip setuptools wheel 2>/dev/null || true
+	$(QUIET)$(PYTHON) -W ignore setup.py init || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUIET)$(PYTHON) -W ignore setup.py install_lib || $(QUIET)$(PYTHON) -W ignore setup.py install
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUIET)$(PYTHON) -m pip uninstall multicast && python -m pip uninstall multicast 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip uninstall --no-input -y multicast && python -m pip uninstall -y multicast 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -122,7 +123,7 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || python -m pytest --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v . ; wait ;
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=.
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
@@ -187,9 +188,9 @@ must_be_root:
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install --user --upgrade pip setuptools wheel || true
-	$(QUIET)$(PYTHON) -m pip install --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
-	$(QUIET)$(PYTHON) -m pip install --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --user --upgrade --upgrade-strategy eager pip setuptools wheel || true
+	$(QUIET)$(PYTHON) -m pip install --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
