@@ -171,7 +171,7 @@ jobs:
       COVERAGE_RCFILE: ./.coveragerc
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: .coverage
+      COV_CORE_DATAFILE: ./coverage.xml
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
@@ -203,7 +203,7 @@ jobs:
       id: clean
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile test-pytest ;
+      run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
@@ -213,7 +213,7 @@ jobs:
         flags: ${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
-        fail_ci_if_error: true
+        fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
       uses: actions/upload-artifact@v3
       with:
