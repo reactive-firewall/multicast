@@ -1,7 +1,7 @@
 [run]
-parallel = True
-branch = True
 concurrency = multiprocessing
+parallel = True
+sigterm = True
 
 [report]
 include = multicast*,tests*

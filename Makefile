@@ -38,6 +38,9 @@ endif
 
 ifeq "$(COVERAGE)" ""
 	COVERAGE=$(PYTHON) -m coverage
+	COV_CORE_SOURCE=./
+	COV_CORE_CONFIG=./.coveragerc
+	COV_CORE_DATAFILE=.coverage
 endif
 
 ifeq "$(WAIT)" ""
@@ -85,12 +88,11 @@ build: init
 
 init:
 	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager pip setuptools wheel 2>/dev/null || true
-	$(QUIET)$(PYTHON) -W ignore setup.py init || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
 	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
-	$(QUIET)$(PYTHON) -W ignore setup.py install_lib || $(QUIET)$(PYTHON) -W ignore setup.py install
+	$(QUIET)$(PYTHON) -W ignore setup.py install_lib 2>/dev/null || $(QUIET)$(PYTHON) -W ignore setup.py install 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -123,7 +125,7 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=.
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=.
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake

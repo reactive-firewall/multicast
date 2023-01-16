@@ -168,7 +168,10 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
-      COVERAGE_RCFILE: "./.coveragerc"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: .coverage
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
@@ -179,12 +182,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade --upgrade-strategy eager pip setuptools wheel
+        pip install --upgrade --upgrade-strategy eager pip setuptools wheel ;
         pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
-        pip install --upgrade coverage ;
         pip install --upgrade --upgrade-strategy eager pytest ;
-        pip install --upgrade --upgrade-strategy eager pytest-cov
-        pip install --upgrade --upgrade-strategy eager pytest-xdist
+        pip install --upgrade --upgrade-strategy eager pytest-cov ;
         pip install --upgrade --upgrade-strategy eager coverage ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
@@ -285,6 +286,10 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       LC_CTYPE: "en_US.utf-8"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: .coverage
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:

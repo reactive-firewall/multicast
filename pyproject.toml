@@ -5,5 +5,8 @@ build-backend = "setuptools.build_meta"
 [pytest.enabler.flake8]
 addopts = "--flake8"
 
+[pytest.enabler.doctest]
+addopts = "--doctest-glob=**/*.py --doctest-modules"
+
 [pytest.enabler.cov]
-addopts = "--cov"
+addopts = "--cov=. --cov-append --cov-report=xml"
