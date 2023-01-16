@@ -168,11 +168,12 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
+      COVERAGE_RCFILE: "./.coveragerc"
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
     - uses: actions/checkout@v3
-    - name: Setup Python ${{ matrix.python-version }}
+    - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
       uses: actions/setup-python@v3
       with:
         os: ${{ matrix.os }}
@@ -201,7 +202,7 @@ jobs:
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage for py${{ matrix.python-version }}
+    - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v2
