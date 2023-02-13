@@ -202,7 +202,11 @@ jobs:
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
+    - name: Generate Coverage for py3.9 on ${{ matrix.os }}
+      if: ${{ runner.python-version }} == "3.9"
+      run: make -f Makefile test ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ runner.python-version }} != "3.9"
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v3
