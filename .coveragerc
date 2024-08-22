@@ -5,6 +5,7 @@ sigterm = True
 
 [report]
 include = multicast*,tests*
+ignore_errors = True
 # Regexes for lines to exclude from consideration
 exclude_lines =
 	# Have to re-enable the standard pragma
@@ -51,5 +52,4 @@ partial_branches =
 	if 'os.path' not in sys.modules:
 	if 'argparse' not in sys.modules:
 
-ignore_errors = True
 
