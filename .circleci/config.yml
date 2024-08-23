@@ -174,7 +174,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.11
+      - image: cimg/python:3.11
     resource_class: medium
     environment:
       CI: cicleci
