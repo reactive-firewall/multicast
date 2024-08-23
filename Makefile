@@ -20,8 +20,34 @@ ifeq "$(LC_CTYPE)" ""
 	LC_CTYPE="en_US.UTF-8"
 endif
 
+
+SHELL:=`command -v bash`
+
+
+ifeq "$(COMMAND)" ""
+	COMMAND_CMD=`command -v xcrun || command which which || command -v which || command -v command`
+	ifeq "$(COMMAND_CMD)" "*xcrun"
+		COMMAND_ARGS=--find
+	endif
+	ifeq "$(COMMAND_CMD)" "*command"
+		COMMAND_ARGS=-v
+	endif
+	COMMAND=$(COMMAND_CMD) $(COMMAND_ARGS)
+endif
+
 ifeq "$(ECHO)" ""
-	ECHO=echo
+	ECHO=$(COMMAND) echo
+endif
+
+ifdef "$(ACTION)"
+	SET_FILE_ATTR=$(COMMAND) xattr
+endif
+
+ifdef "$(SET_FILE_ATTR)"
+	CREATEDBYBUILDSYSTEM=-w com.apple.xcode.CreatedByBuildSystem true
+	BSMARK=$(SET_FILE_ATTR) $(CREATEDBYBUILDSYSTEM)
+else
+	BSMARK=$(COMMAND) touch -a
 endif
 
 ifeq "$(LINK)" ""
@@ -29,18 +55,25 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(MAKE)" ""
-	MAKE=make -j1
+	#  just no cmake please
+	MAKE=$($(COMMAND) make || $(COMMAND) gnumake) -j1
 endif
 
 ifeq "$(PYTHON)" ""
-	PYTHON=`command -v python3` -B
-endif
-
-ifeq "$(COVERAGE)" ""
-	COVERAGE=$(PYTHON) -m coverage
-	COV_CORE_SOURCE=./
-	COV_CORE_CONFIG=./.coveragerc
-	COV_CORE_DATAFILE=.coverage
+	PYTHON=$(COMMAND) python3 -B
+	ifeq "$(COVERAGE)" ""
+		COVERAGE=$(PYTHON) -m coverage
+		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
+		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
+		COV_CORE_DATAFILE = .coverage
+	endif
+else
+	ifeq "$(COVERAGE)" ""
+		COVERAGE=$(PYTHON) -B -m coverage
+		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
+		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
+		COV_CORE_DATAFILE = .coverage
+	endif
 endif
 
 ifeq "$(WAIT)" ""
@@ -63,41 +96,42 @@ endif
 
 ifeq "$(LOG)" "no"
 	QUIET=@
+	ifeq "$(DO_FAIL)" ""
+		DO_FAIL=$(ECHO) "ok"
+	endif
 endif
 
 ifeq "$(DO_FAIL)" ""
-	DO_FAIL=$(ECHO) "ok"
+	DO_FAIL=$(COMMAND) :
 endif
 
 ifeq "$(RM)" ""
-	RM=`command -v rm` -f
+	RM=$(COMMAND) rm -f
 endif
 
 ifeq "$(RMDIR)" ""
-	RMDIR=$(RM) -Rd
+	RMDIR=$(RM)Rd
 endif
 
-PHONY: must_be_root cleanup
+PHONY: must_be_root cleanup init
 
-build: init
-	$(QUIET)$(ECHO) "INFO: No need to build. Try 'make -f Makefile install'"
-	$(QUIET)$(PYTHON) -W ignore setup.py build
-	$(QUIET)$(PYTHON) -W ignore setup.py bdist_wheel --universal
+build: init ./setup.py
+	$(QUIET)$(PYTHON) -W ignore -m build ./
+	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager pip setuptools wheel 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager pip setuptools wheel build 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install --upgrade --upgrade-strategy eager -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
-	$(QUIET)$(PYTHON) -W ignore setup.py install_lib 2>/dev/null || $(QUIET)$(PYTHON) -W ignore setup.py install 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager --break-system-packages --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUIET)$(PYTHON) -m pip uninstall --no-input -y multicast && python -m pip uninstall -y multicast 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 --no-input -y multicast 2>/dev/null || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -112,7 +146,7 @@ purge: clean uninstall
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t ./ || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
+	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -125,11 +159,12 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=**/*.py --doctest-modules --cov=./ --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=.
+	$(QUIET)$(PYTHON) -B -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
+	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
+	$(QUIET)$(PYTHON) -B -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
 	$(QUIET)tests/check_spelling || true
 	$(QUIET)tests/check_cc_lines || true
 	$(QUIET)$(ECHO) "$@: Done."
@@ -179,24 +214,34 @@ cleanup:
 	$(QUIET)$(RMDIR) ./.tox/ 2>/dev/null || true
 	$(QUIET)$(WAIT) ;
 
-clean: cleanup
+clean-docs: ./docs/ ./docs/Makefile
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(WAIT) ;
+
+./docs/:
+	$(QUIET)$(WAIT) ;
+
+./docs/Makefile: ./docs/
+	$(QUIET)$(WAIT) ;
+
+clean: clean-docs cleanup
+	$(QUIET)$(ECHO) "Cleaning Up."
 	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
 	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
-	$(QUIET)$(ECHO) "$@: Done."
+	$(QUIET)$(ECHO) "All clean."
 
 must_be_root:
 	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install --user --upgrade --upgrade-strategy eager pip setuptools wheel || true
-	$(QUIET)$(PYTHON) -m pip install --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
-	$(QUIET)$(PYTHON) -m pip install --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager pip setuptools wheel || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-
 %:
-	$(QUIET)$(ECHO) "No Rule Found For $@" ; $(WAIT) ;
+	$(QUIET)$(ECHO) "No Rule Found For $@" 1>&2 ;
+	$(QUIET)$(WAIT) ;
 
