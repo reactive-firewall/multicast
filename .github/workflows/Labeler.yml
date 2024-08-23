@@ -4,6 +4,9 @@ on:
     types: [opened, reopened]
     branches: [ master, stable ]
 
+# Declare default permissions as none.
+permissions: {}
+
 jobs:
   triage:
     permissions:
@@ -14,6 +17,6 @@ jobs:
       security-events: none
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v4
+    - uses: actions/labeler@v5
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
