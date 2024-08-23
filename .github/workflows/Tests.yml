@@ -43,7 +43,7 @@ jobs:
 
 
   BOOTSTRAP:
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
     defaults:
@@ -127,7 +127,7 @@ jobs:
 
 
   MATS:
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
     defaults:
@@ -228,7 +228,7 @@ jobs:
         files: ./coverage.xml
         directory: .
         flags: ${{ matrix.os }},${{ matrix.python-version }}
-        name: pythonrepo-github-${{ matrix.os }}-${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
@@ -312,7 +312,7 @@ jobs:
         files: ./coverage.xml
         directory: .
         flags: ${{ matrix.os }},${{ matrix.python-version }}
-        name: pythonrepo-github-${{ matrix.os }}-${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
@@ -373,7 +373,7 @@ jobs:
       if: ${{ always() }}
 
   REGRESSION:
-    if: ${{ success() }}
+    if: ${{ !cancelled() }}
     needs: [MATS, COVERAGE]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
@@ -412,7 +412,7 @@ jobs:
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile user-install || true ;
       if: ${{ success() }}
-    - name: regression check for Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Regression check of Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         ./tests/check_codecov_regression || false ;
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
@@ -430,7 +430,7 @@ jobs:
     - name: Post-Clean
       id: post-zz-end
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
   INTEGRATION:
     if: ${{ success() }}
@@ -518,7 +518,7 @@ jobs:
     - name: Post-Clean
       id: post-z-end
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
   TOX:
     if: ${{ success() }}
