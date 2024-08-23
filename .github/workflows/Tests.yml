@@ -17,8 +17,8 @@ jobs:
     env:
       LANG: "en_US.UTF-8"
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: "3.10"
     - name: Pre-Clean
@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, 3.11]
+        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
@@ -63,6 +63,9 @@ jobs:
           - python-version: 3.9
             lang-var: "en_US.utf-8"
             experimental: false
+          - python-version: "3.10"
+            lang-var: "en_US.utf-8"
+            experimental: false
           - python-version: "3.11"
             lang-var: "en_US.utf-8"
             experimental: false
@@ -70,9 +73,9 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: ${{ matrix.lang-var }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup dependencies
@@ -128,9 +131,9 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for ${{ matrix.python-version }}
@@ -175,9 +178,9 @@ jobs:
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -219,7 +222,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
@@ -251,9 +254,9 @@ jobs:
       LANG: "en_US.utf-8"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
     - name: Install dependencies for python Linters
@@ -275,10 +278,69 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
+  REGRESSION:
+    if: ${{ success() }}
+    needs: [MATS, COVERAGE]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: .coverage
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        pip install --upgrade pip setuptools wheel
+        pip install -r ./requirements.txt ;
+        pip install coverage ;
+        pip install pytest ;
+        pip install pytest-cov ;
+    - name: Pre-Clean
+      id: clean-prep
+      run: make -j1 -f Makefile clean ;
+    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile build ;
+      if: ${{ success() }}
+    - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile user-install || true ;
+      if: ${{ success() }}
+    - name: regression check for Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        ./tests/check_codecov_regression || false ;
+        cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
+      shell: bash
+    - name: Summerize MATs for python ${{ matrix.python-version }}
+      id: sumerize-r-check
+      run: |
+        echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+      if: ${{ success() }}
+      shell: bash
+    - name: Post-z-purge
+      id: post-uninstall
+      run: make -j1 -f Makefile purge || true ;
+      if: ${{ always() }}
+    - name: Post-Clean
+      id: post-zz-end
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
 
   INTEGRATION:
     if: ${{ success() }}
-    needs: [MATS, COVERAGE]
+    needs: [MATS, COVERAGE, REGRESSION]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -297,9 +359,9 @@ jobs:
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -346,7 +408,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Extra Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Integration-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
@@ -364,10 +426,9 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
-
   TOX:
     if: ${{ success() }}
-    needs: [MATS, STYLE, COVERAGE, INTEGRATION]
+    needs: [MATS, STYLE, COVERAGE, REGRESSION, INTEGRATION]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -376,9 +437,9 @@ jobs:
       LANG: 'en_US.utf-8'
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
     - name: Install dependencies for Tox
