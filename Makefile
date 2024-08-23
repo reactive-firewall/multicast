@@ -2,7 +2,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2023, Mr. Walls
+# Copyright (c) 2017-2024, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,19 +20,26 @@ ifeq "$(LC_CTYPE)" ""
 	LC_CTYPE="en_US.UTF-8"
 endif
 
-
-SHELL:=`command -v bash`
+ifndef SHELL
+	SHELL:=command -pv bash
+endif
 
 
 ifeq "$(COMMAND)" ""
-	COMMAND_CMD=`command -v xcrun || command which which || command -v which || command -v command`
+	COMMAND_CMD!=`command -v xcrun || command which which || command -v which || command -v command`
 	ifeq "$(COMMAND_CMD)" "*xcrun"
 		COMMAND_ARGS=--find
 	endif
 	ifeq "$(COMMAND_CMD)" "*command"
-		COMMAND_ARGS=-v
+		COMMAND_ARGS=-pv
 	endif
 	COMMAND=$(COMMAND_CMD) $(COMMAND_ARGS)
+endif
+
+ifeq "$(MAKE)" ""
+	#  just no cmake please
+	MAKEFLAGS=$(MAKEFLAGS) -s
+	MAKE!=`$(COMMAND) make || $(COMMAND) gnumake`
 endif
 
 ifeq "$(ECHO)" ""
