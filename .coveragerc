@@ -5,51 +5,51 @@ sigterm = True
 
 [report]
 include = multicast*,tests*
-ignore_errors = True
 # Regexes for lines to exclude from consideration
 exclude_lines =
-	# Have to re-enable the standard pragma
-	pragma: no cover
-	from . import
-	pass
-	except Exception
-	except BaseException:
-	# Don't complain if tests don't hit defensive assertion code:
-	raise AssertionError
-	raise NotImplementedError
-	raise ImportError
-	raise baton
-	baton = ImportError
-	baton.module
-	except subprocess.CalledProcessError
-	except ..Error
-	# don't complain about sys.modules
-	sys.modules
-	not in sys.modules:
-	# Don't complain if non-runnable code isn't run:
-	if __name__ in u'__main__':
-	if __name__ .. .__main__.:
-	if __sys_path__ not in sys.path:
-	os.abort()
-	exit
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    from . import
+    pass
+    except Exception
+    except BaseException:
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+    raise ImportError
+    raise baton
+    baton = ImportError
+    baton.module
+    except subprocess.CalledProcessError
+    except ..Error
+    # don't complain about sys.modules
+    sys.modules
+    not in sys.modules:
+    # Don't complain if non-runnable code isn't run:
+    if __name__ in u'__main__':
+    if __name__ .. .__main__.:
+    if __sys_path__ not in sys.path:
+    os.abort()
+    exit
 
+ignore_errors = True
 
 partial_branches =
-	# Have to re-enable the standard pragma rules
-	pragma: no branch
-	finally:
-	@
-	except unittest.SkipTest
-	# Don't complain if non-runnable code isn't run:
-	if __name__ in u'__main__':
-	if __name__ in '__main__':
-	if __sys_path__ not in sys.path:
-	# don't complain about sys.modules
-	sys.modules
-	not in sys.modules:
-	if context.__name__ is None:
-	if 'os' not in sys.modules:
-	if 'os.path' not in sys.modules:
-	if 'argparse' not in sys.modules:
+    # Have to re-enable the standard pragma rules
+    pragma: no branch
+    finally:
+    @
+    except unittest.SkipTest
+    # Don't complain if non-runnable code isn't run:
+    if __name__ in u'__main__':
+    if __name__ in '__main__':
+    if __sys_path__ not in sys.path:
+    # don't complain about sys.modules
+    sys.modules
+    not in sys.modules:
+    if context.__name__ is None:
+    if 'os' not in sys.modules:
+    if 'os.path' not in sys.modules:
+    if 'argparse' not in sys.modules:
 
 

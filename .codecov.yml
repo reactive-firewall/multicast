@@ -1,25 +1,37 @@
 codecov:
+  notify:
+    wait_for_ci: true
+  require_ci_to_pass: true
   max_report_age: off
-
+comment:
+  behavior: default
+  layout: reach, diff, flags, files, footer
+  require_base: false
+  require_changes: false
+  require_head: true
+  show_carryforward_flags: false
 coverage:
-  precision: 2
-  range: "80...100"
+  precision: 3
+  round: nearest
   status:
+    changes: false
     default_rules:
-      flag_coverage_not_uploaded_behavior: exclude
+      flag_coverage_not_uploaded_behavior: include
+    patch: true
     project:
       default:
-        target: auto
+        target: 95%
         base: auto
-        threshold: 1%
         branches:
           - master
           - stageing
           - stable
-        if_ci_failed: error #success, failure, error, ignore
+        if_ci_failed: error
         only_pulls: false
+        removed_code_behavior: adjust_base
       multicast:
         target: 95%
+        threshold: 1%
         threshold: 1%
         only_pulls: false
         flags:
@@ -31,9 +43,22 @@ coverage:
       tests:
         target: 80%
         threshold: 1%
+        if_ci_failed: ignore
+        only_pulls: false
+        removed_code_behavior: fully_covered_patch
         flags:
           - "tests"
         paths:
           - tests/
           - "!multicast/"
-        if_ci_failed: ignore
+github_checks:
+  annotations: true
+flags:
+  multicast:
+    paths:
+      - "multicast/"
+      - "!tests/"
+  tests:
+    paths:
+      - "tests/"
+      - "!multicast/"
