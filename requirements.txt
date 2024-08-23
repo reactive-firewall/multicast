@@ -33,7 +33,7 @@ setuptools>=45.0
 #tox>=3.0.0
 #py>=1.4.33
 pip>=21.0
-build>=1.2.1
+build>=1.1.1
 # multicast - MIT
 #-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
 
