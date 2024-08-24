@@ -4,7 +4,7 @@ parallel = True
 sigterm = True
 
 [report]
-include = multicast*,tests*
+include = multicast/*,tests/*,setup.py
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma

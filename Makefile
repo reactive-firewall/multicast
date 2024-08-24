@@ -43,7 +43,7 @@ ifeq "$(MAKE)" ""
 endif
 
 ifeq "$(ECHO)" ""
-	ECHO=$(COMMAND) echo
+	ECHO=printf "%s\n"
 endif
 
 ifdef "$(ACTION)"
@@ -69,14 +69,14 @@ endif
 ifeq "$(PYTHON)" ""
 	PYTHON=$(COMMAND) python3 -B
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(PYTHON) -m coverage
+		COVERAGE=$(`$(COMMAND) -vp coverage || $(COMMAND) -vp coverage3` || printf '%s' '$(PYTHON) -m coverage')
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
 	endif
 else
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(PYTHON) -B -m coverage
+		COVERAGE=$(`$(COMMAND) -vp coverage || $(COMMAND) -vp coverage3` || printf '%s' '$(PYTHON) -B -m coverage')
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
@@ -148,7 +148,7 @@ purge: clean uninstall
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
-	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
+	$(QUIET)$(RM) ./test-reports/junit.xml 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -165,7 +165,7 @@ test-reports:
 	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-pytest: cleanup test-reports
+test-pytest: cleanup must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -B -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
@@ -179,6 +179,10 @@ test-style: cleanup must_have_flake
 must_have_flake:
 	$(QUIET)runner=`python3 -m pip freeze --all | grep --count -oF flake` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
+
+must_have_pytest:
+	$(QUIET)runner=`python3 -m pip freeze --all | grep --count -oF pytest` ; \
+	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
 
 cleanup:
 	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true

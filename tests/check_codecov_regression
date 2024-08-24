@@ -137,11 +137,11 @@ if [[ (${EXIT_CODE} -eq 0) ]] ; then
 	if [[ (${EXIT_CODE} -eq 0) ]] ; then
 		make -C "${_TEST_ROOT_DIR}" -f "${_TEST_ROOT_DIR}/Makefile" test-pytest 1>/dev/null 2>&1 || EXIT_CODE=3 ;
 		if [[ (${EXIT_CODE} -eq 0) ]] ; then
-			test -r "${_TEST_ROOT_DIR}/.coverage" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/.coverage.*" 1>/dev/null 2>&1 || EXIT_CODE=3 ;
+			test -r "${_TEST_ROOT_DIR}/.coverage" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/.coverage.*" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/coverage.*" 1>/dev/null 2>&1 || EXIT_CODE=3 ;
 		fi
 	fi
-	test -d "${_TEST_ROOT_DIR}/test-reports" 1>/dev/null 2>&1 || EXIT_CODE=4 ;
-	test -r "${_TEST_ROOT_DIR}/test-reports/junit.xml" 1>/dev/null 2>&1 || EXIT_CODE=5 ;
+	if [[ (${EXIT_CODE} -eq 0) ]] ; then test -d "${_TEST_ROOT_DIR}/test-reports" 1>/dev/null 2>&1 || EXIT_CODE=4 ; fi
+	if [[ (${EXIT_CODE} -eq 0) ]] ; then test -r "${_TEST_ROOT_DIR}/test-reports/junit.xml" 1>/dev/null 2>&1 || EXIT_CODE=5 ; fi
 	if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
 		case "$EXIT_CODE" in
 			1) printf "\t%s\n" "SKIP: Unclassified issue with test" ;;
