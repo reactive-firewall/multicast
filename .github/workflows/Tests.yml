@@ -421,16 +421,16 @@ jobs:
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
       shell: bash
     - name: Summerize Regressions for python ${{ matrix.python-version }}
-      id: sumerize-r-check
+      id: sumerize-r-check-s
       run: |
         echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
       if: ${{ success() }}
       shell: bash
     - name: Summerize Regressions for python ${{ matrix.python-version }}
-      id: sumerize-r-check
+      id: sumerize-r-check-f
       run: |
         echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ failed() }}
+      if: ${{ failure() }}
       shell: bash
     - name: Post-z-purge
       id: post-uninstall
