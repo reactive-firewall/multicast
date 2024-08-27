@@ -135,8 +135,27 @@ p.join() # if not already handled don't forget to join the process and other ove
 ```
 #### Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and the standard python `multiprocessing` module and its use.
 
+### What does exit code _x_ mean?
 
-### Considerations for usage:
+#### Python function return code meanings
+
+`0` is the default and implies *success*, and means the process has essentially (or actually) returned nothing (or `None`)
+`1` is used when a *single* result is returned (caveat: functions may return a single `tuple` instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result (which may also be encapsulated as an iteratable if needed) )
+`2` is used to indicate a *value and reason* are returned (caveat: functions may return a single `tuple` with a single value and reason and the value can be a `tuple`)
+`-1` is used to mean *many* of unspecified length and otherwise functions as `1`
+
+#### CLI exit code meanings
+
+`0` *success*
+`1` *none-sucsess* - and is often accompanied by warnings or errors
+`2 >` *failure* of specific reason
+
+#### Everything Else
+_(extra exit code meanings)_
+
+Other codes (such as `126`) may or may not have meanings (such as skip) but are not handled within the scope of the Multicast Project at this time.
+
+## Considerations for usage:
 
 #### [CWE-183]
 
