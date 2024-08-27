@@ -79,7 +79,7 @@
 
 ulimit -t 600
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
-umask 137
+# note: no umask set when checking regressions
 
 LOCK_FILE="/tmp/org.pak.multicast.test-mcast-regression-49-script.lock"
 test -x "$(command -v find)" || exit 126 ;
@@ -135,8 +135,10 @@ if [[ (${EXIT_CODE} -eq 0) ]] ; then
 		printf "\t%s\n" "SKIP: ${_TEST_ROOT_DIR}/Makefile is not a valid makefile" ;
 	fi
 	if [[ (${EXIT_CODE} -eq 0) ]] ; then
-		make -C "${_TEST_ROOT_DIR}" -f "${_TEST_ROOT_DIR}/Makefile" test-pytest 1>/dev/null 2>&1 || EXIT_CODE=3 ;
+		printf "\t\t%s\n" "START: make -C "${_TEST_ROOT_DIR}" -f "${_TEST_ROOT_DIR}/Makefile" test-pytest" 2>&1 ;
+		make -C "${_TEST_ROOT_DIR}" -f "${_TEST_ROOT_DIR}/Makefile" test-pytest || EXIT_CODE=3 ;
 		wait ;
+		printf "\t\t%s\n" "END: make ... test-pytest" 2>&1 ;
 		if [[ (${EXIT_CODE} -eq 0) ]] ; then
 			test -r "${_TEST_ROOT_DIR}/.coverage" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/.coverage.*" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/coverage.*" 1>/dev/null 2>&1 || EXIT_CODE=3 ;
 		fi
@@ -146,9 +148,10 @@ if [[ (${EXIT_CODE} -eq 0) ]] ; then
 	if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
 		case "$EXIT_CODE" in
 			1) printf "\t%s\n" "SKIP: Unclassified issue with test" ;;
-			2|3) printf "\t%s\n" "FAIL: Unstable version." >&2 ;;
-			4|5) printf "\t%s\n" "FAIL: Version is a REGRESSION of coverage." >&2 ;;
-			*) printf "\t%s\n" "SKIP: Can't check coverage" ;;
+			2) printf "\t%s\n" "FAIL: Unstable version." >&2 ;;
+			3) printf "\t%s\n" "FAIL: Version is a REGRESSION of coverage." >&2 ;;
+			4|5) printf "\t%s\n" "FAIL: Version is a REGRESSION of Test Reporting." >&2 ;;
+			*) printf "\t%s\n" "SKIP: Can't check REGRESSION" ;;
 		esac
 	fi
 fi
