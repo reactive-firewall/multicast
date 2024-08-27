@@ -329,13 +329,11 @@ jobs:
       shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
-      if: ${{ !cancelled() }}
     - name: deepsource for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
-      if: ${{ !cancelled() }}
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
