@@ -93,7 +93,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Setup dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade pip setuptools build wheel
         pip install -r ./requirements.txt
     - name: Pre-build
       id: bootstrap
@@ -401,11 +401,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade pip setuptools wheel
-        pip install -r ./requirements.txt ;
-        pip install coverage ;
-        pip install pytest ;
-        pip install pytest-cov ;
+        pip install --upgrade --upgrade-strategy eager pip setuptools build wheel ;
+        pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
+        pip install --upgrade --upgrade-strategy eager pytest ;
+        pip install --upgrade --upgrade-strategy eager pytest-cov ;
+        pip install --upgrade --upgrade-strategy eager coverage ;
       if: ${{ !cancelled() }}
     - name: Pre-Clean
       id: clean-prep

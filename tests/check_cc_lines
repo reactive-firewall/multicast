@@ -71,6 +71,9 @@ test -x $(command -v grep) || exit 126 ;
 test -x $(command -v curl) || exit 126 ;
 test -x $(command -v find) || exit 126 ;
 test -x $(command -v git) || exit 126 ;
+hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
+test -x "$(command -v shlock)" || exit 126 ;
+
 
 function cleanup() {
 	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;

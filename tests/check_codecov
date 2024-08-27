@@ -71,11 +71,13 @@ EXIT_CODE=0
 
 test -x $(command -v grep) || exit 126 ;
 test -x $(command -v curl) || exit 126 ;
+hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
+test -x "$(command -v shlock)" || exit 126 ;
 test -x $(command -v gpgv) || exit 126 ;
 test -x $(command -v shasum) || exit 126 ;
 
 # sorry no windows support here
-if [[ $( \uname -s ) == "Darwin" ]] ; then
+if [[ $( \uname -s ) == "*arwin" ]] ; then
 	CI_OS="macos"
 else
 	CI_OS="linux"
