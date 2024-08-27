@@ -136,6 +136,7 @@ if [[ (${EXIT_CODE} -eq 0) ]] ; then
 	fi
 	if [[ (${EXIT_CODE} -eq 0) ]] ; then
 		make -C "${_TEST_ROOT_DIR}" -f "${_TEST_ROOT_DIR}/Makefile" test-pytest 1>/dev/null 2>&1 || EXIT_CODE=3 ;
+		wait ;
 		if [[ (${EXIT_CODE} -eq 0) ]] ; then
 			test -r "${_TEST_ROOT_DIR}/.coverage" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/.coverage.*" 1>/dev/null 2>&1 || test -r "${_TEST_ROOT_DIR}/coverage.*" 1>/dev/null 2>&1 || EXIT_CODE=3 ;
 		fi
