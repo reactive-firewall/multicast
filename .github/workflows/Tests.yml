@@ -329,11 +329,13 @@ jobs:
       shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+      if: ${{ !cancelled() }}
     - name: deepsource for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
         if [ $OS == ubuntu-latest ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+      if: ${{ !cancelled() }}
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -358,7 +360,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies for python Linters
       run: |
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools build wheel
         pip install -r ./requirements.txt ;
         pip install flake8 ;
         pip install pyflakes ;
@@ -396,7 +398,7 @@ jobs:
       COV_CORE_DATAFILE: ./coverage.xml
     steps:
     - uses: actions/checkout@v4
-    - name: Setup Python ${{ matrix.python-version }}
+    - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
@@ -406,9 +408,11 @@ jobs:
         pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
         pip install --upgrade --upgrade-strategy eager coverage pytest pytest-cov ;
         pip freeze --all ;
+      if: ${{ !cancelled() }}
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
+      if: ${{ !cancelled() }}
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile build ;
       if: ${{ success() }}
@@ -416,10 +420,8 @@ jobs:
       run: make -j1 -f Makefile user-install || true ;
       if: ${{ success() }}
     - name: Regression check of Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        ./tests/check_codecov_regression ;
-        cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
-      shell: bash
+      run: ./tests/check_codecov_regression ;
+      if: ${{ success() }}
     - name: Summerize Regressions for python ${{ matrix.python-version }}
       id: sumerize-r-check-s
       run: |
@@ -429,7 +431,7 @@ jobs:
     - name: Summerize Regressions for python ${{ matrix.python-version }}
       id: sumerize-r-check-f
       run: |
-        echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
+        echo ":x: Test Reports REGRESS for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
       if: ${{ failure() }}
       shell: bash
     - name: Post-z-purge
