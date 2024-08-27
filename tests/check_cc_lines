@@ -111,7 +111,7 @@ fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
-for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 | xargs -0 -L1 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
+for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -ne 0) ]] ; then
 		echo "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126
