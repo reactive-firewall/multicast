@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
@@ -77,6 +77,9 @@ jobs:
             lang-var: "en_US.utf-8"
             experimental: false
           - python-version: "3.11"
+            lang-var: "en_US.utf-8"
+            experimental: false
+          - python-version: "3.12"
             lang-var: "en_US.utf-8"
             experimental: false
     env:
@@ -380,7 +383,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -389,7 +392,7 @@ jobs:
       COVERAGE_RCFILE: ./.coveragerc
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: .coverage
+      COV_CORE_DATAFILE: ./coverage.xml
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
@@ -403,6 +406,7 @@ jobs:
         pip install coverage ;
         pip install pytest ;
         pip install pytest-cov ;
+      if: ${{ !cancelled() }}
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
@@ -414,13 +418,13 @@ jobs:
       if: ${{ success() }}
     - name: Regression check of Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        ./tests/check_codecov_regression || false ;
+        ./tests/check_codecov_regression ;
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
       shell: bash
-    - name: Summerize MATs for python ${{ matrix.python-version }}
+    - name: Summerize Regressions for python ${{ matrix.python-version }}
       id: sumerize-r-check
       run: |
-        echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
       if: ${{ success() }}
       shell: bash
     - name: Post-z-purge
@@ -440,7 +444,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -527,7 +531,7 @@ jobs:
     timeout-minutes: 30
 
     env:
-      PYTHON_VERSION: '3.11'
+      PYTHON_VERSION: '3.12'
       LANG: 'en_US.utf-8'
 
     steps:
@@ -535,10 +539,10 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     - name: Install dependencies for Tox
       run: |
-        pip install --upgrade pip setuptools wheel tox
+        pip install --upgrade pip setuptools build wheel tox
         pip install -r ./requirements.txt ;
         pip install coverage ;
         pip install codecov ;

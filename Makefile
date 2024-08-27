@@ -247,6 +247,7 @@ must_be_root:
 
 user-install: build
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager pip setuptools wheel || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager build || true
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
