@@ -230,7 +230,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
@@ -441,7 +441,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_supplement.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        flags: ${{ matrix.os }},${{ matrix.python-version }},unittests
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
@@ -462,14 +462,14 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/junit.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        flags: ${{ matrix.os }},${{ matrix.python-version }},unittests
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-test-results
         verbose: true
         fail_ci_if_error: false
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
     - name: Post-Clean
       id: post-z-end
       run: make -j1 -f Makefile clean || true ;
