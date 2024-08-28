@@ -131,6 +131,15 @@ else
 fi
 
 if [[ (${EXIT_CODE} -eq 0) ]] ; then
+	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
+	if [[ ( $(command python3 -B -m pip freeze --all | grep --count -oF pytest) -le 0 ) ]] ; then
+		printf "\t\t%s\n" "FAIL: No python framework (pytest) found for test." ;
+		EXIT_CODE=126 ;
+		command python3 -B -m pip freeze --all 2>/dev/null || true ;
+	fi
+fi
+
+if [[ (${EXIT_CODE} -eq 0) ]] ; then
 	test -r "${_TEST_ROOT_DIR}/Makefile" 1>/dev/null 2>&1 || EXIT_CODE=2 ;
 	if [[ (${EXIT_CODE} -ne 0) ]] ; then
 		printf "\t%s\n" "SKIP: ${_TEST_ROOT_DIR}/Makefile is not a valid makefile" ;
