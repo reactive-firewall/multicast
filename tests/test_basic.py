@@ -74,8 +74,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		try:
 			from .context import multicast
 			self.assertIsNotNone(multicast.__name__)
-			if multicast.__name__ is None:
-				theResult = False
+			theResult = (multicast.__name__ is not None)
 			with self.assertRaises(Exception):
 				raise RuntimeError("This is a test")
 			with self.assertRaises(Exception):
@@ -90,8 +89,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		try:
 			from .context import multicast
-			if multicast.__name__ is None:
-				theResult = False
+			theResult = (multicast.__name__ is not None)
 			from multicast import __main__ as multicast
 			tst_dispatch = multicast.McastDispatch()
 			test_junk_values = [None, "JunkInput", "--Junk"]
