@@ -140,15 +140,21 @@ p.join() # if not already handled don't forget to join the process and other ove
 #### Python function return code meanings
 
 `0` is the default and implies *success*, and means the process has essentially (or actually) returned nothing (or `None`)
+
 `1` is used when a *single* result is returned (caveat: functions may return a single `tuple` instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result (which may also be encapsulated as an iteratable if needed) )
+
 `2` is used to indicate a *value and reason* are returned (caveat: functions may return a single `tuple` with a single value and reason and the value can be a `tuple`)
+
 `-1` is used to mean *many* of unspecified length and otherwise functions as `1`
 
 #### CLI exit code meanings
 
 `0` *success*
+
 `1` *none-sucsess* - and is often accompanied by warnings or errors
+
 `2 >` *failure* of specific reason
+
 
 #### Everything Else
 _(extra exit code meanings)_

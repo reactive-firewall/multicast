@@ -435,8 +435,8 @@ jobs:
         hash -p ./.github/tool_shlock_helper.sh shlock ;
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
       shell: bash
-    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v3
+    - name: Upload Python ${{ matrix.python-version }} integration coverage to Codecov
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_supplement.xml
