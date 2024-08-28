@@ -455,6 +455,17 @@ jobs:
       if: ${{ runner.os }} != "Linux"
       run: |
         if [ $OS == macos-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+    - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./test-reports/junit.xml
+        directory: .
+        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-test-results
+        verbose: true
+        fail_ci_if_error: false
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
