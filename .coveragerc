@@ -12,8 +12,9 @@ exclude_lines =
     from . import
     pass
     except Exception
-    except BaseException:
+    except BaseException
     # Don't complain if tests don't hit defensive assertion code:
+	except UnicodeDecodeError
     raise AssertionError
     raise NotImplementedError
     raise ImportError
@@ -40,6 +41,8 @@ partial_branches =
     finally:
     @
     except unittest.SkipTest
+	self.skipTest
+	self.fail
     # Don't complain if non-runnable code isn't run:
     if __name__ in u'__main__':
     if __name__ in '__main__':
