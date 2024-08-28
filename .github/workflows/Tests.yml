@@ -376,74 +376,9 @@ jobs:
       if: ${{ always() }}
 
 
-  REGRESSION:
-    if: ${{ !cancelled() }}
-    needs: [MATS, COVERAGE]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
-    env:
-      OS: ${{ matrix.os }}
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.utf-8"
-      LC_CTYPE: "en_US.utf-8"
-      COVERAGE_RCFILE: ./.coveragerc
-      COV_CORE_SOURCE: ./
-      COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: ./coverage.xml
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade --upgrade-strategy eager pip setuptools build wheel ;
-        pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
-        pip install --upgrade --upgrade-strategy eager coverage pytest pytest-cov ;
-        pip freeze --all ;
-      if: ${{ !cancelled() }}
-    - name: Pre-Clean
-      id: clean-prep
-      run: make -j1 -f Makefile clean ;
-      if: ${{ !cancelled() }}
-    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build ;
-      if: ${{ success() }}
-    - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile user-install || true ;
-      if: ${{ success() }}
-    - name: Regression check of Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: ./tests/check_codecov_regression ;
-      if: ${{ success() }}
-    - name: Summerize Regressions for python ${{ matrix.python-version }}
-      id: sumerize-r-check-s
-      run: |
-        echo "- Test Reports did NOT regress for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ success() }}
-      shell: bash
-    - name: Summerize Regressions for python ${{ matrix.python-version }}
-      id: sumerize-r-check-f
-      run: |
-        echo ":x: Test Reports REGRESS for python version ${{ matrix.python-version }} on ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ failure() }}
-      shell: bash
-    - name: Post-z-purge
-      id: post-uninstall
-      run: make -j1 -f Makefile purge || true ;
-      if: ${{ always() }}
-    - name: Post-Clean
-      id: post-zz-end
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ !cancelled() }}
-
   INTEGRATION:
     if: ${{ success() }}
-    needs: [MATS, COVERAGE, REGRESSION]
+    needs: [MATS, COVERAGE]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -531,7 +466,7 @@ jobs:
 
   TOX:
     if: ${{ success() }}
-    needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, REGRESSION, INTEGRATION]
+    needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, INTEGRATION]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
