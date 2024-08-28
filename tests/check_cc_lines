@@ -65,7 +65,7 @@ PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
 LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
-EXIT_CODE=0
+EXIT_CODE=1
 
 test -x $(command -v grep) || exit 126 ;
 test -x $(command -v curl) || exit 126 ;
@@ -77,17 +77,19 @@ test -x "$(command -v shlock)" || exit 126 ;
 
 function cleanup() {
 	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
+	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
 if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
-		trap 'cleanup ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
-		trap 'cleanup ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
+		EXIT_CODE=0
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		# trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
-		trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
-		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
 		echo "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
 		false ;

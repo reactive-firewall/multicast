@@ -86,21 +86,23 @@ fi
 function cleanup() {
 	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
 	rm -f ./codecov 2>/dev/null || true ; wait ;
+	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
 if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-        trap 'cleanup ; wait ; exit 1 ;' SIGHUP || EXIT_CODE=3
-        trap 'cleanup ; wait ; exit 1 ;' SIGTERM || EXIT_CODE=4
-        trap 'cleanup ; wait ; exit 1 ;' SIGQUIT || EXIT_CODE=5
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		# trap 'rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-        trap 'cleanup ; wait ; exit 1 ;' SIGINT || EXIT_CODE=8
-        trap 'cleanup ; wait ; exit 1 ;' SIGABRT || EXIT_CODE=9
-        trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-        echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
-        false ;
-        exit 126 ;
+		echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
+		false ;
+		exit 126 ;
 fi
 
 # this is how test files are found:
@@ -141,7 +143,7 @@ for i in 1 256 512 ; do
 	if [[ ( -r codecov.SHA${i}SUM ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
 		if [[ ( -r codecov.SHA${i}SUM.sig ) ]] ; then
 			# configure your CI evironment to trust the key at https://keybase.io/codecovsecurity/pgp_keys.asc
-            # FP: 2703 4E7F DB85 0E0B BC2C 62FF 806B B28A ED77 9869
+			# FP: 2703 4E7F DB85 0E0B BC2C 62FF 806B B28A ED77 9869
 			# OR...
 			# Set CI=true to continue on missing keys
 			gpgv codecov.SHA${i}SUM.sig codecov.SHA${i}SUM || ${CI} || EXIT_CODE=126
