@@ -144,7 +144,7 @@ uninstall:
 
 purge: clean uninstall
 	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>/dev/null || true
-	$(QUIET)$(PYTHON) -W ignore ./setup.py clean || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
 	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true

@@ -314,7 +314,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }}
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
@@ -441,7 +441,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_supplement.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }},unittests
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
@@ -462,7 +462,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/junit.xml
         directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }},unittests
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-test-results
         verbose: true
         fail_ci_if_error: false
@@ -471,9 +471,82 @@ jobs:
       run: make -j1 -f Makefile purge || true ;
       if: ${{ !cancelled() }}
     - name: Post-Clean
-      id: post-z-end
+      id: post-end
       run: make -j1 -f Makefile clean || true ;
       if: ${{ !cancelled() }}
+
+
+  EXTRAS:
+    if: ${{ success() }}
+    needs: [BOOTSTRAP]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: .coverage
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        pip install --upgrade pip setuptools build wheel
+        pip install -r ./requirements.txt ;
+        pip install coverage ;
+        pip install pytest ;
+        pip install pytest-cov ;
+    - name: Pre-Clean
+      id: clean-prep
+      run: make -j1 -f Makefile clean ;
+    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile build ;
+      if: ${{ success() }}
+    - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile user-install || true ;
+      if: ${{ success() }}
+    - name: Generate Extra Legacy Setup Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        hash -p ./.github/tool_shlock_helper.sh shlock ;
+        ./tests/check_legacy_setup_coverage || echo "::warning file=tests/check_legacy_setup_coverage,line=1,endLine=1,title=SKIPPED::SKIP Legacy Setup.py Tests." ;
+      shell: bash
+    - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./test-reports/coverage_setup.xml
+        directory: .
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: false
+    - name: Upload Extra Python ${{ matrix.python-version }} Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Legacy_Setup-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./test-reports/
+        if-no-files-found: ignore
+    - name: Post-purge
+      id: post-uninstall
+      run: make -j1 -f Makefile purge || true ;
+      if: ${{ !cancelled() }}
+    - name: Post-Clean
+      id: post-end
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ !cancelled() }}
+
 
   TOX:
     if: ${{ success() }}
@@ -510,4 +583,4 @@ jobs:
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
