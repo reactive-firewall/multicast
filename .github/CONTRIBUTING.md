@@ -31,7 +31,7 @@ Here is a brief explanation on how I triage incoming tickets to get a better sen
 When sitting down to do some triaging work, start with the list of untriaged tickets. Consider all tickets that do not have a label as untriaged. The first step is to categorize the ticket into one of the following categories and either close the ticket or assign an appropriate lable. The reported issue
 
  *  is not valid
-If you think the ticket is invalid comment why you think it is invalid, then close the ticket. Tickets might be invalid if they were already fixed in the past or it was decided that the proposed feature will not be implemented because it does not conform with the overall goal of Pocket-PiAI Project. Also if you happen to know that the problem was already reported, label the ticket with Status: duplicate, reference the other ticket that is already addressing the problem and close the duplicate.
+If you think the ticket is invalid comment why you think it is invalid, then close the ticket. Tickets might be invalid if they were already fixed in the past or it was decided that the proposed feature will not be implemented because it does not conform with the overall goal of Multicast Project. Also if you happen to know that the problem was already reported, label the ticket with Status: duplicate, reference the other ticket that is already addressing the problem and close the duplicate.
 
 Examples:
 
@@ -47,7 +47,7 @@ My builds stopped working. Please help! Ask for a link to the build log and for 
 
 
  *  is a valid enhancement proposal
-If the ticket contains an enhancement proposal that aligns with the goals of Pocket-PiAP, then add the label Enhancement. If the proposal seems valid but requires further discussion between core contributors because there might be different possibilities on how to implement the enhancement, then also add the label question.
+If the ticket contains an enhancement proposal that aligns with the goals of Multicast, then add the label Enhancement. If the proposal seems valid but requires further discussion between core contributors because there might be different possibilities on how to implement the enhancement, then also add the label question.
 
 Examples:
 
@@ -107,9 +107,9 @@ This is the checklist that I try to go through for every single pull request tha
 
 - [ ] Do the tests pass for all of the following? If not, write a note in the PR, or fix them yourself.
 
-	- [ ] Python 3.8 - Mac
-	- [ ] Python 3.8 - Linux (OPTIONAL)
-	- [ ] Python 3.9 - Linux
+	- [ ] Python 3.12 - Mac (OPTIONAL)
+	- [ ] Python 3.11 - Linux
+	- [ ] Python 3.12 - Linux
 	- [ ] Python 3.9 (or Newer) - Mac
 	- [ ] Python 3.10 - Linux
 	- [ ] Python any - Windows (OPTIONAL)

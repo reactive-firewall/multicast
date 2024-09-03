@@ -361,8 +361,7 @@ class McastHEAR(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		#  _is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
-		HOST = multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"]
-		PORT = multicast._MCAST_DEFAULT_PORT if "port" not in kwargs.keys() else kwargs["port"]
+		HOST = multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs else kwargs["group"]
+		PORT = multicast._MCAST_DEFAULT_PORT if "port" not in kwargs else kwargs["port"]
 		with McastServer((HOST, PORT), HearUDPHandler) as server:
 			server.serve_forever()
-

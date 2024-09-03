@@ -579,7 +579,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Overides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
-		if (self._thepython is not None) and (len(self._thepython) <= 0):
+		if not self._thepython:
 			self.skipTest(str("""No python cmd to test with!"""))
 
 	@unittest.skipUnless(True, """Insanitty Test. Good luck debugging.""")

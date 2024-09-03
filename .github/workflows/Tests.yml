@@ -454,7 +454,7 @@ jobs:
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
       run: |
-        if [ $OS == macos-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        if [ $OS == macos-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "::warning file=.github/workflows/Tests.yml,line=457,endLine=457,title=SKIPPED::SKIP Code-Climate" ; fi ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
       if: ${{ !cancelled() }}
       uses: codecov/test-results-action@v1

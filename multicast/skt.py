@@ -266,7 +266,7 @@ def endSocket(sock=None):
 
 
 	"""
-	if not (sock is None):  # pragma: no branch
+	if sock is not None:  # pragma: no branch
 		try:
 			sock.close()
 			sock.shutdown(_socket.SHUT_RD)  # pragma: no cover

@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 **PiAP Device (please complete the following information):**
  - OS: [e.g. macOS]
  - OS Version: [e.g. 22]
- - Python Version [e.g. 3.9] _(optional)_
+ - Python Version [e.g. 3.12] _(optional)_
  - Multicast Python Library Version: [e.g. v0.5.0]
 
 **Additional context** _(optional)_
