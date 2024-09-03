@@ -221,14 +221,12 @@ class McastServer(socketserver.UDPServer):
 
 	def handle_error(self, request, client_address):
 		print(str("handle_error"))
-		if request is not None:
-			if request[0] is not None:
-				if """STOP""" in str(request[0]):
-					def kill_func(a_server):
-						if a_server is not None:
-							a_server.shutdown()
-					end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
-					end_thread.start()
+		if request is not None and request[0] is not None and """STOP""" in str(request[0]):
+			def kill_func(a_server):
+				if a_server is not None:
+					a_server.shutdown()
+			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
+			end_thread.start()
 		super(McastServer, self).handle_error(request, client_address)
 
 
@@ -361,7 +359,7 @@ class McastHEAR(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		#  _is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
-		HOST = multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs else kwargs["group"]
-		PORT = multicast._MCAST_DEFAULT_PORT if "port" not in kwargs else kwargs["port"]
+		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)
++		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
 		with McastServer((HOST, PORT), HearUDPHandler) as server:
 			server.serve_forever()
