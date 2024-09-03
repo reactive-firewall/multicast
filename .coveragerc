@@ -2,6 +2,7 @@
 concurrency = multiprocessing
 parallel = True
 sigterm = True
+branch = True
 
 [report]
 include = multicast/*,tests/*

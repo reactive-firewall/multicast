@@ -120,7 +120,7 @@ ifeq "$(RMDIR)" ""
 	RMDIR=$(RM)Rd
 endif
 
-PHONY: must_be_root cleanup init
+PHONY: cleanup init must_be_root must_have_flake must_have_pytest uninstall
 
 build: init ./setup.py
 	$(QUIET)$(PYTHON) -W ignore -m build ./
@@ -155,6 +155,8 @@ purge: clean uninstall
 test: cleanup
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
+	$(QUIET)$(COVERAGE) combine 2>/dev/null || : ;
+	$(QUIET)$(COVERAGE) report --include=* 2>/dev/null || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -163,6 +165,7 @@ test-tox: cleanup
 
 test-reports:
 	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>/dev/null >/dev/null || true ;
+	$(QUIET)$(BSMARK) ./test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup must_have_pytest test-reports

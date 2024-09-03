@@ -3,7 +3,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2023, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
