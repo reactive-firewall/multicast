@@ -1,9 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2024, Kendrick Walls
+# Copyright (c) 2017-2024, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -360,6 +360,6 @@ class McastHEAR(multicast.mtool):
 	def doStep(self, *args, **kwargs):
 		#  _is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)
-+		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
+		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
 		with McastServer((HOST, PORT), HearUDPHandler) as server:
 			server.serve_forever()

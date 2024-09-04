@@ -2,7 +2,7 @@
 
 # Python Multicast Repo
 # ..................................
-# Copyright (c) 2017-2024, Kendrick Walls
+# Copyright (c) 2017-2024, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ __name__ = """multicast"""
 
 global __version__
 
-__version__ = """1.4.3"""
+__version__ = """1.4.4"""
 """The version of this program.
 
 	Minimal Acceptance Testing:

@@ -1,9 +1,9 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Python Test Repo Template
 # ..................................
-# Copyright (c) 2017-2024, Kendrick Walls
+# Copyright (c) 2017-2024, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.

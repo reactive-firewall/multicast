@@ -3,7 +3,7 @@
 
 # Python Test Repo Template
 # ..................................
-# Copyright (c) 2017-2024, Kendrick Walls
+# Copyright (c) 2017-2024, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,6 +85,28 @@ import random
 
 
 class MCastClient(object):
+	"""For use as a test fixture. A trivial implementation of a socket-based object with a function
+	named say. The say function of this class performs a send and recv on a given socket and
+	then prints out simple diognostics about the content sent and any response recived.
+
+	Testing:
+
+		First some test fixtures:
+
+		>>> import socket as socket
+		>>> import random as random
+		>>>
+
+	Testcase 0: test the class MCastClient is.
+
+		>>> import tests.MulticastUDPClient
+		>>> from MulticastUDPClient import MCastClient as MCastClient
+		>>> MCastClient is not None
+		True
+		>>>
+
+
+	"""
 
 	_group_addr = None
 	_source_port = None
@@ -113,7 +135,8 @@ class MCastClient(object):
 		print("Received: {}".format(received))
 
 
-if __name__ == "__main__":
+def main():
+	"""The main test operations."""
 	HOST, PORT = "224.0.0.1", 59991
 	data = "This is a test"
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -121,4 +144,8 @@ if __name__ == "__main__":
 	print(str((HOST, PORT)))
 	tsts_fxr.say(HOST, PORT, sock, data)
 	tsts_fxr.say(HOST, PORT, sock, str("""STOP"""))
+
+
+if __name__ == "__main__":
+	main()
 	exit(0)
