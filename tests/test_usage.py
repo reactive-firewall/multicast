@@ -368,6 +368,42 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
+	def test_prints_usage_WHEN_called_GIVEN_cmd_and_help_argument(self):
+		"""Test case for multicast HEAR|RECV|SAY help."""
+		theResult = None
+		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
+		try:
+			if (self._thepython is not None):
+				for test_case in [".__main__", ""]:
+					args = [
+						str(self._thepython),
+						str("-m"),
+						str("multicast{}").format(
+							str(
+								test_case
+							)
+						),
+						str("--help")
+					]
+					theOutputtxt = context.checkPythonCommand(
+						args, stderr=subprocess.STDOUT
+					)
+					self.assertIn(str("usage:"), str(theOutputtxt))
+					if (str("usage:") in str(theOutputtxt)):
+						theResult = ((theResult is None) or (theResult is True))
+					else:
+						theResult = False
+						context.debugUnexpectedOutput(
+							str("usage:"), str(theOutputtxt), self._thepython
+						)
+		except Exception as err:
+			context.debugtestError(err)
+			err = None
+			del err
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, str("""Could Not find usage from multicast CMD --help"""))
+
 	def test_equivilant_response_WHEN_absolute_vs_implicit(self):
 		"""Test case for multicast vs multicast.__main__"""
 		theResult = False

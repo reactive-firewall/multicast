@@ -98,11 +98,28 @@ class MCastClient(object):
 		>>>
 
 	Testcase 0: test the class MCastClient is.
+		A: Test that the MulticastUDPClient component is importable.
+		B: Test that the MCastClient class is importable.
 
 		>>> import tests.MulticastUDPClient
 		>>> from MulticastUDPClient import MCastClient as MCastClient
 		>>> MCastClient is not None
 		True
+		>>>
+
+	Testcase 1: Test the class MCastClient has a say function.
+		A: Test that the MulticastUDPClient component is importable.
+		B: Test that the MCastClient class is importable.
+		C: Test that the MCastClient class has the function named say.
+
+		>>> import tests.MulticastUDPClient
+		>>> from MulticastUDPClient import MCastClient as MCastClient
+		>>> MCastClient is not None
+		True
+		>>> MCastClient.say is not None
+		True
+		>>> type(MCastClient.say)
+		<class 'function'>
 		>>>
 
 
@@ -136,7 +153,29 @@ class MCastClient(object):
 
 
 def main():
-	"""The main test operations."""
+	"""The main test operations.
+	
+	Testing:
+
+		First some test fixtures:
+
+		>>> import socket as socket
+		>>> import random as random
+		>>>
+
+	Testcase 0: test the function main is.
+		A: Test that the MulticastUDPClient component is importable.
+		B: Test that the MulticastUDPClient has a main function.
+
+		>>> import tests.MulticastUDPClient
+		>>> tests.MulticastUDPClient.main is not None
+		True
+		>>> type(tests.MulticastUDPClient.main)
+		<class 'function'>
+		>>>
+
+
+	"""
 	HOST, PORT = "224.0.0.1", 59991
 	data = "This is a test"
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)

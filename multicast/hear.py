@@ -196,6 +196,30 @@ except Exception as err:
 
 
 class McastServer(socketserver.UDPServer):
+	"""Generic Subclasses socketserver.UDPServer for handling daemon function.
+
+	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	data, after printing the sender's ip out.
+
+	Minimal Acceptance Testing:
+
+	First setup test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>> multicast.hear is not None
+		True
+		>>> from multicast.hear import McastServer as McastServer
+		>>>
+
+	Testcase 1: McastServer should be automaticly imported.
+
+		>>> McastServer.__name__ is not None
+		True
+		>>>
+
+	"""
 
 	def server_activate(self):
 		print(str("server_activate"))

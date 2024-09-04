@@ -61,22 +61,20 @@ ifeq "$(LINK)" ""
 	LINK=ln -sf
 endif
 
-ifeq "$(MAKE)" ""
-	#  just no cmake please
-	MAKE=$($(COMMAND) make || $(COMMAND) gnumake) -j1
-endif
-
 ifeq "$(PYTHON)" ""
 	PYTHON=$(COMMAND) python3 -B
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(`$(COMMAND) -vp coverage || $(COMMAND) -vp coverage3` || printf '%s' '$(PYTHON) -m coverage')
+		COVERAGE=$(PYTHON) -m coverage
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
 	endif
+	ifeq "$(COVERAGE)" ""
+		COVERAGE!=$(COMMAND) coverage
+	endif
 else
 	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(`$(COMMAND) -vp coverage || $(COMMAND) -vp coverage3` || printf '%s' '$(PYTHON) -B -m coverage')
+		COVERAGE!=$(COMMAND) coverage
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
@@ -123,8 +121,7 @@ endif
 PHONY: cleanup init must_be_root must_have_flake must_have_pytest uninstall
 
 build: init ./setup.py
-	$(QUIET)$(PYTHON) -W ignore -m build ./
-	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./
+	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
@@ -156,7 +153,7 @@ test: cleanup
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>/dev/null || : ;
-	$(QUIET)$(COVERAGE) report --include=* 2>/dev/null || : ;
+	$(QUIET)$(COVERAGE) report -m --include=* 2>/dev/null || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -169,12 +166,12 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup must_have_pytest test-reports
-	$(QUIET)$(PYTHON) -B -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=  --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -B -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
+	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || true
 	$(QUIET)tests/check_spelling || true
 	$(QUIET)tests/check_cc_lines || true
 	$(QUIET)$(ECHO) "$@: Done."
