@@ -175,6 +175,35 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 ```
 #### Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and the standard python `multiprocessing` module and its use.
 
+### What are the defaults?
+
+##### The default multicast group address is 224.0.0.1
+
+From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
+> The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
+> on the rational that this group address will be treated as a local-net multicast
+> (caveat: one should use link-local for ipv6)
+
+##### The default multicast Time-to-Live (TTL) is 1
+
+From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
+> ... If the
+> upper-layer protocol chooses not to specify a time-to-live, it should
+> default to 1 for all multicast IP datagrams, so that an explicit
+> choice is required to multicast beyond a single network.
+
+From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
+> A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
+> explicit value that could traverse byond the local connected network should be
+> chosen by the caller rather than the default vaule. This is inline with the principle
+> of none, one or many.
+
+##### The default multicast destination port is 59559
+
+From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
+> Arbitrary port to use by default, though any dynamic and free port would work.
+
+> :exclamation: Caution: it is best to specify the port in use at this time as the default has yet to be properly assigned ( see related #62 )
 
 
 ### What does exit code _x_ mean?

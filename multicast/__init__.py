@@ -81,7 +81,7 @@ __name__ = """multicast"""
 
 global __version__
 
-__version__ = """1.4.4"""
+__version__ = """1.5-rc"""
 """The version of this program.
 
 	Minimal Acceptance Testing:
@@ -94,6 +94,7 @@ __version__ = """1.4.4"""
 		>>> _multicast.__version__ is not None
 		True
 		>>>
+
 
 """
 
@@ -154,7 +155,7 @@ __doc__ = __prologue__ + """
 
 global _MCAST_DEFAULT_PORT  # noqa
 
-_MCAST_DEFAULT_PORT = 44244
+_MCAST_DEFAULT_PORT = 59259
 """
 	Arbitrary port to use by default, though any dynamic and free port would work.
 
@@ -177,6 +178,24 @@ _MCAST_DEFAULT_PORT = 44244
 		>>> multicast._MCAST_DEFAULT_PORT > int(1024)
 		True
 		>>>
+
+	Testcase 1: Multicast should have a default port.
+		A: Test that the _MCAST_DEFAULT_PORT attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_PORT attribute is an int.
+		C: Test that the _MCAST_DEFAULT_PORT attribute is RFC-6335 compliant.
+
+		>>> multicast._MCAST_DEFAULT_PORT is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_PORT) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_PORT >= int(49152)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_PORT <= int(65535)
+		True
+		>>>
+
 
 """
 
@@ -214,7 +233,7 @@ global _MCAST_DEFAULT_TTL  # noqa
 _MCAST_DEFAULT_TTL = int(1)
 """Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
 	A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
-	explicit value that could travers byone the local connected network should be
+	explicit value that could traverse byond the local connected network should be
 	chosen by the caller rather than the default vaule. This is inline with the principle
 	of none, one or many.
 
