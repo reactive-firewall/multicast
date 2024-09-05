@@ -1,48 +1,63 @@
 # Add 'Multicast' label to any root file changes
 Multicast:
-  - setup.py
-  - multicast/*.py
+  - changed-files:
+    - any-glob-to-any-file:
+      - setup.py
+      - multicast/*.py
+      - LICENSE
+      - LICENSE.md
 
 # Add 'Lint' label to any lint file changes
 Linter:
-  - .stickler.yml
-  - .hound.yml
-  - .yamllint.conf
-  - .flake8.ini
-  - .deepsource.toml
-  - tests/check_*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .stickler.yml
+      - .hound.yml
+      - .yamllint.conf
+      - .flake8.ini
+      - .deepsource.toml
+      - tests/check_*
 
 # Add 'Lang' label to any python file changes
 Python Lang:
-  - **/*.py
-  - *.py
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - '*.py'
 
 Configs:
-  - *.yml
-  - ./**/*.yml
-  - *.ini
-  - *.toml
-  - *.cfg
-  - requirements.txt
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.yml'
+      - ./**/*.yml
+      - '*.ini'
+      - '*.toml'
+      - '*.cfg'
+      - requirements.txt
 
 # Add 'test' label
 Testing:
-  - tests/**/*.py
-  - tests/*
-  - .circleci/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/*.py
+      - tests/check_*
+      - .github/workflows/*.yml
+      - .circleci/*
 
 CI:
-  - tests/*.py
-  - .stickler.yml
-  - .hound.yml
-  - .travis.yml
-  - .appveyor.yml
-  - .github/workflows/*
-  - .circleci/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/*.py
+      - .stickler.yml
+      - .hound.yml
+      - .travis.yml
+      - .appveyor.yml
+      - .github/workflows/*
+      - .circleci/*
 
 Github:
-  - .github/**/*
-  - .github/*
-  - README.md
-  - LICENCE
-  - LICENCE.md
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**/*
+      - .github/*
+      - README.md
