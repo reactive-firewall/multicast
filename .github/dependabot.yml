@@ -1,0 +1,62 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    milestone: 1
+    target-branch: "master"
+    versioning-strategy: increase-if-necessary
+    # Labels on pull requests for version updates only
+    labels:
+      - "Configs"
+      - "Duplicate"
+      - "Python Lang"
+      - "Multicast"
+    rebase-strategy: "disabled"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
+          - "setuptools*"
+    allow: 
+      - dependency-name: "setuptools"
+        dependency-type: "production"
+      - dependency-name: "pip"
+        dependency-type: "direct"
+      - dependency-name: "wheel"
+        dependency-type: "production"
+      - dependency-name: "build"
+        dependency-type: "production"
+    assignees:
+      - "reactive-firewall"
+    commit-message:
+      prefix: "[HOTFIX] "
+      include: "scope"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: ".github/workflows/" # Location of package manifests
+    milestone: 1
+    target-branch: "master"
+    rebase-strategy: "disabled"
+    # Labels on pull requests for version updates only
+    labels:
+      - "Configs"
+      - "Duplicate"
+      - "GitHub"
+      - "Testing"
+    assignees:
+      - "reactive-firewall"
+    commit-message:
+      prefix: "[UPDATE] "
+      include: "scope"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
