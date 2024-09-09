@@ -71,14 +71,17 @@ def readFile(filename):
 	"""
 	theResult = None
 	try:
-		if str("""E.md""") not in filename and str("""requirements.txt""") not in filename:
-			raise NotImplementedError("""[CWE-440] Not Implemented.""")
+		expected_files = ["""E.md""", """requirements.txt"""]
+		if not any(aexpected_file in filename for aexpected_file in expected_files):
+			raise ValueError(str(
+				"""[CWE-706] Access to the file {} was not expected."""
+			).format(filename))
 		with open(str("""./{}""").format(str(filename))) as f:
 			theResult = f.read()
-	except Exception:
+	except Exception as err:
 		theResult = str(
-			"""See https://github.com/reactive-firewall/multicast/{}"""
-		).format(filename)
+			"""See https://github.com/reactive-firewall/multicast/{fn}\n{e}"""
+		).format(fn=filename, e=str(err)))
 	return str(theResult)
 
 
