@@ -81,7 +81,7 @@ def readFile(filename):
 	except Exception as err:
 		theResult = str(
 			"""See https://github.com/reactive-firewall/multicast/{fn}\n{e}"""
-		).format(fn=filename, e=str(err)))
+		).format(fn=filename, e=str(err))
 	return str(theResult)
 
 
