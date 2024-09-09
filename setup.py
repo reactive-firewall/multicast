@@ -82,11 +82,8 @@ def readFile(filename):
 	return str(theResult)
 
 
-try:
-	with open("""./requirements.txt""") as rfile:
-		requirements = rfile.read().splitlines()
-except Exception:
-	requirements = None
+requirements = readFile("""requirements.txt""").splitlines()
+"""The list of production requirements of this program."""
 
 
 conf_dict = None
