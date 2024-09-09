@@ -71,6 +71,8 @@ def readFile(filename):
 	"""
 	theResult = None
 	try:
+		if str("""E.md""") not in filename and str("""requirements.txt""") not in filename:
+			raise NotImplementedError("""[CWE-440] Not Implemented.""")
 		with open(str("""./{}""").format(str(filename))) as f:
 			theResult = f.read()
 	except Exception:
@@ -81,8 +83,8 @@ def readFile(filename):
 
 
 try:
-	with open("""./requirements.txt""") as f:
-		requirements = f.read().splitlines()
+	with open("""./requirements.txt""") as rfile:
+		requirements = rfile.read().splitlines()
 except Exception:
 	requirements = None
 
