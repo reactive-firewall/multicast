@@ -476,7 +476,7 @@ class McastDispatch(mtool):
 				if (sys.stdout.isatty()):  # pragma: no cover
 					print(w)
 					print(str(inerr))
-					print(str(inerr.args()))
+					print(str(inerr.args))
 				del inerr
 				__EXIT_MSG = (2, "NoOp")
 		except BaseException:  # pragma: no branch
