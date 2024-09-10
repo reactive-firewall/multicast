@@ -63,7 +63,13 @@ endif
 
 ifeq "$(PYTHON)" ""
 	PY_CMD!=`$(COMMAND) python || $(COMMAND) python3 || $(COMMAND) python27`
-	PYTHON=$(PY_CMD) -B
+	ifeq "$(PY_CMD)" ""
+		PY_ARGS=
+	endif
+	ifeq "$(PY_CMD)" "*python3*"
+		PY_ARGS=-B
+	endif
+	PYTHON=$(PY_CMD) $(PY_ARGS)
 	ifeq "$(COVERAGE)" ""
 		COVERAGE=$(PYTHON) -m coverage
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
