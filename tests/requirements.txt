@@ -22,17 +22,15 @@
 # socket - builtin - PSF licence
 # struct - builtin - PSF licence
 # argparse - builtin - PSF licence
-argparse>=1.4.0
-# argparse - builtin - PSF licence
-setuptools>=38.0
+# argparse>=1.4.0
+# argparse - builtin - PSF licence 3.7 = 62.6.0
+setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
 # virtualenv - MIT
 virtualenv>=15.0.1
-# six - MIT
-six>=1.0.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 # tox - ??? licence
-tox>=3.0.0
+tox>=3.0.0, !=3.16.1
 #py>=1.4.33
 ###
 # TESTING ONLY - Do NOT report issues with these optionals on python-repo
@@ -44,20 +42,20 @@ flake8>=5.0
 # pep8 - ??? licence
 pep8>=1.0
 # pytest - ??? licence
-pytest>=7
+pytest>=7.0, !=8.1.0
 # pytest-checkdocs - ??? licence
-pytest-checkdocs>=2.4
+pytest-checkdocs>=1.2.5
 # pytest-cov - ??? licence
-pytest-cov>=4.0.0
+pytest-cov>=3.0.0
 # pytest-enabler - ??? licence
 pytest-enabler>=1.0.1
-# pytest-flake8 - ??? licence
-pytest-flake8>=1.0
-# coverage - ??? licence
-coverage>=6.3
+# pytest-flake8 - BSD licence
+pytest-flake8>=1.0.7
+# coverage - Apache 2.0 licence
+coverage>=6.2
 # wheel - builtin?? - PSF licence
 wheel>=0.37.0
 # pip - builtin?? - PSF licence
-pip>=21.0
+pip>=19.0
 # build - ?? licence
 build>=1.0.1
