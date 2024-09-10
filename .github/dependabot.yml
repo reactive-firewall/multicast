@@ -41,6 +41,61 @@ updates:
     schedule:
       interval: "weekly"
       day: "tuesday"
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "tests/" # Location of package manifests
+    target-branch: "master"
+    versioning-strategy: increase-if-necessary
+    # Labels on pull requests for version updates only
+    labels:
+      - "Configs"
+      - "Testing"
+      - "Python Lang"
+      - "CI"
+    rebase-strategy: "disabled"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+        exclude-patterns:
+          - "setuptools*"
+    allow:
+      - dependency-name: "setuptools"
+        dependency-type: "production"
+      - dependency-name: "pip"
+        dependency-type: "direct"
+      - dependency-name: "wheel"
+        dependency-type: "production"
+      - dependency-name: "build"
+        dependency-type: "production"
+      - dependency-name: "tox"
+        dependency-type: "development"
+      - dependency-name: "virtualenv"
+        dependency-type: "development"
+      - dependency-name: "flake8"
+        dependency-type: "development"
+      - dependency-name: "pep8"
+        dependency-type: "development"
+      - dependency-name: "pytest"
+        dependency-type: "direct"
+      - dependency-name: "pytest-checkdocs"
+        dependency-type: "development"
+      - dependency-name: "pytest-cov"
+        dependency-type: "development"
+      - dependency-name: "pytest-enabler"
+        dependency-type: "development"
+      - dependency-name: "pytest-flake8"
+        dependency-type: "development"
+      - dependency-name: "coverage"
+        dependency-type: "direct"
+    assignees:
+      - "reactive-firewall"
+    commit-message:
+      prefix: "[TESTS] "
+      include: "scope"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: ".github/workflows/" # Location of package manifests
     milestone: 1

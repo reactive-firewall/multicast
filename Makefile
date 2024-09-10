@@ -26,7 +26,7 @@ endif
 
 
 ifeq "$(COMMAND)" ""
-	COMMAND_CMD!=`command -v xcrun || command which which || command -v which || command -v command`
+	COMMAND_CMD!=`command -v xcrun || command -v command || command -v which || which which`
 	ifeq "$(COMMAND_CMD)" "*xcrun"
 		COMMAND_ARGS=--find
 	endif
@@ -62,7 +62,8 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(PYTHON)" ""
-	PYTHON=$(COMMAND) python3 -B
+	PY_CMD!=`$(COMMAND) python || $(COMMAND) python3 || $(COMMAND) python27`
+	PYTHON=$(PY_CMD) -B
 	ifeq "$(COVERAGE)" ""
 		COVERAGE=$(PYTHON) -m coverage
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/

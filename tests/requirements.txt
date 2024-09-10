@@ -1,4 +1,4 @@
-# Python Multicast Repo req file
+# Python Multicast Repo test req file
 # ..................................
 # Copyright (c) 2017-2024, Mr. Walls
 # ..................................
@@ -21,20 +21,43 @@
 # argparse - builtin - PSF licence
 # socket - builtin - PSF licence
 # struct - builtin - PSF licence
-# argparse>=1.4.0
 # argparse - builtin - PSF licence
-setuptools>=45.0
+argparse>=1.4.0
+# argparse - builtin - PSF licence
+setuptools>=38.0
 # virtualenv - MIT
-#virtualenv>=15.0.1
+virtualenv>=15.0.1
 # six - MIT
-#six>=1.0.0
+six>=1.0.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
-#tox>=3.0.0
+# tox - ??? licence
+tox>=3.0.0
 #py>=1.4.33
+###
+# TESTING ONLY - Do NOT report issues with these optionals on python-repo
+###
+# flake8 - ??? licence
+flake8>=5.0
+# pyflakes - ??? licence
+# pyflakes>=2.5.0
+# pep8 - ??? licence
+pep8>=1.0
+# pytest - ??? licence
+pytest>=7
+# pytest-checkdocs - ??? licence
+pytest-checkdocs>=2.4
+# pytest-cov - ??? licence
+pytest-cov>=4.0.0
+# pytest-enabler - ??? licence
+pytest-enabler>=1.0.1
+# pytest-flake8 - ??? licence
+pytest-flake8>=1.0
+# coverage - ??? licence
+coverage>=6.3
+# wheel - builtin?? - PSF licence
+wheel>=0.37.0
+# pip - builtin?? - PSF licence
 pip>=21.0
-build>=1.1.1
-# multicast - MIT
-#-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
-# wheel - builtin - PSF licence
-wheel>=0.37
+# build - ?? licence
+build>=1.0.1
