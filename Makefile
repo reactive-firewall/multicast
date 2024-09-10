@@ -26,7 +26,7 @@ endif
 
 
 ifeq "$(COMMAND)" ""
-	COMMAND_CMD!=`command -v xcrun || command -v command || command -v which || which which`
+	COMMAND_CMD!=`command -v xcrun || command which which || command -v which || command -v command`
 	ifeq "$(COMMAND_CMD)" "*xcrun"
 		COMMAND_ARGS=--find
 	endif
@@ -39,7 +39,7 @@ endif
 ifeq "$(MAKE)" ""
 	#  just no cmake please
 	MAKEFLAGS=$(MAKEFLAGS) -s
-	MAKE!=`$(COMMAND) make || $(COMMAND) gnumake`
+	MAKE!=`$(COMMAND) make 2>/dev/null || $(COMMAND) gnumake 2>/dev/null`
 endif
 
 ifeq "$(ECHO)" ""
@@ -62,12 +62,11 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(PYTHON)" ""
-	PY_CMD!=`$(COMMAND) python || $(COMMAND) python3 || $(COMMAND) python27`
-	ifeq "$(PY_CMD)" ""
-		PY_ARGS=
-	endif
-	ifeq "$(PY_CMD)" "*python3*"
+	PY_CMD=$(COMMAND) python3
+	ifneq "$(PY_CMD)" ""
 		PY_ARGS=-B
+	else
+		PY_CMD=$(COMMAND) python
 	endif
 	PYTHON=$(PY_CMD) $(PY_ARGS)
 	ifeq "$(COVERAGE)" ""
@@ -133,11 +132,12 @@ build: init ./setup.py
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager pip setuptools wheel build 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r requirements.txt 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager --break-system-packages --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager --break-system-packages -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -172,6 +172,10 @@ test-reports:
 	$(QUIET)$(BSMARK) ./test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
+test-reqs: test-reports init
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r tests/requirements.txt 2>/dev/null || true
+
+
 test-pytest: cleanup must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
@@ -187,7 +191,7 @@ must_have_flake:
 	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF flake` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
-must_have_pytest:
+must_have_pytest: init
 	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
 
@@ -253,8 +257,7 @@ must_be_root:
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager pip setuptools wheel || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager build || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>/dev/null || true
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
