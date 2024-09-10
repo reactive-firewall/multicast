@@ -154,7 +154,7 @@ class MCastClient(object):
 
 def main():
 	"""The main test operations.
-	
+
 	Testing:
 
 		First some test fixtures:
