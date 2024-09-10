@@ -36,7 +36,7 @@ tox>=3.0.0, !=3.16.1
 # TESTING ONLY - Do NOT report issues with these optionals on python-repo
 ###
 # flake8 - ??? licence
-flake8>=5.0
+flake8>=3.9.2
 # pyflakes - ??? licence
 # pyflakes>=2.5.0
 # pep8 - ??? licence
@@ -58,4 +58,4 @@ wheel>=0.37.0
 # pip - builtin?? - PSF licence
 pip>=19.0
 # build - ?? licence
-build>=1.0.1
+# build>=0.5.1, !=1.0.3, !=0.6, !=0.6.1 !=1.1.0 !=1.2.0
