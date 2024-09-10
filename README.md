@@ -21,6 +21,7 @@ Continuous integration testing is handled by github actions and the generous Cir
 [![Appveyor](https://ci.appveyor.com/api/projects/status/0h5vuexyty9lbl81/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/master)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/master/)
+[![Bandit](https://github.com/reactive-firewall/multicast/actions/workflows/bandit.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/multicast/actions/workflows/bandit.yml)
 [![Code Climate](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/maintainability)](https://codeclimate.com/github/reactive-firewall/multicast)
 [![CodeFactor](https://www.codefactor.io/repository/github/reactive-firewall/multicast/badge)](https://www.codefactor.io/repository/github/reactive-firewall/multicast)
 [![codebeat badge](https://codebeat.co/badges/721f752f-289d-457e-af90-487a85f16bf1)](https://codebeat.co/projects/github-com-reactive-firewall-multicast-master)
@@ -55,18 +56,19 @@ The `SAY` command is used to send data messages via multicast diagrams.
 ### `RECV`
 
 The `RECV` command is used to receive multicast diagrams by listening or "joining" a multicast group.
-* if the `--use-std` flag is set the output is printed to the standard-output
-* this command is purely for testing or interfacing with external components and not intended as a first-class API
+* If the `--use-std` flag is set the output is printed to the standard-output
+* This command is purely for testing or interfacing with external components and not intended as a first-class API
 * Note: If the `--daemon` flag is used the process will loop after reporting each diagram until canceled, it has no effect on the `RECV` command.
 
 ### `HEAR`
 
 The `HEAR` command is used to send data acknowledged messages via "HEAR" messages echoing select received multicast diagrams.
-* while mostly a testing function it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
-* note this will use the same port for sends and receives and can lead to data loss if less than two groups are used.
+* While mostly a testing function it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
+* Note: this will use the same port for sends and receives and can lead to data loss if less than two groups are used.
 * If more than one group is used via the `--groups` flag then all but the bind group (via `--group`) will be echoed to the bind group.
 
 ## FAQ
+
 
 ### How do I get this running?
 
@@ -85,13 +87,14 @@ python3 -m multicast --help ;
 
 If all went well `multicast` is now installed and working :tada:
 
+
 ### How do I use this to receive some UDP Multicast?
 
 (assuming project is setup and installed and you want to listen on 0.0.0.0)
 
 ```bash
 # cd /MY-AWSOME-DEV-PATH
-python3 -m multicast HEAR --use-std --port 5353 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
+python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 ```
 
 Caveat: much more usefull if actually used in a loop like:
@@ -99,7 +102,7 @@ Caveat: much more usefull if actually used in a loop like:
 ```bash
 # cd /MY-AWSOME-DEV-PATH
 while true ; do # unitl user ctl+c inturupts
-python3 -m multicast HEAR --use-std --port 5353 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
+python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 done
 ```
 
@@ -110,12 +113,13 @@ done
 
 ```bash
 # cd /MY-AWSOME-DEV-PATH
-python3 -m multicast SAY --mcast-group 224.1.1.2 --port 5353 --message "Hello World!"
+python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello World!"
 ```
+
 
 ### What is the basic API via python (instead of bash like above):
 
-#### Caveat: this module is still a WIP
+#### Caveat: this module is still a BETA
 [Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
 
 ```python3
@@ -123,7 +127,7 @@ import mulicast as mulicast
 from multiprocessing import Process as Process
 
 # setup some stuff
-_fixture_PORT_arg = int(59991)
+_fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg
 _fixture_HEAR_args = [
@@ -174,6 +178,7 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 
 ```
 #### Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and the standard python `multiprocessing` module and its use.
+
 
 ### What are the defaults?
 
@@ -232,18 +237,19 @@ _(extra exit code meanings)_
 
 Other codes (such as `126`) may or may not have meanings (such as skip) but are not handled within the scope of the Multicast Project at this time.
 
-
+---
 ## Considerations for usage:
 
 #### [CWE-183]
 
-:warn: ALL MULTICAST is a surface of attack if the data is not sanitized. Common criteria applies here too, don't assume this library won't forward raw network data that reaches it. Notably the default group is all connected nodes (224.0.0.1).
+:warning: ALL MULTICAST is a surface of attack if the data is not sanitized. Common criteria applies here too, don't assume this library won't forward raw network data that reaches it. Notably the default group is all connected nodes (224.0.0.1).
 
 Other common weakness left to the user to handle (NOT an exhaustive list):
  - CWE-417 - in general all risks of a communication channel :thinking:
  - CWE-346 - multicast is by its very nature NOT one-to-one and can probably always be spoofed to some degree (hint: shared secrets (group keys) are probably a start :shrug:)
  - CWE-351 - don't assume only strings can be sent/received
 
+---
 ## Dev dependancy Testing:
 
 #### In a rush to get this module working? Then try using this with your own test:
@@ -262,13 +268,12 @@ make clean ; # cleans up from any previous tests hopefully
 make test-style ; # runs the tests
 make clean ; # cleans up for next test
 ```
-
+---
 ## Next steps:
 
---(UNSTABLE) clean up Proof-of-concept code into a recognizable python module project.--
-(WIP) might expand the documentation to be more user friendly to the non-network guru
-(WIP) might add tcp multicast ... who knows?
+Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-firewall/projects/1).
 
+---
 #### Copyright (c) 2021-2024, Mr. Walls
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
