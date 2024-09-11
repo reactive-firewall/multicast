@@ -24,6 +24,9 @@ ifndef SHELL
 	SHELL:=command -pv bash
 endif
 
+ifeq "$(ERROR_LOG_PATH)" ""
+	ERROR_LOG_PATH="/dev/null"
+endif
 
 ifeq "$(COMMAND)" ""
 	COMMAND_CMD!=`command -v xcrun || command which which || command -v which || command -v command`
@@ -39,7 +42,7 @@ endif
 ifeq "$(MAKE)" ""
 	#  just no cmake please
 	MAKEFLAGS=$(MAKEFLAGS) -s
-	MAKE!=`$(COMMAND) make 2>/dev/null || $(COMMAND) gnumake 2>/dev/null`
+	MAKE!=`$(COMMAND) make 2>$(ERROR_LOG_PATH) || $(COMMAND) gnumake 2>$(ERROR_LOG_PATH)`
 endif
 
 ifeq "$(ECHO)" ""
@@ -132,8 +135,8 @@ build: init ./setup.py
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>/dev/null || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r requirements.txt 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r requirements.txt 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
@@ -142,38 +145,38 @@ install: init build must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 --no-input -y multicast 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 --no-input -y multicast 2>$(ERROR_LOG_PATH) || true
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>/dev/null || true
-	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./build/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./dist/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./.eggs/ 2>/dev/null || true
-	$(QUIET)$(RM) ./test-reports/junit.xml 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./build/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./test-reports/junit.xml 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine 2>/dev/null || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>/dev/null || : ;
+	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
-	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
+	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
-	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>/dev/null >/dev/null || true ;
-	$(QUIET)$(BSMARK) ./test-reports 2>/dev/null >/dev/null || true ;
+	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)$(BSMARK) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: test-reports init
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r tests/requirements.txt 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
 
 
 test-pytest: cleanup must_have_pytest test-reports
@@ -196,48 +199,48 @@ must_have_pytest: init
 	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
 
 cleanup:
-	$(QUIET)$(RM) tests/*.pyc 2>/dev/null || true
-	$(QUIET)$(RM) tests/*~ 2>/dev/null || true
-	$(QUIET)$(RM) tests/__pycache__/* 2>/dev/null || true
-	$(QUIET)$(RM) __pycache__/* 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*.pyc 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*~ 2>/dev/null || true
-	$(QUIET)$(RM) multicast/__pycache__/* 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*/*.pyc 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*/*~ 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*/*.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) multicast/.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) multicast/*/.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) tests/.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) tests/*/.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) multicast.egg-info/* 2>/dev/null || true
-	$(QUIET)$(RM) ./*.pyc 2>/dev/null || true
-	$(QUIET)$(RM) ./.coverage 2>/dev/null || true
-	$(QUIET)$(RM) ./coverage*.xml 2>/dev/null || true
-	$(QUIET)$(RM) ./sitecustomize.py 2>/dev/null || true
-	$(QUIET)$(RM) ./.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) ./*/.DS_Store 2>/dev/null || true
-	$(QUIET)$(RM) ./*/*~ 2>/dev/null || true
-	$(QUIET)$(RM) ./.*/*~ 2>/dev/null || true
-	$(QUIET)$(RM) ./*~ 2>/dev/null || true
-	$(QUIET)$(RM) ./.*~ 2>/dev/null || true
-	$(QUIET)$(RM) ./src/**/* 2>/dev/null || true
-	$(QUIET)$(RM) ./src/* 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./src/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) tests/__pycache__ 2>/dev/null || true
-	$(QUIET)$(RMDIR) multicast/__pycache__ 2>/dev/null || true
-	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./__pycache__ 2>/dev/null || true
-	$(QUIET)$(RMDIR) multicast.egg-info 2>/dev/null || true
-	$(QUIET)$(RMDIR) .pytest_cache/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) .eggs 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./test-reports/ 2>/dev/null || true
-	$(QUIET)$(RMDIR) ./.tox/ 2>/dev/null || true
+	$(QUIET)$(RM) tests/*.pyc 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) tests/*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) tests/__pycache__/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) __pycache__/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*.pyc 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/__pycache__/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*/*.pyc 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*/*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*/*.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast/*/.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) tests/.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) tests/*/.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) multicast.egg-info/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./*.pyc 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.coverage 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./coverage*.xml 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./sitecustomize.py 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./*/.DS_Store 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.*/*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.*~ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./src/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./src/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./src/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) tests/__pycache__ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast/__pycache__ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./__pycache__ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast.egg-info 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) .pytest_cache/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) .eggs 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;
 
 clean-docs: ./docs/ ./docs/Makefile
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;
 
 ./docs/:
@@ -248,8 +251,8 @@ clean-docs: ./docs/ ./docs/Makefile
 
 clean: clean-docs cleanup
 	$(QUIET)$(ECHO) "Cleaning Up."
-	$(QUIET)$(COVERAGE) erase 2>/dev/null || true
-	$(QUIET)$(RM) ./test-results/junit.xml 2>/dev/null || true
+	$(QUIET)$(COVERAGE) erase 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./test-results/junit.xml 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(ECHO) "All clean."
 
 must_be_root:
@@ -257,8 +260,8 @@ must_be_root:
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>/dev/null || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>/dev/null || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
