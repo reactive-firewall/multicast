@@ -29,7 +29,7 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
-		from context import unittest as unittest
+		from context import unittest
 		from context import sys as _sys
 except Exception:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context")
