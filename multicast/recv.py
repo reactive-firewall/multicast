@@ -515,12 +515,12 @@ class McastRECV(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		response = self._hearstep(
-			[multicast._MCAST_DEFAULT_GROUP] if "groups" not in kwargs.keys() else kwargs["groups"],
-			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
-			None if "iface" not in kwargs.keys() else str(kwargs["iface"]),
-			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
+			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
+			kwargs.get("iface", None),
+			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),
 		)
-		_is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
+		_is_std = kwargs.get("is_std", False)
 		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
 			print(multicast._BLANK)
 			print(str(response))

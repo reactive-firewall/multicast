@@ -187,6 +187,7 @@ def NoOp(*args, **kwargs):
 
 class McastNope(mtool):
 	"""
+		The trivial implementation of mtool.
 
 		Testing:
 
@@ -326,7 +327,7 @@ class McastRecvHearDispatch(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""Will attempt to add send args.
 
 			Testing:
 
@@ -400,7 +401,7 @@ class McastRecvHearDispatch(mtool):
 			)
 
 	def _help_deamon_dispatch(self, *args, **kwargs):
-		_useHear = False if "is_deamon" not in kwargs.keys() else kwargs["is_deamon"]
+		_useHear = False if "is_deamon" not in kwargs else kwargs["is_deamon"]
 		return _useHear
 
 	def doStep(self, *args, **kwargs):

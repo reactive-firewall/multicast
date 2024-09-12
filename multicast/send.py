@@ -272,8 +272,8 @@ class McastSAY(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		return self._sayStep(
-			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
-			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
-			None if "data" not in kwargs.keys() else str(kwargs["data"]),
+			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
+			None if "data" not in kwargs else str(kwargs["data"]),
 		)
 
