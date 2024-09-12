@@ -300,6 +300,8 @@ def checkStrOrByte(theInput):
 		''
 		>>> checkStrOrByte(b"")
 		''
+
+
 	"""
 	theOutput = None
 	if theInput is not None:  # pragma: no branch
@@ -313,7 +315,43 @@ def checkStrOrByte(theInput):
 
 
 def checkPythonCommand(args, stderr=None):
-	"""function for backend subprocess check_output command."""
+	"""
+	Execute a Python command and return its output.
+
+	This function is a wrapper around subprocess.check_output with additional
+	error handling and output processing. It's designed to execute Python
+	commands or coverage commands, making it useful for running tests and
+	collecting coverage data.
+
+	Args:
+		args (list): A list of command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+			Defaults to None.
+
+	Returns:
+		str: The command output as a string, with any byte output decoded to UTF-8.
+
+	Raises:
+		subprocess.CalledProcessError: If the command returns a non-zero exit status.
+
+	Example:
+		>>> checkPythonCommand(['python', '-c', 'print("Hello, World!")'])
+		'Hello, World!\\n'
+
+		>>> import subprocess
+		>>> checkPythonCommand(['python', '-c', 'import sys; print("Error", file=sys.stderr)'], stderr=subprocess.STDOUT)
+		'Error\\n'
+
+		>>> checkPythonCommand(['python', '-c', 'raise ValueError("Test error")'])
+		Traceback (most recent call last):
+		...
+		subprocess.CalledProcessError: Command '['python', '-c', 'raise ValueError("Test error")']' returned non-zero exit status 1.
+
+		>>> isinstance(checkPythonCommand(['python', '-c', 'print(b"Bytes output")'], stderr=subprocess.STDOUT), str)
+		True
+
+
+	"""
 	theOutput = None
 	try:
 		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
