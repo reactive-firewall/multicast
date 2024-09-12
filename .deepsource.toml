@@ -1,10 +1,10 @@
 version = 1
 
 test_patterns = [
-    "tests/check_**",
+    "tests/check_*",
     "tests/*.py",
     ".circleci/**",
-    ".github/workflows/*.yml"
+    ".github/workflows/*.yml",
     "testcases/**"
 ]
 
