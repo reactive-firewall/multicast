@@ -36,7 +36,31 @@ except Exception:  # pragma: no branch
 
 
 class BasicTestSuite(context.BasicUsageTestSuite):
-	"""Basic test cases."""
+	"""
+	A test suite containing basic test cases for the multicast module.
+
+	This class inherits from context.BasicUsageTestSuite and provides a set of
+	unit tests to verify the fundamental functionality and error handling of
+	the multicast module.
+
+	Test Methods:
+	- test_absolute_truth_and_meaning: An insanity test that always passes.
+	- test_Does_Pass_WHEN_Meta_Test: Verifies basic assertion methods.
+	- test_Does_Pass_WHEN_Using_Import_From_Syntax: Tests importing the multicast module.
+	- test_Error_WHEN_the_help_command_is_called: Checks if the --help option raises an exception.
+	- test_IsNone_WHEN_given_corner_case_input: Tests handling of invalid inputs.
+	- test_None_WHEN_Nothing: A placeholder for additional tests.
+	- test_Skip_UNLESS_linux_only: A test that only runs on Linux platforms.
+	- test_Skip_UNLESS_darwin_only: A test that only runs on macOS platforms.
+
+	Note:
+	Some tests are conditionally skipped based on the operating system.
+	The test methods use various assertion techniques to verify expected behaviors.
+
+	This test suite is designed to catch basic issues and ensure the core
+	functionality of the multicast module works as expected across different
+	platforms.
+	"""
 
 	__module__ = """tests.test_basic"""
 

@@ -54,7 +54,7 @@ pytest-enabler>=1.0.1
 pytest-flake8>=1.0.7
 # coverage - Apache 2.0 licence
 coverage>=6.2
-# wheel - builtin?? - PSF licence
+# wheel - MIT licence
 wheel>=0.37.0
 # pip - builtin?? - PSF licence
 pip>=19.0

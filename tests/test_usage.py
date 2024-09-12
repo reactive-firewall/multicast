@@ -73,7 +73,54 @@ except Exception:
 
 
 class MulticastTestSuite(context.BasicUsageTestSuite):
-	"""Special Multicast Usage test cases."""
+	"""
+	A test suite for special Multicast usage scenarios.
+
+	This test suite extends the BasicUsageTestSuite and focuses on testing various
+	aspects of the multicast functionality, including error handling, command-line
+	interface behavior, and basic send/receive operations.
+
+	Methods:
+	--------
+	test_aborts_WHEN_calling_multicast_GIVEN_invalid_tools():
+		Tests the behavior of the CLI tools when given invalid tool names.
+
+	test_say_is_stable_WHEN_calling_multicast_GIVEN_say_tool():
+		Verifies the stability of the 'SAY' command with various message arguments.
+
+	test_recv_aborts_WHEN_calling_multicast_GIVEN_invalid_args():
+		Checks if the 'RECV' command properly aborts when given invalid arguments.
+
+	test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_args():
+		Ensures the 'HEAR' command aborts correctly when provided with invalid arguments.
+
+	test_hear_is_stable_WHEN_calling_multicast_GIVEN_invalid_tool():
+		Tests the stability of the 'HEAR' command when given an invalid tool (--hex).
+
+	test_noop_stable_WHEN_calling_multicast_GIVEN_noop_args():
+		Verifies the stability of the 'NOOP' command.
+
+	test_help_works_WHEN_calling_multicast_GIVEN_help_tool():
+		Checks if the 'HELP' command functions correctly.
+
+	test_hear_works_WHEN_say_works():
+		Tests the basic send and receive functionality using 'SAY' and 'HEAR' commands.
+
+	test_recv_Errors_WHEN_say_not_used():
+		Verifies that 'RECV' command produces an error when 'SAY' is not used.
+
+	Notes:
+	------
+	- This test suite uses subprocess calls to test the multicast CLI interface.
+	- Some tests involve multiprocessing to simulate concurrent operations.
+	- Ensure proper network configuration for multicast tests to function correctly.
+
+	Warnings:
+	---------
+	- Some tests may require specific network conditions to pass successfully.
+	- Failure in these tests may indicate issues with the multicast implementation
+		or the testing environment rather than actual bugs in the code.
+	"""
 
 	__module__ = """tests.test_usage"""
 
@@ -331,7 +378,47 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 
 
 class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
-	"""Basic functional test cases."""
+	"""
+	A test suite for basic functional integration tests of the multicast module.
+
+	This class inherits from context.BasicUsageTestSuite and provides a set of
+	test cases to verify the functionality of the multicast module's command-line
+	interface and core features.
+
+	The suite includes tests for:
+	- Printing usage information when called with the help argument
+	- Verifying command-specific help output
+	- Comparing responses between absolute and implicit module calls
+	- Checking version information output
+	- Validating error handling for invalid inputs
+	- Profiling and stability checks for the NOOP command
+
+	Attributes:
+		_thepython (str): Path to the Python interpreter used for testing.
+
+	Methods:
+		setUp(): Prepares the test environment before each test method is run.
+		test_prints_usage_WHEN_called_GIVEN_help_argument(): Verifies help output.
+		test_prints_usage_WHEN_called_GIVEN_cmd_and_help_argument(): Checks command-specific help.
+		test_equivilant_response_WHEN_absolute_vs_implicit(): Compares module call methods.
+		test_prints_version_WHEN_called_GIVEN_version_argument(): Validates version output.
+		test_Usage_Error_WHEN_the_help_command_is_called(): Ensures correct help output.
+		test_profile_WHEN_the_noop_command_is_called(): Profiles the NOOP command.
+		test_stable_WHEN_the_noop_command_is_called(): Checks NOOP command stability.
+		test_invalid_Error_WHEN_cli_called_GIVEN_bad_input(): Verifies error handling.
+
+	Note:
+		This test suite relies on the context module for utility functions and
+		the subprocess module for executing Python commands. It uses various
+		assertion methods to validate the expected behavior of the multicast module.
+
+	Example:
+		To run this test suite, use the unittest module's test runner:
+
+		```
+		python -m unittest tests.test_usage.BasicIntegrationTestSuite
+		```
+	"""
 
 	__module__ = """tests.test_usage"""
 

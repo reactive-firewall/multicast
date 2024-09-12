@@ -247,7 +247,40 @@ def getPythonCommand():
 
 
 def checkCovCommand(args=[None]):
-	"""Utility Function."""
+	"""
+	Modifies the input command arguments to include coverage-related options when applicable.
+
+	This utility function checks if the first argument contains "coverage" and, if so,
+	modifies the argument list to include additional coverage run options. It's primarily
+	used internally by other functions in the testing framework.
+	Not intended to be run directly.
+
+	Args:
+		args (list): A list of command arguments, defaulting to [None].
+
+	Returns:
+		list: The modified list of arguments with 'coverage run' options added as applicable.
+
+	Examples:
+		>>> checkCovCommand(["python", "script.py"])
+		['python', 'script.py']
+
+		>>> checkCovCommand(["coverage", "script.py"])  # missing 'run'
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		
+		>>> checkCovCommand(["coverage run", "script.py"])  # NOT missing 'run'
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+
+		>>> import sys
+		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
+		>>> checkCovCommand(test_fixutre) #doctest: +ELLIPSIS
+		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
+
+
+	"""
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
 	if str("coverage") in args[0]:
@@ -271,7 +304,38 @@ def checkCovCommand(args=[None]):
 
 
 def checkStrOrByte(theInput):
-	"""Checks for bytes that need decoded before always returning a string."""
+	"""
+	Converts the input to a string if possible, otherwise returns it as bytes.
+
+	This utility function is designed to handle both string and byte inputs,
+	ensuring consistent output type. It attempts to decode byte inputs to UTF-8
+	strings, falling back to bytes if decoding fails.
+
+	Args:
+		theInput: The input to be checked and potentially converted.
+					Can be None, str, bytes, or any other type.
+
+	Returns:
+		str: If the input is already a string or can be decoded to UTF-8.
+		bytes: If the input is bytes and cannot be decoded to UTF-8.
+	None: If the input is None.
+
+	Examples:
+		>>> checkStrOrByte("Hello")
+		'Hello'
+		>>> checkStrOrByte(b"Hello")
+		'Hello'
+		>>> checkStrOrByte(b'\\xff\\xfe')  # Non-UTF-8 bytes
+		b'\xff\xfe'
+		>>> checkStrOrByte(None) is None
+		True
+		>>> checkStrOrByte("")
+		''
+		>>> checkStrOrByte(b"")
+		''
+
+
+	"""
 	theOutput = None
 	if theInput is not None:  # pragma: no branch
 		theOutput = theInput
@@ -284,7 +348,45 @@ def checkStrOrByte(theInput):
 
 
 def checkPythonCommand(args, stderr=None):
-	"""function for backend subprocess check_output command."""
+	"""
+	Execute a Python command and return its output.
+
+	This function is a wrapper around subprocess.check_output with additional
+	error handling and output processing. It's designed to execute Python
+	commands or coverage commands, making it useful for running tests and
+	collecting coverage data.
+
+	Args:
+		args (list): A list of command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+			Defaults to None.
+
+	Returns:
+		str: The command output as a string, with any byte output decoded to UTF-8.
+
+	Raises:
+		subprocess.CalledProcessError: If the command returns a non-zero exit status.
+
+	Examples:
+		>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
+		>>> checkPythonCommand(test_fixture_1)
+		'Hello, World!\\n'
+
+		>>> import subprocess
+		>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
+		>>> checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
+		'Error\\n'
+
+		>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
+		>>> checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
+		'Traceback (most recent call last):\\n...ValueError...'
+
+		>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
+		>>> isinstance(checkPythonCommand(test_fixture_s, stderr=subprocess.STDOUT), str)
+		True
+
+
+	"""
 	theOutput = None
 	try:
 		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch

@@ -1,9 +1,10 @@
 version = 1
 
 test_patterns = [
-    "tests/**,",
+    "tests/check_*",
     "tests/*.py",
     ".circleci/**",
+    ".github/workflows/*.yml",
     "testcases/**"
 ]
 
@@ -30,6 +31,7 @@ name = "python"
 enabled = true
 dependency_file_paths = [
   "requirements.txt",
+  "tests/requirements.txt",
   "setup.py"
 ]
 
