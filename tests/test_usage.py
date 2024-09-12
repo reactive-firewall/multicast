@@ -331,7 +331,47 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 
 
 class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
-	"""Basic functional test cases."""
+	"""
+	A test suite for basic functional integration tests of the multicast module.
+
+	This class inherits from context.BasicUsageTestSuite and provides a set of
+	test cases to verify the functionality of the multicast module's command-line
+	interface and core features.
+
+	The suite includes tests for:
+	- Printing usage information when called with the help argument
+	- Verifying command-specific help output
+	- Comparing responses between absolute and implicit module calls
+	- Checking version information output
+	- Validating error handling for invalid inputs
+	- Profiling and stability checks for the NOOP command
+
+	Attributes:
+		_thepython (str): Path to the Python interpreter used for testing.
+
+	Methods:
+		setUp(): Prepares the test environment before each test method is run.
+		test_prints_usage_WHEN_called_GIVEN_help_argument(): Verifies help output.
+		test_prints_usage_WHEN_called_GIVEN_cmd_and_help_argument(): Checks command-specific help.
+		test_equivilant_response_WHEN_absolute_vs_implicit(): Compares module call methods.
+		test_prints_version_WHEN_called_GIVEN_version_argument(): Validates version output.
+		test_Usage_Error_WHEN_the_help_command_is_called(): Ensures correct help output.
+		test_profile_WHEN_the_noop_command_is_called(): Profiles the NOOP command.
+		test_stable_WHEN_the_noop_command_is_called(): Checks NOOP command stability.
+		test_invalid_Error_WHEN_cli_called_GIVEN_bad_input(): Verifies error handling.
+
+	Note:
+		This test suite relies on the context module for utility functions and
+		the subprocess module for executing Python commands. It uses various
+		assertion methods to validate the expected behavior of the multicast module.
+
+	Example:
+		To run this test suite, use the unittest module's test runner:
+
+		```
+		python -m unittest tests.test_usage.BasicIntegrationTestSuite
+		```
+	"""
 
 	__module__ = """tests.test_usage"""
 
