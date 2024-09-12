@@ -271,7 +271,36 @@ def checkCovCommand(args=[None]):
 
 
 def checkStrOrByte(theInput):
-	"""Checks for bytes that need decoded before always returning a string."""
+	"""
+	Converts the input to a string if possible, otherwise returns it as bytes.
+
+	This utility function is designed to handle both string and byte inputs,
+	ensuring consistent output type. It attempts to decode byte inputs to UTF-8
+	strings, falling back to bytes if decoding fails.
+
+	Args:
+		theInput: The input to be checked and potentially converted.
+					Can be None, str, bytes, or any other type.
+
+	Returns:
+		str: If the input is already a string or can be decoded to UTF-8.
+		bytes: If the input is bytes and cannot be decoded to UTF-8.
+	None: If the input is None.
+
+	Examples:
+		>>> checkStrOrByte("Hello")
+		'Hello'
+		>>> checkStrOrByte(b"Hello")
+		'Hello'
+		>>> checkStrOrByte(b'\xff\xfe')  # Non-UTF-8 bytes
+		b'\xff\xfe'
+		>>> checkStrOrByte(None) is None
+		True
+		>>> checkStrOrByte("")
+		''
+		>>> checkStrOrByte(b"")
+		''
+	"""
 	theOutput = None
 	if theInput is not None:  # pragma: no branch
 		theOutput = theInput
