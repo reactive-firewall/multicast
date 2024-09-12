@@ -93,7 +93,7 @@ endif
 ifndef PIP_COMMON_FLAGS
 	# Define common pip install flags
 	PIP_COMMON_FLAGS := --use-pep517 --upgrade --upgrade-strategy eager
-endef
+endif
 
 # Define environment-specific pip install flags
 ifeq ($(shell uname),Darwin)
