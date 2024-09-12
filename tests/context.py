@@ -247,7 +247,35 @@ def getPythonCommand():
 
 
 def checkCovCommand(args=[None]):
-	"""Utility Function."""
+	"""
+	Modifies the input command arguments to include coverage-related options when applicable.
+
+	This utility function checks if the first argument contains "coverage" and, if so,
+	modifies the argument list to include additional coverage run options. It's primarily
+	used internally by other functions in the testing framework.
+
+	Args:
+		args (list): A list of command arguments, defaulting to [None].
+
+	Returns:
+		list: The modified list of arguments with coverage options added if applicable.
+
+	Examples:
+		>>> checkCovCommand(["python", "script.py"])
+		['python', 'script.py']
+
+		>>> checkCovCommand(["coverage", "run", "script.py"])
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		>>> checkCovCommand(["/usr/bin/coverage", "run", "test.py"])
+		['/usr/bin/coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+
+		>>> import sys
+		>>> checkCovCommand([f"{sys.executable} -m coverage", "run", "test.py"])
+		[sys.executable, '-m', 'coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+
+
+	"""
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
 	if str("coverage") in args[0]:
