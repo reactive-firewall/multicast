@@ -64,10 +64,10 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
-		from context import multicast as multicast
-		from context import unittest as unittest
-		from context import subprocess as subprocess
-		from context import Process as Process
+		from context import multicast as multicast  # skipcq: PYL-C0414
+		from context import unittest
+		from context import subprocess
+		from context import Process
 except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 

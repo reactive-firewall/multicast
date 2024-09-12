@@ -78,8 +78,8 @@ test -x "$(command -v shlock)" || exit 126 ;
 test -x $(command -v make) || exit 126 ;
 test -x $(command -v tee) || exit 126 ;
 
-LOG_FILE="test_log_${PPID}.log"
-ERR_FILE="test_log_errors_${PPID}.log"
+LOG_FILE="test_setup_log_${PPID}.log"
+ERR_FILE="test_setup_log_errors_${PPID}.log"
 
 function cleanup() {
 	rm -f ./${LOG_FILE} 2>/dev/null || : ;
@@ -99,52 +99,60 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		printf "%s\n" "Check Setup Scripts Tests Coverage already in progress by "`head ${LOCK_FILE}` ;
+		# shellcheck disable=SC2046
+		printf "\t%s\n" "Check Setup Scripts Tests Coverage already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 fi
 
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./multicast ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if [[ -d ../.git ]] ; then
+	_TEST_ROOT_DIR="../" ;
+elif [[ -d ./.git ]] ; then
+	_TEST_ROOT_DIR=$(pwd) ;
+elif [[ ( -d $(git rev-parse --show-toplevel 2>/dev/null) ) ]] ; then
+	_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
 else
-	printf "%s\n" "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2 ;
+	EXIT_CODE=40
 fi
 
-export COVERAGE_CMD="$(command -v python3) -m coverage run --include=setup.py -p"
+if [[ ( -x $(command -v python3) ) ]] ; then
+	export COVERAGE_CMD="$(command -v python3) -m coverage run --include=setup.py -p"
+elif [[ ( -x $(command -v coverage) ) ]] ; then
+	export COVERAGE_CMD="$(command -v coverage) run --include=setup.py -p"
+fi
 
-make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
-printf "%s\n" "Start of Log:" > ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "Start of Setup.py Test one-shot:" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
+make -C ${_TEST_ROOT_DIR} -j1 -f Makefile test-reports || EXIT_CODE=3 ;
+printf "%s\n" "Start of Log:" > ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
+printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
+printf "%s\n" "Start of Setup.py Test one-shot:" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
+printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 
-{ ${COVERAGE_CMD} ./setup.py --version 2>./${ERR_FILE} | grep --count -oE "^([0-9].){2}[0-9]$" 2>./${ERR_FILE} || echo "FAIL: Setup.py version check failed" 1>&2 ;} 2>./${ERR_FILE} >> ./${LOG_FILE} & true ;
-
-wait ;
-printf "%s\n" "End of Setup.py Test one-shot" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
-
-$(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
-$(command -v python3) -m coverage xml --include=setup.py,multicast -o ./test-reports/coverage_setup.xml || EXIT_CODE=2 ;
+{ ${COVERAGE_CMD} setup.py --name --version --license 2>${_TEST_ROOT_DIR}/${ERR_FILE} | grep --count -oE "^([0-9].){2}[0-9]$" 2>${_TEST_ROOT_DIR}/${ERR_FILE} || printf "%s\n" "FAIL: Setup.py version check failed" 1>&2 ;} 2>${_TEST_ROOT_DIR}/${ERR_FILE} >> ${_TEST_ROOT_DIR}/${LOG_FILE} & : ;
 
 wait ;
-cp -f ./${LOG_FILE} ./test-reports/legacy_setup_version_log.log 2>/dev/null ; wait ;
-printf "%s\n" "" | tee -a ./test-reports/legacy_setup_version_log.log ; wait ;
+printf "%s\n" "End of Setup.py Test one-shot" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
+printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 
-if [[ ( -r ./${ERR_FILE} ) ]] ; then
-	printf "%s\n" "Errors: " | tee -a ./test-reports/legacy_setup_version_log.log ; wait ;
-	cat <./${ERR_FILE} | tee -a ./test-reports/legacy_setup_version_log.log ; wait ;
+${COVERAGE_CMD} combine 2>${_TEST_ROOT_DIR}/${ERR_FILE} || EXIT_CODE=2 ;
+${COVERAGE_CMD} xml --include=setup.py,multicast -o ${_TEST_ROOT_DIR}/test-reports/coverage_setup.xml || EXIT_CODE=2 ;
+
+wait ;
+cp -f ./${LOG_FILE} ${_TEST_ROOT_DIR}/test-reports/legacy_setup_version_log.log 2>./${ERR_FILE} ; wait ;
+printf "%s\n" "" | tee -a ${_TEST_ROOT_DIR}/test-reports/legacy_setup_version_log.log ; wait ;
+
+if [[ ( -r ${_TEST_ROOT_DIR}/${ERR_FILE} ) ]] ; then
+	printf "%s\n" "Errors: " | tee -a ${_TEST_ROOT_DIR}/test-reports/legacy_setup_version_log.log ; wait ;
+	cat <${_TEST_ROOT_DIR}/${ERR_FILE} | tee -a ${_TEST_ROOT_DIR}/test-reports/legacy_setup_version_log.log ; wait ;
 fi
 
 unset COVERAGE_CMD 2>/dev/null || : ;
+unset _TEST_ROOT_DIR 2>/dev/null || : ;
 
-cleanup || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
+cleanup || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;

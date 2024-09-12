@@ -29,12 +29,20 @@
 # NO ASSOCIATION
 
 
+__module__ = """tests.profiling"""
+"""This is pythonrepo testing module Template."""
+
+
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
@@ -42,26 +50,50 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] OS Failed to import.")
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
+
+
+try:
+	if 'functools' not in sys.modules:
+		import functools
+	else:  # pragma: no branch
+		functools = sys.modules["""functools"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
 	import time
 	if time.__name__ is None:  # pragma: no branch
 		raise NotImplementedError("[CWE-440] We could not import time. Are we in the speed-force!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
-	import cProfile
-	if cProfile.__name__ is None:  # pragma: no branch
-		raise NotImplementedError("[CWE-440] We could not import cProfile. ABORT!")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
-	exit(3)
+	if 'cProfile' not in sys.modules:
+		import cProfile
+	else:  # pragma: no branch
+		cProfile = sys.modules["""cProfile"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
@@ -69,20 +101,18 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:  # pragma: no branch
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
-		ImportErr = None
-		del ImportErr
-		raise ImportError(str("[CWE-758] Profile module failed completely."))
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Failed to import test profiling")
+		raise ImportError(ImportErr, str("[CWE-758] Profile module failed completely."))
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 class timewith():
 	"""Basic timer for do_time_profile."""
+
 	def __init__(self, name=''):
 		self.name = name
 		self.start = time.time()
@@ -103,13 +133,12 @@ class timewith():
 	def __enter__(self):
 		return self
 
-	def __exit__(self, type, value, traceback):
+	def __exit__(self, type, value, traceback):  # skipcq: PYL-W0622
 		self.checkpoint(str("finished"))
-		pass
 
 
 def do_time_profile(func, timer_name="time_profile"):
-	"""Runs a function with a timer.
+	"""Run a function with a timer.
 
 	Time Testing:
 
@@ -136,12 +165,11 @@ def do_time_profile(func, timer_name="time_profile"):
 		work...took ... seconds
 		>>>
 
-	"""
-	import functools
 
+	"""
 	@functools.wraps(func)
 	def timer_profile_func(*args, **kwargs):
-		"""Wraps a function in timewith()"""
+		"""Wraps a function in timewith() function."""
 		theOutput = None
 		with timewith(timer_name) as timer:
 			timer.checkpoint(str("Start Timer"))
@@ -183,7 +211,9 @@ def do_cprofile(func):
 
 
 	"""
+	@functools.wraps(func)
 	def profiled_func(*args, **kwargs):
+		"""Wraps a function in profile.enable/disable() functions."""
 		profile = cProfile.Profile()
 		try:
 			profile.enable()

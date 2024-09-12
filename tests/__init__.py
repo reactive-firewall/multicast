@@ -33,6 +33,7 @@
 
 
 __module__ = """tests"""
+"""This is multicast testing module."""
 
 try:
 	import sys
@@ -86,7 +87,7 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)))
 	if 'tests' in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
-	from tests import profiling as profiling
+	from tests import profiling as profiling  # skipcq: PYL-C0414
 	from tests import test_basic
 	from tests import test_usage
 

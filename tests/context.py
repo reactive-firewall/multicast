@@ -73,7 +73,7 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'Process' not in sys.modules:
-		from multiprocessing import Process as Process
+		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		Process = sys.modules["""Process"""]
 except Exception:  # pragma: no branch
@@ -100,7 +100,7 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'tests.profiling' not in sys.modules:
-		import profiling as profiling
+		import tests.profiling as profiling
 	else:  # pragma: no branch
 		profiling = sys.modules["""tests.profiling"""]
 except Exception:  # pragma: no branch
