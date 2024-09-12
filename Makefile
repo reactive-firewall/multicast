@@ -90,6 +90,18 @@ else
 	endif
 endif
 
+ifndef PIP_COMMON_FLAGS
+	# Define common pip install flags
+	PIP_COMMON_FLAGS := --use-pep517 --upgrade --upgrade-strategy eager
+endef
+
+# Define environment-specific pip install flags
+ifeq ($(shell uname),Darwin)
+	PIP_ENV_FLAGS := --break-system-packages
+else
+	PIP_ENV_FLAGS :=
+endif
+
 ifeq "$(WAIT)" ""
 	WAIT=wait
 endif
@@ -135,28 +147,28 @@ build: init ./setup.py
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r requirements.txt 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager --break-system-packages -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 --no-input -y multicast 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 $(PIP_ENV_FLAGS) --no-input -y multicast 2>$(ERROR_LOG_PATH) || :
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
-	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./build/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./test-reports/junit.xml 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./build/ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./test-reports/junit.xml 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: cleanup
@@ -176,7 +188,7 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: test-reports init
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --upgrade --upgrade-strategy eager -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
 
 
 test-pytest: cleanup must_have_pytest test-reports
@@ -260,9 +272,9 @@ must_be_root:
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade --upgrade-strategy eager -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -m pip install --use-pep517 --user --upgrade -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
