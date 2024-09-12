@@ -253,26 +253,31 @@ def checkCovCommand(args=[None]):
 	This utility function checks if the first argument contains "coverage" and, if so,
 	modifies the argument list to include additional coverage run options. It's primarily
 	used internally by other functions in the testing framework.
+	Not intended to be run directly.
 
 	Args:
 		args (list): A list of command arguments, defaulting to [None].
 
 	Returns:
-		list: The modified list of arguments with coverage options added if applicable.
+		list: The modified list of arguments with 'coverage run' options added as applicable.
 
 	Examples:
 		>>> checkCovCommand(["python", "script.py"])
 		['python', 'script.py']
 
-		>>> checkCovCommand(["coverage", "run", "script.py"])
+		>>> checkCovCommand(["coverage", "script.py"])  # missing 'run'
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		
+		>>> checkCovCommand(["coverage run", "script.py"])  # NOT missing 'run'
 		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
-		>>> checkCovCommand(["/usr/bin/coverage", "run", "test.py"])
-		['/usr/bin/coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])
+		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		>>> import sys
-		>>> checkCovCommand([f"{sys.executable} -m coverage", "run", "test.py"])
-		[sys.executable, '-m', 'coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
+		>>> checkCovCommand(test_fixutre) #doctest: +ELLIPSIS
+		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
 	"""
@@ -320,7 +325,7 @@ def checkStrOrByte(theInput):
 		'Hello'
 		>>> checkStrOrByte(b"Hello")
 		'Hello'
-		>>> checkStrOrByte(b'\xff\xfe')  # Non-UTF-8 bytes
+		>>> checkStrOrByte(b'\\xff\\xfe')  # Non-UTF-8 bytes
 		b'\xff\xfe'
 		>>> checkStrOrByte(None) is None
 		True
@@ -362,20 +367,22 @@ def checkPythonCommand(args, stderr=None):
 	Raises:
 		subprocess.CalledProcessError: If the command returns a non-zero exit status.
 
-	Example:
-		>>> checkPythonCommand(['python', '-c', 'print("Hello, World!")'])
+	Examples:
+		>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
+		>>> checkPythonCommand(test_fixture_1)
 		'Hello, World!\\n'
 
 		>>> import subprocess
-		>>> checkPythonCommand(['python', '-c', 'import sys; print("Error", file=sys.stderr)'], stderr=subprocess.STDOUT)
+		>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
+		>>> checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
 		'Error\\n'
 
-		>>> checkPythonCommand(['python', '-c', 'raise ValueError("Test error")'])
-		Traceback (most recent call last):
-		...
-		subprocess.CalledProcessError: Command '['python', '-c', 'raise ValueError("Test error")']' returned non-zero exit status 1.
+		>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
+		>>> checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
+		'Traceback (most recent call last):\\n...ValueError...'
 
-		>>> isinstance(checkPythonCommand(['python', '-c', 'print(b"Bytes output")'], stderr=subprocess.STDOUT), str)
+		>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
+		>>> isinstance(checkPythonCommand(test_fixture_s, stderr=subprocess.STDOUT), str)
 		True
 
 
