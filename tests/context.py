@@ -389,7 +389,7 @@ def checkPythonCommand(args, stderr=None):
 	"""
 	theOutput = None
 	try:
-		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
+		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
@@ -416,7 +416,7 @@ def checkPythonFuzzing(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:  # pragma: no branch
+		if args is None or args == [None]:  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
