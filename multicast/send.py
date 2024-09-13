@@ -248,9 +248,36 @@ class McastSAY(multicast.mtool):
 				True
 				>>>
 
+			Testcase 2: setupArgs should return None untouched.
+				A: Test that the multicast component is initialized.
+				B: Test that the send component is initialized.
+				C: Test that the McastSAY.setupArgs() function is initialized.
+				D: Test that the McastSAY.setupArgs() function yields None.
+
+				>>> multicast.send is not None
+				True
+				>>> multicast.send.McastSAY is not None
+				True
+				>>> multicast.send.McastSAY.setupArgs is not None
+				True
+				>>> tst_fxtr_null_args = None
+				>>> test_fixture = multicast.send.McastSAY.setupArgs(tst_fxtr_null_args)
+				>>> test_fixture is not None
+				False
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...None...>
+				>>> tst_fxtr_null_args == test_fixture
+				True
+				>>> tst_fxtr_null_args is None
+				True
+				>>>
+				>>> test_fixture is None
+				True
+				>>>
+
 
 		"""
-		if parser is not None:
+		if parser is not None:  # pragma: no branch
 			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
 			parser.add_argument("""--group""", default=multicast._MCAST_DEFAULT_GROUP)
 			parser.add_argument(
@@ -258,7 +285,8 @@ class McastSAY(multicast.mtool):
 				default=str("""PING from {name}: group: {group}, port: {port}""")
 			)
 
-	def _sayStep(self, group, port, data):
+	@staticmethod
+	def _sayStep(group, port, data):
 		"""Will send the given data over the given port to the given group.
 
 		The actual magic is handeled here.
