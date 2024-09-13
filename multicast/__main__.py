@@ -59,7 +59,7 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__doc__""",
-	"""NoOp""", """McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""McastNope""", """McastNope.NoOp""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
 ]
 
 
@@ -152,39 +152,6 @@ except Exception as importErr:
 	import multicast.hear as hear
 
 
-def NoOp(*args, **kwargs):
-	"""Do Nothing.
-
-	The meaning of Nothing. This function should be self-explanitory;
-	it does 'no operation' i.e. nothing.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast.__main__
-		>>>
-
-	Testcase 0: multicast.__main__ should have a doctests.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.__module__ is not None
-		True
-		>>>
-
-	Testcase 1: multicast.NoOp should return None.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.NoOp() is None
-		True
-		>>> multicast.__main__.NoOp() is not None
-		False
-		>>>
-
-	"""
-	return None  # noqa
-
-
 class McastNope(mtool):
 	"""
 		The trivial implementation of mtool.
@@ -252,8 +219,44 @@ class McastNope(mtool):
 	def setupArgs(cls, parser):
 		pass
 
+	@staticmethod
+	def NoOp(*args, **kwargs):
+		"""Do Nothing.
+
+		The meaning of Nothing. This function should be self-explanitory;
+		it does 'no operation' i.e. nothing.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast.__main__
+			>>>
+
+		Testcase 0: multicast.__main__ should have a McastNope class.
+
+			>>> import multicast.__main__
+			>>> multicast.__main__.McastNope is not None
+			True
+			>>>
+
+		Testcase 1: multicast.NoOp should return None.
+
+			>>> import multicast.__main__
+			>>> multicast.__main__.McastNope.NoOp() is None
+			True
+			>>> multicast.__main__.McastNope.NoOp() is not None
+			False
+			>>>
+			>>> multicast.__main__.McastNope.NoOp("Junk")
+			None
+			>>>
+
+		"""
+		return None  # noqa
+
 	def doStep(self, *args, **kwargs):
-		return NoOp(*args, **kwargs)
+		return self.NoOp(*args, **kwargs)
 
 
 class McastRecvHearDispatch(mtool):
@@ -376,8 +379,36 @@ class McastRecvHearDispatch(mtool):
 				>>> multicast.__main__.McastRecvHearDispatch.setupArgs(parser=tst_fxtr_args)
 				>>>
 
+			Testcase 3: setupArgs should return None untouched.
+				A: Test that the multicast component is initialized.
+				B: Test that the __main__ component is initialized.
+				C: Test that the McastRecvHearDispatch class is initialized.
+				D: Test that the McastRecvHearDispatch.setupArgs() function yields None.
+
+				>>> multicast.__main__ is not None
+				True
+				>>> multicast.__main__.McastRecvHearDispatch is not None
+				True
+				>>> multicast.__main__.McastRecvHearDispatch.setupArgs is not None
+				True
+				>>> tst_fxtr_N = None
+				>>> test_fixture = multicast.__main__.McastRecvHearDispatch.setupArgs(tst_fxtr_N)
+				>>> test_fixture is not None
+				False
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...None...>
+				>>> tst_fxtr_N == test_fixture
+				True
+				>>> tst_fxtr_N is None
+				True
+				>>>
+				>>> test_fixture is None
+				True
+				>>>
+
+
 		"""
-		if parser is not None:
+		if parser is not None:  # pragma: no branch
 			parser.add_argument("""--port""", type=int, default=_MCAST_DEFAULT_PORT)
 			__tmp_help = """local interface to use for listening to multicast data; """
 			__tmp_help += """if unspecified, any one interface may be chosen."""
@@ -400,8 +431,9 @@ class McastRecvHearDispatch(mtool):
 				help="""multicast groups (ip addrs) to listen to join."""
 			)
 
-	def _help_deamon_dispatch(self, *args, **kwargs):
-		_useHear = False if "is_deamon" not in kwargs else kwargs["is_deamon"]
+	@staticmethod
+	def _help_deamon_dispatch(*args, **kwargs):
+		_useHear = kwargs.get("is_deamon", False)
 		return _useHear
 
 	def doStep(self, *args, **kwargs):
@@ -441,7 +473,8 @@ class McastDispatch(mtool):
 				sub_parser = parser.add_parser(sub_tool, help="...")
 				type(TASK_OPTIONS[sub_tool]).setupArgs(sub_parser)
 
-	def useTool(self, tool, **kwargs):
+	@staticmethod
+	def useTool(tool, **kwargs):
 		"""Will Handle launching the actual task functions."""
 		theResult = None
 		cached_list = sorted(TASK_OPTIONS.keys())

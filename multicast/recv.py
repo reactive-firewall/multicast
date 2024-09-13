@@ -463,7 +463,8 @@ class McastRECV(multicast.mtool):
 				help="""multicast groups (ip addrs) to listen to join."""
 			)
 
-	def _hearstep(self, groups, port, iface=None, bind_group=None):
+	@staticmethod
+	def _hearstep(groups, port, iface=None, bind_group=None):
 		"""Will listen on the given port of an interface for multicast messages to the given group(s).
 
 		The work-horse function.
@@ -492,7 +493,7 @@ class McastRECV(multicast.mtool):
 			>>> type(test_RCEV) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			<class ...McastRECV...>
 			>>> type(test_RCEV._hearstep)
-			<class 'method'>
+			<class 'function'>
 			>>> test_RCEV._hearstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			'...'
 			>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP

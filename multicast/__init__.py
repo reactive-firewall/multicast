@@ -25,7 +25,7 @@ __all__ = [
 	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
 	"""_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
-	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""", """hear.McastHEAR""",
+	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""",
 ]
 
 __package__ = """multicast"""  # skipcq: PYL-W0622

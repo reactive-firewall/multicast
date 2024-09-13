@@ -84,7 +84,7 @@ import socket
 import random
 
 
-class MCastClient(object):
+class MCastClient(object):  # skipcq: PYL-R0205
 	"""For use as a test fixture. A trivial implementation of a socket-based object with a function
 	named say. The say function of this class performs a send and recv on a given socket and
 	then prints out simple diognostics about the content sent and any response recived.
