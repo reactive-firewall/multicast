@@ -63,10 +63,10 @@ __all__ = [
 ]
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 
 
-__module__ = """multicast.__main__"""
+__module__ = """multicast.__main__"""  # skipcq: PYL-W0622
 
 
 __file__ = """multicast/__main__.py"""
@@ -462,7 +462,7 @@ class McastDispatch(mtool):
 		__EXIT_MSG = (1, "Unknown")
 		try:
 			try:
-				(argz, extra) = type(self).parseArgs(*args)
+				(argz, _) = type(self).parseArgs(*args)
 				service_cmd = argz.cmd_tool
 				argz.__dict__.__delitem__("""cmd_tool""")
 				_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))

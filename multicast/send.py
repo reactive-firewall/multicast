@@ -66,7 +66,7 @@ Minimal Acceptance Testing:
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -272,7 +272,7 @@ class McastSAY(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		return self._sayStep(
-			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),
+			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
 			None if "data" not in kwargs else str(kwargs["data"]),
 		)

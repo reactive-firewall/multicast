@@ -103,7 +103,7 @@
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -152,7 +152,7 @@ __file__ = """multicast/recv.py"""
 """The file of this component."""
 
 
-__name__ = """multicast.recv"""
+__name__ = """multicast.recv"""  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:

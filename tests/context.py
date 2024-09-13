@@ -19,7 +19,7 @@
 
 __module__ = """tests"""
 
-__name__ = """tests.context"""
+__name__ = """tests.context"""  # skipcq: PYL-W0622
 
 __doc__ = """
 	Context for Testing.

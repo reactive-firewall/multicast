@@ -90,7 +90,7 @@
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """Names the package of this program.
 
 	Minimal Acceptance Testing:
@@ -139,7 +139,7 @@ __file__ = """multicast/hear.py"""
 """Names the file of this component."""
 
 
-__name__ = """multicast.hear"""
+__name__ = """multicast.hear"""  # skipcq: PYL-W0622
 """Names this component.
 
 	Minimal Acceptance Testing:
