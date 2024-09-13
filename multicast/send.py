@@ -138,7 +138,7 @@ __name__ = """multicast.send"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
+		from . import multicast as multicast  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
@@ -148,10 +148,10 @@ except Exception as importErr:
 
 
 try:
-	from multicast import argparse as argparse
-	from multicast import unicodedata as unicodedata
-	from multicast import socket as socket
-	from multicast import struct as struct
+	from multicast import argparse as argparse  # skipcq: PYL-C0414
+	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
+	from multicast import socket as socket  # skipcq: PYL-C0414
+	from multicast import struct as struct  # skipcq: PYL-C0414
 	depends = [
 		unicodedata, socket, struct, argparse
 	]

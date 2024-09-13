@@ -76,7 +76,7 @@ __file__ = """multicast/__main__.py"""
 
 
 try:
-	from . import sys as sys
+	from . import sys as sys  # skipcq: PYL-C0414
 except Exception:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python"))
@@ -84,7 +84,7 @@ except Exception:
 
 try:
 	if 'multicast.__version__' not in sys.modules:
-		from . import __version__ as __version__
+		from . import __version__ as __version__  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		__version__ = sys.modules["""multicast.__version__"""]
 except Exception as importErr:
@@ -94,7 +94,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
-		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT
+		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 except Exception as importErr:
@@ -104,7 +104,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
-		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP
+		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 except Exception as importErr:
@@ -114,7 +114,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.mtool' not in sys.modules:
-		from . import mtool as mtool
+		from . import mtool as mtool  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		mtool = sys.modules["""multicast.mtool"""]
 except Exception as importErr:
@@ -124,7 +124,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.recv' not in sys.modules:
-		from . import recv as recv
+		from . import recv as recv  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		recv = sys.modules["""multicast.recv"""]
 except Exception as importErr:
@@ -134,7 +134,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.send' not in sys.modules:
-		from . import send as send
+		from . import send as send  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
@@ -144,7 +144,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.hear' not in sys.modules:
-		from . import hear as hear
+		from . import hear as hear  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		hear = sys.modules["""multicast.hear"""]
 except Exception as importErr:
