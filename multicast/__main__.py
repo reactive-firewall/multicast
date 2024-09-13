@@ -59,7 +59,7 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__doc__""",
-	"""McastNope""", """McastNope.NoOp""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
 ]
 
 
