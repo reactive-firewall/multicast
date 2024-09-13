@@ -80,7 +80,7 @@ Testcase 2: SKT utils should be detailed with some metadata.
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -129,7 +129,7 @@ __file__ = """multicast/skt.py"""
 """The file of this component."""
 
 
-__name__ = """multicast.skt"""
+__name__ = """multicast.skt"""  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -151,9 +151,9 @@ __name__ = """multicast.skt"""
 
 
 try:
-	from . import socket as _socket
+	from . import socket as _socket  # skipcq: PYL-C0414
 	from . import struct as _struct  # noqa
-	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL
+	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL  # skipcq: PYL-C0414
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__

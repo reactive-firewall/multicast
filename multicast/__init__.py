@@ -25,10 +25,10 @@ __all__ = [
 	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
 	"""_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
-	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""", """hear.McastHEAR""",
+	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""",
 ]
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -62,7 +62,7 @@ __module__ = """multicast"""
 """
 
 
-__name__ = """multicast"""
+__name__ = """multicast"""  # skipcq: PYL-W0622
 """The name of this program.
 
 	Minimal Acceptance Testing:
@@ -79,7 +79,7 @@ __name__ = """multicast"""
 """
 
 
-global __version__
+global __version__  # skipcq: PYL-W0604
 
 __version__ = """1.5-rc"""
 """The version of this program.
@@ -153,7 +153,7 @@ __doc__ = __prologue__ + """
 """
 
 
-global _MCAST_DEFAULT_PORT  # noqa
+global _MCAST_DEFAULT_PORT  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_PORT = 59259
 """
@@ -199,7 +199,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 """
 
-global _MCAST_DEFAULT_GROUP  # noqa
+global _MCAST_DEFAULT_GROUP  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """Arbitrary group to use by default, though any mcst grp would work.
@@ -228,7 +228,7 @@ _MCAST_DEFAULT_GROUP = """224.0.0.1"""
 """
 
 
-global _MCAST_DEFAULT_TTL  # noqa
+global _MCAST_DEFAULT_TTL  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_TTL = int(1)
 """Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
@@ -262,7 +262,7 @@ _MCAST_DEFAULT_TTL = int(1)
 """
 
 
-global _BLANK  # noqa
+global _BLANK  # skipcq: PYL-W0604
 
 _BLANK = str("""""")
 """Arbitrary blank string.

@@ -90,7 +90,7 @@
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """Names the package of this program.
 
 	Minimal Acceptance Testing:
@@ -139,7 +139,7 @@ __file__ = """multicast/hear.py"""
 """Names the file of this component."""
 
 
-__name__ = """multicast.hear"""
+__name__ = """multicast.hear"""  # skipcq: PYL-W0622
 """Names this component.
 
 	Minimal Acceptance Testing:
@@ -162,24 +162,24 @@ __name__ = """multicast.hear"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
+		from . import multicast as multicast  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
-	from . import recv as recv
-	from . import send as send
+	from . import recv as recv  # skipcq: PYL-C0414
+	from . import send as send  # skipcq: PYL-C0414
 except Exception as importErr:
 	del importErr
-	import multicast as multicast
+	import multicast as multicast  # skipcq: PYL-C0414
 
 
 try:
 	import socketserver
-	from socketserver import threading as threading
-	from multicast import argparse as argparse
-	from multicast import unicodedata as unicodedata
-	from multicast import socket as socket
-	from multicast import struct as struct
+	from socketserver import threading as threading  # skipcq: PYL-C0414
+	from multicast import argparse as argparse  # skipcq: PYL-C0414
+	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
+	from multicast import socket as socket  # skipcq: PYL-C0414
+	from multicast import struct as struct  # skipcq: PYL-C0414
 	depends = [
 		unicodedata, socket, struct, argparse
 	]
@@ -382,7 +382,7 @@ class McastHEAR(multicast.mtool):
 		pass
 
 	def doStep(self, *args, **kwargs):
-		#  _is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
+		#  _is_std = False if "is_std" not in kwargs else kwargs["is_std"]
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
 		with McastServer((HOST, PORT), HearUDPHandler) as server:

@@ -66,7 +66,7 @@ Minimal Acceptance Testing:
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -138,7 +138,7 @@ __name__ = """multicast.send"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
+		from . import multicast as multicast  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
@@ -148,10 +148,10 @@ except Exception as importErr:
 
 
 try:
-	from multicast import argparse as argparse
-	from multicast import unicodedata as unicodedata
-	from multicast import socket as socket
-	from multicast import struct as struct
+	from multicast import argparse as argparse  # skipcq: PYL-C0414
+	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
+	from multicast import socket as socket  # skipcq: PYL-C0414
+	from multicast import struct as struct  # skipcq: PYL-C0414
 	depends = [
 		unicodedata, socket, struct, argparse
 	]
@@ -248,9 +248,36 @@ class McastSAY(multicast.mtool):
 				True
 				>>>
 
+			Testcase 2: setupArgs should return None untouched.
+				A: Test that the multicast component is initialized.
+				B: Test that the send component is initialized.
+				C: Test that the McastSAY.setupArgs() function is initialized.
+				D: Test that the McastSAY.setupArgs() function yields None.
+
+				>>> multicast.send is not None
+				True
+				>>> multicast.send.McastSAY is not None
+				True
+				>>> multicast.send.McastSAY.setupArgs is not None
+				True
+				>>> tst_fxtr_null_args = None
+				>>> test_fixture = multicast.send.McastSAY.setupArgs(tst_fxtr_null_args)
+				>>> test_fixture is not None
+				False
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...None...>
+				>>> tst_fxtr_null_args == test_fixture
+				True
+				>>> tst_fxtr_null_args is None
+				True
+				>>>
+				>>> test_fixture is None
+				True
+				>>>
+
 
 		"""
-		if parser is not None:
+		if parser is not None:  # pragma: no branch
 			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
 			parser.add_argument("""--group""", default=multicast._MCAST_DEFAULT_GROUP)
 			parser.add_argument(
@@ -258,7 +285,8 @@ class McastSAY(multicast.mtool):
 				default=str("""PING from {name}: group: {group}, port: {port}""")
 			)
 
-	def _sayStep(self, group, port, data):
+	@staticmethod
+	def _sayStep(group, port, data):
 		"""Will send the given data over the given port to the given group.
 
 		The actual magic is handeled here.
@@ -272,8 +300,8 @@ class McastSAY(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		return self._sayStep(
-			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
-			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
-			None if "data" not in kwargs.keys() else str(kwargs["data"]),
+			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
+			None if "data" not in kwargs else str(kwargs["data"]),
 		)
 
