@@ -30,7 +30,7 @@ setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
 virtualenv>=15.0.1
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
-# tox - ??? licence
+# tox - MIT licence
 tox>=3.0.0, !=3.16.1
 #py>=1.4.33
 ###
