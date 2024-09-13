@@ -36,7 +36,7 @@ tox>=3.0.0, !=3.16.1
 ###
 # TESTING ONLY - Do NOT report issues with these optionals on python-repo
 ###
-# flake8 - ??? licence
+# flake8 - MIT licence
 flake8>=3.9.2
 # pyflakes - ??? licence
 # pyflakes>=2.5.0
