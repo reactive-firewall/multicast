@@ -17,6 +17,7 @@
 # time - builtin - PSF licence
 # re - builtin - PSF licence?
 # subprocess - PSF licence
+# sphinx - BSD license
 # sphinx
 # argparse - builtin - PSF licence
 # socket - builtin - PSF licence
