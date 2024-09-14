@@ -267,7 +267,7 @@ def checkCovCommand(args=[None]):
 
 		>>> checkCovCommand(["coverage", "script.py"])  # missing 'run'
 		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
-		
+
 		>>> checkCovCommand(["coverage run", "script.py"])  # NOT missing 'run'
 		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
