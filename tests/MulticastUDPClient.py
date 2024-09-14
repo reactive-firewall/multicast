@@ -126,9 +126,69 @@ class MCastClient(object):  # skipcq: PYL-R0205
 	"""
 
 	_group_addr = None
+	"""The multicast group address."""
+
 	_source_port = None
+	"""The source port for the client."""
 
 	def __init__(self, *args, **kwargs):
+		"""Initialize a MCastClient object with optional group address and source port.
+
+		The client can be initialized with or without specifying a group address and source port.
+		If no source port is provided, a random port between 50000 and 59999 is generated.
+
+		Args:
+			*args: Variable length argument list (Unused).
+			**kwargs: Arbitrary keyword arguments.
+				- grp_addr (str): The multicast group address.
+				- src_port (int): The source port for the client.
+
+		Meta Testing:
+
+			First setup test fixtures by importing test context.
+
+				>>> import tests.MulticastUDPClient as MulticastUDPClient
+				>>> from MulticastUDPClient import MCastClient as MCastClient
+				>>>
+
+			Testcase 1: Initialization without any arguments.
+
+				>>> client = MCastClient()
+				>>> 50000 <= client._source_port <= 59999
+				True
+				>>> client._group_addr is None
+				True
+				>>>
+
+			Testcase 2: Initialization with only group address.
+
+				>>> client = MCastClient(grp_addr="224.0.0.1")
+				>>> client._group_addr
+				'224.0.0.1'
+				>>> 50000 <= client._source_port <= 59999
+				True
+				>>>
+
+			Testcase 3: Initialization with only source port.
+
+				>>> client = MCastClient(src_port=55555)
+				>>> client._source_port
+				55555
+				>>> client._group_addr is None
+				True
+				>>>
+
+			Testcase 4: Initialization with both group address and source port.
+
+				>>> client = MCastClient(grp_addr="224.0.0.2", src_port=55556)
+				>>> client._group_addr
+				'224.0.0.2'
+				>>> client._source_port
+				55556
+				>>>
+
+
+		"""
 		if str("""grp_addr""") in kwargs:
 			self._group_addr = kwargs.grp_addr
 		if str("""src_port""") in kwargs:
@@ -146,7 +206,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			)
 
 	def say(self, address, port, conn, msg):
-		""" Send a message to a specified multicast address and port,
+		"""Send a message to a specified multicast address and port,
 		then receive and print the response.
 
 		This function sends a UTF-8 encoded message to the specified multicast address and port
