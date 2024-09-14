@@ -21,22 +21,18 @@ jobs:
       - run:
           name: "fetch and pull"
           command: |
-            git fetch && git pull --all || true
+            git fetch && git pull --all || : ;
       - run:
           shell: /bin/bash
           name: "install depends attempt"
           command: |
-            python3 -m pip install --user -r ./requirements.txt || true
+            python3 -m pip install --user -r ./requirements.txt || : ;
           when: on_success
       - run:
           shell: /bin/bash
-          name: "install coverage attempt"
+          name: "install test depends attempt"
           command: |
-            python3 -m pip install --upgrade --user coverage || true
-      - run:
-          name: "install flake8 attempt"
-          command: |
-            python3 -m pip install --upgrade --user flake8 || true
+            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
           when: on_success
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -67,14 +63,8 @@ jobs:
           shell: /bin/bash
           name: "Installing deps for test"
           command: |
-            python3 -m pip install --user coverage || true
+            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
           when: on_success
-      - run:
-          shell: /bin/bash
-          name: "Installing newer deps"
-          command: |
-            python3 -m pip install --upgrade --user coverage3 || true
-          when: on_fail
       - run:
           shell: /bin/bash
           name: "clean up for test"
@@ -119,27 +109,15 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
-          name: "setup for doctest"
+          name: "setup depends"
           command: |
-            python3 -m pip install --upgrade --user doctest || true
+            python3 -m pip install --upgrade --user -r ./requirements.txt || : ;
           when: on_success
       - run:
           shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --upgrade --user coverage || true
-          when: on_success
-      - run:
-          shell: /bin/bash
-          name: "setup up for pytest"
-          command: |
-            python3 -m pip install --user pytest || true
-          when: on_success
-      - run:
-          shell: /bin/bash
-          name: "setup up for pytest"
-          command: |
-            python3 -m pip install --user pytest-cov || true
+            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
           when: on_success
       - run:
           shell: /bin/bash
@@ -187,9 +165,13 @@ jobs:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: "install flake8 attempt"
+          name: "install reqs attempt"
           command: |
-            python3 -m pip install --user flake8 || true
+            python3 -m pip install --user -r ./requirements.txt || : ;
+      - run:
+          name: "install test-reqs attempt"
+          command: |
+            python3 -m pip install --user -r ./tests/requirements.txt || : ;
       - run:
           shell: /bin/bash
           name: "clean up for test"
