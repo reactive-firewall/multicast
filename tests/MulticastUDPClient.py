@@ -162,6 +162,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 			Testcase 2: Initialization with only group address.
 
+				>>> tst_args = {}
 				>>> client = MCastClient(grp_addr="224.0.0.1")
 				>>> client._group_addr
 				'224.0.0.1'
@@ -190,9 +191,9 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		if str("""grp_addr""") in kwargs:
-			self._group_addr = kwargs.grp_addr
+			self._group_addr = kwargs.get("""grp_addr""", None)
 		if str("""src_port""") in kwargs:
-			self._source_port = kwargs.src_port
+			self._source_port = kwargs.get("""src_port""", 0)
 		else:
 			self._source_port = int(
 				50000 + (
