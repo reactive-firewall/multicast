@@ -265,11 +265,11 @@ def checkCovCommand(args=[None]):
 		>>> checkCovCommand(["python", "script.py"])
 		['python', 'script.py']
 
-		>>> checkCovCommand(["coverage", "script.py"])  # missing 'run'
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS  # missing 'run'
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
-		>>> checkCovCommand(["coverage run", "script.py"])  # NOT missing 'run'
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS  # NOT missing 'run'
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])
 		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
