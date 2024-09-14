@@ -14,50 +14,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #python
-# time - builtin - PSF licence
-# re - builtin - PSF licence?
-# subprocess - PSF licence
+# time - builtin - PSF license
+# re - builtin - PSF license?
+# subprocess - PSF license
 # sphinx - BSD license
 # sphinx
-# argparse - builtin - PSF licence
-# socket - builtin - PSF licence
-# struct - builtin - PSF licence
-# argparse - builtin - PSF licence
+# argparse - builtin - PSF license
+# socket - builtin - PSF license
+# struct - builtin - PSF license
+# argparse - builtin - PSF license
 # argparse>=1.4.0
-# argparse - builtin - PSF licence 3.7 = 62.6.0
+# argparse - builtin - PSF license 3.7 = 62.6.0
 # setuptools - MIT license
 setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
-# virtualenv - MIT
+# virtualenv - MIT license
 virtualenv>=15.0.1
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
-# tox - MIT licence
+# tox - MIT license
 tox>=3.0.0, !=3.16.1
 #py>=1.4.33
 ###
-# TESTING ONLY - Do NOT report issues with these optionals on python-repo
+# TESTING ONLY - Do NOT report issues with these optionals on multicast
 ###
-# flake8 - MIT licence
+# flake8 - MIT license
 flake8>=3.9.2
-# pyflakes - MIT licence
+# pyflakes - MIT license
 # pyflakes>=2.5.0
-# pep8 - MIT licence
+# pep8 - MIT license
 pep8>=1.0
-# pytest - MIT licence
+# pytest - MIT license
 pytest>=7.0, !=8.1.0
-# pytest-checkdocs - MIT licence
+# pytest-checkdocs - MIT license
 pytest-checkdocs>=1.2.5
-# pytest-cov - MIT licence
+# pytest-cov - MIT license
 pytest-cov>=3.0.0
-# pytest-enabler - MIT licence
+# pytest-enabler - MIT license
 pytest-enabler>=1.0.1
-# pytest-flake8 - BSD licence
+# pytest-flake8 - BSD license
 pytest-flake8>=1.0.7
-# coverage - Apache 2.0 licence
+# coverage - Apache 2.0 license
 coverage>=6.2
-# wheel - MIT licence
+# wheel - MIT license
 wheel>=0.37.0
-# pip - MIT licence
+# pip - MIT license
 pip>=19.0
-# build - MIT licence
+# build - MIT license
 # build>=0.5.1, !=1.0.3, !=0.6, !=0.6.1 !=1.1.0 !=1.2.0
