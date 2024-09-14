@@ -44,7 +44,7 @@ flake8>=3.9.2
 pep8>=1.0
 # pytest - MIT licence
 pytest>=7.0, !=8.1.0
-# pytest-checkdocs - ??? licence
+# pytest-checkdocs - MIT licence
 pytest-checkdocs>=1.2.5
 # pytest-cov - ??? licence
 pytest-cov>=3.0.0
