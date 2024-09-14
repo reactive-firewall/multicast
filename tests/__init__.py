@@ -89,10 +89,11 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
 	from tests import profiling as profiling  # skipcq: PYL-C0414
 	from tests import test_basic
+	from tests import test_deps
 	from tests import test_usage
 
 	depends = [
-		profiling, test_basic, test_usage
+		profiling, test_basic, test_deps, test_usage
 	]
 	for unit_test in depends:
 		try:

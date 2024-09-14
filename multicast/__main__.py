@@ -59,14 +59,14 @@
 
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__doc__""",
-	"""NoOp""", """McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
 ]
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 
 
-__module__ = """multicast.__main__"""
+__module__ = """multicast.__main__"""  # skipcq: PYL-W0622
 
 
 __file__ = """multicast/__main__.py"""
@@ -76,7 +76,7 @@ __file__ = """multicast/__main__.py"""
 
 
 try:
-	from . import sys as sys
+	from . import sys as sys  # skipcq: PYL-C0414
 except Exception:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python"))
@@ -84,7 +84,7 @@ except Exception:
 
 try:
 	if 'multicast.__version__' not in sys.modules:
-		from . import __version__ as __version__
+		from . import __version__ as __version__  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		__version__ = sys.modules["""multicast.__version__"""]
 except Exception as importErr:
@@ -94,7 +94,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
-		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT
+		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 except Exception as importErr:
@@ -104,7 +104,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
-		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP
+		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 except Exception as importErr:
@@ -114,7 +114,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.mtool' not in sys.modules:
-		from . import mtool as mtool
+		from . import mtool as mtool  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		mtool = sys.modules["""multicast.mtool"""]
 except Exception as importErr:
@@ -124,7 +124,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.recv' not in sys.modules:
-		from . import recv as recv
+		from . import recv as recv  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		recv = sys.modules["""multicast.recv"""]
 except Exception as importErr:
@@ -134,7 +134,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.send' not in sys.modules:
-		from . import send as send
+		from . import send as send  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
@@ -144,7 +144,7 @@ except Exception as importErr:
 
 try:
 	if 'multicast.hear' not in sys.modules:
-		from . import hear as hear
+		from . import hear as hear  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		hear = sys.modules["""multicast.hear"""]
 except Exception as importErr:
@@ -152,41 +152,9 @@ except Exception as importErr:
 	import multicast.hear as hear
 
 
-def NoOp(*args, **kwargs):
-	"""Do Nothing.
-
-	The meaning of Nothing. This function should be self-explanitory;
-	it does 'no operation' i.e. nothing.
-
-	Minimal Acceptance Testing:
-
-	First setup test fixtures by importing multicast.
-
-		>>> import multicast.__main__
-		>>>
-
-	Testcase 0: multicast.__main__ should have a doctests.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.__module__ is not None
-		True
-		>>>
-
-	Testcase 1: multicast.NoOp should return None.
-
-		>>> import multicast.__main__
-		>>> multicast.__main__.NoOp() is None
-		True
-		>>> multicast.__main__.NoOp() is not None
-		False
-		>>>
-
-	"""
-	return None  # noqa
-
-
 class McastNope(mtool):
 	"""
+		The trivial implementation of mtool.
 
 		Testing:
 
@@ -251,8 +219,44 @@ class McastNope(mtool):
 	def setupArgs(cls, parser):
 		pass
 
+	@staticmethod
+	def NoOp(*args, **kwargs):
+		"""Do Nothing.
+
+		The meaning of Nothing. This function should be self-explanitory;
+		it does 'no operation' i.e. nothing.
+
+		Minimal Acceptance Testing:
+
+		First setup test fixtures by importing multicast.
+
+			>>> import multicast.__main__
+			>>>
+
+		Testcase 0: multicast.__main__ should have a McastNope class.
+
+			>>> import multicast.__main__
+			>>> multicast.__main__.McastNope is not None
+			True
+			>>>
+
+		Testcase 1: multicast.NoOp should return None.
+
+			>>> import multicast.__main__
+			>>> multicast.__main__.McastNope.NoOp() is None
+			True
+			>>> multicast.__main__.McastNope.NoOp() is not None
+			False
+			>>>
+			>>> multicast.__main__.McastNope.NoOp("Junk")
+			None
+			>>>
+
+		"""
+		return None  # noqa
+
 	def doStep(self, *args, **kwargs):
-		return NoOp(*args, **kwargs)
+		return self.NoOp(*args, **kwargs)
 
 
 class McastRecvHearDispatch(mtool):
@@ -326,7 +330,7 @@ class McastRecvHearDispatch(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""Will attempt to add send args.
 
 			Testing:
 
@@ -375,8 +379,36 @@ class McastRecvHearDispatch(mtool):
 				>>> multicast.__main__.McastRecvHearDispatch.setupArgs(parser=tst_fxtr_args)
 				>>>
 
+			Testcase 3: setupArgs should return None untouched.
+				A: Test that the multicast component is initialized.
+				B: Test that the __main__ component is initialized.
+				C: Test that the McastRecvHearDispatch class is initialized.
+				D: Test that the McastRecvHearDispatch.setupArgs() function yields None.
+
+				>>> multicast.__main__ is not None
+				True
+				>>> multicast.__main__.McastRecvHearDispatch is not None
+				True
+				>>> multicast.__main__.McastRecvHearDispatch.setupArgs is not None
+				True
+				>>> tst_fxtr_N = None
+				>>> test_fixture = multicast.__main__.McastRecvHearDispatch.setupArgs(tst_fxtr_N)
+				>>> test_fixture is not None
+				False
+				>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+				<...None...>
+				>>> tst_fxtr_N == test_fixture
+				True
+				>>> tst_fxtr_N is None
+				True
+				>>>
+				>>> test_fixture is None
+				True
+				>>>
+
+
 		"""
-		if parser is not None:
+		if parser is not None:  # pragma: no branch
 			parser.add_argument("""--port""", type=int, default=_MCAST_DEFAULT_PORT)
 			__tmp_help = """local interface to use for listening to multicast data; """
 			__tmp_help += """if unspecified, any one interface may be chosen."""
@@ -399,8 +431,9 @@ class McastRecvHearDispatch(mtool):
 				help="""multicast groups (ip addrs) to listen to join."""
 			)
 
-	def _help_deamon_dispatch(self, *args, **kwargs):
-		_useHear = False if "is_deamon" not in kwargs.keys() else kwargs["is_deamon"]
+	@staticmethod
+	def _help_deamon_dispatch(*args, **kwargs):
+		_useHear = kwargs.get("is_deamon", False)
 		return _useHear
 
 	def doStep(self, *args, **kwargs):
@@ -440,7 +473,8 @@ class McastDispatch(mtool):
 				sub_parser = parser.add_parser(sub_tool, help="...")
 				type(TASK_OPTIONS[sub_tool]).setupArgs(sub_parser)
 
-	def useTool(self, tool, **kwargs):
+	@staticmethod
+	def useTool(tool, **kwargs):
 		"""Will Handle launching the actual task functions."""
 		theResult = None
 		cached_list = sorted(TASK_OPTIONS.keys())
@@ -461,7 +495,7 @@ class McastDispatch(mtool):
 		__EXIT_MSG = (1, "Unknown")
 		try:
 			try:
-				(argz, extra) = type(self).parseArgs(*args)
+				(argz, _) = type(self).parseArgs(*args)
 				service_cmd = argz.cmd_tool
 				argz.__dict__.__delitem__("""cmd_tool""")
 				_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))

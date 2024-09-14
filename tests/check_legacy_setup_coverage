@@ -59,6 +59,39 @@
 #    the amount of five dollars ($5.00). The foregoing limitations will apply
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
+#
+# This script performs coverage testing on the setup.py file for the multicast project.
+# It accomplishes the following tasks:
+# 1. Sets up error handling and cleanup mechanisms to ensure proper execution.
+# 2. Determines the test root directory based on the project structure.
+# 3. Configures the coverage command for Python.
+# 4. Generates test reports using the project's Makefile.
+# 5. Executes setup.py with coverage, specifically checking the --name, --version, and --license options.
+#    This ensures that:
+#    - The package metadata is correctly read from setup.cfg
+#    - The readFile function properly handles reading README.md, requirements.txt, and LICENSE.md
+#    - The package requirements are correctly parsed
+#    - The package classifiers are properly set
+# 6. Combines coverage data and generates an XML report for analysis.
+# 7. Copies log files to the test reports directory for record-keeping.
+#
+# Exit Code Summary:
+# The script uses the EXIT_CODE variable to track exit conditions:
+# -   0: Successful execution.
+# -   1: General failure.
+# -   2: Coverage combine or XML generation failed.
+# -   3: Make command failed.
+# -  40: Missing valid repository or source structure.
+# - 126: Script already in progress or command not executable.
+# - 129: Received SIGHUP signal.
+# - 130: Received SIGINT signal (Ctrl+C).
+# - 131: Received SIGQUIT signal.
+# - 137: Received SIGABRT signal.
+# - 143: Received SIGTERM signal.
+#
+# The primary goal is to ensure that all parts of setup.py are executed when queried for
+# basic package information, helping maintain the integrity of the package configuration
+# and ensuring that the package can be properly installed and distributed.
 
 ulimit -t 60
 # setting the path may break brain-dead CI that uses crazy paths

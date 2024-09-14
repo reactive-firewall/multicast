@@ -135,6 +135,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			for tst_in in test_junk_values:
 				(test_code, test_fixture) = tst_dispatch.useTool(tst_in)
+				self.assertEqual(type(test_code), type(True))
+				self.assertIsNone(test_fixture)
 				self.assertTupleEqual(
 					tst_dispatch.useTool(tst_in),
 					tuple((False, None)),

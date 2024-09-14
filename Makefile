@@ -239,6 +239,8 @@ cleanup:
 	$(QUIET)$(RM) ./.*~ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./src/**/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./src/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./test_env/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./test_env/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./src/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) tests/__pycache__ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) multicast/__pycache__ 2>$(ERROR_LOG_PATH) || true
@@ -247,6 +249,7 @@ cleanup:
 	$(QUIET)$(RMDIR) multicast.egg-info 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) .pytest_cache/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) .eggs 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./test_env/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;

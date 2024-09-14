@@ -84,7 +84,7 @@ import socket
 import random
 
 
-class MCastClient(object):
+class MCastClient(object):  # skipcq: PYL-R0205
 	"""For use as a test fixture. A trivial implementation of a socket-based object with a function
 	named say. The say function of this class performs a send and recv on a given socket and
 	then prints out simple diognostics about the content sent and any response recived.
@@ -126,13 +126,74 @@ class MCastClient(object):
 	"""
 
 	_group_addr = None
+	"""The multicast group address."""
+
 	_source_port = None
+	"""The source port for the client."""
 
 	def __init__(self, *args, **kwargs):
+		"""Initialize a MCastClient object with optional group address and source port.
+
+		The client can be initialized with or without specifying a group address and source port.
+		If no source port is provided, a random port between 50000 and 59999 is generated.
+
+		Args:
+			*args: Variable length argument list (Unused).
+			**kwargs: Arbitrary keyword arguments.
+				- grp_addr (str): The multicast group address.
+				- src_port (int): The source port for the client.
+
+		Meta Testing:
+
+			First setup test fixtures by importing test context.
+
+				>>> import tests.MulticastUDPClient as MulticastUDPClient
+				>>> from MulticastUDPClient import MCastClient as MCastClient
+				>>>
+
+			Testcase 1: Initialization without any arguments.
+
+				>>> client = MCastClient()
+				>>> 50000 <= client._source_port <= 59999
+				True
+				>>> client._group_addr is None
+				True
+				>>>
+
+			Testcase 2: Initialization with only group address.
+
+				>>> tst_args = {}
+				>>> client = MCastClient(grp_addr="224.0.0.1")
+				>>> client._group_addr
+				'224.0.0.1'
+				>>> 50000 <= client._source_port <= 59999
+				True
+				>>>
+
+			Testcase 3: Initialization with only source port.
+
+				>>> client = MCastClient(src_port=55555)
+				>>> client._source_port
+				55555
+				>>> client._group_addr is None
+				True
+				>>>
+
+			Testcase 4: Initialization with both group address and source port.
+
+				>>> client = MCastClient(grp_addr="224.0.0.2", src_port=55556)
+				>>> client._group_addr
+				'224.0.0.2'
+				>>> client._source_port
+				55556
+				>>>
+
+
+		"""
 		if str("""grp_addr""") in kwargs:
-			self._group_addr = kwargs.grp_addr
+			self._group_addr = kwargs.get("""grp_addr""", None)
 		if str("""src_port""") in kwargs:
-			self._source_port = kwargs.src_port
+			self._source_port = kwargs.get("""src_port""", 0)
 		else:
 			self._source_port = int(
 				50000 + (
@@ -146,6 +207,57 @@ class MCastClient(object):
 			)
 
 	def say(self, address, port, conn, msg):
+		"""Send a message to a specified multicast address and port,
+		then receive and print the response.
+
+		This function sends a UTF-8 encoded message to the specified multicast address and port
+		using the provided connection. It then waits for a response, decodes it, and prints both
+		the sent and received messages.
+
+		Args:
+			address (str): The multicast group address to send the message to.
+			port (int): The port number to send the message to.
+			conn (socket.socket): The socket connection to use for sending and receiving.
+			msg (str): The message to be sent.
+
+		Returns:
+			None
+
+		Prints:
+			The sent message and the received response.
+
+		Meta Testing:
+
+			First, set up test fixtures:
+
+				>>> import unittest.mock
+				>>> from MulticastUDPClient import MCastClient
+				>>>
+
+			Testcase 1: Test sending and receiving a message.
+
+				>>> mock_socket = unittest.mock.Mock()
+				>>> mock_socket.recv.return_value = b"Response received"
+				>>> client = MCastClient()
+				>>> client.say("224.0.0.1", 59991, mock_socket, "Test message")
+				Sent:     Test message
+				Received: Response received
+				>>>
+
+			Testcase 2: Test sending a 'STOP' message.
+
+				>>> mock_socket.recv.return_value = b"Stopped"
+				>>> client.say("224.0.0.1", 59991, mock_socket, "STOP")
+				Sent:     STOP
+				Received: Stopped
+				>>>
+
+
+		Note:
+			This function assumes that the connection is already properly configured
+			for multicast communication.
+
+		"""
 		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
 		received = str(conn.recv(1024), "utf-8")
 		print("Sent:     {}".format(msg))

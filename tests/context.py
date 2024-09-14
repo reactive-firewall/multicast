@@ -19,7 +19,7 @@
 
 __module__ = """tests"""
 
-__name__ = """tests.context"""
+__name__ = """tests.context"""  # skipcq: PYL-W0622
 
 __doc__ = """
 	Context for Testing.
@@ -265,18 +265,18 @@ def checkCovCommand(args=[None]):
 		>>> checkCovCommand(["python", "script.py"])
 		['python', 'script.py']
 
-		>>> checkCovCommand(["coverage", "script.py"])  # missing 'run'
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
-		
-		>>> checkCovCommand(["coverage run", "script.py"])  # NOT missing 'run'
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS  # missing 'run'
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
-		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS  # NOT missing 'run'
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		>>> import sys
 		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
-		>>> checkCovCommand(test_fixutre) #doctest: +ELLIPSIS
+		>>> checkCovCommand(test_fixutre)  #doctest: +ELLIPSIS
 		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
@@ -389,7 +389,7 @@ def checkPythonCommand(args, stderr=None):
 	"""
 	theOutput = None
 	try:
-		if (args is None) or (args is [None]) or (len(args) <= 0):  # pragma: no branch
+		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
@@ -416,7 +416,7 @@ def checkPythonFuzzing(args=[None], stderr=None):
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:  # pragma: no branch
+		if args is None or args == [None]:  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:

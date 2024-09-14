@@ -103,7 +103,7 @@
 """
 
 
-__package__ = """multicast"""
+__package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -152,7 +152,7 @@ __file__ = """multicast/recv.py"""
 """The file of this component."""
 
 
-__name__ = """multicast.recv"""
+__name__ = """multicast.recv"""  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -175,20 +175,20 @@ __name__ = """multicast.recv"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast
+		from . import multicast as multicast  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
 except Exception as importErr:
 	del importErr
-	import multicast as multicast
+	import multicast as multicast  # skipcq: PYL-C0414
 
 
 try:
-	from multicast import argparse as argparse
-	from multicast import unicodedata as unicodedata
-	from multicast import socket as socket
-	from multicast import struct as struct
+	from multicast import argparse as argparse  # skipcq: PYL-C0414
+	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
+	from multicast import socket as socket  # skipcq: PYL-C0414
+	from multicast import struct as struct  # skipcq: PYL-C0414
 	depends = [
 		unicodedata, socket, struct, argparse
 	]
@@ -463,7 +463,8 @@ class McastRECV(multicast.mtool):
 				help="""multicast groups (ip addrs) to listen to join."""
 			)
 
-	def _hearstep(self, groups, port, iface=None, bind_group=None):
+	@staticmethod
+	def _hearstep(groups, port, iface=None, bind_group=None):
 		"""Will listen on the given port of an interface for multicast messages to the given group(s).
 
 		The work-horse function.
@@ -492,7 +493,7 @@ class McastRECV(multicast.mtool):
 			>>> type(test_RCEV) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			<class ...McastRECV...>
 			>>> type(test_RCEV._hearstep)
-			<class 'method'>
+			<class 'function'>
 			>>> test_RCEV._hearstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 			'...'
 			>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP
@@ -515,12 +516,12 @@ class McastRECV(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		response = self._hearstep(
-			[multicast._MCAST_DEFAULT_GROUP] if "groups" not in kwargs.keys() else kwargs["groups"],
-			multicast._MCAST_DEFAULT_GROUP if "port" not in kwargs.keys() else kwargs["port"],
-			None if "iface" not in kwargs.keys() else str(kwargs["iface"]),
-			multicast._MCAST_DEFAULT_GROUP if "group" not in kwargs.keys() else kwargs["group"],
+			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
+			kwargs.get("iface", None),
+			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),
 		)
-		_is_std = False if "is_std" not in kwargs.keys() else kwargs["is_std"]
+		_is_std = kwargs.get("is_std", False)
 		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
 			print(multicast._BLANK)
 			print(str(response))
