@@ -68,9 +68,9 @@ class TestRequirementsTxt(context.BasicUsageTestSuite):
 		"""Validate the format of 'tests/requirements.txt'."""
 		pattern = re.compile(
 			r'^\s*'
-			r'(?P<package>[a-zA-Z0-9_\-\.]+)'			# Package name
-			r'(\s*,?\s*(==|!=|>=|<=|>|<)\s*[^\s,]+)+'	# One or more version specifiers
-			r'\s*(#.*)?$'
+			r'[a-zA-Z0-9_\-\.]+'
+			r'(?:,?\s?(?:==|!=|>=|<=|>|<)\s?[0-9\.]+)+'
+			r'(?:\s*(?:#.*)?)$'
 		)
 		with open('tests/requirements.txt', 'r') as req_file:
 			for line_number, line in enumerate(req_file, start=1):
