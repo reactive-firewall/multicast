@@ -146,6 +146,57 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			)
 
 	def say(self, address, port, conn, msg):
+		""" Send a message to a specified multicast address and port,
+		then receive and print the response.
+
+		This function sends a UTF-8 encoded message to the specified multicast address and port
+		using the provided connection. It then waits for a response, decodes it, and prints both
+		the sent and received messages.
+
+		Args:
+			address (str): The multicast group address to send the message to.
+			port (int): The port number to send the message to.
+			conn (socket.socket): The socket connection to use for sending and receiving.
+			msg (str): The message to be sent.
+
+		Returns:
+			None
+
+		Prints:
+			The sent message and the received response.
+
+		Meta Testing:
+
+			First, set up test fixtures:
+
+				>>> import unittest.mock
+				>>> from MulticastUDPClient import MCastClient
+				>>>
+
+			Testcase 1: Test sending and receiving a message.
+
+				>>> mock_socket = unittest.mock.Mock()
+				>>> mock_socket.recv.return_value = b"Response received"
+				>>> client = MCastClient()
+				>>> client.say("224.0.0.1", 59991, mock_socket, "Test message")
+				Sent:     Test message
+				Received: Response received
+				>>>
+
+			Testcase 2: Test sending a 'STOP' message.
+
+				>>> mock_socket.recv.return_value = b"Stopped"
+				>>> client.say("224.0.0.1", 59991, mock_socket, "STOP")
+				Sent:     STOP
+				Received: Stopped
+				>>>
+
+
+		Note:
+			This function assumes that the connection is already properly configured
+			for multicast communication.
+
+		"""
 		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
 		received = str(conn.recv(1024), "utf-8")
 		print("Sent:     {}".format(msg))
