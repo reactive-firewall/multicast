@@ -271,12 +271,12 @@ def checkCovCommand(args=[None]):
 		>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS  # NOT missing 'run'
 		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
-		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])
-		['coverage', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		>>> import sys
 		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
-		>>> checkCovCommand(test_fixutre) #doctest: +ELLIPSIS
+		>>> checkCovCommand(test_fixutre)  #doctest: +ELLIPSIS
 		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
