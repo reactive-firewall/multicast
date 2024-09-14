@@ -14,27 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #python
-# time - builtin - PSF licence
-# re - builtin - PSF licence?
-# subprocess - PSF licence
-# sphinx
-# argparse - builtin - PSF licence
-# socket - builtin - PSF licence
-# struct - builtin - PSF licence
+# time - builtin - PSF license
+# re - builtin - PSF license?
+# subprocess - PSF license
+# sphinx - BSD license
+#sphinx>=5.0
+# argparse - builtin - PSF license
+# socket - builtin - PSF license
+# struct - builtin - PSF license
 # argparse>=1.4.0
-# argparse - builtin - PSF licence
+# argparse - builtin - PSF license
+# setuptools - MIT license
 setuptools>=45.0
-# virtualenv - MIT
+# virtualenv - MIT license
 #virtualenv>=15.0.1
-# six - MIT
-#six>=1.0.0
-# pgpy - BSD 3-Clause licensed
-#pgpy>=0.4.1
-#tox>=3.0.0
-#py>=1.4.33
+# pip - MIT license
 pip>=21.0
+# build - MIT license
 build>=1.1.1
-# multicast - MIT
+# multicast - MIT license
 #-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
-# wheel - builtin - PSF licence
+# wheel - MIT license
 wheel>=0.37
