@@ -49,7 +49,7 @@ pytest>=7.0, !=8.1.0
 pytest-checkdocs>=1.2.5
 # pytest-cov - MIT licence
 pytest-cov>=3.0.0
-# pytest-enabler - ??? licence
+# pytest-enabler - MIT licence
 pytest-enabler>=1.0.1
 # pytest-flake8 - BSD licence
 pytest-flake8>=1.0.7
