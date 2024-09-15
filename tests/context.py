@@ -414,7 +414,7 @@ def checkPythonCommand(args, stderr=None):
 	Raises:
 		subprocess.CalledProcessError: If the command returns a non-zero exit status.
 
-		Meta Testing:
+	Meta Testing:
 
 		First setup test fixtures by importing test context.
 
@@ -425,20 +425,20 @@ def checkPythonCommand(args, stderr=None):
 
 			>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
 			>>> tests.context.checkPythonCommand(test_fixture_1)
-			'Hello, World!\n'
+			'Hello, World!\\n'
 
 		Testcase 2: Function should capture stderr when specified.
 
 			>>> import subprocess
 			>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
 			>>> tests.context.checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
-			'Error\n'
+			'Error\\n'
 
 		Testcase 3: Function should handle exceptions and return output.
 
 			>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
 			>>> tests.context.checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
-			'Traceback (most recent call last):\n...ValueError...'
+			'Traceback (most recent call last):\\n...ValueError...'
 
 		Testcase 4: Function should return the output as a string.
 
