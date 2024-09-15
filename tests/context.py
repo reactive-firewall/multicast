@@ -261,23 +261,41 @@ def checkCovCommand(args=[None]):
 	Returns:
 		list: The modified list of arguments with 'coverage run' options added as applicable.
 
-	Examples:
-		>>> checkCovCommand(["python", "script.py"])
-		['python', 'script.py']
+	Meta Testing:
 
-		>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS  # missing 'run'
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		First setup test fixtures by importing test context.
 
-		>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS  # NOT missing 'run'
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+			>>> import tests.context as context
+			>>>
 
-		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		Testcase 1: Function should return unmodified arguments if 'coverage' is not in the first argument.
 
-		>>> import sys
-		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
-		>>> checkCovCommand(test_fixutre)  #doctest: +ELLIPSIS
-		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
+			>>> context.checkCovCommand(["python", "script.py"])
+			['python', 'script.py']
+
+		Testcase 2: Function should modify arguments when 'coverage' is the first argument.
+			A.) Missing 'run'
+
+			>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		Testcase 3: Function should modify arguments when 'coverage run' is in the first argument.
+			A.) NOT missing 'run'
+
+			>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		Testcase 4: Function should handle coverage command with full path.
+
+			>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+
+		Testcase 5: Function should handle coverage invoked via sys.executable.
+
+			>>> import sys
+			>>> test_fixture = [str("{} -m coverage run").format(sys.executable), "test.py"]
+			>>> context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
+			[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
 	"""
