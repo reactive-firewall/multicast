@@ -261,23 +261,41 @@ def checkCovCommand(args=[None]):
 	Returns:
 		list: The modified list of arguments with 'coverage run' options added as applicable.
 
-	Examples:
-		>>> checkCovCommand(["python", "script.py"])
-		['python', 'script.py']
+	Meta Testing:
 
-		>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS  # missing 'run'
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+		First setup test fixtures by importing test context.
 
-		>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS  # NOT missing 'run'
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+			>>> import tests.context as context
+			>>>
 
-		>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
-		['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+		Testcase 1: Function should return unmodified arguments if 'coverage' is not in the first argument.
 
-		>>> import sys
-		>>> test_fixutre = [str("{} -m coverage run").format(sys.executable), "test.py"]
-		>>> checkCovCommand(test_fixutre)  #doctest: +ELLIPSIS
-		[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
+			>>> context.checkCovCommand(["python", "script.py"])
+			['python', 'script.py']
+
+		Testcase 2: Function should modify arguments when 'coverage' is the first argument.
+			A.) Missing 'run'
+
+			>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		Testcase 3: Function should modify arguments when 'coverage run' is in the first argument.
+			A.) NOT missing 'run'
+
+			>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
+
+		Testcase 4: Function should handle coverage command with full path.
+
+			>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
+
+		Testcase 5: Function should handle coverage invoked via sys.executable.
+
+			>>> import sys
+			>>> test_fixture = [str("{} -m coverage run").format(sys.executable), "test.py"]
+			>>> context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
+			[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
 	"""
@@ -318,21 +336,50 @@ def checkStrOrByte(theInput):
 	Returns:
 		str: If the input is already a string or can be decoded to UTF-8.
 		bytes: If the input is bytes and cannot be decoded to UTF-8.
-	None: If the input is None.
+		None: If the input is None.
 
-	Examples:
-		>>> checkStrOrByte("Hello")
-		'Hello'
-		>>> checkStrOrByte(b"Hello")
-		'Hello'
-		>>> checkStrOrByte(b'\\xff\\xfe')  # Non-UTF-8 bytes
-		b'\xff\xfe'
-		>>> checkStrOrByte(None) is None
-		True
-		>>> checkStrOrByte("")
-		''
-		>>> checkStrOrByte(b"")
-		''
+	Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context as _context
+			>>>
+
+		Testcase 1: Input is a string.
+
+			>>> _context.checkStrOrByte("Hello")
+			'Hello'
+			>>>
+
+		Testcase 2: Input is UTF-8 decodable bytes.
+
+			>>> _context.checkStrOrByte(b"Hello")
+			'Hello'
+			>>>
+
+		Testcase 3: Input is bytes that are not UTF-8 decodable.
+
+			>>> _context.checkStrOrByte(b'\\xff\\xfe')
+			b'\xff\xfe'
+			>>>
+
+		Testcase 4: Input is None.
+
+			>>> _context.checkStrOrByte(None) is None
+			True
+			>>>
+
+		Testcase 5: Input is an empty string.
+
+			>>> _context.checkStrOrByte("")
+			''
+			>>>
+
+		Testcase 6: Input is empty bytes.
+
+			>>> _context.checkStrOrByte(b"")
+			''
+			>>>
 
 
 	"""
@@ -367,23 +414,37 @@ def checkPythonCommand(args, stderr=None):
 	Raises:
 		subprocess.CalledProcessError: If the command returns a non-zero exit status.
 
-	Examples:
-		>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
-		>>> checkPythonCommand(test_fixture_1)
-		'Hello, World!\\n'
+	Meta Testing:
 
-		>>> import subprocess
-		>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
-		>>> checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
-		'Error\\n'
+		First setup test fixtures by importing test context.
 
-		>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
-		>>> checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
-		'Traceback (most recent call last):\\n...ValueError...'
+			>>> import tests.context
+			>>>
 
-		>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
-		>>> isinstance(checkPythonCommand(test_fixture_s, stderr=subprocess.STDOUT), str)
-		True
+		Testcase 1: Function should have an output when provided valid arguments.
+
+			>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
+			>>> tests.context.checkPythonCommand(test_fixture_1)
+			'Hello, World!\\n'
+
+		Testcase 2: Function should capture stderr when specified.
+
+			>>> import subprocess
+			>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
+			>>> tests.context.checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
+			'Error\\n'
+
+		Testcase 3: Function should handle exceptions and return output.
+
+			>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
+			>>> tests.context.checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
+			'Traceback (most recent call last):\\n...ValueError...'
+
+		Testcase 4: Function should return the output as a string.
+
+			>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
+			>>> isinstance(tests.context.checkPythonCommand(test_fixture_s, stderr=subprocess.STDOUT), str)
+			True
 
 
 	"""
