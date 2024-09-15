@@ -336,21 +336,50 @@ def checkStrOrByte(theInput):
 	Returns:
 		str: If the input is already a string or can be decoded to UTF-8.
 		bytes: If the input is bytes and cannot be decoded to UTF-8.
-	None: If the input is None.
+		None: If the input is None.
 
-	Examples:
-		>>> checkStrOrByte("Hello")
-		'Hello'
-		>>> checkStrOrByte(b"Hello")
-		'Hello'
-		>>> checkStrOrByte(b'\\xff\\xfe')  # Non-UTF-8 bytes
-		b'\xff\xfe'
-		>>> checkStrOrByte(None) is None
-		True
-		>>> checkStrOrByte("")
-		''
-		>>> checkStrOrByte(b"")
-		''
+	Meta Testing:
+
+		First setup test fixtures by importing test context.
+
+			>>> import tests.context as _context
+			>>>
+
+		Testcase 1: Input is a string.
+
+			>>> _context.checkStrOrByte("Hello")
+			'Hello'
+			>>>
+
+		Testcase 2: Input is UTF-8 decodable bytes.
+
+			>>> _context.checkStrOrByte(b"Hello")
+			'Hello'
+			>>>
+
+		Testcase 3: Input is bytes that are not UTF-8 decodable.
+
+			>>> _context.checkStrOrByte(b'\\xff\\xfe')
+			b'\xff\xfe'
+			>>>
+
+		Testcase 4: Input is None.
+
+			>>> _context.checkStrOrByte(None) is None
+			True
+			>>>
+
+		Testcase 5: Input is an empty string.
+
+			>>> _context.checkStrOrByte("")
+			''
+			>>>
+
+		Testcase 6: Input is empty bytes.
+
+			>>> _context.checkStrOrByte(b"")
+			''
+			>>>
 
 
 	"""
