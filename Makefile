@@ -64,14 +64,6 @@ ifeq "$(LINK)" ""
 	LINK=ln -sf
 endif
 
-ifeq "$(GIT)" ""
-	GIT=$(COMMAND) git
-endif
-
-ifeq "$(GIT_WORK_TREE)" ""
-	GIT_WORK_TREE=$(shell -c "$(GIT) rev-parse --show-toplevel")
-endif
-
 ifeq "$(PYTHON)" ""
 	PY_CMD=$(COMMAND) python3
 	ifneq "$(PY_CMD)" ""
@@ -149,13 +141,12 @@ endif
 
 .PHONY: cleanup init clean-docs must_be_root must_have_flake must_have_pytest uninstall
 
-build: init ./setup.py build-docs
+build: init ./setup.py
 	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(ECHO) "Building from ... $(GIT_WORK_TREE)"
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
@@ -266,10 +257,21 @@ cleanup:
 build-docs: ./docs/ ./docs/Makefile ./docs/requirements.txt
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r ./docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(WAIT) ;
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile html 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile html 2>$(ERROR_LOG_PATH) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
+	$(QUIET)mkdir $(INST_OPTS) ./docs/www 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(BSMARK) ./docs/www 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(WAIT) ;
+	$(QUIET)cp -fRp ./docs/_build/ ./docs/www/ 2>$(ERROR_LOG_PATH) || DO_FAIL="exit 35" ;
+	$(QUIET)$(WAIT) ;
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(WAIT) ;
+	$(QUIET)$(ECHO) "Documentation should be in docs/www/html/"
+	$(QUIET)$(DO_FAIL) ;
 
 clean-docs: ./docs/ ./docs/Makefile
+	$(QUIET)$(RM) ./docs/www/* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(RMDIR) ./docs/www/ 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(WAIT) ;
 
