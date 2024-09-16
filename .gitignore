@@ -109,3 +109,10 @@ ENV/
 *.xcodeproj
 *.xcodeproj/*
 
+# Project Specific
+_build/
+docs/_build/
+docs/www/
+docs/make.bat
+multicast/multicast/**
+tests/tests/**
