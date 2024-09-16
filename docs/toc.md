@@ -3,10 +3,9 @@
 ## Contents:
 
 ```{toctree}
-:maxdepth: 3
+:maxdepth: 2
 apidocs/index
 /README.md
-/setup.py
 /LICENSE.md
 :Name: Documentation
 /
@@ -16,7 +15,6 @@ apidocs/index
 
 ```{autosummary}
 ```
-
 
 ## Quickstart:
 
