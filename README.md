@@ -111,6 +111,8 @@ In the realm of network communication, security is paramount. When using multica
 
 As Bruce Schneier aptly puts it, "Security is a process, not a product." Always be proactive in assessing and mitigating risks in your implementations and use of `multicast`.
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9458/badge)](https://www.bestpractices.dev/projects/9458)
+
 ## Documentation
 
 For more detailed documentation and advanced usage, please refer to the [official documentation](docs/toc.md) (update with the actual link).
