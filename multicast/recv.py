@@ -34,7 +34,7 @@
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -108,7 +108,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -132,7 +132,7 @@ __module__ = """multicast"""
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -157,7 +157,7 @@ __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -215,7 +215,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>> multicast.recv is not None
@@ -281,7 +281,7 @@ def tryrecv(msgbuffer, chunk, sock):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.recv is not None
@@ -339,7 +339,7 @@ class McastRECV(multicast.mtool):
 
 		Testing:
 
-		Testcase 0: First setup test fixtures by importing multicast.
+		Testcase 0: First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.recv is not None
@@ -394,7 +394,7 @@ class McastRECV(multicast.mtool):
 
 			Testing:
 
-			Testcase 0: First setup test fixtures by importing multicast.
+			Testcase 0: First set up test fixtures by importing multicast.
 
 				>>> import multicast
 				>>> multicast.recv is not None
@@ -472,7 +472,7 @@ class McastRECV(multicast.mtool):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.recv is not None

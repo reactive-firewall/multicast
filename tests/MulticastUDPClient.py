@@ -145,7 +145,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		Meta Testing:
 
-			First setup test fixtures by importing test context.
+			First set up test fixtures by importing test context.
 
 				>>> import tests.MulticastUDPClient as MulticastUDPClient
 				>>> from MulticastUDPClient import MCastClient as MCastClient

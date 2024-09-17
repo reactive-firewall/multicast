@@ -21,7 +21,7 @@
 
 Minimal Acceptance Testing:
 
-	Testcase 0: Just setup test fixtures by importing multicast.
+	Testcase 0: Just set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -55,7 +55,7 @@ def readFile(filename):
 
 		Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>>

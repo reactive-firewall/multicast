@@ -21,7 +21,7 @@
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast as multicast
 		>>>
@@ -158,7 +158,7 @@ class McastNope(mtool):
 
 		Testing:
 
-		Testcase 0: First setup test fixtures by importing multicast.
+		Testcase 0: First set up test fixtures by importing multicast.
 
 			>>> import multicast.__main__ as _multicast
 			>>> _multicast.McastNope is not None
@@ -228,7 +228,7 @@ class McastNope(mtool):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast.__main__
 			>>>
@@ -264,7 +264,7 @@ class McastRecvHearDispatch(mtool):
 
 		Testing:
 
-		Testcase 0: First setup test fixtures by importing multicast.
+		Testcase 0: First set up test fixtures by importing multicast.
 
 			>>> import multicast.__main__ as _multicast
 			>>> _multicast.McastNope is not None
@@ -334,7 +334,7 @@ class McastRecvHearDispatch(mtool):
 
 			Testing:
 
-			Testcase 0: First setup test fixtures by importing multicast.
+			Testcase 0: First set up test fixtures by importing multicast.
 
 				>>> import multicast
 				>>> multicast.hear is not None
@@ -541,7 +541,7 @@ def main(*argv):
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>> multicast.send is not None

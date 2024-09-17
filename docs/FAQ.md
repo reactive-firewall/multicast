@@ -65,7 +65,7 @@ python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello W
 import multicast as multicast
 from multiprocessing import Process as Process
 
-# setup some stuff
+# set up some stuff
 _fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg = """224.0.0.1"""

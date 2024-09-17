@@ -35,7 +35,7 @@
 
 Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -71,7 +71,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -95,7 +95,7 @@ __module__ = """multicast"""
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -120,7 +120,7 @@ __name__ = """multicast.send"""
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 	Testcase 0: Multicast should be importable.
 
@@ -172,7 +172,7 @@ class McastSAY(multicast.mtool):
 
 		Testing:
 
-		Testcase 0: First setup test fixtures by importing multicast.
+		Testcase 0: First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.send is not None
@@ -217,7 +217,7 @@ class McastSAY(multicast.mtool):
 
 			Testing:
 
-			Testcase 0: First setup test fixtures by importing multicast.
+			Testcase 0: First set up test fixtures by importing multicast.
 
 				>>> import multicast
 				>>> multicast.send is not None

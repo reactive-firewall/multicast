@@ -33,7 +33,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast as _multicast
 		>>>
@@ -50,7 +50,7 @@ __module__ = """multicast"""
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast as _multicast
 		>>>
@@ -67,7 +67,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast as _multicast
 		>>>
@@ -86,7 +86,7 @@ __version__ = """1.5-rc"""
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast as _multicast
 		>>>
@@ -107,7 +107,7 @@ __doc__ = __prologue__ + """
 
 	Minimal Acceptance Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -161,7 +161,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 	Minimal Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -210,7 +210,7 @@ _MCAST_DEFAULT_GROUP = """224.0.0.1"""
 
 	Minimal Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -239,7 +239,7 @@ _MCAST_DEFAULT_TTL = int(1)
 
 	Minimal Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>>
@@ -269,7 +269,7 @@ _BLANK = str("""""")
 
 	Minimal Testing:
 
-	First setup test fixtures by importing multicast.
+	First set up test fixtures by importing multicast.
 
 		>>> import multicast
 		>>> _BLANK = multicast._BLANK
@@ -348,7 +348,7 @@ class mtool(abc.ABC):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.mtool is not None
@@ -375,7 +375,7 @@ class mtool(abc.ABC):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.mtool is not None
@@ -447,7 +447,7 @@ class mtool(abc.ABC):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>> multicast.mtool is not None
@@ -499,7 +499,7 @@ class mtool(abc.ABC):
 
 		Minimal Acceptance Testing:
 
-		First setup test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
 			>>> import multicast
 			>>>

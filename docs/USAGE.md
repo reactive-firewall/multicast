@@ -12,7 +12,7 @@ Here is an example of usage (circa v1.4)
 import multicast as multicast
 from multiprocessing import Process as Process
 
-# setup some stuff
+# set up some stuff
 _fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg

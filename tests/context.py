@@ -113,7 +113,7 @@ __BLANK = str("""""")
 
 	Meta Testing:
 
-	First setup test fixtures by importing test context.
+	First set up test fixtures by importing test context.
 
 		>>> import tests.context as _context
 		>>>
@@ -142,7 +142,7 @@ def getCoverageCommand():
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context as context
 			>>>
@@ -178,7 +178,7 @@ def __check_cov_before_py():
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context
 			>>>
@@ -222,7 +222,7 @@ def getPythonCommand():
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 		>>> import tests.context
 		>>>
@@ -263,7 +263,7 @@ def checkCovCommand(args=[None]):
 
 	Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context as context
 			>>>
@@ -340,7 +340,7 @@ def checkStrOrByte(theInput):
 
 	Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context as _context
 			>>>
@@ -416,7 +416,7 @@ def checkPythonCommand(args, stderr=None):
 
 	Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context
 			>>>
@@ -505,7 +505,7 @@ def debugBlob(blob=None):
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 			>>> import tests.context
 			>>>
@@ -571,7 +571,7 @@ def debugtestError(someError):
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 		>>> import tests.context
 		>>>
@@ -646,7 +646,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 
 		Meta Testing:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 		>>> import tests.context
 		>>>
@@ -716,7 +716,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 		Meta Tests - Creation:
 
-		First setup test fixtures by importing test context.
+		First set up test fixtures by importing test context.
 
 		>>> import tests.context
 		>>>
@@ -742,7 +742,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		"""Overides unittest.TestCase.setUpClass(cls) to setup thepython test fixture."""
+		"""Overides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
 	def setUp(self):
