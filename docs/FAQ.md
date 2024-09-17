@@ -24,7 +24,7 @@ python3 -m multicast --help ;
 ```
 #### DONE
 
-If all went well `multicast` is now installed and working :tada:
+If all went well, `multicast` is now installed and working :tada:
 
 
 ### How do I use this to receive some UDP Multicast?
@@ -167,7 +167,7 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 
 `0` *success*
 
-`1` *none-sucsess* - and is often accompanied by warnings or errors
+`1` *non-success* - and is often accompanied by warnings or errors
 
 `2 >` *failure* of specific reason
 

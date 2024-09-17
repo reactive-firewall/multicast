@@ -20,7 +20,7 @@ branch remains acceptable for production use.
 ## Testing
 ***
 
-You can find all of the testing code in the aptly named `tests/` directory.
+You can find all the testing code in the aptly named `tests/` directory.
 * Unit-testing is primarily done with the `unittest` framework.
 * Functional testing is done via additional checks, including an end-to-end check invoking an
   actual pair of processes to test that `SAY` and `RECV` indeed work together.
