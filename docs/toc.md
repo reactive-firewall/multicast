@@ -1,6 +1,6 @@
 # Welcome to Multicast's documentation!
 
-## Quickstart:
+## Quickstart
 **Welcome to the Multicast Python Library! Let's get you started quickly.**
 
 ### Step 1: Install Python 3
