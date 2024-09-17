@@ -32,7 +32,7 @@ If all went well `multicast` is now installed and working :tada:
 (assuming project is set up, installed and you want to listen on 0.0.0.0)
 
 ```bash
-# cd /MY-AWSOME-DEV-PATH
+# cd /MY-AWESOME-DEV-PATH
 python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 ```
 
@@ -140,7 +140,7 @@ From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
 From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
 > A Value of 1 (one TTL) is chosen as per [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1) on the rational that an
 > explicit value that could traverse beyond the local connected network should be
-> chosen by the caller rather than the default value. This is inline with the principle
+> chosen by the caller rather than the default value. This is in line with the principle
 > of none, one or many.
 
 #### The default multicast destination port is 59559

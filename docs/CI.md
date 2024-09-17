@@ -9,7 +9,7 @@ Continuous integration testing is handled by GitHub Actions and the generous Cir
 ## MATs
 ***
 
-Minimal acceptance testing is run across multiple versions of python to ensure stable behavior
+Minimal acceptance testing is run across multiple versions of Python to ensure stable behavior
 across a wide range of environments. Feature development and non-security related bug fixes are
 done on development branches and then merged into the
 [default branch (master)](https://github.com/reactive-firewall/multicast/blob/master/) for further
