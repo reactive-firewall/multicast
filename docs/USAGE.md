@@ -25,10 +25,10 @@ _fixture_HEAR_args = [
 # spwan a listening proc
 
 def inputHandle():
+	test_RCEV = multicast.recv.McastRECV()
 	buffer_string = str("""""")
-	buffer_string += multicast.recv.hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
+	buffer_string += test_RCEV._hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
 	return buffer_string
-
 def printLoopStub(func):
 	for i in range( 0, 5 ):
 		print( str( func() ) )
