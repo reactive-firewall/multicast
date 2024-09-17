@@ -176,3 +176,8 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 _(extra exit code meanings)_
 
 Other codes (such as `126`) may or may not have meanings (such as skip) but are not handled within the scope of the Multicast Project at this time.
+
+
+***
+#### Copyright (c) 2021-2024, Mr. Walls
+[MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
