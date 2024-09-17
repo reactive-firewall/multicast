@@ -1,16 +1,15 @@
 # Multicast Python Repo
 
-## About
+## Introduction
 
-This repo is basically a wrapper for sending and receiving UDP multicast messages via python. Y.M.M.V.
-This library is not intended to fully implement the complexities of multicast traffic, rather to allow a user
-friendly API for python components to send and receive across a multicast transmission.
-The obvious advantage of this wrapper over unicast solutions is the ability to have multiple nodes communicate
-concurrently without individual connections for each node pair.
+The `multicast` package is a Python library that simplifies sending and receiving multicast network messages. It provides classes and tools for implementing multicast communication in Python applications, making it straightforward to work with multicast sockets.
 
-## CI:
+## Features
 
-Continuous integration testing is handled by github actions and the generous Circle-CI Service.
+- **Easy Multicast Communication**: Send and receive messages over multicast networks with simple interfaces.
+- **Command-Line Tools**: Includes command-line utilities for quick multicast operations.
+- **Cross-Python Compatibility**: Designed to work with multiple Python versions.
+- **Support for UDP**: Works with UDP via IPv4 multicast addresses.
 
 ## Status
 
@@ -36,245 +35,97 @@ Continuous integration testing is handled by github actions and the generous Cir
 [![Stable Code Coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/)
 [![CodeQL](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml/badge.svg?branch=stable)](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml)
 
-## CLI Usage
+## Installation
 
-The CLI is actually not the best way to use this kind of library so it should not be considered the full implementation. For testing/prototyping though it is quite convenient, thus I begin with it.
+Install the package using pip:
 
-CLI should work like so:
-
-```plain
-multicast (SAY|RECV|HEAR) [-h|--help] [--use-std] [--daemon] [--port PORT] [--iface IFACE] [--pipe|-m MESSAGE|--message MESSAGE] [--group BIND_GROUP] [--groups [JOIN_MCAST_GROUPS ...]]
+```bash
+pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 ```
 
-The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogus to `send` listen/accept and echo functions of a 1-to-1 connection.
+## Getting Started
 
-### `SAY`
+Below are basic examples to help you start using the `multicast` package.
 
-The `SAY` command is used to send data messages via multicast diagrams.
-* Note: the `--daemon` flag has no effect on the `SAY` command.
+### Sending Multicast Messages
 
-### `RECV`
+```python3
+from multicast import send
 
-The `RECV` command is used to receive multicast diagrams by listening or "joining" a multicast group.
-* If the `--use-std` flag is set the output is printed to the standard-output
-* This command is purely for testing or interfacing with external components and not intended as a first-class API
-* Note: If the `--daemon` flag is used the process will loop after reporting each diagram until canceled, it has no effect on the `RECV` command.
+# Create a multicast sender
+sender = send.McastSAY(group='224.0.0.1', port=59259, ttl=1)
 
-### `HEAR`
+# Send a message
+sender('Hello, Multicast!')
+```
 
-The `HEAR` command is used to send data acknowledged messages via "HEAR" messages echoing select received multicast diagrams.
-* While mostly a testing function it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
-* Note: this will use the same port for sends and receives and can lead to data loss if less than two groups are used.
-* If more than one group is used via the `--groups` flag then all but the bind group (via `--group`) will be echoed to the bind group.
+### Receiving Multicast Messages
+
+```python3
+from multicast import recv
+
+# Create a multicast receiver
+receiver = recv.McastRECV(group='224.0.0.1', port=59259, ttl=1)
+
+# Receive a message
+message = receiver()
+print('Received:', message)
+```
+
+### Listening for Multicast Messages
+
+```python3
+from multicast import hear
+
+# Create a multicast listener
+listener = hear.McastHEAR(group='224.0.0.1', port=59259, ttl=1)
+
+# Listen for messages indefinitely
+listener()
+```
+
+## Command-Line Usage
+
+The `multicast` package provides command-line tools for multicast communication prototyping.
+* Read the [Usage](docs/USAGE.md) for details.
 
 ## FAQ
 
+* Read the [FAQ](docs/FAQ.md) for common answers.
 
-### How do I get this running?
+## Default Settings
 
-(assuming python3 is setup and installed)
+- **Multicast Group Address**: `224.0.0.1` (link-local multicast as per [RFC 5771](https://tools.ietf.org/html/rfc5771))
+- **Default Port**: `59259` (within the dynamic/private port range defined by [RFC 6335](https://tools.ietf.org/html/rfc6335))
+- **Time-to-Live (TTL)**: `1` (as recommended by [RFC 1112 Section 6.1](https://tools.ietf.org/html/rfc1112#section-6.1); messages do not leave the local network)
 
-```bash
-# cd /MY-AWSOME-DEV-PATH
-git clone https://github.com/reactive-firewall/multicast.git multicast
-cd ./multicast
-git checkout stable
-# make clean ; make test ; make clean ;
-make install ;
-python3 -m multicast --help ;
-```
-#### DONE
+## Security Considerations
 
-If all went well `multicast` is now installed and working :tada:
+In the realm of network communication, security is paramount. When using multicast communication, be vigilant about potential vulnerabilities:
 
+- **Data Sanitization**: Always sanitize incoming data to prevent injection attacks ([CWE-20](https://cwe.mitre.org/data/definitions/20.html), [CWE-74](https://cwe.mitre.org/data/definitions/74.html)).
 
-### How do I use this to receive some UDP Multicast?
+- **Network Scope**: Be mindful of the TTL settings to limit message propagation to the intended network segment. Inappropriate TTL values might expose your multicast traffic beyond the local network, potentially leading to information disclosure ([CWE-200](https://cwe.mitre.org/data/definitions/200.html)).
 
-(assuming project is setup and installed and you want to listen on 0.0.0.0)
+- **Validation and Error Handling**: Implement robust validation and error handling to prevent misuse or disruption of multicast services. ([CWE-351](https://cwe.mitre.org/data/definitions/351.html)).
 
-```bash
-# cd /MY-AWSOME-DEV-PATH
-python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
-```
+As Bruce Schneier aptly puts it, "Security is a process, not a product." Always be proactive in assessing and mitigating risks in your implementations and use of `multicast`.
 
-Caveat: much more usefull if actually used in a loop like:
+## Documentation
 
-```bash
-# cd /MY-AWSOME-DEV-PATH
-while true ; do # unitl user ctl+c inturupts
-python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
-done
-```
+For more detailed documentation and advanced usage, please refer to the [official documentation](docs/toc.md) (update with the actual link).
 
+## Contributing
 
-### How do I use this to send UDP Multicast?
+Contributions are welcome! Please read the [contributing guidelines](.github/CONTRIBUTING.md) for more information.
 
-(assuming project is setup and installed)
-
-```bash
-# cd /MY-AWSOME-DEV-PATH
-python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello World!"
-```
-
-
-### What is the basic API via python (instead of bash like above):
-
-#### Caveat: this module is still a BETA
-[Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
-
-```python3
-import mulicast as mulicast
-from multiprocessing import Process as Process
-
-# setup some stuff
-_fixture_PORT_arg = int(59595)
-_fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_BIND_arg
-_fixture_HEAR_args = [
-	"""--port""", _fixture_PORT_arg,
-	"""--join-mcast-groups""", _fixture_mcast_GRP_arg,
-	"""--bind-group""", _fixture_mcast_GRP_arg"
-]
-
-# spwan a listening proc
-
-def inputHandle()
-	buffer_string = str("""""")
-	buffer_string += multicast.recv.hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
-	return buffer_string
-
-def printLoopStub(func):
-	for i in range( 0, 5 ):
-		print( str( func() ) )
-
-p = Process(
-				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
-			)
-p.start()
-
-# ... probably will return with nothing outside a handler function in a loop
-```
-and elsewhere (like another function or even module) for the sender:
-```python3
-
-# assuming already did 'import mulicast as mulicast'
-
-_fixture_SAY_args = [
-	"""--port""", _fixture_PORT_arg,
-	"""--mcast-group""", _fixture_mcast_GRP_arg,
-	"""--message""", """'test message'"""
-]
-try:
-	multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-	# Hint: use a loop to repeat or different arguments to varry message.
-except Exception:
-	p.join()
-	raise RuntimeException("multicast seems to have failed, blah, blah")
-
-# clean up some stuff
-p.join() # if not already handled don't forget to join the process and other overhead
-didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
-
-```
-#### Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and the standard python `multiprocessing` module and its use.
-
-
-### What are the defaults?
-
-##### The default multicast group address is 224.0.0.1
-
-From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
-> The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
-> on the rational that this group address will be treated as a local-net multicast
-> (caveat: one should use link-local for ipv6)
-
-##### The default multicast Time-to-Live (TTL) is 1
-
-From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
-> ... If the
-> upper-layer protocol chooses not to specify a time-to-live, it should
-> default to 1 for all multicast IP datagrams, so that an explicit
-> choice is required to multicast beyond a single network.
-
-From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
-> A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
-> explicit value that could traverse byond the local connected network should be
-> chosen by the caller rather than the default vaule. This is inline with the principle
-> of none, one or many.
-
-##### The default multicast destination port is 59559
-
-From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
-> Arbitrary port to use by default, though any dynamic and free port would work.
-
-> :exclamation: Caution: it is best to specify the port in use at this time as the default has yet to be properly assigned ( see related #62 )
-
-
-### What does exit code _x_ mean?
-
-#### Python function return code meanings
-
-`0` is the default and implies *success*, and means the process has essentially (or actually) returned nothing (or `None`)
-
-`1` is used when a *single* result is returned (caveat: functions may return a single `tuple` instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result (which may also be encapsulated as an iteratable if needed) )
-
-`2` is used to indicate a *value and reason* are returned (caveat: functions may return a single `tuple` with a single value and reason and the value can be a `tuple`)
-
-`-1` is used to mean *many* of unspecified length and otherwise functions as `1`
-
-#### CLI exit code meanings
-
-`0` *success*
-
-`1` *none-sucsess* - and is often accompanied by warnings or errors
-
-`2 >` *failure* of specific reason
-
-
-#### Everything Else
-_(extra exit code meanings)_
-
-Other codes (such as `126`) may or may not have meanings (such as skip) but are not handled within the scope of the Multicast Project at this time.
-
----
-## Considerations for usage:
-
-#### [CWE-183]
-
-:warning: ALL MULTICAST is a surface of attack if the data is not sanitized. Common criteria applies here too, don't assume this library won't forward raw network data that reaches it. Notably the default group is all connected nodes (224.0.0.1).
-
-Other common weakness left to the user to handle (NOT an exhaustive list):
- - CWE-417 - in general all risks of a communication channel :thinking:
- - CWE-346 - multicast is by its very nature NOT one-to-one and can probably always be spoofed to some degree (hint: shared secrets (group keys) are probably a start :shrug:)
- - CWE-351 - don't assume only strings can be sent/received
-
----
-## Dev dependancy Testing:
-
-#### In a rush to get this module working? Then try using this with your own test:
-
-```bash
-#cd  /MY-AWSOME-DEV-PATH/multicast
-make clean ; # cleans up from any previous tests hopefully
-make test ; # runs the tests
-make clean ; # cleans up for next test
-```
-
-#### Use PEP8 to check python code style? Great! Try this:
-
-```bash
-make clean ; # cleans up from any previous tests hopefully
-make test-style ; # runs the tests
-make clean ; # cleans up for next test
-```
----
-## Next steps:
+### Next steps:
 
 Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-firewall/projects/1).
 
----
-#### Copyright (c) 2021-2024, Mr. Walls
+## License
+
+This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
 
