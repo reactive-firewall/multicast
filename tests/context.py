@@ -268,7 +268,7 @@ def checkCovCommand(args=[None]):
 			>>> import tests.context as context
 			>>>
 
-		Testcase 1: Function should return unmodified arguments if 'coverage' is not in the first argument.
+		Testcase 1: Function should return unmodified arguments if 'coverage' is missing.
 
 			>>> context.checkCovCommand(["python", "script.py"])
 			['python', 'script.py']
@@ -430,20 +430,27 @@ def checkPythonCommand(args, stderr=None):
 		Testcase 2: Function should capture stderr when specified.
 
 			>>> import subprocess
-			>>> test_args_2 = [str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)']
+			>>> test_args_2 = [
+			... 	str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
+			... ]
+			>>>
 			>>> tests.context.checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
 			'Error\\n'
 
 		Testcase 3: Function should handle exceptions and return output.
 
 			>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
-			>>> tests.context.checkPythonCommand(test_fixture_e, stderr=subprocess.STDOUT) #doctest: +ELLIPSIS
+			>>> tests.context.checkPythonCommand(
+			... 	test_fixture_e, stderr=subprocess.STDOUT
+			... ) #doctest: +ELLIPSIS
 			'Traceback (most recent call last):\\n...ValueError...'
 
 		Testcase 4: Function should return the output as a string.
 
 			>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
-			>>> isinstance(tests.context.checkPythonCommand(test_fixture_s, stderr=subprocess.STDOUT), str)
+			>>> isinstance(tests.context.checkPythonCommand(
+			... 	test_fixture_s, stderr=subprocess.STDOUT
+			... ), str)
 			True
 
 

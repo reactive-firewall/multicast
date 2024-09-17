@@ -54,7 +54,7 @@ except Exception:  # pragma: no branch
 
 class TestRequirementsTxt(context.BasicUsageTestSuite):
 	"""Test cases for 'tests/requirements.txt'."""
-	
+
 	__module__ = """tests.test_deps"""
 
 	def test_requirements_file_exists(self):
@@ -81,14 +81,17 @@ class TestRequirementsTxt(context.BasicUsageTestSuite):
 					line,
 					pattern,
 					str("""Invalid requirement format at line {line_number}: '{line}'""").format(
-					line_number=line_number, line=line
-				)
+						line_number=line_number, line=line
+					)
 				)
 
-	@unittest.skipUnless((_sys.platform.startswith("linux") or
-		_sys.platform.startswith("darwin")), "This test is not supported on OS.")
+	@unittest.skipUnless(
+		(
+			_sys.platform.startswith("linux") or _sys.platform.startswith("darwin")
+		), "This test is not supported on this OS."
+	)
 	def test_requirements_installation(self):
-		"""Attempt to install dependencies from 'tests/requirements.txt' in a virtual environment."""
+		"""Attempt to install dependencies from 'tests/requirements.txt' in a virtual env."""
 		env_dir = 'test_env'
 		builder = venv.EnvBuilder(with_pip=True)
 		builder.create(env_dir)
