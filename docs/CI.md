@@ -1,4 +1,4 @@
-# CI:
+# CI
 
 ## Service providers
 ***
@@ -29,7 +29,7 @@ You can find all of the testing code in the aptly named `tests/` directory.
 ## Dev Dependency Testing
 ***
 
-### In a rush to get this module working? Then try using this with your own test:
+### In a rush to get this module working? Then try using this with your own test
 
 ```bash
 #cd  /MY-AWESOME-DEV-PATH/multicast
@@ -38,7 +38,7 @@ make test ; # runs the tests
 make clean ; # cleans up for next test
 ```
 
-#### Use PEP8 to check python code style? Great! Try this:
+#### Use PEP8 to check python code style? Great! Try this
 
 ```bash
 make clean ; # cleans up from any previous tests hopefully

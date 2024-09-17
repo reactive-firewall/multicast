@@ -34,7 +34,7 @@ You may obtain a copy of the License at
 [MIT License](http://www.github.com/reactive-firewall/python-repo/LICENSE.md)
 ***
 
-## Third-party Acknowledgments:
+## Third-party Acknowledgments
 
 * Files: `multicast/send.py` and `multicast/recv.py`
 ***

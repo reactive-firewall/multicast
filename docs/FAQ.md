@@ -36,11 +36,11 @@ If all went well `multicast` is now installed and working :tada:
 python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 ```
 
-Caveat: `RCEV` is much more useful if actually used in a loop like:
+Caveat: `RECV` is much more useful if actually used in a loop like:
 
 ```bash
 # cd /MY-AWESOME-DEV-PATH
-while true ; do  # until user Ctl+C interrupts
+while true ; do  # until user Ctrl+C interrupts
 python3 -m multicast RECV --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 done
 ```
@@ -139,8 +139,8 @@ From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
 
 From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
 > A Value of 1 (one TTL) is chosen as per [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1) on the rational that an
-> explicit value that could traverse byond the local connected network should be
-> chosen by the caller rather than the default vaule. This is inline with the principle
+> explicit value that could traverse beyond the local connected network should be
+> chosen by the caller rather than the default value. This is inline with the principle
 > of none, one or many.
 
 #### The default multicast destination port is 59559
@@ -157,7 +157,7 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 
 `0` is the default and implies *success*, and means the process has essentially (or actually) returned nothing (or `None`)
 
-`1` is used when a *single* result is returned (caveat: functions may return a single `tuple` instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result (which may also be encapsulated as an iteratable if needed) )
+`1` is used when a *single* result is returned (caveat: functions may return a single `tuple` instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result (which may also be encapsulated as an iterable if needed) )
 
 `2` is used to indicate a *value and reason* are returned (caveat: functions may return a single `tuple` with a single value and reason and the value can be a `tuple`)
 
