@@ -24,7 +24,7 @@ copies or substantial portions of the Software.
 
 ***
 
-## Included Licenses and additional Acknowledgments included with package:
+## Included Licenses and additional Acknowledgments included with package
 
 * Files: `tests/context.py`, `tests/test_basic.py`, and `tests/test_usage.py`
 ***
@@ -38,33 +38,33 @@ You may obtain a copy of the License at
 
 * Files: `multicast/send.py` and `multicast/recv.py`
 ***
-Some code (namely: run, and parseArgs) was modified/derived from:
+Some code (namely: run, and parseArgs) was modified/derived from
 [This answer on stackoverflow](https://stackoverflow.com/a/52791404)
 Copyright (c) 2019, ["pterodragon"](https://stackoverflow.com/users/5256940/pterodragon)
 which was under CC-by-sa-4 license.
-see [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details
+See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
 The code in `parseArgs`, `run`, and `main` are thus also under
 CC-by-sa-4
-see [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details
+See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
 ***
 NO ASSOCIATION
 
 * Files: `tests/profiling.py`
 ***
-Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
+Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from
 [profiling-python-like-a-boss](https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154)
 Copyright (c) 2013, Zapier Inc. All rights reserved.
 which was under BSD-3 Clause license.
-see [BSD-3 Clause license](https://github.com/zapier/profiling-python-like-a-boss/blob/1ab93a1154/LICENSE.md) for details
+See [BSD-3 Clause license](https://github.com/zapier/profiling-python-like-a-boss/blob/1ab93a1154/LICENSE.md) for details.
 ***
 NO ASSOCIATION
 
 * Files: `docs/config.py`
 ***
-Some code (namely: sphinx setup output config) was modified/derived from:
+Some code (namely: Sphinx setup output config) was modified/derived from
 [Sphinx documentation](https://github.com/sphinx-doc/sphinx/blob/569fde84d49c984282355c768c16426af83132e2/doc/conf.py)
 Copyright (c) 2007-2024 by the Sphinx team. All rights reserved.
 which was under BSD-2 Clause license.
-see [BSD License](https://github.com/sphinx-doc/sphinx/blob/569fde84d49c984282355c768c16426af83132e2/LICENSE.rst) for details
+See [BSD License](https://github.com/sphinx-doc/sphinx/blob/569fde84d49c984282355c768c16426af83132e2/LICENSE.rst) for details.
 ***
 NO ASSOCIATION

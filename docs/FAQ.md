@@ -11,7 +11,7 @@ https://github.com/reactive-firewall/multicast/.github/CONTRIBUTING.md
 
 ### How do I get this running?
 
-(assuming python3 is setup and installed)
+(assuming python3 is set up and installed)
 
 ```bash
 # cd /MY-AWSOME-DEV-PATH
@@ -29,18 +29,18 @@ If all went well `multicast` is now installed and working :tada:
 
 ### How do I use this to receive some UDP Multicast?
 
-(assuming project is setup and installed and you want to listen on 0.0.0.0)
+(assuming project is set up, installed and you want to listen on 0.0.0.0)
 
 ```bash
 # cd /MY-AWSOME-DEV-PATH
 python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 ```
 
-Caveat: RCEV is much more usefull if actually used in a loop like:
+Caveat: `RCEV` is much more useful if actually used in a loop like:
 
 ```bash
-# cd /MY-AWSOME-DEV-PATH
-while true ; do # unitl user ctl+c inturupts
+# cd /MY-AWESOME-DEV-PATH
+while true ; do  # until user Ctl+C interrupts
 python3 -m multicast RECV --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
 done
 ```
@@ -48,7 +48,7 @@ done
 
 ### How do I use this to send UDP Multicast?
 
-(assuming project is setup and installed)
+(assuming `multicast` is set up and installed)
 
 ```bash
 # cd /MY-AWSOME-DEV-PATH
@@ -56,7 +56,7 @@ python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello W
 ```
 
 
-### What is the basic API via python (instead of bash like above):
+### What is the basic API via python (instead of bash like above)?
 
 #### Caveat: this module is still a BETA
 [Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
@@ -68,18 +68,19 @@ from multiprocessing import Process as Process
 # setup some stuff
 _fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_BIND_arg
+_fixture_host_BIND_arg = """224.0.0.1"""
 _fixture_HEAR_args = [
 	"""--port""", _fixture_PORT_arg,
 	"""--join-mcast-groups""", _fixture_mcast_GRP_arg,
-	"""--bind-group""", _fixture_mcast_GRP_arg"
+	"""--bind-group""", _fixture_host_BIND_arg
 ]
 
 # spwan a listening proc
 
-def inputHandle()
+def inputHandler():
+	test_RCEV = multicast.recv.McastRECV()
 	buffer_string = str("""""")
-	buffer_string += multicast.recv.hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
+	buffer_string += test_RCEV._hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
 	return buffer_string
 
 def printLoopStub(func):

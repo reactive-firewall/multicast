@@ -19,12 +19,12 @@ _fixture_host_BIND_arg
 _fixture_HEAR_args = [
 	"""--port""", _fixture_PORT_arg,
 	"""--join-mcast-groups""", _fixture_mcast_GRP_arg,
-	"""--bind-group""", _fixture_mcast_GRP_arg"
+	"""--bind-group""", _fixture_mcast_GRP_arg
 ]
 
 # spwan a listening proc
 
-def inputHandle()
+def inputHandle():
 	buffer_string = str("""""")
 	buffer_string += multicast.recv.hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
 	return buffer_string
@@ -56,21 +56,22 @@ try:
 	# Hint: use a loop to repeat or different arguments to varry message.
 except Exception:
 	p.join()
-	raise RuntimeException("multicast seems to have failed, blah, blah")
+	raise RuntimeError("Multicast operation failed.")
 
 # clean up some stuff
 p.join() # if not already handled don't forget to join the process and other overhead
 didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
 
 ```
-#### Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and the standard python `multiprocessing` module and its use.
+### Caveat
+The above examples assume the reader is knowledgeable about general `IPC` theory and the standard Python `multiprocessing` module and its use.
 
 
 
 ## CLI Usage
 ***
 
-The CLI is actually not the best way to use this kind of library so it should not be considered the full implementation. For testing/prototyping though it is quite convenient, thus I begin with it.
+The CLI is actually not the best way to use this kind of library, so it should not be considered the full implementation. For testing and prototyping, though, it is quite convenient; therefore, I begin with it.
 
 CLI should work like so:
 
