@@ -33,11 +33,11 @@ needs_sphinx = "5.2"
 # for md us 'autodoc2' (pip install sphinx-autodoc2)
 # for rst use 'sphinx.ext.autodoc'
 extensions = [
-				"sphinx.ext.napoleon", "autodoc2", "sphinx.ext.autosummary",
-				"sphinx.ext.githubpages",
-				"sphinx.ext.autosummary", "sphinx.ext.doctest", "sphinx.ext.todo",
-				"sphinx.ext.linkcode", "sphinx.ext.viewcode", "myst_parser"
-			]
+	"""sphinx.ext.napoleon""", """autodoc2""", """sphinx.ext.autosectionlabel""",
+	"""sphinx.ext.githubpages""", """myst_parser""",
+	"""sphinx.ext.autosummary""", """sphinx.ext.doctest""", """sphinx.ext.todo""",
+	"""sphinx.ext.linkcode""", """sphinx.ext.viewcode""", """sphinx.ext.intersphinx""",
+]
 
 # for md auto-docs
 autodoc2_packages = [
@@ -93,7 +93,7 @@ today_fmt = "%Y.%B.%d"
 # directories to ignore when looking for source files.
 exclude_patterns = [
 	"_build", ".github", ".circleci", "coddcov_env", ".DS_Store", "**/.git", "dist",
-	"tests/tests", "www", "**/docs", "multicast/multicast", "*~"
+	"../tests/tests/**", "www", "**/docs", "../multicast/multicast/**", "*~"
 ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -123,15 +123,15 @@ pygments_style_dark = "github-dark"
 
 
 pygments_options = {
-	tabsize: 4,
-	stripall: False,
-	encoding: "utf-8",
+	"""tabsize""": 4,
+	"""stripall""": False,
+	"""encoding""": "utf-8",
 }
 
 pygments_yaml_options = {
-	tabsize: 2,
-	stripall: True,
-	encoding: "utf-8",
+	"""tabsize""": 2,
+	"""stripall""": True,
+	"""encoding""": "utf-8",
 }
 
 highlight_options = {
@@ -345,12 +345,36 @@ texinfo_documents = [
 # texinfo_show_urls = 'footnote'
 
 # -- Link resolver -------------------------------------------------------------
+
+linkcode_url_prefix = str(
+	"""https://github.com/reactive-firewall/{proj}"""
+).format(proj=project)
+
+extlinks = {"""issue""": (str("""{prefix}/{suffix}""").format(
+			prefix=linkcode_url_prefix, suffix="""/issues/%s"""
+		),
+		"""issue #%s""")
+}
+
+# try to link with official python3 documentation.
+# see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
+intersphinx_mapping = {
+	"""python""": (
+			"""https://docs.python.org/3""",
+			(None, """python-inv.txt"""
+		)
+	)
+}
+
 def linkcode_resolve(domain, info):
-	if domain != """py""":
-		return None
-	if not info["""module"""]:
+	if domain != """py""" or not info["""module"""]:
 		return None
 	filename = info["""module"""].replace(""".""", """/""")
-	return str("""https://github.com/reactive-firewall/{proj}/blob/{branch}/{file}.py""").format(
-			proj=project, branch="""stable""", file=filename
+	theResult = str("""{prefix}/blob/{branch}/{file}.py""").format(
+			prefix=linkcode_url_prefix, branch="""stable""", file=filename
 		)
+	if str("""/multicast.py""") in theResult:
+		theResult = theResult.replace("/multicast.py", "/multicast/__init__.py")
+	if str("""/tests.py""") in theResult:
+		theResult = theResult.replace("/tests.py", "/tests/__init__.py")
+	return theResult
