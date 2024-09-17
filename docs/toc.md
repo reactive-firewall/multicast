@@ -1,21 +1,5 @@
 # Welcome to Multicast' documentation!
 
-## Contents:
-
-```{toctree}
-:maxdepth: 2
-apidocs/index
-/README.md
-/LICENSE.md
-:Name: Documentation
-/
-```
-
-## Overview
-
-```{autosummary}
-```
-
 ## Quickstart:
 **Welcome to the Multicast Python Library! Let's get you started quickly.**
 
@@ -54,6 +38,26 @@ apidocs/index
 
 **You're all set! Enjoy using Multicast for your projects.**
 
+
+
+## Contents:
+
+```{toctree}
+:maxdepth: 2
+:Name: Documentation
+apidocs/index
+/README.md
+/FAQ.md
+/CI.md
+/USAGE.md
+:Name: License
+/LICENSE.md
+```
+
+## Overview
+
+```{autosummary}
+```
 
 ---
 ### Copyright (c) 2021-2024, Mr. Walls

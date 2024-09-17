@@ -2,6 +2,13 @@
 
 ## Frequently Asked Questions
 
+```{toctree}
+:maxdepth: 3
+
+https://github.com/reactive-firewall/multicast/.github/CODE_OF_CONDUCT.md
+https://github.com/reactive-firewall/multicast/.github/CONTRIBUTING.md
+```
+
 ### How do I get this running?
 
 (assuming python3 is setup and installed)
@@ -55,7 +62,7 @@ python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello W
 [Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
 
 ```python3
-import mulicast as mulicast
+import multicast as multicast
 from multiprocessing import Process as Process
 
 # setup some stuff
@@ -90,7 +97,7 @@ p.start()
 and elsewhere (like another function or even module) for the sender:
 ```python3
 
-# assuming already did 'import mulicast as mulicast'
+# assuming already did 'import multicast as multicast'
 
 _fixture_SAY_args = [
 	"""--port""", _fixture_PORT_arg,

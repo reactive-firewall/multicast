@@ -17,14 +17,6 @@
 # time - builtin - PSF license
 # re - builtin - PSF license?
 # subprocess - PSF license
-# sphinx - BSD license
-sphinx>=5.2
-# sphinx - BSD license
-sphinx-autodoc2>=0.5
-# sphinx - BSD license
-myst-parser[linkify]>=4.0
-# sphinx - BSD license
-sphinxawesome-theme>=0.5.0
 # argparse - builtin - PSF license
 # socket - builtin - PSF license
 # struct - builtin - PSF license
@@ -45,3 +37,11 @@ wheel>=0.37.0
 pip>=19.0
 # build - MIT license
 # build>=0.5.1, !=1.0.3, !=0.6, !=0.6.1 !=1.1.0 !=1.2.0
+# sphinx - BSD license
+sphinx>=5.2
+# sphinx-autodoc2 - MIT license
+sphinx-autodoc2>=0.5.0
+# myst-parser - MIT license
+myst-parser[linkify]>=4.0.0
+# sphinxawesome-theme - MIT license
+sphinxawesome-theme>=0.5.0
