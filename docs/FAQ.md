@@ -51,7 +51,7 @@ done
 (assuming `multicast` is set up and installed)
 
 ```bash
-# cd /MY-AWSOME-DEV-PATH
+# cd /MY-AWESOME-DEV-PATH
 python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello World!"
 ```
 
@@ -75,7 +75,7 @@ _fixture_HEAR_args = [
 	"""--bind-group""", _fixture_host_BIND_arg
 ]
 
-# spwan a listening proc
+# spawn a listening proc
 
 def inputHandler():
 	test_RCEV = multicast.recv.McastRECV()
