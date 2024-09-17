@@ -115,13 +115,13 @@ As Bruce Schneier aptly puts it, "Security is a process, not a product." Always 
 
 ## Documentation
 
-For more detailed documentation and advanced usage, please refer to the [official documentation](docs/toc.md) (update with the actual link).
+For more detailed documentation and advanced usage, please refer to the [official documentation](docs/toc.md).
 
 ## Contributing
 
 Contributions are welcome! Please read the [contributing guidelines](.github/CONTRIBUTING.md) for more information.
 
-### Next steps:
+### Next steps
 
 Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-firewall/projects/1).
 
