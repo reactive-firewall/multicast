@@ -154,6 +154,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -191,6 +192,7 @@ jobs:
       COV_CORE_DATAFILE: ./coverage.xml
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      DEEPSOURCE_DSN: ${{ DEEPSOURCE_DSN }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -202,6 +204,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -273,6 +276,7 @@ jobs:
       COV_CORE_DATAFILE: ./coverage.xml
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      DEEPSOURCE_DSN: ${{ DEEPSOURCE_DSN }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -284,6 +288,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -358,6 +363,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -402,6 +408,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
       run: |
@@ -564,6 +571,7 @@ jobs:
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
