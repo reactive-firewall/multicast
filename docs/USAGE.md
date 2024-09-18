@@ -103,7 +103,7 @@ The `RECV` command is used to receive multicast datagrams by listening or "joini
 ### `HEAR`
 
 The `HEAR` command is used to send data acknowledged messages via "HEAR" messages echoing select received multicast datagrams.
-* While mostly a testing function it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
+* While mostly a testing function, it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
 * Note: this will use the same port for sends and receives and can lead to data loss if less than two groups are used.
 * If more than one group is used via the `--groups` flag then all but the bind group (via `--group`) will be echoed to the bind group.
 
