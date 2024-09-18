@@ -15,7 +15,6 @@
 
 import sys
 import os
-from sphinxawesome_theme.postprocess import Icons
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -177,8 +176,12 @@ html_short_title = "Multicast Docs"
 # pixels large.
 # html_favicon = None
 
-#html_permalinks_icon = "<span>#</span>"
-html_permalinks_icon = Icons.permalinks_icon
+try:
+	import sphinxawesome_theme
+	from sphinxawesome_theme.postprocess import Icons
+	html_permalinks_icon = Icons.permalinks_icon
+except Exception:
+	html_permalinks_icon = "<span>#</span>"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

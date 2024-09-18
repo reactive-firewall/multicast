@@ -92,7 +92,7 @@ endif
 
 ifndef PIP_COMMON_FLAGS
 	# Define common pip install flags
-	PIP_COMMON_FLAGS := --use-pep517 --upgrade --upgrade-strategy eager
+	PIP_COMMON_FLAGS := --use-pep517 --exists-action s --upgrade --upgrade-strategy eager
 endif
 
 # Define environment-specific pip install flags
@@ -191,6 +191,9 @@ test-reports:
 test-reqs: test-reports init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
 
+docs-reqs: ./docs/ ./docs/requirements.txt init
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(WAIT) ;
 
 test-pytest: cleanup must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
@@ -258,9 +261,7 @@ cleanup:
 	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;
 
-build-docs: ./docs/ ./docs/Makefile ./docs/requirements.txt
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r ./docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(WAIT) ;
+build-docs: ./docs/ ./docs/Makefile docs-reqs
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile html 2>$(ERROR_LOG_PATH) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)mkdir $(INST_OPTS) ./docs/www 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || : ;
