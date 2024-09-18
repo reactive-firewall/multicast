@@ -504,7 +504,7 @@ class McastDispatch(mtool):
 				elif (sys.stdout.isatty()):  # pragma: no cover
 					print(_TOOL_MSG)
 			except Exception as inerr:  # pragma: no branch
-				w = str("WARNING - An error occured while")
+				w = str("WARNING - An error occurred while")
 				w += str(" handling the arguments.")
 				w += str(" Refused.")
 				if (sys.stdout.isatty()):  # pragma: no cover
@@ -514,7 +514,7 @@ class McastDispatch(mtool):
 				del inerr
 				__EXIT_MSG = (2, "NoOp")
 		except BaseException:  # pragma: no branch
-			e = str("CRITICAL - An error occured while handling")
+			e = str("CRITICAL - An error occurred while handling")
 			e += str(" the dispatch.")
 			if (sys.stdout.isatty()):  # pragma: no cover
 				print(str(e))
@@ -526,7 +526,7 @@ def main(*argv):
 	"""Do main event stuff.
 
 	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
-	Regardles of errors the result as an 'exit code' (int) is returned.
+	Regardless of errors the result as an 'exit code' (int) is returned.
 	The only exception is multicast.__main__.main(*args) which will exit with the underlying
 	return codes.
 	The expected return codes are as follows:

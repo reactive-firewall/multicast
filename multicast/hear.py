@@ -32,7 +32,7 @@
 		True
 		>>>
 
-	Testcase 1: Recv should be automaticly imported.
+	Testcase 1: Recv should be automatically imported.
 		A: Test that the multicast component is initialized.
 		B: Test that the hear component is initialized.
 		C: Test that the hear component has __doc__
@@ -102,7 +102,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Hear should be automaticly imported.
+	Testcase 1: Hear should be automatically imported.
 
 		>>> multicast.hear.__package__ is not None
 		True
@@ -126,7 +126,7 @@ __module__ = """multicast"""
 		>>> import multicast
 		>>>
 
-	Testcase 1: Hear should be automaticly imported.
+	Testcase 1: Hear should be automatically imported.
 
 		>>> multicast.hear.__module__ is not None
 		True
@@ -151,7 +151,7 @@ __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Hear should be automaticly imported.
+	Testcase 1: Hear should be automatically imported.
 
 		>>> multicast.hear.__name__ is not None
 		True
@@ -198,7 +198,7 @@ except Exception as err:
 class McastServer(socketserver.UDPServer):
 	"""Generic Subclasses socketserver.UDPServer for handling daemon function.
 
-	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
 
 	Minimal Acceptance Testing:
@@ -213,7 +213,7 @@ class McastServer(socketserver.UDPServer):
 		>>> from multicast.hear import McastServer as McastServer
 		>>>
 
-	Testcase 1: McastServer should be automaticly imported.
+	Testcase 1: McastServer should be automatically imported.
 
 		>>> McastServer.__name__ is not None
 		True
@@ -257,7 +257,7 @@ class McastServer(socketserver.UDPServer):
 class MyUDPHandler(socketserver.BaseRequestHandler):
 	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
 
-	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
 
 	Minimal Acceptance Testing:
@@ -272,7 +272,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 		>>> from multicast.hear import MyUDPHandler as MyUDPHandler
 		>>>
 
-	Testcase 1: MyUDPHandler should be automaticly imported.
+	Testcase 1: MyUDPHandler should be automatically imported.
 
 		>>> MyUDPHandler.__name__ is not None
 		True
@@ -291,7 +291,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 class HearUDPHandler(socketserver.BaseRequestHandler):
 	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
 
-	Basicly simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
 	"""
 

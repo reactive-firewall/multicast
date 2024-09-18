@@ -42,7 +42,7 @@ Minimal Acceptance Testing:
 		>>> import multicast
 		>>>
 
-	Testcase 1: Send should be automaticly imported.
+	Testcase 1: Send should be automatically imported.
 		A: Test that the send component is initialized.
 		B: Test that the send.__MAGIC__ components are initialized.
 
@@ -78,7 +78,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Send should be automaticly imported.
+	Testcase 1: Send should be automatically imported.
 
 		>>> multicast.send.__package__ is not None
 		True
@@ -102,7 +102,7 @@ __module__ = """multicast"""
 		>>> import multicast
 		>>>
 
-	Testcase 1: Send should be automaticly imported.
+	Testcase 1: Send should be automatically imported.
 
 		>>> multicast.send.__module__ is not None
 		True
@@ -127,7 +127,7 @@ __name__ = """multicast.send"""
 		>>> import multicast
 		>>>
 
-	Testcase 1: Send should be automaticly imported.
+	Testcase 1: Send should be automatically imported.
 
 		>>> multicast.send.__name__ is not None
 		True
@@ -289,7 +289,7 @@ class McastSAY(multicast.mtool):
 	def _sayStep(group, port, data):
 		"""Will send the given data over the given port to the given group.
 
-		The actual magic is handeled here.
+		The actual magic is handled here.
 		"""
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 		try:

@@ -45,7 +45,7 @@
 		True
 		>>>
 
-	Testcase 1: Recv should be automaticly imported.
+	Testcase 1: Recv should be automatically imported.
 		A: Test that the multicast component is initialized.
 		B: Test that the recv component is initialized.
 		C: Test that the recv component has __doc__
@@ -115,7 +115,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automaticly imported.
+	Testcase 1: Recv should be automatically imported.
 
 		>>> multicast.recv.__package__ is not None
 		True
@@ -139,7 +139,7 @@ __module__ = """multicast"""
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automaticly imported.
+	Testcase 1: Recv should be automatically imported.
 
 		>>> multicast.recv.__module__ is not None
 		True
@@ -164,7 +164,7 @@ __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automaticly imported.
+	Testcase 1: Recv should be automatically imported.
 
 		>>> multicast.recv.__name__ is not None
 		True

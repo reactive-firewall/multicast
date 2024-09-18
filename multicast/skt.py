@@ -47,7 +47,7 @@ Testcase 0: Multicast should be importable.
 	True
 	>>>
 
-Testcase 1: SKT utils should be automaticly imported.
+Testcase 1: SKT utils should be automatically imported.
 	A: Test that the multicast.skt component is initialized.
 	B: Test that the skt component is initialized.
 	C: Test that the skt component has __doc__
@@ -92,7 +92,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: SKT utils should be automaticly imported.
+	Testcase 1: SKT utils should be automatically imported.
 
 		>>> multicast.skt.__package__ is not None
 		True
@@ -116,7 +116,7 @@ __module__ = """multicast.skt"""
 		>>> import multicast
 		>>>
 
-	Testcase 1: SKT utils should be automaticly imported.
+	Testcase 1: SKT utils should be automatically imported.
 
 		>>> multicast.skt.__module__ is not None
 		True
@@ -141,7 +141,7 @@ __name__ = """multicast.skt"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: SKT utils should be automaticly imported.
+	Testcase 1: SKT utils should be automatically imported.
 
 		>>> multicast.skt.__name__ is not None
 		True
@@ -177,7 +177,7 @@ def genSocket():
 		True
 		>>>
 
-	Testcase 0: skt should be automaticly imported.
+	Testcase 0: skt should be automatically imported.
 		A: Test that the multicast component is initialized.
 		B: Test that the skt component is initialized.
 
@@ -221,7 +221,7 @@ def endSocket(sock=None):
 		True
 		>>>
 
-	Testcase 0: skt should be automaticly imported.
+	Testcase 0: skt should be automatically imported.
 		A: Test that the multicast component is initialized.
 		B: Test that the skt component is initialized.
 

@@ -234,7 +234,7 @@ _MCAST_DEFAULT_TTL = int(1)
 """Arbitrary TTL time to live to use by default, though any small (1-126) TTL would work.
 	A Value of 1 (one TTL) is chosen as per RFC1112 Sec 6.1 on the rational that an
 	explicit value that could traverse byond the local connected network should be
-	chosen by the caller rather than the default vaule. This is inline with the principle
+	chosen by the caller rather than the default value. This is inline with the principle
 	of none, one or many.
 
 	Minimal Testing:
@@ -546,7 +546,7 @@ class mtool(abc.ABC):
 			will be silently ignored.
 
 			Subclasses should not reimplement __call__ directly and instead
-			should implement nessasary logic in the abstract doStep() function.
+			should implement necessary logic in the abstract doStep() function.
 		"""
 		return self.doStep(*args, **kwargs)
 
