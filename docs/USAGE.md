@@ -17,9 +17,9 @@ _fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg = None  # Assuming this variable needs an initial value
 _fixture_HEAR_args = [
-	"""--port""", _fixture_PORT_arg,
-	"""--join-mcast-groups""", _fixture_mcast_GRP_arg,
-	"""--bind-group""", _fixture_mcast_GRP_arg
+	"--port", _fixture_PORT_arg,
+	"--join-mcast-groups", _fixture_mcast_GRP_arg,
+	"--bind-group", _fixture_mcast_GRP_arg
 ]
 
 # spawn a listening proc
@@ -36,9 +36,9 @@ def inputHandle():
 	if didWork:
 		buffer_string += result
 	return buffer_string
-def printLoopStub(func):
-	for i in range( 0, 5 ):
-		print( str( func() ) )
+def print_loop_stub(func):
+    for _ in range(5):
+        print(str(func()))
 
 p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
