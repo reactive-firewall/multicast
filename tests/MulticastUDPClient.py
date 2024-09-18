@@ -206,7 +206,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 				)
 			)
 
-	def say(self, address, port, conn, msg):
+	@staticmethod
+	def say(address, port, conn, msg):
 		"""Send a message to a specified multicast address and port,
 		then receive and print the response.
 
