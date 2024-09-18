@@ -62,7 +62,7 @@ python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello W
 [Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
 
 ```python3
-import multicast as multicast
+import multicast
 from multiprocessing import Process as Process
 
 # set up some stuff

@@ -32,6 +32,8 @@
 
 """multicast RECV Features.
 
+Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
+
 	Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
@@ -175,13 +177,13 @@ __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast  # skipcq: PYL-C0414
+		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
 except Exception as importErr:
 	del importErr
-	import multicast as multicast  # skipcq: PYL-C0414
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 try:

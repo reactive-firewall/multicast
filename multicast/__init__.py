@@ -105,6 +105,12 @@ __prologue__ = str("""Python Multicast library version {version}.""").format(ver
 
 __doc__ = __prologue__ + """
 
+	Dynamic Imports:
+		While the alias is the same as the module name, this pattern may serve to reinforce the
+		Multicast module's namespace, especially when dealing with dynamic imports and to maintain
+		consistency across different parts of the code.
+
+
 	Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.

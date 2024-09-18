@@ -51,7 +51,7 @@ p.start()
 and elsewhere (like another function or even module) for the sender:
 ```python3
 
-# assuming already did 'import multicast as multicast'
+# assuming already did 'import multicast'
 
 _fixture_SAY_args = [
 	"""--port""", _fixture_PORT_arg,

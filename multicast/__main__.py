@@ -19,37 +19,39 @@
 
 """The Main Entrypoint.
 
+Caution: See details regarding dynamic imports [documented](../__init__.py) in this module. 
+
 	Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
 
-		>>> import multicast as multicast
+		>>> import multicast as _multicast
 		>>>
-		>>> import multicast.__main__
+		>>> import _multicast.__main__
 		>>>
 
-		>>> multicast.__doc__ is not None
+		>>> _multicast.__doc__ is not None
 		True
 		>>>
 
-		>>> multicast.__main__.__doc__ is not None
+		>>> _multicast.__main__.__doc__ is not None
 		True
 		>>>
 
-		>>> multicast.__version__ is not None
+		>>> _multicast.__version__ is not None
 		True
 		>>>
 
 	Testcase 0: multicast.__main__ should have a doctests.
 
-		>>> import multicast.__main__
+		>>> import _multicast.__main__
 		>>>
 
-		>>> multicast.__main__.__module__ is not None
+		>>> _multicast.__main__.__module__ is not None
 		True
 		>>>
 
-		>>> multicast.__main__.__doc__ is not None
+		>>> _multicast.__main__.__doc__ is not None
 		True
 		>>>
 
