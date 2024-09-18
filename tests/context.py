@@ -109,7 +109,7 @@ except Exception:  # pragma: no branch
 
 __BLANK = str("""""")
 """
-	A literaly named variable to improve readability of code when using a blank string.
+	A literally named variable to improve readability of code when using a blank string.
 
 	Meta Testing:
 
@@ -500,7 +500,7 @@ def checkPythonFuzzing(args=[None], stderr=None):
 def debugBlob(blob=None):
 	"""Helper function to debug unexpected outputs.
 
-		Especialy usefull for cross-python testing where output may differ
+		Especially useful for cross-python testing where output may differ
 		yet may be from the same logical data.
 
 		Meta Testing:
@@ -742,11 +742,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		"""Overides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
+		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
 	def setUp(self):
-		"""Overides unittest.TestCase.setUp(unittest.TestCase).
+		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if not self._thepython:
@@ -766,6 +766,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(cls):
-		"""Overides unittest.TestCase.tearDownClass(cls) to clean up thepython test fixture."""
+		"""Overrides unittest.TestCase.tearDownClass(cls) to clean up thepython test fixture."""
 		cls._thepython = None
 
