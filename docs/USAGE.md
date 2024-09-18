@@ -22,7 +22,7 @@ _fixture_HEAR_args = [
 	"""--bind-group""", _fixture_mcast_GRP_arg
 ]
 
-# spwan a listening proc
+# spawn a listening proc
 
 def inputHandle():
 	test_RCEV = multicast.recv.McastRECV()
@@ -79,7 +79,7 @@ CLI should work like so:
 multicast (SAY|RECV|HEAR) [-h|--help] [--use-std] [--daemon] [--port PORT] [--iface IFACE] [--pipe|-m MESSAGE|--message MESSAGE] [--group BIND_GROUP] [--groups [JOIN_MCAST_GROUPS ...]]
 ```
 
-The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogus to `send` listen/accept and echo functions of a 1-to-1 connection.
+The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogous to `send` listen/accept and echo functions of a 1-to-1 connection.
 
 ### `SAY`
 

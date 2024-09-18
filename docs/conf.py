@@ -58,7 +58,7 @@ source_suffix = {
 	"Makefile": "makefile",
 }
 
-# The encoding of source files. Official sphinx docs reccomend utf-8-sig.
+# The encoding of source files. Official sphinx docs recommend utf-8-sig.
 source_encoding = "utf-8-sig"
 
 # The master toctree document.
@@ -91,7 +91,7 @@ today_fmt = "%Y.%B.%d"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-	"_build", ".github", ".circleci", "coddcov_env", ".DS_Store", "**/.git", "dist",
+	"_build", ".github", ".circleci", "codecov_env", ".DS_Store", "**/.git", "dist",
 	"../tests/tests/**", "www", "**/docs", "../multicast/multicast/**", "*~"
 ]
 
@@ -244,7 +244,7 @@ myst_enable_extensions = set(["tasklist", "strikethrough", "fieldlist"])
 myst_fence_as_directive = ("mermaid", "suggestion", "note")
 
 # Focus only on github markdown
-myst_gfm_only = False
+myst_gfm_only = True
 
 # how deep should markdown headers have anchors be generated
 heading_anchors = 3
@@ -364,8 +364,7 @@ extlinks = {"""issue""": (str("""{prefix}/{suffix}""").format(
 intersphinx_mapping = {
 	"""python""": (
 			"""https://docs.python.org/3""",
-			(None, """python-inv.txt"""
-		)
+			(None, """python-inv.txt""")
 	)
 }
 
