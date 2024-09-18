@@ -177,6 +177,7 @@ html_short_title = "Multicast Docs"
 # html_favicon = None
 
 try:
+	#  extra import for CI test stability during discovery
 	import sphinxawesome_theme
 	from sphinxawesome_theme.postprocess import Icons
 	html_permalinks_icon = Icons.permalinks_icon

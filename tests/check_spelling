@@ -95,7 +95,7 @@ ulimit -t 600
 umask 137
 
 # force utf-8 for spelling
-export LC_CTYPE="${LC_CTYPE:-'en_US.UTF-8'}"
+export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.spell-check-shell"
 EXIT_CODE=1
@@ -179,4 +179,4 @@ unset _TEST_ROOT_DIR 2>/dev/null || : ;
 unset CODESPELL_OPTIONS 2>/dev/null || : ;
 
 wait ;
-exit ${EXIT_CODE:255} ;
+exit ${EXIT_CODE:-255} ;
