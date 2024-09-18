@@ -53,7 +53,7 @@ _fixture_SAY_args = [
 ]
 try:
 	multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-	# Hint: use a loop to repeat or different arguments to varry message.
+	# Hint: use a loop to repeat or different arguments to vary message.
 except Exception:
 	p.join()
 	raise RuntimeError("Multicast operation failed.")
