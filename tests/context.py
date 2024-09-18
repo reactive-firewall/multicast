@@ -22,6 +22,12 @@ __module__ = """tests"""
 __name__ = """tests.context"""  # skipcq: PYL-W0622
 
 __doc__ = """
+
+	Robust imports: These statements import the entire "multicast" module,
+		allowing access to all its functionalities within the test environment.
+		this can be flagged as an intentional
+		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+
 	Context for Testing.
 
 	Meta Tests - Fixtures:
@@ -91,9 +97,9 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'multicast' not in sys.modules:
-		import multicast
+		import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
 except Exception:  # pragma: no branch
 	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.")
 
@@ -144,13 +150,12 @@ def getCoverageCommand():
 
 		First set up test fixtures by importing test context.
 
-			>>> import tests.context as context
+			>>> import tests.context as _context
 			>>>
 
 		Testcase 1: function should have a output.
 
-			>>> import tests.context as context
-			>>> context.getCoverageCommand() is None
+			>>> _context.getCoverageCommand() is None
 			False
 			>>>
 
@@ -180,18 +185,18 @@ def __check_cov_before_py():
 
 		First set up test fixtures by importing test context.
 
-			>>> import tests.context
+			>>> import tests.context as _context
 			>>>
 
 		Testcase 1: function should have a output.
 
-			>>> tests.context.__check_cov_before_py() is not None
+			>>> _context.__check_cov_before_py() is not None
 			True
 			>>>
 
 		Testcase 2: function should have a string output of python or coverage.
 
-			>>> _test_fixture = tests.context.__check_cov_before_py()
+			>>> _test_fixture = _context.__check_cov_before_py()
 			>>> isinstance(_test_fixture, type(str("")))
 			True
 			>>> (str("python") in _test_fixture) or (str("coverage") in _test_fixture)
@@ -224,12 +229,12 @@ def getPythonCommand():
 
 		First set up test fixtures by importing test context.
 
-		>>> import tests.context
+		>>> import tests.context as _context
 		>>>
 
 		Testcase 1: function should have a output.
 
-		>>> tests.context.getPythonCommand() is not None
+		>>> _context.getPythonCommand() is not None
 		True
 		>>>
 
@@ -265,36 +270,36 @@ def checkCovCommand(args=[None]):
 
 		First set up test fixtures by importing test context.
 
-			>>> import tests.context as context
+			>>> import tests.context as _context
 			>>>
 
 		Testcase 1: Function should return unmodified arguments if 'coverage' is missing.
 
-			>>> context.checkCovCommand(["python", "script.py"])
+			>>> _context.checkCovCommand(["python", "script.py"])
 			['python', 'script.py']
 
 		Testcase 2: Function should modify arguments when 'coverage' is the first argument.
 			A.) Missing 'run'
 
-			>>> checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 3: Function should modify arguments when 'coverage run' is in the first argument.
 			A.) NOT missing 'run'
 
-			>>> checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 4: Function should handle coverage command with full path.
 
-			>>> checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		Testcase 5: Function should handle coverage invoked via sys.executable.
 
-			>>> import sys
-			>>> test_fixture = [str("{} -m coverage run").format(sys.executable), "test.py"]
-			>>> context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
+			>>> import sys as _sys
+			>>> test_fixture = [str("{} -m coverage run").format(_sys.executable), "test.py"]
+			>>> _context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
 			[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
@@ -418,38 +423,39 @@ def checkPythonCommand(args, stderr=None):
 
 		First set up test fixtures by importing test context.
 
-			>>> import tests.context
+			>>> import sys as _sys
+			>>> import tests.context as _context
 			>>>
 
 		Testcase 1: Function should have an output when provided valid arguments.
 
-			>>> test_fixture_1 = [str(sys.executable), '-c', 'print("Hello, World!")']
-			>>> tests.context.checkPythonCommand(test_fixture_1)
+			>>> test_fixture_1 = [str(_sys.executable), '-c', 'print("Hello, World!")']
+			>>> _context.checkPythonCommand(test_fixture_1)
 			'Hello, World!\\n'
 
 		Testcase 2: Function should capture stderr when specified.
 
-			>>> import subprocess
+			>>> import subprocess as _subprocess
 			>>> test_args_2 = [
-			... 	str(sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
+			... 	str(_sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
 			... ]
 			>>>
-			>>> tests.context.checkPythonCommand(test_args_2, stderr=subprocess.STDOUT)
+			>>> _context.checkPythonCommand(test_args_2, stderr=_subprocess.STDOUT)
 			'Error\\n'
 
 		Testcase 3: Function should handle exceptions and return output.
 
-			>>> test_fixture_e = [str(sys.executable), '-c', 'raise ValueError("Test error")']
-			>>> tests.context.checkPythonCommand(
-			... 	test_fixture_e, stderr=subprocess.STDOUT
+			>>> test_fixture_e = [str(_sys.executable), '-c', 'raise ValueError("Test error")']
+			>>> _context.checkPythonCommand(
+			... 	test_fixture_e, stderr=_subprocess.STDOUT
 			... ) #doctest: +ELLIPSIS
 			'Traceback (most recent call last):\\n...ValueError...'
 
 		Testcase 4: Function should return the output as a string.
 
-			>>> test_fixture_s = [str(sys.executable), '-c', 'print(b"Bytes output")']
-			>>> isinstance(tests.context.checkPythonCommand(
-			... 	test_fixture_s, stderr=subprocess.STDOUT
+			>>> test_fixture_s = [str(_sys.executable), '-c', 'print(b"Bytes output")']
+			>>> isinstance(_context.checkPythonCommand(
+			... 	test_fixture_s, stderr=_subprocess.STDOUT
 			... ), str)
 			True
 
@@ -507,7 +513,7 @@ def debugBlob(blob=None):
 
 		First set up test fixtures by importing test context.
 
-			>>> import tests.context
+			>>> import tests.context as _context
 			>>>
 
 			>>> norm_fixture = "Example Sample"
@@ -573,7 +579,7 @@ def debugtestError(someError):
 
 		First set up test fixtures by importing test context.
 
-		>>> import tests.context
+		>>> import tests.context as _context
 		>>>
 
 		>>> err_fixture = RuntimeError(\"Example Error\")
@@ -648,7 +654,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 
 		First set up test fixtures by importing test context.
 
-		>>> import tests.context
+		>>> import tests.context as _context
 		>>>
 
 		>>> expected_fixture = "<EXPECTED OUTPUT>"
@@ -658,7 +664,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 
 		Testcase 1: function should have a output.
 
-		>>> tests.context.debugUnexpectedOutput(
+		>>> _context.debugUnexpectedOutput(
 		... 	expected_fixture, unexpected_fixture, python_fixture
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE
 		<BLANKLINE>
@@ -676,7 +682,7 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 
 		Testcase 2: function should have a output even with bad input.
 
-		>>> tests.context.debugUnexpectedOutput(
+		>>> _context.debugUnexpectedOutput(
 		... 	expected_fixture, unexpected_fixture, None
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE
 		<BLANKLINE>
@@ -718,10 +724,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 		First set up test fixtures by importing test context.
 
-		>>> import tests.context
+		>>> import tests.context as _context
 		>>>
 
-		>>> class TestCaseFixture(tests.context.BasicUsageTestSuite):
+		>>> class TestCaseFixture(_context.BasicUsageTestSuite):
 		... 	pass
 		>>>
 		>>> TestCaseFixture

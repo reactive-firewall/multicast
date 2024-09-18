@@ -19,6 +19,11 @@
 
 """Multicast Testing Module.
 
+	Robust imports: These statements import the entire "multicast" module,
+		allowing access to all its functionalities within the test environment.
+		this can be flagged as an intentional
+		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+
 	Testing:
 
 	Testcase 0: Load tests fixtures
@@ -72,7 +77,7 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'multicast' not in sys.modules:
-		import multicast
+		import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 except Exception:  # pragma: no branch
