@@ -443,7 +443,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					str("multicast"),
 					str("--help")
 				], stderr=subprocess.STDOUT)
-				self.asserting(str("usage:"), str(theOutputtxt))
+				self.assertIn(str("usage:"), str(theOutputtxt))
 				if (str("usage:") in str(theOutputtxt)):
 					theResult = True
 				else:
@@ -477,7 +477,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					theOutputtxt = context.checkPythonCommand(
 						args, stderr=subprocess.STDOUT
 					)
-					self.asserting(str("usage:"), str(theOutputtxt))
+					self.assertIn(str("usage:"), str(theOutputtxt))
 					if (str("usage:") in str(theOutputtxt)):
 						theResult = ((theResult is None) or (theResult is True))
 					else:
@@ -508,7 +508,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				str("-m"),
 				str("multicast")
 			], stderr=subprocess.STDOUT)
-			self.asserting(str(theExpectedText), str(theOutputtxt))
+			self.assertIn(str(theExpectedText), str(theOutputtxt))
 			if (str(theExpectedText) in str(theOutputtxt)):
 				theResult = True
 			else:
@@ -574,7 +574,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						theOutputtxt = str(repr(bytes(theOutputtxt)))
 					# or simply:
 					self.assertIsNotNone(theOutputtxt)
-					self.asserting(str("""usage:"""), str(theOutputtxt))
+					self.assertIn(str("""usage:"""), str(theOutputtxt))
 					if (str("""usage:""") in str(theOutputtxt)):
 						theResult = True or theResult
 					else:
@@ -668,8 +668,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# or simply:
 					self.assertIsNotNone(theOutputtxt)
-					self.asserting(str("invalid choice:"), str(theOutputtxt))
-					self.asserting(str(test_case), str(theOutputtxt))
+					self.assertIn(str("invalid choice:"), str(theOutputtxt))
+					self.assertIn(str(test_case), str(theOutputtxt))
 					theResult = True
 			except Exception as err:
 				context.debugtestError(err)
