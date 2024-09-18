@@ -81,7 +81,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """1.5-rc"""
+__version__ = """1.5.0"""
 """The version of this program.
 
 	Minimal Acceptance Testing:
