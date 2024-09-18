@@ -96,7 +96,7 @@ The `SAY` command is used to send data messages via multicast datagrams.
 ### `RECV`
 
 The `RECV` command is used to receive multicast datagrams by listening or "joining" a multicast group.
-* If the `--use-std` flag is set the output is printed to the standard-output
+* If the `--use-std` flag is set, the output is printed to the standard-output
 * This command is purely for testing or interfacing with external components and not intended as a first-class API
 * Note: If the `--daemon` flag is used the process will loop after reporting each datagrams until canceled, it has no effect on the `RECV` command.
 
@@ -105,7 +105,7 @@ The `RECV` command is used to receive multicast datagrams by listening or "joini
 The `HEAR` command is used to send data acknowledged messages via "HEAR" messages echoing select received multicast datagrams.
 * While mostly a testing function, it is possible to use `HEAR` as a proxy for other send/recv instances by using the `--daemon` flag
 * Note: this will use the same port for sends and receives and can lead to data loss if less than two groups are used.
-* If more than one group is used via the `--groups` flag then all but the bind group (via `--group`) will be echoed to the bind group.
+* If more than one group is used via the `--groups` flag, then all but the bind group (via `--group`) will be echoed to the bind group.
 
 
 ***
