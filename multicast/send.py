@@ -295,7 +295,10 @@ class McastSAY(multicast.mtool):
 		"""
 		sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
 		try:
-			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_MULTICAST_TTL, multicast._MCAST_DEFAULT_TTL)
+			sock.setsockopt(
+				_socket.IPPROTO_IP, _socket.IP_MULTICAST_TTL,
+				multicast._MCAST_DEFAULT_TTL  # skipcq: PYL-W0212  -  use of module-wide var.
+			)
 			sock.sendto(data.encode('utf8'), (group, port))
 		finally:
 			multicast.endSocket(sock)
