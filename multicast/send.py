@@ -140,13 +140,13 @@ __name__ = """multicast.send"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
-		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
 except Exception as importErr:
 	del importErr
-	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
 
 
 try:

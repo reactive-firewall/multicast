@@ -164,7 +164,7 @@ __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 try:
 	import sys as _sys
 	if 'multicast' not in _sys.modules:
-		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-C0414
 	else:  # pragma: no branch
 		multicast = _sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
@@ -172,7 +172,7 @@ try:
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
 	del importErr
-	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
 
 
 try:
