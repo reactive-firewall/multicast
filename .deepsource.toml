@@ -32,6 +32,7 @@ enabled = true
 dependency_file_paths = [
   "requirements.txt",
   "tests/requirements.txt",
+  "docs/requirements.txt",
   "setup.py"
 ]
 

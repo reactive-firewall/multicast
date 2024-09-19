@@ -177,7 +177,7 @@ except Exception as importErr:
 
 try:
 	import socketserver
-	from socketserver import threading as _threading
+	import threading as _threading
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket

@@ -25,8 +25,9 @@ __doc__ = """
 
 	Robust imports: These statements import the entire "multicast" module,
 		allowing access to all its functionalities within the test environment.
-		this can be flagged as an intentional
+		This can be flagged as an intentional
 		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+		warning.
 
 	Context for Testing.
 

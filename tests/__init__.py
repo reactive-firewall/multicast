@@ -21,8 +21,9 @@
 
 	Robust imports: These statements import the entire "multicast" module,
 		allowing access to all its functionalities within the test environment.
-		this can be flagged as an intentional
-		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+		This may be flagged as an intentional cyclic import by pylint.
+		See warning about cyclic-imports
+		[here](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
 
 	Testing:
 

@@ -345,16 +345,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	@staticmethod
 	def _always_generate_random_port_WHEN_called():
 		"""Outputs a psuedo-random, RFC-6335 compliant, port number."""
-		return int(
-			50000 + (
-				int(
-					_random.SystemRandom().randbytes(
-						int(60000).__sizeof__()
-					).hex(),
-					16
-				) % 9999
-			)
-		)
+		return _random.randint(49152, 65535)
 
 	def test_hear_works_WHEN_fuzzed_and_say_works(self):
 		"""Tests the basic send and recv test. Skips if fuzzing broke SAY fixture."""
@@ -363,7 +354,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
-			self.assertIsEqual(type(_fixture_port_num), type(int(0)))
+			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_SAY_args = [
 				"""--port""", str(_fixture_port_num),
 				"""--mcast-group""", """'224.0.0.1'""",

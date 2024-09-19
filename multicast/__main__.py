@@ -91,7 +91,7 @@ try:
 		__version__ = _sys.modules["""multicast.__version__"""]
 except Exception as importErr:
 	del importErr
-	import multicast.__version__ as __version__  # noqa  -  used by --version argument.
+	import multicast.__version__ as __version__  # noqa. skipcq  -  used by --version argument.
 
 
 try:
@@ -101,7 +101,7 @@ try:
 		_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 except Exception as importErr:
 	del importErr
-	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # noqa  -  used by --port argument.
+	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq  -  used by port argument.
 
 
 try:
@@ -111,7 +111,7 @@ try:
 		_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 except Exception as importErr:
 	del importErr
-	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # noqa  -  used by --group arg.
+	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq  -  used by group arg.
 
 
 try:
