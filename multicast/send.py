@@ -150,12 +150,12 @@ except Exception as importErr:
 
 
 try:
-	from multicast import argparse as argparse  # skipcq: PYL-C0414
-	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
-	from multicast import socket as socket  # skipcq: PYL-C0414
-	from multicast import struct as struct  # skipcq: PYL-C0414
+	from multicast import argparse as _argparse  # skipcq: PYL-C0414
+	from multicast import unicodedata as _unicodedata  # skipcq: PYL-C0414
+	from multicast import socket as _socket  # skipcq: PYL-C0414
+	from multicast import struct as _struct  # skipcq: PYL-C0414
 	depends = [
-		unicodedata, socket, struct, argparse
+		_unicodedata, _socket, _struct, _argparse
 	]
 	for unit in depends:
 		try:
@@ -293,9 +293,9 @@ class McastSAY(multicast.mtool):
 
 		The actual magic is handled here.
 		"""
-		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+		sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
 		try:
-			sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, multicast._MCAST_DEFAULT_TTL)
+			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_MULTICAST_TTL, multicast._MCAST_DEFAULT_TTL)
 			sock.sendto(data.encode('utf8'), (group, port))
 		finally:
 			multicast.endSocket(sock)

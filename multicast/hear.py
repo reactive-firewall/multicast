@@ -162,14 +162,14 @@ __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 """
 
 try:
-	import sys
-	if 'multicast' not in sys.modules:
+	import sys as _sys
+	if 'multicast' not in _sys.modules:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = _sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
-	from . import recv as recv  # skipcq: PYL-C0414
-	from . import send as send  # skipcq: PYL-C0414
+	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
 	del importErr
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
@@ -177,13 +177,13 @@ except Exception as importErr:
 
 try:
 	import socketserver
-	from socketserver import threading as threading  # skipcq: PYL-C0414
-	from multicast import argparse as argparse  # skipcq: PYL-C0414
-	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
-	from multicast import socket as socket  # skipcq: PYL-C0414
-	from multicast import struct as struct  # skipcq: PYL-C0414
+	from socketserver import threading as _threading
+	from multicast import argparse as _argparse
+	from multicast import unicodedata as _unicodedata
+	from multicast import socket as _socket
+	from multicast import struct as _struct
 	depends = [
-		unicodedata, socket, struct, argparse
+		_unicodedata, _socket, _struct, _argparse
 	]
 	for unit in depends:
 		try:
@@ -251,7 +251,7 @@ class McastServer(socketserver.UDPServer):
 			def kill_func(a_server):
 				if a_server is not None:
 					a_server.shutdown()
-			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
+			end_thread = _threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
 			end_thread.start()
 		super(McastServer, self).handle_error(request, client_address)
 

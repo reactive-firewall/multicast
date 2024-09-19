@@ -127,6 +127,8 @@ Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-fi
 
 ## License
 
+### Copyright (c) 2021-2024, Mr. Walls
+
 This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

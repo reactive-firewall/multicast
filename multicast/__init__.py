@@ -106,9 +106,13 @@ __prologue__ = str("""Python Multicast library version {version}.""").format(ver
 __doc__ = __prologue__ + """
 
 	Dynamic Imports:
-		While the alias is the same as the module name, this pattern may serve to reinforce the
-		Multicast module's namespace, especially when dealing with dynamic imports and to maintain
-		consistency across different parts of the code.
+		The sub-modules within "multicast" are interdependent, requiring access to each other's
+		functionalities. These statements import sub-modules of "multicast" and assign them to
+		aliases that match their sub-module names, facilitating organized access to these
+		components.
+		While the multicast alias is the same as the multicast module name, this pattern should
+		serve to reinforce the Multicast module's namespace, especially when dealing with dynamic
+		imports and to maintain consistency across different parts of the code.
 
 
 	Minimal Acceptance Testing:
@@ -570,12 +574,12 @@ class mtool(abc.ABC):
 
 try:
 	if 'multicast.skt' not in sys.modules:
-		from . import skt
+		from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		skt = sys.modules["""multicast.skt"""]
 except Exception as importErr:
 	del importErr
-	import multicast.skt as skt
+	import multicast.skt as skt  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 genSocket = skt.genSocket
@@ -586,39 +590,39 @@ endSocket = skt.endSocket
 
 try:
 	if 'multicast.recv' not in sys.modules:
-		from . import recv as recv
+		from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		recv = sys.modules["""multicast.recv"""]
 except Exception as importErr:
 	del importErr
-	import multicast.recv as recv
+	import multicast.recv as recv  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 try:
 	if 'multicast.send' not in sys.modules:
-		from . import send as send
+		from . import send as send  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
 	del importErr
-	import multicast.send as send
+	import multicast.send as send  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 try:
 	if 'multicast.hear' not in sys.modules:
-		from . import hear as hear
+		from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 	else:  # pragma: no branch
 		hear = sys.modules["""multicast.hear"""]
 except Exception as importErr:
 	del importErr
-	import multicast.hear as hear
+	import multicast.hear as hear  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 try:
 	if """multicast.__main__""" in sys.modules:  # pragma: no cover
 		__main__ = sys.modules["""multicast.__main__"""]
 except Exception:
-	import multicast.__main__ as __main__
+	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
 if __name__ in u'__main__':

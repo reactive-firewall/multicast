@@ -187,12 +187,12 @@ except Exception as importErr:
 
 
 try:
-	from multicast import argparse as argparse  # skipcq: PYL-C0414
-	from multicast import unicodedata as unicodedata  # skipcq: PYL-C0414
-	from multicast import socket as socket  # skipcq: PYL-C0414
-	from multicast import struct as struct  # skipcq: PYL-C0414
+	from multicast import argparse as _argparse
+	from multicast import unicodedata as _unicodedata
+	from multicast import socket as _socket
+	from multicast import struct as _struct
 	depends = [
-		unicodedata, socket, struct, argparse
+		_unicodedata, _socket, _struct, _argparse
 	]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
@@ -263,12 +263,12 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	try:
 		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
 		for group in groups:
-			mreq = struct.pack(
+			mreq = _struct.pack(
 				'4sl' if iface is None else '4s4s',
-				socket.inet_aton(group),
-				socket.INADDR_ANY if iface is None else socket.inet_aton(iface)
+				_socket.inet_aton(group),
+				_socket.INADDR_ANY if iface is None else _socket.inet_aton(iface)
 			)
-			sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
 		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
 	return sock
@@ -399,6 +399,7 @@ class McastRECV(multicast.mtool):
 			Testcase 0: First set up test fixtures by importing multicast.
 
 				>>> import multicast
+				>>> import argparse as _argparse
 				>>> multicast.recv is not None
 				True
 				>>> multicast.recv.McastRECV is not None
@@ -437,7 +438,7 @@ class McastRECV(multicast.mtool):
 				True
 				>>> multicast.__main__.main is not None
 				True
-				>>> tst_fxtr_args = argparse.ArgumentParser(prog="testcase")
+				>>> tst_fxtr_args = _argparse.ArgumentParser(prog="testcase")
 				>>> multicast.recv.McastRECV.setupArgs(parser=tst_fxtr_args)
 				>>>
 
