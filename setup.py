@@ -84,8 +84,45 @@ def readFile(filename):
 		).format(fn=filename, e=str(err))
 	return str(theResult)
 
+def parse_requirements_for_install_requires(requirements_text):
+	"""
+	Parses requirements.txt contents and extracts the minimal constraints
+	suitable for install_requires.
 
-requirements = readFile("""requirements.txt""").splitlines()
+	Only preserves the minimum required versions, ignores comments and complex
+	version specifications that are not supported by install_requires.
+
+	Returns a list of requirement strings suitable for install_requires.
+	"""
+	import re
+	install_requires = []
+	for line in requirements_text.splitlines():
+		line = line.strip()
+		if not line or line.startswith('#'):
+			continue  # Skip empty lines and comments
+		# Remove inline comments
+		line = line.split('#', 1)[0].strip()
+		# Skip options or URLs
+		if line.startswith('-') or line.startswith('http:') or line.startswith('https:'):
+			continue
+		# Extract package and version specifiers
+		match = re.match(r'^([A-Za-z0-9_\-\.]+)([<>=!~]+)?\s*([^\s,;]+)?', line)
+		if match:
+			package = match.group(1)
+			operator = match.group(2)
+			version = match.group(3)
+			if operator == '>=' and version:
+				# Keep only the minimum required version
+				install_requires.append(f"{package}>={version}")
+			else:
+				# Include the package without version or with simplified specifier
+				install_requires.append(package)
+		else:
+			# If line doesn't match expected pattern, include as is
+			install_requires.append(line)
+	return install_requires
+
+requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
 """The list of production requirements of this program."""
 
 
