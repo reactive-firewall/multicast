@@ -37,8 +37,8 @@ gitGraph
   commit id: "some feature"
   branch develop-nest
   checkout develop-nest
-  commit id: "some feature debuging"
-  commit id: "more feature debuging"
+  commit id: "some feature debugging"
+  commit id: "more feature debugging"
   checkout master
   branch develop-B
   checkout develop-B
