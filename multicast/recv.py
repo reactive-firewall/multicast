@@ -530,5 +530,5 @@ class McastRECV(multicast.mtool):
 			print(str(response))
 			print(multicast._BLANK)
 		_result = (len(response) > 0) is True
-		return tuple((_result, None if not _result else response))
+		return tuple((_result, None if not _result else response))  # skipcq: PTC-W0020  - intended
 

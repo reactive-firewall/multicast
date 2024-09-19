@@ -65,10 +65,11 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
-		from context import multicast # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from context import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 		from context import unittest
 		from context import subprocess
 		from context import Process
+	import random as _random
 except Exception:
 	raise ImportError("[CWE-758] Failed to import test context")
 
@@ -140,7 +141,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNone(test_fixture)
 				self.assertTupleEqual(
 					tst_dispatch.useTool(tst_in),
-					tuple((False, None)),
+					tuple((False, None)),  # skipcq: PTC-W0020  - This is test-code.
 					fail_fixture
 				)
 			theResult = True
@@ -254,7 +255,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			self.assertTupleEqual(
 				multicast.__main__.main(["HEAR", "--hex"]),
-				tuple((0, (True, (False, None))))
+				tuple((0, (True, (False, None))))  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -269,10 +270,10 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.main(NOOP) == Error""")
 		try:
 			self.assertIsNotNone(multicast.__main__.main(["NOOP"]), fail_fixture)
-			self.assertIsNotNone(tuple(multicast.__main__.main(["NOOP"]))[0])
+			self.assertIsNotNone(tuple(multicast.__main__.main(["NOOP"]))[0])  # skipcq: PTC-W0020
 			self.assertTupleEqual(
 				multicast.__main__.main(["NOOP"]),
-				tuple((0, tuple((True, None)))),
+				tuple((0, tuple((True, None)))),  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -289,7 +290,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(multicast.__main__.McastDispatch().doStep("HELP", []))
 			self.assertTupleEqual(
 				multicast.__main__.McastDispatch().doStep(["HELP"], []),
-				tuple((int(2), "NoOp")),
+				tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -337,8 +338,67 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = (int(p.exitcode) <= int(0))
 		except Exception as err:
 			context.debugtestError(err)
-			# raise unittest.SkipTest(fail_fixture)
 			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	@staticmethod
+	def _always_generate_random_port_WHEN_called():
+		"""Outputs a psuedo-random, RFC-6335 compliant, port number."""
+		return int(
+			50000 + (
+				int(
+					_random.SystemRandom().randbytes(
+						int(60000).__sizeof__()
+					).hex(),
+					16
+				) % 9999
+			)
+		)
+
+	def test_hear_works_WHEN_fuzzed_and_say_works(self):
+		"""Tests the basic send and recv test. Skips if fuzzing broke SAY fixture."""
+		theResult = False
+		fail_fixture = str("""SAY --> HEAR == error""")
+		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		try:
+			self.assertIsNotNone(_fixture_port_num)
+			self.assertIsEqual(type(_fixture_port_num), type(int(0)))
+			_fixture_SAY_args = [
+				"""--port""", str(_fixture_port_num),
+				"""--mcast-group""", """'224.0.0.1'""",
+				"""--message""", """'test message'"""
+			]
+			_fixture_HEAR_args = [
+				"""--port""", str(_fixture_port_num),
+				"""--join-mcast-groups""", """'224.0.0.1'""",
+				"""--bind-group""", """'224.0.0.1'"""
+			]
+			p = Process(
+				target=multicast.__main__.McastDispatch().doStep,
+				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+			)
+			p.start()
+			try:
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
+				self.assertIsNotNone(
+					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+				)
+			except Exception:
+				p.join()
+				raise unittest.SkipTest(fail_fixture)
+			p.join()
+			self.assertIsNotNone(p.exitcode)
+			self.assertEqual(int(p.exitcode), int(0))
+			theResult = (int(p.exitcode) <= int(0))
+		except Exception as err:
+			context.debugtestError(err)
+			self.skipTest(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
@@ -362,7 +422,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				test_cls = multicast.__main__.McastDispatch()
 				self.assertTupleEqual(
 					test_cls.doStep("NOOP", []),
-					tuple((int(2), "NoOp")),
+					tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
 			except Exception:
@@ -374,7 +434,6 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = (int(p.exitcode) <= int(0))
 		except Exception as err:
 			context.debugtestError(err)
-			# raise unittest.SkipTest(fail_fixture)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)

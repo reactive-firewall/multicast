@@ -19,7 +19,7 @@
 
 """The Main Entrypoint.
 
-Caution: See details regarding dynamic imports [documented](../__init__.py) in this module. 
+Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
 	Minimal Acceptance Testing:
 
@@ -449,12 +449,12 @@ class McastRecvHearDispatch(mtool):
 # More boiler-plate-code
 
 
-TASK_OPTIONS = dict({
-	'NOOP': McastNope(),
-	'RECV': McastRecvHearDispatch(),
-	'SAY': send.McastSAY(),
-	'HEAR': McastRecvHearDispatch(),
-})
+TASK_OPTIONS = {
+	"""NOOP""": McastNope(),
+	"""RECV""": McastRecvHearDispatch(),
+	"""SAY""": send.McastSAY(),
+	"""HEAR""": McastRecvHearDispatch(),
+}
 """The callable function tasks of this program. will add."""
 
 

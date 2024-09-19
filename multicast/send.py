@@ -33,7 +33,7 @@
 
 """Python Multicast Broadcaster.
 
-Caution: See details regarding dynamic imports [documented](../__init__.py) in this module. 
+Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
 Minimal Acceptance Testing:
 

@@ -239,7 +239,7 @@ htmlhelp_basename = "multicast_doc"
 # see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#syntax-directives
 
 # be more like GFM with style
-myst_enable_extensions = set(["tasklist", "strikethrough", "fieldlist"])
+myst_enable_extensions = ("tasklist", "strikethrough", "fieldlist")
 
 # for GFM diagrams and interoperability with other Markdown renderers
 myst_fence_as_directive = ("mermaid", "suggestion", "note")

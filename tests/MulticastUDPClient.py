@@ -261,8 +261,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		"""
 		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
 		received = str(conn.recv(1024), "utf-8")
-		print("Sent:     {}".format(msg))
-		print("Received: {}".format(received))
+		print(str("Sent:     {}").format(msg))  # skipcq: PYL-C0209  -  must remain compatible
+		print(str("Received: {}").format(received))  # skipcq: PYL-C0209  -  must remain compatible
 
 
 def main():
