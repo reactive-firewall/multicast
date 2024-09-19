@@ -20,46 +20,47 @@ integration testing. This ensures the [stable](https://github.com/reactive-firew
 branch remains acceptable for production use.
 
 ```mermaid
+%%{init: { 'gitGraph': {'mainBranchName': 'master'}} }%%
 gitGraph
-  commit id:start
+  commit id: "start"
   branch master
   checkout master
-  commit
-  commit
+  commit id: "history"
+  commit id: "release candidate" tag: "v1.4-rc"
   branch stable
-  commit 
+  commit id: "release" tag: "v1.4"
   checkout stable
   merge master
   checkout master
   branch develop
   checkout develop
-  commit
+  commit id: "some feature"
   branch develop-nest
   checkout develop-nest
-  commit
-  commit
+  commit id: "some feature debuging"
+  commit id: "more feature debuging"
   checkout master
   branch develop-B
   checkout develop-B
-  commit
+  commit id: "some other feature"
   checkout master
   branch develop-C
   checkout develop-C
-  commit
-  commit
+  commit id: "yet another feature"
+  commit id: "yet another feature improvement"
   checkout develop
   merge develop-nest
   checkout develop-C
-  commit
+  commit id: "yet another feature improvement"
   checkout master
   merge develop
   merge develop-B
   merge develop-C
-  commit
+  commit id: "yet another release ready" tag: "v1.5"
   checkout stable
   merge master
   checkout master
-  commit
+  commit id: "yet another small improvement"
 ```
 
 
