@@ -56,8 +56,28 @@ apidocs/index
 
 ## Overview
 
-```{autosummary}
-```
+Multicast is a Python module designed to simplify raw multicast communication in Python applications. It offers intuitive interfaces for sending and receiving multicast messages, enabling developers to implement efficient and robust multicast functionality with ease.
+
+### Key Features
+
+- **Simple API**: Easy-to-use functions for sending (`send`) and receiving (`recv`) multicast messages.
+- **Command-Line Interface**: Convenient CLI commands (`SAY`, `RECV`, `HEAR`) for quick testing and debugging.
+- **Cross-Platform Support**: Compatible with Linux, and macOS.
+
+### Getting Started
+
+- **Installation**: Install the package using `make install` or via `pip`.
+- **Quickstart**: Refer to the [Quickstart](#quickstart) section for immediate setup instructions.
+- **Examples**: Explore detailed examples and API references in the [Usage Guide](USAGE.md).
+
+### Documentation Resources
+
+- [README](README.md): Introduction and installation instructions.
+- [Usage Guide](USAGE.md): Detailed usage examples and API documentation.
+- [FAQ](FAQ.md): Frequently asked questions and troubleshooting tips.
+- [CI Processes](CI.md): Information on continuous integration and testing strategies.
+- [License](LICENSE.md): Licensing information and acknowledgments.
+
 
 ---
 ### Copyright (c) 2021-2024, Mr. Walls
