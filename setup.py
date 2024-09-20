@@ -84,6 +84,7 @@ def readFile(filename):
 		).format(fn=filename, e=str(err))
 	return str(theResult)
 
+
 def parse_requirements_for_install_requires(requirements_text):
 	"""
 	Parses requirements.txt contents and extracts the minimal constraints
@@ -121,6 +122,7 @@ def parse_requirements_for_install_requires(requirements_text):
 			# If line doesn't match expected pattern, include as is
 			install_requires.append(line)
 	return install_requires
+
 
 requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
 """The list of production requirements of this program."""

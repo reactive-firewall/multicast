@@ -37,7 +37,6 @@ coverage:
           - "multicast"
         paths:
           - "multicast/"
-          - "setup.py"
           - "!tests/"
       tests:
         target: 80%

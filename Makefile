@@ -219,8 +219,10 @@ test: cleanup
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-tox: cleanup
+test-tox: build
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
+	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
