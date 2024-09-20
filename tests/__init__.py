@@ -96,10 +96,11 @@ try:
 	from tests import profiling as profiling  # skipcq: PYL-C0414
 	from tests import test_basic
 	from tests import test_deps
+	from tests import test_install_requires
 	from tests import test_usage
 
 	depends = [
-		profiling, test_basic, test_deps, test_usage
+		profiling, test_basic, test_deps, test_install_requires, test_usage
 	]
 	for unit_test in depends:
 		try:

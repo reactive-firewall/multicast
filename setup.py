@@ -104,7 +104,9 @@ def parse_requirements_for_install_requires(requirements_text):
 		# Remove inline comments
 		line = line.split('#', 1)[0].strip()
 		# Skip options or URLs
-		if line.startswith('-') or line.startswith('http:') or line.startswith('https:'):
+		# also blacklist word/pkg "See" (sorry https://pypi.org/project/see/ - we conflict)
+		bad_prefixes = ["""-""", """http:""", """https:""", """See """]
+		if any(line.startswith(bad_prefix) for bad_prefix in bad_prefixes):
 			continue
 		# Extract package and version specifiers
 		match = re.match(r'^([A-Za-z0-9_\-\.]+)([<>=!~]+)?\s*([^\s,;]+)?', line)
@@ -114,13 +116,13 @@ def parse_requirements_for_install_requires(requirements_text):
 			version = match.group(3)
 			if operator == '>=' and version:
 				# Keep only the minimum required version
-				install_requires.append(f"{package}>={version}")
-			else:
+				install_requires.append(str("{pkg}>={ver}").format(pkg=package, ver=version))
+			elif version:
 				# Include the package without version or with simplified specifier
 				install_requires.append(package)
-		else:
-			# If line doesn't match expected pattern, include as is
-			install_requires.append(line)
+		# removed else:
+			# Don't If line doesn't match expected pattern, include as is
+			# removed install_requires.append(line)
 	return install_requires
 
 
@@ -164,20 +166,22 @@ try:
 except Exception:
 	class_tags = str("""Development Status :: 4 - Beta""")
 
-setup(
-	name=conf_dict["""metadata"""]["""name"""],
-	version=conf_dict["""metadata"""]["""version"""],
-	description=conf_dict["""metadata"""]["""description"""],
-	long_description=readme,
-	long_description_content_type="""text/markdown""",
-	zip_safe=False,
-	include_package_data=True,
-	install_requires=requirements,
-	author=conf_dict["""metadata"""]["""author"""],
-	author_email=conf_dict["""metadata"""]["""author_email"""],
-	classifiers=class_tags,
-	url=conf_dict["""metadata"""]["""url"""],
-	download_url=conf_dict["""metadata"""]["""download_url"""],
-	license=SLA,
-	packages=find_packages(exclude=("""tests""", """docs""")),
-)
+if __name__ == '__main__':
+	setup(
+		name=conf_dict["""metadata"""]["""name"""],
+		version=conf_dict["""metadata"""]["""version"""],
+		description=conf_dict["""metadata"""]["""description"""],
+		long_description=readme,
+		long_description_content_type="""text/markdown""",
+		zip_safe=False,
+		include_package_data=True,
+		install_requires=requirements,
+		author=conf_dict["""metadata"""]["""author"""],
+		author_email=conf_dict["""metadata"""]["""author_email"""],
+		classifiers=class_tags,
+		url=conf_dict["""metadata"""]["""url"""],
+		download_url=conf_dict["""metadata"""]["""download_url"""],
+		license=SLA,
+		obsoletes="""See""",
+		packages=find_packages(exclude=("""tests""", """docs""")),
+	)
