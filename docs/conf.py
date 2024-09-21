@@ -372,14 +372,14 @@ intersphinx_mapping = {
 
 
 def linkcode_resolve(domain, info):
-	if domain != """py""" or not info["""module"""]:
+	if domain != "py" or not info["module"]:
 		return None
-	filename = info["""module"""].replace(""".""", """/""")
-	theResult = str("""{prefix}/blob/{branch}/{file}.py""").format(
-		prefix=linkcode_url_prefix, branch="""stable""", file=filename
+	filename = info["module"].replace(".", "/")
+	theResult = "{prefix}/blob/{branch}/{file}.py".format(
+		prefix=linkcode_url_prefix, branch="stable", file=filename
 	)
-	if str("""/multicast.py""") in theResult:
+	if "/multicast.py" in theResult:
 		theResult = theResult.replace("/multicast.py", "/multicast/__init__.py")
-	if str("""/tests.py""") in theResult:
+	if "/tests.py" in theResult:
 		theResult = theResult.replace("/tests.py", "/tests/__init__.py")
 	return theResult
