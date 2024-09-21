@@ -97,10 +97,12 @@ try:
 	from tests import test_basic
 	from tests import test_deps
 	from tests import test_install_requires
+	from tests import test_manifest
+	from tests import test_build
 	from tests import test_usage
 
 	depends = [
-		profiling, test_basic, test_deps, test_install_requires, test_usage
+		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest, test_usage
 	]
 	for unit_test in depends:
 		try:
@@ -138,8 +140,9 @@ except Exception:  # pragma: no branch
 
 
 test_cases = (
-	test_basic.BasicTestSuite, test_usage.MulticastTestSuite,
-	test_usage.BasicIntegrationTestSuite
+	test_basic.BasicTestSuite, test_deps.TestRequirementsTxt, test_build.TestPEP517Build,
+	test_manifest.TestManifestInclusion,
+	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite
 )
 
 
