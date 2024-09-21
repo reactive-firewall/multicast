@@ -177,8 +177,6 @@ html_short_title = "Multicast Docs"
 # html_favicon = None
 
 try:
-	#  extra import for CI test stability during discovery
-	import sphinxawesome_theme
 	from sphinxawesome_theme.postprocess import Icons
 	html_permalinks_icon = Icons.permalinks_icon
 except Exception:
@@ -236,7 +234,7 @@ htmlhelp_basename = "multicast_doc"
 
 
 # -- Options for MyST markdown parser -------------------------------------------
-# see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#syntax-directives
+# see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html
 
 # be more like GFM with style
 myst_enable_extensions = ("tasklist", "strikethrough", "fieldlist")
@@ -354,28 +352,32 @@ linkcode_url_prefix = str(
 	"""https://github.com/reactive-firewall/{proj}"""
 ).format(proj=project)
 
-extlinks = {"""issue""": (str("""{prefix}/{suffix}""").format(
+extlinks = {
+	"""issue""": (
+		str("""{prefix}/{suffix}""").format(
 			prefix=linkcode_url_prefix, suffix="""/issues/%s"""
 		),
-		"""issue #%s""")
+		"""issue #%s"""
+	)
 }
 
 # try to link with official python3 documentation.
 # see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
 intersphinx_mapping = {
 	"""python""": (
-			"""https://docs.python.org/3""",
-			(None, """python-inv.txt""")
+		"""https://docs.python.org/3""",
+		(None, """python-inv.txt""")
 	)
 }
+
 
 def linkcode_resolve(domain, info):
 	if domain != """py""" or not info["""module"""]:
 		return None
 	filename = info["""module"""].replace(""".""", """/""")
 	theResult = str("""{prefix}/blob/{branch}/{file}.py""").format(
-			prefix=linkcode_url_prefix, branch="""stable""", file=filename
-		)
+		prefix=linkcode_url_prefix, branch="""stable""", file=filename
+	)
 	if str("""/multicast.py""") in theResult:
 		theResult = theResult.replace("/multicast.py", "/multicast/__init__.py")
 	if str("""/tests.py""") in theResult:

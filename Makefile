@@ -141,7 +141,47 @@ endif
 
 .PHONY: cleanup init clean-docs must_be_root must_have_flake must_have_pytest uninstall
 
-build: init ./setup.py
+help:
+	$(QUIET)$(ECHO) "HELP"
+	$(QUIET)$(ECHO) " * house-keeping" ;
+	$(QUIET)$(ECHO) "   make help - this help text" ;
+	$(QUIET)$(ECHO) "   make build - packages the module" ;
+	$(QUIET)$(ECHO) "   make clean - cleans up a bit" ;
+	$(QUIET)$(ECHO) "   make init - sets up requirements for first time" ;
+	$(QUIET)$(ECHO) " * install/remove" ;
+	$(QUIET)$(ECHO) "   make install - installs the module properly" ;
+	$(QUIET)$(ECHO) "   make user-install - trys an unprivliged install (may not work for some users)" ;
+	$(QUIET)$(ECHO) "   make uninstall - uninstalls the module" ;
+	$(QUIET)$(ECHO) "   make purge - uninstalls the module, and resets most related things" ;
+	$(QUIET)$(ECHO) "     (the big exception is init)" ;
+	$(QUIET)$(ECHO) " * misc" ;
+	$(QUIET)$(ECHO) "   make build-docs - generate documentation (using sphinx)" ;
+	$(QUIET)$(ECHO) "   make test - run minimal acceptance testing" ;
+	$(QUIET)$(ECHO) "   make test-style - run some code-style testing" ;
+	$(QUIET)$(ECHO) "   make test-pytest - run extensive testing (with pytest)" ;
+	$(QUIET)$(ECHO) "" ;
+
+MANIFEST.in: init
+	$(QUIET)$(ECHO) "include requirements.txt" >"$@" ;
+	$(QUIET)$(BSMARK) "$@" 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)$(ECHO) "include README.md" >>"$@" ;
+	$(QUIET)$(ECHO) "include LICENSE.md" >>"$@" ;
+	$(QUIET)$(ECHO) "include CHANGES.md" >>"$@" ;
+	$(QUIET)$(ECHO) "include HISTORY.md" >>"$@" ;
+	$(QUIET)$(ECHO) "recursive-include . *.txt" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .gitignore" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .tox.ini" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .deepsource.toml" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .*.yml" >>"$@" ;
+	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
+	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
+	$(QUIET)$(ECHO) "global-exclude .DS_Store" >>"$@" ;
+	$(QUIET)$(ECHO) "prune .gitattributes" >>"$@" ;
+	$(QUIET)$(ECHO) "prune test-reports" >>"$@" ;
+	$(QUIET)$(ECHO) "prune .github" >>"$@" ;
+	$(QUIET)$(ECHO) "prune .circleci" >>"$@" ;
+
+build: init ./setup.py MANIFEST.in
 	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
@@ -179,8 +219,10 @@ test: cleanup
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-tox: cleanup
+test-tox: build
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
+	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
@@ -290,6 +332,7 @@ clean: clean-docs cleanup
 	$(QUIET)$(ECHO) "Cleaning Up."
 	$(QUIET)$(COVERAGE) erase 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./test-results/junit.xml 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./MANIFEST.in 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(ECHO) "All clean."
 
 must_be_root:
