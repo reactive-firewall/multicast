@@ -1,0 +1,197 @@
+#! /bin/bash
+# Disclaimer of Warranties.
+# A. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT, TO THE EXTENT PERMITTED BY
+#    APPLICABLE LAW, USE OF THIS SHELL SCRIPT AND ANY SERVICES PERFORMED
+#    BY OR ACCESSED THROUGH THIS SHELL SCRIPT IS AT YOUR SOLE RISK AND
+#    THAT THE ENTIRE RISK AS TO SATISFACTORY QUALITY, PERFORMANCE, ACCURACY AND
+#    EFFORT IS WITH YOU.
+#
+# B. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THIS SHELL SCRIPT
+#    AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITH ALL FAULTS AND
+#    WITHOUT WARRANTY OF ANY KIND, AND THE AUTHOR OF THIS SHELL SCRIPT'S LICENSORS
+#    (COLLECTIVELY REFERRED TO AS "THE AUTHOR" FOR THE PURPOSES OF THIS DISCLAIMER)
+#    HEREBY DISCLAIM ALL WARRANTIES AND CONDITIONS WITH RESPECT TO THIS SHELL SCRIPT
+#    SOFTWARE AND SERVICES, EITHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
+#    NOT LIMITED TO, THE IMPLIED WARRANTIES AND/OR CONDITIONS OF
+#    MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A PARTICULAR PURPOSE,
+#    ACCURACY, QUIET ENJOYMENT, AND NON-INFRINGEMENT OF THIRD PARTY RIGHTS.
+#
+# C. THE AUTHOR DOES NOT WARRANT AGAINST INTERFERENCE WITH YOUR ENJOYMENT OF THE
+#    THE AUTHOR's SOFTWARE AND SERVICES, THAT THE FUNCTIONS CONTAINED IN, OR
+#    SERVICES PERFORMED OR PROVIDED BY, THIS SHELL SCRIPT WILL MEET YOUR
+#    REQUIREMENTS, THAT THE OPERATION OF THIS SHELL SCRIPT OR SERVICES WILL
+#    BE UNINTERRUPTED OR ERROR-FREE, THAT ANY SERVICES WILL CONTINUE TO BE MADE
+#    AVAILABLE, THAT THIS SHELL SCRIPT OR SERVICES WILL BE COMPATIBLE OR
+#    WORK WITH ANY THIRD PARTY SOFTWARE, APPLICATIONS OR THIRD PARTY SERVICES,
+#    OR THAT DEFECTS IN THIS SHELL SCRIPT OR SERVICES WILL BE CORRECTED.
+#    INSTALLATION OF THIS THE AUTHOR SOFTWARE MAY AFFECT THE USABILITY OF THIRD
+#    PARTY SOFTWARE, APPLICATIONS OR THIRD PARTY SERVICES.
+#
+# D. YOU FURTHER ACKNOWLEDGE THAT THIS SHELL SCRIPT AND SERVICES ARE NOT
+#    INTENDED OR SUITABLE FOR USE IN SITUATIONS OR ENVIRONMENTS WHERE THE FAILURE
+#    OR TIME DELAYS OF, OR ERRORS OR INACCURACIES IN, THE CONTENT, DATA OR
+#    INFORMATION PROVIDED BY THIS SHELL SCRIPT OR SERVICES COULD LEAD TO
+#    DEATH, PERSONAL INJURY, OR SEVERE PHYSICAL OR ENVIRONMENTAL DAMAGE,
+#    INCLUDING WITHOUT LIMITATION THE OPERATION OF NUCLEAR FACILITIES, AIRCRAFT
+#    NAVIGATION OR COMMUNICATION SYSTEMS, AIR TRAFFIC CONTROL, LIFE SUPPORT OR
+#    WEAPONS SYSTEMS.
+#
+# E. NO ORAL OR WRITTEN INFORMATION OR ADVICE GIVEN BY THE AUTHOR
+#    SHALL CREATE A WARRANTY. SHOULD THIS SHELL SCRIPT OR SERVICES PROVE DEFECTIVE,
+#    YOU ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+#
+#    Limitation of Liability.
+# F. TO THE EXTENT NOT PROHIBITED BY APPLICABLE LAW, IN NO EVENT SHALL THE AUTHOR
+#    BE LIABLE FOR PERSONAL INJURY, OR ANY INCIDENTAL, SPECIAL, INDIRECT OR
+#    CONSEQUENTIAL DAMAGES WHATSOEVER, INCLUDING, WITHOUT LIMITATION, DAMAGES
+#    FOR LOSS OF PROFITS, CORRUPTION OR LOSS OF DATA, FAILURE TO TRANSMIT OR
+#    RECEIVE ANY DATA OR INFORMATION, BUSINESS INTERRUPTION OR ANY OTHER
+#    COMMERCIAL DAMAGES OR LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OR
+#    INABILITY TO USE THIS SHELL SCRIPT OR SERVICES OR ANY THIRD PARTY
+#    SOFTWARE OR APPLICATIONS IN CONJUNCTION WITH THIS SHELL SCRIPT OR
+#    SERVICES, HOWEVER CAUSED, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT,
+#    TORT OR OTHERWISE) AND EVEN IF THE AUTHOR HAS BEEN ADVISED OF THE
+#    POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION
+#    OR LIMITATION OF LIABILITY FOR PERSONAL INJURY, OR OF INCIDENTAL OR
+#    CONSEQUENTIAL DAMAGES, SO THIS LIMITATION MAY NOT APPLY TO YOU. In no event
+#    shall THE AUTHOR's total liability to you for all damages (other than as may
+#    be required by applicable law in cases involving personal injury) exceed
+#    the amount of five dollars ($5.00). The foregoing limitations will apply
+#    even if the above stated remedy fails of its essential purpose.
+################################################################################
+#
+# This, best-effort, script audits and validates Python requirements files using tools like pip-audit and pip-licenses.
+# It accomplishes the following tasks:
+# 1. Sets up a safe execution environment with resource limits and UTF-8 encoding.
+# 2. Checks for the existence and executability of required commands.
+# 3. Implements a lock mechanism to prevent concurrent executions.
+# 4. Gathers all requirements.txt files from the project using git.
+# 5. Audits requirements files for security vulnerabilities using pip-audit.
+# 6. Checks licenses of dependencies using pip-licenses.
+# 7. Reports any findings and cleans up before exiting.
+#
+# Usage Summary:
+#   ./tests/check_pip [--fix]
+# Use the '--fix' option to enable auto-correction of vulnerabilities.
+#
+# Exit Code Summary:
+# The script uses the EXIT_CODE variable to track exit conditions:
+# -   0: Successful execution.
+# -   1: General failure.
+# -   3: git ls-tree command failed.
+# -   4: pip-audit failed.
+# -   5: pip-licenses failed.
+# -  40: Missing valid repository or source structure.
+# - 126: Script already in progress or command not executable.
+# - 129: Received SIGHUP signal.
+# - 130: Received SIGINT signal (Ctrl+C).
+# - 131: Received SIGQUIT signal.
+# - 137: Received SIGABRT signal.
+# - 143: Received SIGTERM signal.
+
+ulimit -t 600
+# setting the path may break brain-dead CI that uses crazy paths
+# PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+umask 137
+
+# force utf-8 for spelling
+export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
+
+LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
+EXIT_CODE=1
+
+test -x $(command -v grep) || exit 126 ;
+test -x $(command -v python3) || exit 126 ;
+test -x $(command -v git) || exit 126 ;
+hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
+test -x "$(command -v shlock)" || exit 126 ;
+test -x $(command -v pip-audit) || exit 126 ;
+test -x $(command -v pip-licenses) || exit 126 ;
+
+# Set pip-audit options
+AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
+
+# Set pip-licenses options
+LICENSE_OPTIONS="--from=mixed"
+
+function cleanup() {
+	rm -f ${LOCK_FILE} 2>/dev/null || : ; wait ;
+	# unset when done
+	unset LOCK_FILE 2>/dev/null || : ;
+	hash -d shlock 2>/dev/null || : ;
+}
+
+if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+		EXIT_CODE=0
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+else
+		# shellcheck disable=SC2046
+		printf "\t%s\n" "Check Setup Scripts Tests Coverage already in progress by "$(head "${LOCK_FILE}") >&2 ;
+		exit 126 ;
+fi
+
+# check_pip: Audit and validate Python requirements files.
+
+# THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if [[ -d ../.git ]] ; then
+	_TEST_ROOT_DIR="../" ;
+elif [[ -d ./.git ]] ; then
+	_TEST_ROOT_DIR=$(pwd) ;
+elif [[ ( -d $(git rev-parse --show-toplevel 2>/dev/null) ) ]] ; then
+	_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+else
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2 ;
+	EXIT_CODE=40
+fi
+
+cd $_TEST_ROOT_DIR 2>/dev/null || EXIT_CODE=40
+
+# Get a list of files to check using git ls-tree with filtering
+FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- **/requirements.txt *-requirements.txt requirements.txt 2>/dev/null || EXIT_CODE=3)
+
+# Enable auto-correction if '--fix' argument is provided
+if [[ "$1" == "--fix" ]]; then
+	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"
+	printf "%s\n" "Auto-correction enabled."
+fi
+
+# THIS IS THE ACTUAL TEST
+# Iterate over files and run checks
+for req_file in $FILES_TO_CHECK; do
+	printf "%s\n" "Checking ${req_file}" ;
+	printf "%s\n" "Auditing ${req_file} for security vulnerabilities..."
+	{ pip-audit $AUDIT_OPTIONS "${req_file}" || EXIT_CODE=4 ;} ; wait ;
+	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+		printf "%s\n" "Checking licenses in $req_file..." ;
+		{ pip install -r "$req_file" --quiet >/dev/null || EXIT_CODE=4 ;} 2>/dev/null ; wait ;
+		{ pip-licenses $LICENSE_OPTIONS || EXIT_CODE=5 ;} 2>/dev/null ; wait ;
+	else
+		printf "%s\n" "FAIL: Found requirements errors." >&2 ;
+	fi
+done
+
+# cleaning up and reporting
+
+if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+	printf "%s\n" "OK: Found no detected requirements errors." ;
+else
+	printf "%s\n" "FAIL: Found requirements errors." >&2 ;
+fi
+
+cleanup || rm -f ${LOCK_FILE} 2>/dev/null || : ;
+
+# unset when done
+unset _TEST_ROOT_DIR 2>/dev/null || : ;
+unset AUDIT_OPTIONS 2>/dev/null || : ;
+unset LICENSE_OPTIONS 2>/dev/null || : ;
+
+wait ;
+exit ${EXIT_CODE:-255} ;

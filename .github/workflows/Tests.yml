@@ -166,7 +166,6 @@ jobs:
       run: |
         echo "- MATS works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
       if: ${{ success() }}
-      shell: bash
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -346,6 +345,9 @@ jobs:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 10
 
     env:
@@ -476,10 +478,13 @@ jobs:
       if: ${{ !cancelled() }}
 
 
-  EXTRAS:
+  EXTRAS-FOR-SETUP:
     if: ${{ success() }}
-    needs: [BOOTSTRAP]
+    needs: [BOOTSTRAP, MATS]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 10
     strategy:
       matrix:
@@ -519,7 +524,7 @@ jobs:
       run: |
         hash -p ./.github/tool_shlock_helper.sh shlock ;
         ./tests/check_legacy_setup_coverage || echo "::warning file=tests/check_legacy_setup_coverage,line=1,endLine=1,title=SKIPPED::SKIP Legacy Setup.py Tests." ;
-      shell: bash
+      if: ${{ !cancelled() }}
     - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -546,6 +551,132 @@ jobs:
       if: ${{ !cancelled() }}
 
 
+  EXTRAS-FOR-PIP:
+    if: ${{ !cancelled() }}
+    needs: [BOOTSTRAP, MATS]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: .coverage
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install -r ./requirements.txt ;
+        pip install -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
+    - name: Pre-Clean
+      id: clean-prep
+      run: make -j1 -f Makefile clean ;
+    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile build ;
+      if: ${{ success() }}
+    - name: Test Dependencies with py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        hash -p ./.github/tool_shlock_helper.sh shlock ;
+        ./tests/check_pip || echo "::warning file=tests/check_pip,line=1,endLine=1,title=SKIPPED::SKIP Requirements Tests." ;
+      shell: bash
+      if: ${{ !cancelled() }}
+    - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./test-reports/coverage_setup.xml
+        directory: .
+        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: false
+    - name: Upload Extra Python ${{ matrix.python-version }} Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Legacy_Setup-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./test-reports/
+        if-no-files-found: ignore
+    - name: Post-purge
+      id: post-uninstall
+      run: make -j1 -f Makefile purge || true ;
+      if: ${{ !cancelled() }}
+    - name: Post-Clean
+      id: post-end
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ !cancelled() }}
+
+
+  DOCS:
+    if: ${{ !cancelled() }}
+    needs: [MATS, COVERAGE, EXTRAS-FOR-SETUP, EXTRAS-FOR-PIP]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: |
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install -r ./requirements.txt ;
+        pip install -r ./tests/requirements.txt || true ;
+        pip install --upgrade -r ./docs/requirements.txt || true ;
+    - name: Pre-Clean
+      id: clean-prep
+      run: make -j1 -f Makefile clean ;
+    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile build ;
+      if: ${{ success() }}
+    - name: Generate Extra Legacy Setup Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -j1 -f Makefile build-docs ;
+      if: ${{ !cancelled() }}
+    - name: Upload Docs Artifact with Python ${{ matrix.python-version }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: Multicast-Documentation-${{ env.GITHUB_SHA }}-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./docs/www/html/
+        if-no-files-found: ignore
+    - name: Post-purge
+      id: post-uninstall
+      run: make -j1 -f Makefile purge || true ;
+      if: ${{ !cancelled() }}
+    - name: Post-Clean
+      id: post-end
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ !cancelled() }}
+
+
   TOX:
     if: ${{ success() }}
     needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, INTEGRATION]
@@ -553,6 +684,7 @@ jobs:
     timeout-minutes: 30
 
     env:
+      OS: 'ubuntu-latest'
       PYTHON_VERSION: '3.12'
       LANG: 'en_US.utf-8'
 
