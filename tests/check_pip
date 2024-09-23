@@ -60,21 +60,27 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 #
-# This script attempts to enforce spell-checking if the codespell tool is available.
+# This, best-effort, script audits and validates Python requirements files using tools like pip-audit and pip-licenses.
 # It accomplishes the following tasks:
-# 1. ???
+# 1. Sets up a safe execution environment with resource limits and UTF-8 encoding.
+# 2. Checks for the existence and executability of required commands.
+# 3. Implements a lock mechanism to prevent concurrent executions.
+# 4. Gathers all requirements.txt files from the project using git.
+# 5. Audits requirements files for security vulnerabilities using pip-audit.
+# 6. Checks licenses of dependencies using pip-licenses.
+# 7. Reports any findings and cleans up before exiting.
 #
 # Usage Summary:
-# ???
+#   ./tests/check_pip [--fix]
+# Use the '--fix' option to enable auto-correction of vulnerabilities.
 #
 # Exit Code Summary:
 # The script uses the EXIT_CODE variable to track exit conditions:
 # -   0: Successful execution.
 # -   1: General failure.
-# -   2: Coverage combine or XML generation failed.
 # -   3: git ls-tree command failed.
 # -   4: pip-audit failed.
-# -   5: pip-license failed.
+# -   5: pip-licenses failed.
 # -  40: Missing valid repository or source structure.
 # - 126: Script already in progress or command not executable.
 # - 129: Received SIGHUP signal.
@@ -82,8 +88,6 @@
 # - 131: Received SIGQUIT signal.
 # - 137: Received SIGABRT signal.
 # - 143: Received SIGTERM signal.
-#
-# The primary goal is to allow linter like spell-checking.
 
 ulimit -t 600
 # setting the path may break brain-dead CI that uses crazy paths
