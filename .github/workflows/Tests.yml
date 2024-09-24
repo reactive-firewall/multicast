@@ -204,18 +204,18 @@ jobs:
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }}
+    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ "$OS" == "ubuntu-latest" ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter before-build || true ; fi
-    - name: Install deepsource tools for ${{ matrix.python-version }}
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
+        chmod +x ./cc-test-reporter 2>/dev/null || true ;
+        ./cc-test-reporter before-build || true ;
+    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
+        (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -288,18 +288,18 @@ jobs:
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }}
+    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ "$OS" == "ubuntu-latest" ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter before-build || true ; fi
-    - name: Install deepsource tools for ${{ matrix.python-version }}
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
+        chmod +x ./cc-test-reporter 2>/dev/null || true ;
+        ./cc-test-reporter before-build || true ;
+    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
+        (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -325,16 +325,16 @@ jobs:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
         if-no-files-found: ignore
-    - name: code-climate for ${{ matrix.python-version }}
+    - name: code-climate for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
-    - name: deepsource for ${{ matrix.python-version }}
+        ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ;
+    - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource"
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -456,7 +456,7 @@ jobs:
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
       run: |
-        if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "::warning file=.github/workflows/Tests.yml,line=450,endLine=450,title=SKIPPED::SKIP Code-Climate" ; fi ;
+        if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "::warning file=.github/workflows/Tests.yml,line=459,endLine=459,title=SKIPPED::SKIP Code-Climate" ; fi ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
       if: ${{ !cancelled() }}
       uses: codecov/test-results-action@v1
@@ -623,6 +623,33 @@ jobs:
       if: ${{ !cancelled() }}
 
 
+  EXTRAS-FOR-SCRIPTS:
+    if: ${{ success() }}
+    needs: [BOOTSTRAP, MATS]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 10
+    env:
+      OS: "ubuntu-latest"
+      PYTHON_VERSION: '3.12'
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Shellcheck Lint Scripts
+      uses: lumaxis/shellcheck-problem-matchers@54048fb94dd2acd2fab7a634d10b19cb92281a29
+      run: |
+        shellcheck -f gcc -a --shell=bash **/*.bash tests/check_* ;
+      shell: bash
+      if: ${{ !cancelled() }}
+    - name: Post-Clean
+      id: post-end
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ !cancelled() }}
+
+
   DOCS:
     if: ${{ !cancelled() }}
     needs: [MATS, COVERAGE, EXTRAS-FOR-SETUP, EXTRAS-FOR-PIP]
@@ -661,6 +688,12 @@ jobs:
     - name: Generate Extra Legacy Setup Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile build-docs ;
       if: ${{ !cancelled() }}
+    - name: Check documentation quality
+      run: |
+        pip install --upgrade sphinx-lint
+        sphinx-lint docs/ || true ;
+      if: ${{ !cancelled() }}
+  if: ${{ !cancelled() }}
     - name: Upload Docs Artifact with Python ${{ matrix.python-version }}
       uses: actions/upload-artifact@v4
       with:
