@@ -215,7 +215,7 @@ jobs:
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ;
+        (curl https://deepsource.io/cli | sh) || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -299,7 +299,7 @@ jobs:
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ;
+        (curl https://deepsource.io/cli | sh) || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
