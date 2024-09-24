@@ -638,8 +638,8 @@ jobs:
       LC_CTYPE: "en_US.utf-8"
     steps:
     - uses: actions/checkout@v4
+    - uses: lumaxis/shellcheck-problem-matchers@54048fb94dd2acd2fab7a634d10b19cb92281a29
     - name: Shellcheck Lint Scripts
-      uses: lumaxis/shellcheck-problem-matchers@54048fb94dd2acd2fab7a634d10b19cb92281a29
       run: |
         shellcheck -f gcc -a --shell=bash **/*.bash tests/check_* ;
       shell: bash
