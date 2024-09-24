@@ -171,7 +171,7 @@ try:
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
 
 
@@ -291,10 +291,29 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	"""Subclasses socketserver.BaseRequestHandler for handling HEAR function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
+	
+	Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>> multicast.hear is not None
+		True
+		>>> from multicast.hear import HearUDPHandler as HearUDPHandler
+		>>>
+
+	Testcase 1: HearUDPHandler should be automatically imported.
+
+		>>> HearUDPHandler.__name__ is not None
+		True
+		>>>
+
 	"""
 
 	def handle(self):
@@ -381,10 +400,9 @@ class McastHEAR(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		pass
+		pass  # skipcq - Optional abstract method
 
 	def doStep(self, *args, **kwargs):
-		#  _is_std = False if "is_std" not in kwargs else kwargs["is_std"]
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
 		with McastServer((HOST, PORT), HearUDPHandler) as server:

@@ -90,7 +90,7 @@ try:
 	else:  # pragma: no branch
 		__version__ = _sys.modules["""multicast.__version__"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.__version__ as __version__  # noqa. skipcq  -  used by --version argument.
 
 
@@ -100,7 +100,7 @@ try:
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq  -  used by port argument.
 
 
@@ -110,7 +110,7 @@ try:
 	else:  # pragma: no branch
 		_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq  -  used by group arg.
 
 
@@ -120,7 +120,7 @@ try:
 	else:  # pragma: no branch
 		mtool = _sys.modules["""multicast.mtool"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.mtool as mtool  # noqa  -  used by all arguments' CMD (sub-command).
 
 
@@ -130,7 +130,7 @@ try:
 	else:  # pragma: no branch
 		recv = _sys.modules["""multicast.recv"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 
 
@@ -140,7 +140,7 @@ try:
 	else:  # pragma: no branch
 		send = _sys.modules["""multicast.send"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 
 
@@ -150,7 +150,7 @@ try:
 	else:  # pragma: no branch
 		hear = _sys.modules["""multicast.hear"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 
 
@@ -513,7 +513,7 @@ class McastDispatch(mtool):
 					print(w)
 					print(str(inerr))
 					print(str(inerr.args))
-				del inerr
+				del inerr  # skipcq - cleanup any error leaks early
 				__EXIT_MSG = (2, "NoOp")
 		except BaseException:  # pragma: no branch
 			e = str("CRITICAL - An error occurred while handling")

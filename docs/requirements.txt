@@ -21,8 +21,6 @@
 # socket - builtin - PSF license
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
-# argparse>=1.4.0
-# argparse - builtin - PSF license 3.7 = 62.6.0
 # setuptools - MIT license
 setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
 # virtualenv - MIT license

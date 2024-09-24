@@ -182,7 +182,7 @@ try:
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
 
 

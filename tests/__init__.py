@@ -117,7 +117,7 @@ try:
 			print(str((impErr.args)))
 			print(str(''))
 			impErr = None
-			del impErr
+			del impErr  # skipcq - cleanup any error leaks early
 			raise ImportError(str("[CWE-758] Test module failed completely."))
 except Exception as badErr:  # pragma: no branch
 	print(str(''))
@@ -126,7 +126,7 @@ except Exception as badErr:  # pragma: no branch
 	print(str((badErr.args)))
 	print(str(''))
 	badErr = None
-	del badErr
+	del badErr  # skipcq - cleanup any error leaks early
 	exit(0)
 
 

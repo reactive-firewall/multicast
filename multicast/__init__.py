@@ -564,12 +564,12 @@ class mtool(abc.ABC):
 	@abc.abstractmethod
 	def setupArgs(cls, parser):  # pragma: no cover
 		"""Abstract hook for setting up the tool's arguments."""
-		pass
+		pass  # skipcq - abstract method
 
 	@abc.abstractmethod
 	def doStep(self, *args):  # pragma: no cover
 		"""Abstracts the __call__ behavior for sub-classing the tool."""
-		pass
+		pass  # skipcq - abstract method
 
 
 try:
@@ -578,7 +578,7 @@ try:
 	else:  # pragma: no branch
 		skt = sys.modules["""multicast.skt"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.skt as skt  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
@@ -594,7 +594,7 @@ try:
 	else:  # pragma: no branch
 		recv = sys.modules["""multicast.recv"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.recv as recv  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
@@ -604,7 +604,7 @@ try:
 	else:  # pragma: no branch
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.send as send  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 
@@ -614,7 +614,7 @@ try:
 	else:  # pragma: no branch
 		hear = sys.modules["""multicast.hear"""]
 except Exception as importErr:
-	del importErr
+	del importErr  # skipcq - cleanup any error leaks early
 	import multicast.hear as hear  # pylint: disable=cyclic-import - skipcq: PLY-R0401
 
 

@@ -25,7 +25,7 @@ try:
 		import context
 	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
-		del ImportErr
+		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")

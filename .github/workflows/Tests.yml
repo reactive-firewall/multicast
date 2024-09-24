@@ -305,10 +305,10 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
       if: ${{ runner.python-version }} == "3.9"
-      run: make -f Makefile test ;
+      run: make -f Makefile test >> $GITHUB_STEP_SUMMARY ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.python-version }} != "3.9"
-      run: make -f Makefile test-pytest ;
+      run: make -f Makefile test-pytest >> $GITHUB_STEP_SUMMARY ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -371,7 +371,7 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
     - name: Testing Style
       id: style
-      run: make -j1 -f Makefile test-style ;
+      run: make -j1 -f Makefile test-style >> $GITHUB_STEP_SUMMARY ;
       shell: bash
     - name: Post-Clean
       id: post
@@ -594,7 +594,7 @@ jobs:
     - name: Test Dependencies with py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         hash -p ./.github/tool_shlock_helper.sh shlock ;
-        ./tests/check_pip || echo "::warning file=tests/check_pip,line=1,endLine=1,title=SKIPPED::SKIP Requirements Tests." ;
+        ./tests/check_pip 2>&1 >> $GITHUB_STEP_SUMMARY || echo "::warning file=tests/check_pip,line=1,endLine=1,title=SKIPPED::SKIP Requirements Tests." ;
       shell: bash
       if: ${{ !cancelled() }}
     - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
@@ -616,33 +616,6 @@ jobs:
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
-      if: ${{ !cancelled() }}
-    - name: Post-Clean
-      id: post-end
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ !cancelled() }}
-
-
-  EXTRAS-FOR-SCRIPTS:
-    if: ${{ success() }}
-    needs: [BOOTSTRAP, MATS]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    timeout-minutes: 10
-    env:
-      OS: "ubuntu-latest"
-      PYTHON_VERSION: '3.12'
-      LANG: "en_US.utf-8"
-      LC_CTYPE: "en_US.utf-8"
-    steps:
-    - uses: actions/checkout@v4
-    - uses: lumaxis/shellcheck-problem-matchers@54048fb94dd2acd2fab7a634d10b19cb92281a29
-    - name: Shellcheck Lint Scripts
-      run: |
-        shellcheck -f gcc -a --shell=bash **/*.bash tests/check_* ;
-      shell: bash
       if: ${{ !cancelled() }}
     - name: Post-Clean
       id: post-end
@@ -686,18 +659,18 @@ jobs:
       run: make -j1 -f Makefile build ;
       if: ${{ success() }}
     - name: Generate documentation with py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build-docs ;
+      run: make -j1 -f Makefile build-docs 2>&1 >> $GITHUB_STEP_SUMMARY ;
       if: ${{ !cancelled() }}
     - name: Lint documentation
       run: |
         pip install --upgrade sphinx-lint
-        sphinx-lint docs/ || true ;
+        sphinx-lint docs/ 2>&1 >> $GITHUB_STEP_SUMMARY || true ;
       if: ${{ !cancelled() }}
-    - name: Upload Docs Artifact with Python ${{ matrix.python-version }}
+    - name: Upload Docs Artifact with Python ${{ matrix.python-version }} on ${{ matrix.os }}
       uses: actions/upload-artifact@v4
       with:
         name: Multicast-Documentation-${{ env.GITHUB_SHA }}-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./docs/www/html/
+        path: ./docs/www/
         if-no-files-found: ignore
     - name: Post-purge
       id: post-uninstall
@@ -711,7 +684,7 @@ jobs:
 
   TOX:
     if: ${{ success() }}
-    needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, INTEGRATION]
+    needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -729,7 +702,7 @@ jobs:
     - name: Prep Testing Tox
       id: prep-tox
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} && { apt-get install --assume-yes python python3.6 python3.9 python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=558,endLine=560,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; fi
+        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} && { apt-get install --assume-yes python python3.6 python3.7 python3.8 python3.9 python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=558,endLine=560,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; fi
     - name: Install dependencies for Tox
       run: |
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";

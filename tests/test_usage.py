@@ -60,7 +60,7 @@ try:
 		import context
 	except Exception as ImportErr:  # pragma: no branch
 		ImportErr = None
-		del ImportErr
+		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
@@ -503,7 +503,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
-			del err
+			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
@@ -539,7 +539,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
-			del err
+			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast CMD --help"""))
@@ -568,7 +568,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		except BaseException as err:
 			context.debugtestError(err)
 			err = None
-			del err
+			del err  # skipcq - cleanup any error leaks early
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not swap multicast for multicast.__main__"""))
 
@@ -594,7 +594,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
-				del err
+				del err  # skipcq - cleanup any error leaks early
 				theResult = False
 		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
 
@@ -636,7 +636,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
-			del err
+			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
@@ -670,7 +670,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
-				del err
+				del err  # skipcq - cleanup any error leaks early
 				theResult = False
 		assert theResult
 
@@ -696,7 +696,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
-				del err
+				del err  # skipcq - cleanup any error leaks early
 				theResult = False
 		self.assertTrue(theResult, str("""Could Not handle multicast NOOP"""))
 
@@ -725,7 +725,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			except Exception as err:
 				context.debugtestError(err)
 				err = None
-				del err
+				del err  # skipcq - cleanup any error leaks early
 				theResult = False
 		assert theResult
 
