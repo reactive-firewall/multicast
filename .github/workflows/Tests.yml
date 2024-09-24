@@ -685,10 +685,10 @@ jobs:
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile build ;
       if: ${{ success() }}
-    - name: Generate Extra Legacy Setup Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Generate documentation with py${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile build-docs ;
       if: ${{ !cancelled() }}
-    - name: Check documentation quality
+    - name: Lint documentation
       run: |
         pip install --upgrade sphinx-lint
         sphinx-lint docs/ || true ;
