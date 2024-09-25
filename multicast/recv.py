@@ -183,7 +183,7 @@ try:
 	_BLANK = multicast._BLANK
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 
 try:

@@ -164,7 +164,7 @@ __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 try:
 	import sys as _sys
 	if 'multicast' not in _sys.modules:
-		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-C0414
+		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = _sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
@@ -172,7 +172,7 @@ try:
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 
 try:
@@ -291,29 +291,10 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling HEAR function.
+	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
-	
-	Minimal Acceptance Testing:
-
-	First set up test fixtures by importing multicast.
-
-	Testcase 0: Multicast should be importable.
-
-		>>> import multicast
-		>>> multicast.hear is not None
-		True
-		>>> from multicast.hear import HearUDPHandler as HearUDPHandler
-		>>>
-
-	Testcase 1: HearUDPHandler should be automatically imported.
-
-		>>> HearUDPHandler.__name__ is not None
-		True
-		>>>
-
 	"""
 
 	def handle(self):

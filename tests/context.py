@@ -98,7 +98,7 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'multicast' not in sys.modules:
-		import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
 except Exception:  # pragma: no branch
@@ -243,7 +243,7 @@ def getPythonCommand():
 	thepython = "python"
 	try:
 		thepython = __check_cov_before_py()
-	except Exception:   # pragma: no branch
+	except Exception:  # pragma: no branch
 		thepython = "exit 1 ; #"
 		try:
 			thepython = str(sys.executable)
@@ -252,7 +252,7 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkCovCommand(args=[None]):
+def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 	"""
 	Modifies the input command arguments to include coverage-related options when applicable.
 
@@ -482,12 +482,12 @@ def checkPythonCommand(args, stderr=None):
 
 
 @profiling.do_cprofile
-def timePythonCommand(args=[None], stderr=None):
+def timePythonCommand(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 	"""function for backend subprocess check_output command"""
 	return checkPythonCommand(args, stderr)
 
 
-def checkPythonFuzzing(args=[None], stderr=None):
+def checkPythonFuzzing(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 	"""function for backend subprocess check_output command"""
 	theOutput = None
 	try:

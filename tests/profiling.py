@@ -269,5 +269,5 @@ if __name__ in '__main__':  # pragma: no cover
 	try:
 		exitcode = main(sys.argv[1:])
 	finally:
-		exit(exitcode)
+		exit(exitcode)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
 

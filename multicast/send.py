@@ -117,7 +117,7 @@ __file__ = """multicast/send.py"""
 """The file of this component."""
 
 
-__name__ = """multicast.send"""
+__name__ = """multicast.send"""  # skipcq: PYL-W0622 - Ensures the correct name value.
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -140,13 +140,15 @@ __name__ = """multicast.send"""
 try:
 	import sys
 	if 'multicast' not in sys.modules:
+		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
+	# skipcq
+	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 
 try:

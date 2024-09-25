@@ -78,7 +78,7 @@ except Exception:  # pragma: no branch
 
 try:
 	if 'multicast' not in sys.modules:
-		import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 except Exception:  # pragma: no branch
@@ -127,7 +127,7 @@ except Exception as badErr:  # pragma: no branch
 	print(str(''))
 	badErr = None
 	del badErr  # skipcq - cleanup any error leaks early
-	exit(0)
+	exit(0)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
 
 
 try:

@@ -59,6 +59,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 """
 
 
+# skipcq
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__doc__""",
 	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
@@ -72,9 +73,6 @@ __module__ = """multicast.__main__"""  # skipcq: PYL-W0622
 
 
 __file__ = """multicast/__main__.py"""
-
-
-# __name__ = """multicast.__main__"""
 
 
 try:
@@ -219,7 +217,7 @@ class McastNope(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		pass
+		pass  # skipcq: PTC-W0049 - optional abstract method
 
 	@staticmethod
 	def NoOp(*args, **kwargs):
@@ -607,4 +605,4 @@ if __name__ in '__main__':
 		__EXIT_CODE = main(_sys.argv[1:])
 	elif (_sys.argv is not None):
 		__EXIT_CODE = main([str(__name__), """-h"""])
-	exit(__EXIT_CODE[0])
+	exit(__EXIT_CODE[0])  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing

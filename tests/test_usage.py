@@ -65,7 +65,7 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context")
 	else:
-		from context import multicast  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from context import subprocess
 		from context import Process

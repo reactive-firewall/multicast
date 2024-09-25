@@ -71,9 +71,9 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 
 	def test_Does_Pass_WHEN_Meta_Test(self):
 		"""Insanity Test 2: for unittests assertion."""
-		self.assertTrue(True)
-		self.assertFalse(False)
-		self.assertIsNone(None)
+		self.assertTrue(True)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
+		self.assertFalse(False)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
+		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
 		self.test_absolute_truth_and_meaning()
 		self.test_None_WHEN_Nothing()
 

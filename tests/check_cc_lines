@@ -91,7 +91,7 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		echo "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
+		printf "%s\n" "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
 		false ;
 		exit 126 ;
 fi
@@ -107,31 +107,31 @@ if [[ -d ./.git ]] ; then
 elif [[ -d ./tests ]] ; then
 	_TEST_ROOT_DIR=$(pwd) ;
 else
-	echo "FAIL: missing valid folder or file" >&2 ;
+	printf "%s\n" "FAIL: missing valid folder or file" >&2 ;
 	EXIT_CODE=1
 fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
 for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
-	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -ne 0) ]] ; then
-		echo "SKIP: ${_TEST_DOC} is disclaimed." ;
-		EXIT_CODE=126
+	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
+		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
+		EXIT_CODE=126;
 	else
-		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || EXIT_CODE=$? ;) -le 0) ]] ; then
-			echo "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
+		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || : ;) -le 0) ]] ; then
+			printf "%s\n" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
 			EXIT_CODE=127
 		fi
 		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
-			echo "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
+			printf "%s\n" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
 		fi
 		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt ${_TEST_YEAR}) ]] ; then
-			echo "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" ;
+			printf "%s\n" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
 		fi
 		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
 			case "$EXIT_CODE" in
-				0) true ;;
-				*) echo "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
+				0|126) true ;;
+				*) printf "%s\n" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
 			esac
 		fi
 	fi

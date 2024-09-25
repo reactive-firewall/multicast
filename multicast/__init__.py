@@ -18,6 +18,7 @@
 
 """Contains the Python Multicast library."""
 
+# skipcq
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
@@ -574,12 +575,12 @@ class mtool(abc.ABC):
 
 try:
 	if 'multicast.skt' not in sys.modules:
-		from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PLY-R0401, PYL-C0414
+		from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	else:  # pragma: no branch
 		skt = sys.modules["""multicast.skt"""]
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.skt as skt  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast.skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
 
 genSocket = skt.genSocket
@@ -590,43 +591,43 @@ endSocket = skt.endSocket
 
 try:
 	if 'multicast.recv' not in sys.modules:
-		from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		recv = sys.modules["""multicast.recv"""]
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.recv as recv  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast.recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
 
 try:
 	if 'multicast.send' not in sys.modules:
-		from . import send as send  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		send = sys.modules["""multicast.send"""]
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.send as send  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast.send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
 
 try:
 	if 'multicast.hear' not in sys.modules:
-		from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+		from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		hear = sys.modules["""multicast.hear"""]
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.hear as hear  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast.hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
 
 try:
 	if """multicast.__main__""" in sys.modules:  # pragma: no cover
 		__main__ = sys.modules["""multicast.__main__"""]
 except Exception:
-	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PLY-R0401
+	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
 
 if __name__ in u'__main__':
 	__EXIT_CODE = 2
 	if __main__.main is not None:
 		__EXIT_CODE = __main__.main(sys.argv[1:])
-	exit(__EXIT_CODE)
+	exit(__EXIT_CODE)  # skipcq: PYL-R1722 - intentionally allow coverage and testing to catch exit

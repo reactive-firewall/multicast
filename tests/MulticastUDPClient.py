@@ -300,4 +300,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
-	exit(0)
+	exit(0)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
