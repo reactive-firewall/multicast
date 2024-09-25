@@ -177,12 +177,14 @@ __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 try:
 	import sys
 	if 'multicast' not in sys.modules:
+		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
+	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 

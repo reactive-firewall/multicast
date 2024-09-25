@@ -478,7 +478,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 	__name__ = """tests.test_usage.BasicIntegrationTestSuite"""
 
 	def setUp(self):
-		super(self.__class__, self).setUp()
+		super(self.__class__, self).setUp()  # skipcq: PYL-E1003 - this is more polymorphic
 		if (self._thepython is None):
 			self.skipTest(str("""No python cmd to test with!"""))
 

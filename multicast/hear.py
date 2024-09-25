@@ -172,10 +172,13 @@ try:
 	else:  # pragma: no branch
 		multicast = _sys.modules["""multicast"""]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
+	# skipcq
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+	# skipcq
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
+	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 
