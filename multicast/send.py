@@ -144,7 +144,7 @@ try:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
-	_BLANK = multicast._BLANK
+	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
 	# skipcq

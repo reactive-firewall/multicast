@@ -180,7 +180,7 @@ try:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
-	_BLANK = multicast._BLANK
+	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
@@ -322,11 +322,11 @@ def recvstep(msgbuffer, chunk, sock):
 		msgbuffer = tryrecv(msgbuffer, chunk, sock)
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)
+			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 			print(str("""User Interrupted"""))
 	except OSError:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)
+			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 	finally:
 		sock = multicast.endSocket(sock)
 	if not (chunk is None):  # pragma: no branch
@@ -515,7 +515,7 @@ class McastRECV(multicast.mtool):
 
 		"""
 		sock = joinstep(groups, port, iface, bind_group, None)
-		msgbuffer = str(multicast._BLANK)
+		msgbuffer = str(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		chunk = None
 		msgbuffer = recvstep(msgbuffer, chunk, sock)
 		# about 969 bytes in base64 encoded as chars

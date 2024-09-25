@@ -171,7 +171,7 @@ try:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = _sys.modules["""multicast"""]
-	_BLANK = multicast._BLANK
+	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 except Exception as importErr:
@@ -341,7 +341,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 					me=myID, you=self.client_address, what=str(data)
 				)
 			)
-			send.McastSAY()._sayStep(
+			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
 				str("HEAR [ {what} SAID {you} ] from {me}").format(
 					me=myID, you=self.client_address, what=data.upper()
