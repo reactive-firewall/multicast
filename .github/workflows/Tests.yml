@@ -245,12 +245,12 @@ jobs:
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -329,12 +329,12 @@ jobs:
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ;
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
       run: |
-        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource"
+        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
@@ -411,13 +411,19 @@ jobs:
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }}
+    - name: Install Darwin code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
       run: |
         if [ "$OS" == "macos-latest" ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter || true ; fi ;
         if [ "$OS" == "macos-latest" ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
         if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter before-build || true ; fi
       shell: bash
+    - name: Install Linux code-climate tools for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-arm64 > ./cc-test-reporter || true ;
+        chmod +x ./cc-test-reporter 2>/dev/null || true ;
+        ./cc-test-reporter before-build || true ;
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
@@ -457,6 +463,11 @@ jobs:
       if: ${{ runner.os }} != "Linux"
       run: |
         if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "::warning file=.github/workflows/Tests.yml,line=459,endLine=459,title=SKIPPED::SKIP Code-Climate" ; fi ;
+      if: ${{ !cancelled() }}
+    - name: code-climate for ${{ matrix.python-version }}
+      if: ${{ runner.os }} == "Linux"
+      run: |
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
       if: ${{ !cancelled() }}
       uses: codecov/test-results-action@v1

@@ -191,7 +191,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		if str("""grp_addr""") in kwargs:
-			self._group_addr = kwargs.get("""grp_addr""", None)
+			self._group_addr = kwargs.get("""grp_addr""", None)  # skipcq: PTC-W0039 - ensure None
 		if str("""src_port""") in kwargs:
 			self._source_port = kwargs.get("""src_port""", 0)
 		else:

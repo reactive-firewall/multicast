@@ -444,7 +444,10 @@ class McastRECV(multicast.mtool):
 
 		"""
 		if parser is not None:
-			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
+			parser.add_argument(
+				"""--port""",
+				type=int, default=multicast._MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+			)
 			__tmp_help = """local interface to use for listening to multicast data; """
 			__tmp_help += """if unspecified, any one interface may be chosen."""
 			parser.add_argument(
@@ -458,7 +461,8 @@ class McastRECV(multicast.mtool):
 			__tmp_help += """If unspecified, bind to 224.0.0.1 """
 			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
 			parser.add_argument(
-				"""--group""", default=multicast._MCAST_DEFAULT_GROUP,
+				"""--group""",
+				default=multicast._MCAST_DEFAULT_GROUP,  # skipcq: PYL-W0212 - module ok
 				help=str(__tmp_help)
 			)
 			parser.add_argument(
@@ -519,16 +523,16 @@ class McastRECV(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		response = self._hearstep(
-			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),
-			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
-			kwargs.get("iface", None),
-			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),
+			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
+			kwargs.get("iface", None),  # skipcq: PTC-W0039 - ensure None by default
+			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),  # skipcq: PYL-W0212 - module ok
 		)
 		_is_std = kwargs.get("is_std", False)
 		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
-			print(multicast._BLANK)
+			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 			print(str(response))
-			print(multicast._BLANK)
+			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		_result = (len(response) > 0) is True
 		return tuple((_result, None if not _result else response))  # skipcq: PTC-W0020  - intended
 

@@ -410,7 +410,7 @@ class McastHEAR(multicast.mtool):
 		pass  # skipcq - Optional abstract method
 
 	def doStep(self, *args, **kwargs):
-		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)
-		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
+		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
+		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		with McastServer((HOST, PORT), HearUDPHandler) as server:
 			server.serve_forever()

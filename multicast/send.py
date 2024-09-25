@@ -282,8 +282,14 @@ class McastSAY(multicast.mtool):
 
 		"""
 		if parser is not None:  # pragma: no branch
-			parser.add_argument("""--port""", type=int, default=multicast._MCAST_DEFAULT_PORT)
-			parser.add_argument("""--group""", default=multicast._MCAST_DEFAULT_GROUP)
+			parser.add_argument(
+				"""--port""", type=int,
+				default=multicast._MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+			)
+			parser.add_argument(
+				"""--group""",
+				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
+			)
 			parser.add_argument(
 				"""-m""", """--message""", nargs='+', dest="""data""",
 				default=str("""PING from {name}: group: {group}, port: {port}""")
@@ -307,8 +313,8 @@ class McastSAY(multicast.mtool):
 
 	def doStep(self, *args, **kwargs):
 		return self._sayStep(
-			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),
-			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),
+			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
+			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
 			None if "data" not in kwargs else str(kwargs["data"]),
 		)
 
