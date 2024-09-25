@@ -702,6 +702,9 @@ jobs:
       OS: 'ubuntu-latest'
       PYTHON_VERSION: '3.12'
       LANG: 'en_US.utf-8'
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
     - uses: actions/checkout@v4
@@ -712,7 +715,7 @@ jobs:
     - name: Prep Testing Tox
       id: prep-tox
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} && { apt-get install --assume-yes python python3.6 python3.7 python3.8 python3.9 python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=558,endLine=560,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; fi
+        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} ; wait ; { apt-get install --assume-yes python python3.6 python3.7 python3.8 python3.9 python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=715,endLine=718,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
     - name: Install dependencies for Tox
       run: |
         pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
