@@ -47,13 +47,13 @@ class TestManifestInclusion(BasicUsageTestSuite):
 	def setUp(self):
 		super(TestManifestInclusion, self).setUp()
 		# Arguments need to build
-		build_arguments = [
+		clean_arguments = [
 			str("{} -m coverage run").format(_sys.executable),
 			'setup.py', 'clean', '--all'
 		]
 		# Clean previous builds
-		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running clean"), str(theBuildtxt))
+		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
+		self.assertIn(str("running clean"), str(theCleantxt))
 
 	def test_sdist_includes_required_files(self):
 		"""Test that the source distribution includes all required files."""
@@ -68,9 +68,6 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		dist_dir = _os.path.join(_os.getcwd(), 'dist')
 		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
 		self.assertTrue(len(dist_files) > 0, 'No files found in dist directory.')
-		print("")
-		print(str(dist_files))
-		print("")
 		sdist_path = _os.path.join(dist_dir, dist_files[0])
 		# Open the tar.gz file and inspect contents
 		with tarfile.open(sdist_path, 'r:gz') as tar:

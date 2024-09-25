@@ -211,7 +211,7 @@ purge: clean uninstall
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-test: cleanup
+test: cleanup MANIFEST.in
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -237,7 +237,7 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(WAIT) ;
 
-test-pytest: cleanup must_have_pytest test-reports
+test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
