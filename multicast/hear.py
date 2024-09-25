@@ -89,6 +89,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		True
 		>>>
 
+
 """
 
 
@@ -113,6 +114,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 		True
 		>>>
 
+
 """
 
 
@@ -133,6 +135,7 @@ __module__ = """multicast"""
 		>>> multicast.hear.__module__ is not None
 		True
 		>>>
+
 
 """
 
@@ -158,6 +161,7 @@ __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 		>>> multicast.hear.__name__ is not None
 		True
 		>>>
+
 
 """
 
@@ -221,6 +225,7 @@ class McastServer(socketserver.UDPServer):
 		True
 		>>>
 
+
 	"""
 
 	def server_activate(self):
@@ -280,6 +285,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 		True
 		>>>
 
+
 	"""
 
 	def handle(self):
@@ -291,10 +297,30 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	"""Subclasses socketserver.BaseRequestHandler for handling HEAR function.
 
-	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	Basically simplifies testing by allowing a simple HEAR back (case-insensitive) of string
 	data, after printing the sender's ip out.
+
+	Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>> multicast.hear is not None
+		True
+		>>> from multicast.hear import HearUDPHandler as HearUDPHandler
+		>>>
+
+	Testcase 1: HearUDPHandler should be automatically imported.
+
+		>>> HearUDPHandler.__name__ is not None
+		True
+		>>>
+
+
 	"""
 
 	def handle(self):
