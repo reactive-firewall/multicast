@@ -463,7 +463,6 @@ jobs:
       if: ${{ runner.os }} != "Linux"
       run: |
         if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "::warning file=.github/workflows/Tests.yml,line=459,endLine=459,title=SKIPPED::SKIP Code-Climate" ; fi ;
-      if: ${{ !cancelled() }}
     - name: code-climate for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       run: |
