@@ -55,8 +55,42 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running clean"), str(theCleantxt))
 
-	def test_sdist_includes_required_files(self):
-		"""Test that the source distribution includes all required files."""
+	def _get_package_version(self):
+		"""
+		Retrieve the current version of the package.
+
+		This helper method imports the package and extracts the __version__ attribute.
+
+		Returns:
+			str: The version string of the package.
+
+		Raises:
+			AssertionError: If the version string cannot be retrieved.
+
+		"""
+		try:
+			from .context import multicast
+			self.assertIsNotNone(multicast.__module__)
+			self.assertIsNotNone(multicast.__version__)
+			mcast_version = multicast.__version__
+			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
+			return mcast_version
+		except ImportError:
+			self.fail("""Failed to import the multicast package to retrieve version.""")
+
+	def _build_sdist_and_get_members(self):
+		"""Build the source distribution and return the list of member files and package version.
+
+		This helper method runs the command to create a source distribution (sdist) of the package
+		and then extracts the list of files included in the archive.
+
+		Returns:
+			tuple: A tuple containing the list of member file paths and the package version string.
+
+		Raises:
+			AssertionError: If the build command does not run successfully or if no files are found
+				in the 'dist' directory.
+		"""
 		# Arguments need to build
 		build_arguments = [
 			str("{} -m coverage run").format(_sys.executable),
@@ -69,51 +103,60 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
 		self.assertTrue(len(dist_files) > 0, 'No files found in dist directory.')
 		sdist_path = _os.path.join(dist_dir, dist_files[0])
-		# Open the tar.gz file and inspect contents
+		# Open the tar.gz file to inspect contents
 		with tarfile.open(sdist_path, 'r:gz') as tar:
 			members = tar.getnames()
-			expected_files = [
-				'multicast-1.5.0/README.md',
-				'multicast-1.5.0/LICENSE.md',
-				'multicast-1.5.0/requirements.txt',
-				'multicast-1.5.0/setup.py',
-				'multicast-1.5.0/MANIFEST.in',
-				# Include other important files and directories
-			]
-			for expected_file in expected_files:
-				self.assertIn(
-					expected_file, members,
-					str('Missing {expected} in sdist.').format(expected=expected_file)
-				)
+		version = self._get_package_version()
+		return members, version
+
+	def test_sdist_includes_required_files(self):
+		"""Test that the source distribution includes all required files.
+
+		This test verifies that the source distribution includes all expected files by building
+		the sdist and checking if the required files are present in the tar archive.
+		"""
+		members, version = self._build_sdist_and_get_members()
+		package_prefix = str("""multicast-{}""").format(version)
+		expected_files = [
+			str("""{}/README.md""").format(package_prefix),
+			str("""{}/LICENSE.md""").format(package_prefix),
+			str("""{}/requirements.txt""").format(package_prefix),
+			str("""{}/setup.py""").format(package_prefix),
+			str("""{}/MANIFEST.in""").format(package_prefix),
+			str("""{}/setup.cfg""").format(package_prefix),
+			str("""{}/multicast/__init__.py""").format(package_prefix),
+			str("""{}/multicast/__main__.py""").format(package_prefix),
+			str("""{}/multicast/skt.py""").format(package_prefix),
+			str("""{}/multicast/recv.py""").format(package_prefix),
+			str("""{}/multicast/send.py""").format(package_prefix),
+			str("""{}/multicast/hear.py""").format(package_prefix),
+			# Include other important files and directories
+		]
+		for expected_file in expected_files:
+			self.assertIn(
+				expected_file, members,
+				str("""Missing {expected} in sdist.""").format(expected=expected_file)
+			)
 
 	def test_sdist_excludes_unwanted_files(self):
-		"""Test that the source distribution excludes unwanted files."""
-		# Arguments need to build
-		build_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
-			'setup.py', 'sdist', '--formats=gztar'
+		"""Test that the source distribution excludes unwanted files.
+
+		This test ensures that unwanted files and directories are not included in the source distribution
+		by building the sdist and verifying that these files are absent from the tar archive.
+		"""
+		members, version = self._build_sdist_and_get_members()
+		package_prefix = str("""multicast-{}""").format(version)
+		unwanted_files = [
+			str("""{}/.gitignore""").format(package_prefix),
+			str("""{}/.github/""").format(package_prefix),
+			str("""{}/tests/""").format(package_prefix),
+			# Exclude other files or directories as specified in MANIFEST.in
 		]
-		# Build the source distribution
-		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running sdist"), str(theBuildtxt))
-		dist_dir = _os.path.join(_os.getcwd(), 'dist')
-		dist_files = _os.listdir(dist_dir)
-		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
-		sdist_path = _os.path.join(dist_dir, dist_files[0])
-		# Open the tar.gz file and inspect contents
-		with tarfile.open(sdist_path, 'r:gz') as tar:
-			members = tar.getnames()
-			unwanted_files = [
-				'multicast-1.5.0/.gitignore',
-				'multicast-1.5.0/.github/',
-				'multicast-1.5.0/tests/',
-				# Exclude other files or directories as specified in MANIFEST.in
-			]
-			for unwanted_file in unwanted_files:
-				self.assertNotIn(
-					unwanted_file, members,
-					str('Unwanted file {reject} found in sdist.').format(reject=unwanted_file)
-				)
+		for unwanted_file in unwanted_files:
+			self.assertNotIn(
+				unwanted_file, members,
+				str("""Unwanted file {reject} found in sdist.""").format(reject=unwanted_file)
+			)
 
 
 # leave this part
