@@ -759,6 +759,30 @@ class BasicUsageTestSuite(unittest.TestCase):
 		if not self._thepython:
 			self.skipTest(str("""No python cmd to test with!"""))
 
+	def _get_package_version(self):
+		"""
+		Retrieve the current version of the package.
+
+		This helper method imports the package and extracts the __version__ attribute.
+
+		Returns:
+			str: The version string of the package.
+
+		Raises:
+			AssertionError: If the version string cannot be retrieved.
+
+		"""
+		try:
+			self.assertIsNotNone(multicast.__module__)
+			self.assertIsNotNone(multicast.__version__)
+			mcast_version = multicast.__version__
+			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
+			# refactor alpha tags
+			mcast_version = mcast_version.replace("-alpha", "a0", 1)
+			return mcast_version
+		except ImportError:
+			self.fail("""Failed to import the multicast package to retrieve version.""")
+
 	@unittest.skipUnless(True, """Insanitty Test. Good luck debugging.""")
 	def test_absolute_truth_and_meaning(self):
 		"""Test case 0: Insanitty Test."""

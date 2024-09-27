@@ -55,29 +55,6 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running clean"), str(theCleantxt))
 
-	def _get_package_version(self):
-		"""
-		Retrieve the current version of the package.
-
-		This helper method imports the package and extracts the __version__ attribute.
-
-		Returns:
-			str: The version string of the package.
-
-		Raises:
-			AssertionError: If the version string cannot be retrieved.
-
-		"""
-		try:
-			from .context import multicast
-			self.assertIsNotNone(multicast.__module__)
-			self.assertIsNotNone(multicast.__version__)
-			mcast_version = multicast.__version__
-			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
-			return mcast_version
-		except ImportError:
-			self.fail("""Failed to import the multicast package to retrieve version.""")
-
 	def _build_sdist_and_get_members(self):
 		"""Build the source distribution and return the list of member files and package version.
 
