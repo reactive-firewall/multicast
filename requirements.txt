@@ -25,14 +25,14 @@
 # argparse>=1.4.0
 # argparse - builtin - PSF license
 # setuptools - MIT license
-setuptools>=45.0
+setuptools>=75.0
 # virtualenv - MIT license
 #virtualenv>=15.0.1
 # pip - MIT license
-pip>=21.0
+pip>=22.0
 # build - MIT license
 build>=1.1.1
 # multicast - MIT license
 #-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
 # wheel - MIT license
-wheel>=0.37
+wheel>=0.44

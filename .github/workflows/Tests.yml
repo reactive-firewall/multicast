@@ -54,26 +54,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
-          - python-version: 3.7
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: 3.8
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: 3.9
+          - python-version: "3.10"
             lang-var: "de.utf-8"
             experimental: false
-          - python-version: 3.9
+          - python-version: "3.10"
             lang-var: "jp.utf-8"
             experimental: false
-          - python-version: 3.9
+          - python-version: "3.10"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.10"
+          - python-version: "3.11"
             lang-var: "en_US.utf-8"
             experimental: false
           - python-version: "3.11"
@@ -93,7 +87,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Set up dependencies
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
     - name: Pre-build
       id: bootstrap
@@ -136,10 +130,10 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: 10
+    timeout-minutes: 8
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
@@ -151,7 +145,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for ${{ matrix.python-version }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=45.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -172,7 +166,7 @@ jobs:
       if: ${{ always() }}
 
 
-  COVERAGE-MATS:
+  COVERAGE:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
@@ -180,7 +174,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -200,91 +194,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
-        pip install -r ./requirements.txt ;
-        pip install -r ./tests/requirements.txt || true ;
-        pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
-        chmod +x ./cc-test-reporter 2>/dev/null || true ;
-        ./cc-test-reporter before-build || true ;
-    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      run: |
-        (curl https://deepsource.io/cli | sh) || true ;
-    - name: Pre-Clean
-      id: clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage for py3.9 on ${{ matrix.os }}
-      if: ${{ runner.python-version == '3.9' }}
-      run: make -f Makefile test ;
-    - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ runner.python-version != '3.9' }}
-      run: make -f Makefile test-pytest ;
-    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./coverage.xml
-        directory: .
-        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
-        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
-        verbose: true
-        fail_ci_if_error: false
-    - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./test-reports/
-        if-no-files-found: ignore
-    - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      run: |
-        ./cc-test-reporter after-build --exit-code 0 || true ;
-    - name: deepsource for ${{ matrix.python-version }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      run: |
-        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
-    - name: Post-Clean
-      id: post
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
-
-  COVERAGE:
-    if: ${{ success() }}
-    needs: [BUILD, MATS, COVERAGE-MATS]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-13, windows-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10"]
-    env:
-      OS: ${{ matrix.os }}
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.utf-8"
-      COVERAGE_RCFILE: ./.coveragerc
-      COV_CORE_SOURCE: ./
-      COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: ./coverage.xml
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -303,11 +213,7 @@ jobs:
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage for py3.9 on ${{ matrix.os }}
-      if: ${{ runner.python-version == '3.9' }}
-      run: make -f Makefile test >> $GITHUB_STEP_SUMMARY ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ runner.python-version != '3.9' }}
       run: make -f Makefile test-pytest >> $GITHUB_STEP_SUMMARY ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v4
@@ -351,7 +257,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-      PYTHON_VERSION: '3.10'
+      PYTHON_VERSION: '3.12'
       LANG: "en_US.utf-8"
 
     steps:
@@ -359,10 +265,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     - name: Install dependencies for python Linters
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.2";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -407,7 +313,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -518,7 +424,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
     - name: Pre-Clean
@@ -591,7 +497,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -658,7 +564,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
@@ -694,7 +600,7 @@ jobs:
 
   TOX:
     if: ${{ success() }}
-    needs: [MATS, COVERAGE-MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
+    needs: [MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -715,10 +621,10 @@ jobs:
     - name: Prep Testing Tox
       id: prep-tox
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} ; wait ; { apt-get install --assume-yes python python3.6 python3.7 python3.8 python3.9 python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=715,endLine=718,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
+        if [ "$OS" == "ubuntu-latest" ] ; then { apt-get update || true ;} ; wait ; { apt-get install --assume-yes python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=621,endLine=624,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
     - name: Install dependencies for Tox
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "build>=1.0.1";
+        pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;

@@ -157,8 +157,6 @@ try:
 		str("""Programming Language :: Python :: 3.12"""),
 		str("""Programming Language :: Python :: 3.11"""),
 		str("""Programming Language :: Python :: 3.10"""),
-		str("""Programming Language :: Python :: 3.9"""),
-		str("""Programming Language :: Python :: 3.8"""),
 		str("""Topic :: Software Development :: Libraries :: Python Modules"""),
 		str("""Topic :: System :: Networking"""),
 		str("""Topic :: Network""")
