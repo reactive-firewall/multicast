@@ -154,9 +154,9 @@ except Exception as importErr:
 
 class McastNope(mtool):
 	"""
-		The trivial implementation of mtool.
+	The trivial implementation of mtool.
 
-		Testing:
+	Testing:
 
 		Testcase 0: First set up test fixtures by importing multicast.
 
@@ -221,7 +221,8 @@ class McastNope(mtool):
 
 	@staticmethod
 	def NoOp(*args, **kwargs):
-		"""Do Nothing.
+		"""
+		Do Nothing.
 
 		The meaning of Nothing. This function should be self-explanitory;
 		it does 'no operation' i.e. nothing.
@@ -256,13 +257,30 @@ class McastNope(mtool):
 		return None  # noqa
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Executes a no-operation step.
+
+		This method calls the `NoOp` function with the provided arguments and returns the result.
+
+		Args:
+			*args: Positional arguments passed to `NoOp`.
+			**kwargs: Keyword arguments passed to `NoOp`.
+
+		Returns:
+			The result of the `NoOp` function.
+		"""
 		return self.NoOp(*args, **kwargs)
 
 
 class McastRecvHearDispatch(mtool):
 	"""
+	The `McastRecvHearDispatch` class handles receiving and dispatching multicast messages.
 
-		Testing:
+	This class listens for multicast messages on a specified group and port, and dispatches them
+	to the appropriate handler. It is designed to work with both command-line tools and
+	programmatic interfaces.
+
+	Testing:
 
 		Testcase 0: First set up test fixtures by importing multicast.
 
@@ -330,9 +348,10 @@ class McastRecvHearDispatch(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt to add send args.
+		"""
+		Will attempt to add send args.
 
-			Testing:
+		Testing:
 
 			Testcase 0: First set up test fixtures by importing multicast.
 
@@ -437,6 +456,23 @@ class McastRecvHearDispatch(mtool):
 		return _useHear
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Executes a multicast step based on the daemon dispatch.
+
+		This method selects either the `McastHEAR` or `McastRECV` class based on the daemon
+		dispatch flag and executes the corresponding step.
+
+		The RECV (via McastRECV) is the primitive sub-command to recieve a single multicas hunk.
+		The HEAR (via McastHEAR) is equivilant to running RECV in a loop to continually recive
+		multiple hunks. Most use-case will probably want to use HEAR instead of RECV.
+
+		Args:
+			*args: Positional arguments for the multicast step.
+			**kwargs: Keyword arguments for the multicast step.
+
+		Returns:
+			The result of the selected multicast class's `doStep` method.
+		"""
 		if self._help_deamon_dispatch(*args, **kwargs):
 			__stub_class = hear.McastHEAR
 		else:
@@ -457,6 +493,14 @@ TASK_OPTIONS = {
 
 
 class McastDispatch(mtool):
+	"""
+	The `McastDispatch` class is the main entry point for dispatching multicast tasks.
+
+	It provides a command-line interface for sending, receiving, and listening to multicast
+	messages. The class handles argument parsing and dispatches the appropriate multicast
+	tool based on the provided command.
+
+	"""
 
 	__proc__ = """multicast"""
 
@@ -492,6 +536,18 @@ class McastDispatch(mtool):
 		return (_is_done, theResult)  # noqa
 
 	def doStep(self, *args):
+		"""
+		Executes the multicast tool based on parsed arguments.
+
+		This method parses the command-line arguments, selects the appropriate multicast tool, and
+		executes it. If an error occurs during argument handling, it prints a warning message.
+
+		Args:
+			*args: Command-line arguments for the multicast tool.
+
+		Returns:
+			A tuple containing the exit status and the result of the tool execution.
+		"""
 		__EXIT_MSG = (1, "Unknown")
 		try:
 			try:
@@ -523,7 +579,8 @@ class McastDispatch(mtool):
 
 
 def main(*argv):
-	"""Do main event stuff.
+	"""
+	Do main event stuff.
 
 	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
 	Regardless of errors the result as an 'exit code' (int) is returned.
@@ -531,67 +588,67 @@ def main(*argv):
 	return codes.
 	The expected return codes are as follows:
 		= 0:  Any nominal state (i.e. no errors and possibly success)
-		<=1:  Any erroneous state (caveat: includes simple failure)
+		=>1:  Any erroneous state (caveat: includes simple failure)
 		= 2:  Any failed state
 		= 3:  Any undefined (but assumed erroneous) state
-		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
+		=<0:  implicitly erroneous and treated same as abs(exit_code) would be.
 
 	param iterable - argv - the array of arguments. Usually _sys.argv[1:]
 	returns int - the Namespace parsed with the key-value pairs.
 
 	Minimal Acceptance Testing:
 
-	First set up test fixtures by importing multicast.
+		First set up test fixtures by importing multicast.
 
-		>>> import multicast
-		>>> multicast.send is not None
-		True
-		>>>
+			>>> import multicast
+			>>> multicast.send is not None
+			True
+			>>>
 
-	Testcase 0: main should return an int.
-		A: Test that the multicast component is initialized.
-		B: Test that the send component is initialized.
-		C: Test that the send.main function is initialized.
-		D: Test that the send.main function returns an int 0-3.
+		Testcase 0: main should return an int.
+			A: Test that the multicast component is initialized.
+			B: Test that the send component is initialized.
+			C: Test that the send.main function is initialized.
+			D: Test that the send.main function returns an int 0-3.
 
-		>>> multicast.send is not None
-		True
-		>>> multicast.__main__.main is not None
-		True
-		>>> tst_fxtr_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
-		>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...int...>
-		>>> int(test_fixture) >= int(0)
-		True
-		>>> int(test_fixture) < int(4)
-		True
-		>>>
+			>>> multicast.send is not None
+			True
+			>>> multicast.__main__.main is not None
+			True
+			>>> tst_fxtr_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
+			>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+			>>> test_fixture is not None
+			True
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_fixture) >= int(0)
+			True
+			>>> int(test_fixture) < int(4)
+			True
+			>>>
 
 
-	Testcase 1: main should return an int.
-		A: Test that the multicast component is initialized.
-		B: Test that the recv component is initialized.
-		C: Test that the main(recv) function is initialized.
-		D: Test that the main(recv) function returns an int 0-3.
+		Testcase 1: main should return an int.
+			A: Test that the multicast component is initialized.
+			B: Test that the recv component is initialized.
+			C: Test that the main(recv) function is initialized.
+			D: Test that the main(recv) function returns an int 0-3.
 
-		>>> multicast.recv is not None
-		True
-		>>> multicast.__main__.main is not None
-		True
-		>>> tst_fxtr_args = ['''RECV''', '''--port=1234''', '''--group''', '''224.0.0.1''']
-		>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
-		>>> test_fixture is not None
-		True
-		>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<...int...>
-		>>> int(test_fixture) >= int(0)
-		True
-		>>> int(test_fixture) < int(4)
-		True
-		>>>
+			>>> multicast.recv is not None
+			True
+			>>> multicast.__main__.main is not None
+			True
+			>>> tst_fxtr_args = ['''RECV''', '''--port=1234''', '''--group''', '''224.0.0.1''']
+			>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
+			>>> test_fixture is not None
+			True
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_fixture) >= int(0)
+			True
+			>>> int(test_fixture) < int(4)
+			True
+			>>>
 
 
 	"""

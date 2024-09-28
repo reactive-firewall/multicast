@@ -106,6 +106,22 @@ __prologue__ = str("""Python Multicast library version {version}.""").format(ver
 
 __doc__ = __prologue__ + """
 
+	The `multicast` package simplifies multicast communication in Python applications.
+
+	It provides tools for sending, receiving, and listening to multicast messages over UDP.
+	The package includes command-line utilities and is designed to work with multiple Python
+	versions. It supports IPv4 multicast addresses and is compliant with dynamic/private port
+	ranges as per RFC-6335.
+
+	Key Features:
+	- Easy-to-use interfaces for multicast communication.
+	- Command-line tools for quick multicast operations.
+	- Support for UDP multicast via IPv4.
+
+	Security Considerations:
+	- Ensure proper data sanitization and validation to prevent injection attacks.
+	- Be mindful of TTL settings to limit message propagation to the intended network segment.
+
 	Dynamic Imports:
 		The sub-modules within "multicast" are interdependent, requiring access to each other's
 		functionalities. These statements import sub-modules of "multicast" and assign them to

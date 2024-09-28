@@ -252,7 +252,7 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
+def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	"""
 	Modifies the input command arguments to include coverage-related options when applicable.
 
@@ -262,7 +262,7 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 	Not intended to be run directly.
 
 	Args:
-		args (list): A list of command arguments, defaulting to [None].
+		*args (list): A list of command arguments, defaulting to [None].
 
 	Returns:
 		list: The modified list of arguments with 'coverage run' options added as applicable.
@@ -276,37 +276,41 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 
 		Testcase 1: Function should return unmodified arguments if 'coverage' is missing.
 
-			>>> _context.checkCovCommand(["python", "script.py"])
+			>>> _context.checkCovCommand("python", "script.py")
 			['python', 'script.py']
 
 		Testcase 2: Function should modify arguments when 'coverage' is the first argument.
 			A.) Missing 'run'
 
-			>>> _context.checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("coverage", "script.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 3: Function should modify arguments when 'coverage run' is in the first argument.
 			A.) NOT missing 'run'
 
-			>>> _context.checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("coverage run", "script.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 4: Function should handle coverage command with full path.
 
-			>>> _context.checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("/usr/bin/coverage", "test.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		Testcase 5: Function should handle coverage invoked via sys.executable.
 
 			>>> import sys as _sys
 			>>> test_fixture = [str("{} -m coverage run").format(_sys.executable), "test.py"]
-			>>> _context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand(*test_fixture)  #doctest: +ELLIPSIS
 			[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
 	"""
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+	if not args or args[0] is None:
+		raise RuntimeError("[CWE-1286] args must be an array of positional arguments")
+	else:
+		args = [*args]  # convert to an array
 	if str("coverage") in args[0]:
 		i = 1
 		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
@@ -324,7 +328,7 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 		for k, ktem in enumerate(extra_args):
 			offset = i + k
 			args.insert(offset, ktem)
-	return args
+	return [*args]
 
 
 def checkStrOrByte(theInput):
@@ -468,7 +472,7 @@ def checkPythonCommand(args, stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
-				args = checkCovCommand(args)
+				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:  # pragma: no branch
 		theOutput = None
@@ -476,30 +480,100 @@ def checkPythonCommand(args, stderr=None):
 			if err.output is not None:
 				theOutput = err.output
 		except Exception:
-			theOutput = None
+			theOutput = None  # suppress all errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
 @profiling.do_cprofile
-def timePythonCommand(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
-	return checkPythonCommand(args, stderr)
+def timePythonCommand(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
+	"""
+	Function for backend subprocess check_output command.
+
+	Args:
+		args (array): An array of positional command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+		Returns:
+			The output of checkPythonCommand.
+	"""
+	return checkPythonCommand(args, stderr=stderr)
 
 
-def checkPythonFuzzing(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
+def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
+	"""
+	Function for backend subprocess check_output command with improved error handling.
+
+	Args:
+		args (list): A list of command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+	Returns:
+		str: The command output as a string.
+
+	Raises:
+		RuntimeError: If an error occurs during command execution.
+
+	Meta Testing:
+
+		First set up test fixtures by importing test context.
+
+			>>> import tests.context as _context
+			>>>
+
+		Testcase 1: Function should raise RuntimeError when args is None.
+
+			>>> _context.checkPythonFuzzing(None)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 2: Function should raise RuntimeError when args is an empty list.
+
+			>>> _context.checkPythonFuzzing([])  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 3: Function should return output when valid arguments are provided.
+
+			>>> import sys as _sys
+			>>> test_fixture_3 = [str(_sys.executable), '-c', 'print("Hello, Fuzzing!")']
+			>>> _context.checkPythonFuzzing(test_fixture_3)
+			'Hello, Fuzzing!\\n'
+
+		Testcase 4: Function should handle coverage command and return output. Coverage will fail.
+
+			>>> test_fixture_4 = [
+			...     'coverage run', '-c', 'print("Coverage Fuzzing!")'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_4)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...Command '['coverage', 'run',...'-c'...]' returned...exit status 1...
+			>>>
+
+		Testcase 5: Function should capture stderr when specified.
+
+			>>> import subprocess as _subprocess
+			>>> test_fixture_5 = [
+			...     str(_sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_5, stderr=_subprocess.STDOUT)
+			'Error\\n'
+
+
+	"""
 	theOutput = None
 	try:
-		if args is None or args == [None]:  # pragma: no branch
+		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
-				args = checkCovCommand(args)
+				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except BaseException as err:  # pragma: no branch
 		theOutput = None
-		raise RuntimeError(err)
+		raise RuntimeError(err)  # do not suppress all errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
