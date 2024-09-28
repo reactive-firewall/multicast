@@ -515,6 +515,53 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 
 	Raises:
 		RuntimeError: If an error occurs during command execution.
+
+	Meta Testing:
+
+		First set up test fixtures by importing test context.
+
+			>>> import tests.context as _context
+			>>>
+
+		Testcase 1: Function should raise RuntimeError when args is None.
+
+			>>> _context.checkPythonFuzzing(None)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 2: Function should raise RuntimeError when args is an empty list.
+
+			>>> _context.checkPythonFuzzing([])  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 3: Function should return output when valid arguments are provided.
+
+			>>> import sys as _sys
+			>>> test_fixture_3 = [str(_sys.executable), '-c', 'print("Hello, Fuzzing!")']
+			>>> _context.checkPythonFuzzing(test_fixture_3)
+			'Hello, Fuzzing!\\n'
+
+		Testcase 4: Function should handle coverage command and return output. Coverage will fail.
+
+			>>> test_fixture_4 = [
+			...     'coverage run', '-c', 'print("Coverage Fuzzing!")'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_4)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...Command '['coverage', 'run',...'-c'...]' returned...exit status 1...
+			>>>
+
+		Testcase 5: Function should capture stderr when specified.
+
+			>>> import subprocess as _subprocess
+			>>> test_fixture_5 = [
+			...     str(_sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_5, stderr=_subprocess.STDOUT)
+			'Error\\n'
+
+
 	"""
 	theOutput = None
 	try:
