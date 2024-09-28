@@ -487,12 +487,35 @@ def checkPythonCommand(args, stderr=None):
 
 @profiling.do_cprofile
 def timePythonCommand(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
+	"""
+	Function for backend subprocess check_output command.
+
+	Args:
+		args (array): An array of positional command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+		Returns:
+			The output of checkPythonCommand.
+	"""
 	return checkPythonCommand(args, stderr=stderr)
 
 
 def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
+	"""
+	Function for backend subprocess check_output command with improved error handling.
+
+	Args:
+		args (list): A list of command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+	Returns:
+		str: The command output as a string.
+
+	Raises:
+		RuntimeError: If an error occurs during command execution.
+	"""
 	theOutput = None
 	try:
 		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
