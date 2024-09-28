@@ -588,10 +588,10 @@ def main(*argv):
 	return codes.
 	The expected return codes are as follows:
 		= 0:  Any nominal state (i.e. no errors and possibly success)
-		<=1:  Any erroneous state (caveat: includes simple failure)
+		=>1:  Any erroneous state (caveat: includes simple failure)
 		= 2:  Any failed state
 		= 3:  Any undefined (but assumed erroneous) state
-		> 0:  implicitly erroneous and treated same as abs(exit_code) would be.
+		=<0:  implicitly erroneous and treated same as abs(exit_code) would be.
 
 	param iterable - argv - the array of arguments. Usually _sys.argv[1:]
 	returns int - the Namespace parsed with the key-value pairs.
