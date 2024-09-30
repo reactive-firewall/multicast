@@ -21,6 +21,7 @@ exclude_lines =
     raise ImportError
     raise baton
     baton = ImportError
+    raise ModuleNotFoundError
     baton.module
     except subprocess.CalledProcessError
     except ..Error
@@ -56,5 +57,6 @@ partial_branches =
     if 'os' not in sys.modules:
     if 'os.path' not in sys.modules:
     if 'argparse' not in sys.modules:
+    RuntimeError("SHUTDOWN")
 
 

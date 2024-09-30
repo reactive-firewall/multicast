@@ -19,6 +19,8 @@
 
 """Provides multicast HEAR Features.
 
+Implements functionalities to listen to multicast messages and process them accordingly.
+
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
 	Minimal Acceptance Testing:
@@ -183,8 +185,8 @@ except Exception as importErr:
 
 
 try:
+	import threading
 	import socketserver
-	import threading as _threading
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
@@ -195,17 +197,18 @@ try:
 	for unit in depends:
 		try:
 			if unit.__name__ is None:  # pragma: no branch
-				raise ImportError(
+				raise ModuleNotFoundError(
 					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
+				) from None
 		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class McastServer(socketserver.UDPServer):
-	"""Generic Subclasses socketserver.UDPServer for handling daemon function.
+	"""
+	Generic Subclasses socketserver.UDPServer for handling daemon function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -259,13 +262,14 @@ class McastServer(socketserver.UDPServer):
 			def kill_func(a_server):
 				if a_server is not None:
 					a_server.shutdown()
-			end_thread = _threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
+			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
 			end_thread.start()
 		super(McastServer, self).handle_error(request, client_address)
 
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	"""
+	Subclasses socketserver.BaseRequestHandler for handling echo function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -300,7 +304,8 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling HEAR function.
+	"""
+	Subclasses socketserver.BaseRequestHandler for handling HEAR function.
 
 	Basically simplifies testing by allowing a simple HEAR back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -351,11 +356,12 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				)
 			)
 			if """STOP""" in str(data):
-				raise RuntimeError("SHUTDOWN")
+				raise RuntimeError("SHUTDOWN") from None
 
 
 class McastHEAR(multicast.mtool):
-	"""Subclasses multicast.mtool to provide the HEAR tooling.
+	"""
+	Subclasses multicast.mtool to provide the HEAR tooling.
 
 		Testing:
 

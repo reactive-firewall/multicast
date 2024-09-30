@@ -50,9 +50,9 @@ __module__ = """tests"""
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
+		raise ModuleNotFoundError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.") from None
 except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
@@ -63,15 +63,15 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from context import subprocess
 		from context import Process
 	import random as _random
-except Exception:
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as err:
+	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
 class MulticastTestSuite(context.BasicUsageTestSuite):
@@ -329,9 +329,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture)
+				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
@@ -380,9 +380,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture)
+				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
@@ -416,9 +416,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(sub_fail_fixture)
+				raise unittest.SkipTest(sub_fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode, fail_fixture)
 			self.assertEqual(int(p.exitcode), int(0))

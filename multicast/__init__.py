@@ -16,7 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Contains the Python Multicast library."""
+import sys
+import argparse
+import unicodedata
+import socket
+import struct
+import abc
+
 
 # skipcq
 __all__ = [
@@ -28,6 +34,7 @@ __all__ = [
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
 	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""",
 ]
+
 
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
@@ -317,58 +324,37 @@ _BLANK = str("""""")
 """
 
 
-try:
-	import sys
-	if sys.__name__ is None:
-		raise ImportError("FAIL: we could not import os. We're like in the matrix! ABORT.")
-except Exception as err:
-	raise ImportError(err)
+if sys.__name__ is None:
+	raise ModuleNotFoundError(
+		"FAIL: we could not import sys. We're like in the matrix! ABORT."
+	) from None
 
 
-try:
-	import argparse
-	if argparse.__name__ is None:
-		raise ImportError("FAIL: we could not import argparse. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+if argparse.__name__ is None:
+	raise ModuleNotFoundError("FAIL: we could not import argparse. ABORT.") from None
 
 
-try:
-	import unicodedata
-	if unicodedata.__name__ is None:
-		raise ImportError("FAIL: we could not import unicodedata. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+if unicodedata.__name__ is None:
+	raise ModuleNotFoundError("FAIL: we could not import unicodedata. ABORT.") from None
 
 
-try:
-	import socket
-	if socket.__name__ is None:
-		raise ImportError("FAIL: we could not import socket. ABORT.")
-	else:  # pragma: no branch
-		socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
-except Exception as err:
-	raise ImportError(err)
+if socket.__name__ is None:
+	raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
+else:  # pragma: no branch
+	socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
 
 
-try:
-	import struct
-	if struct.__name__ is None:
-		raise ImportError("FAIL: we could not import struct. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+if struct.__name__ is None:
+	raise ModuleNotFoundError("FAIL: we could not import struct. ABORT.") from None
 
 
-try:
-	import abc
-	if abc.__name__ is None:
-		raise ImportError("FAIL: we could not import Abstract base class. ABORT.")
-except Exception as err:
-	raise ImportError(err)
+if abc.__name__ is None:
+	raise ModuleNotFoundError("FAIL: we could not import Abstract base class. ABORT.") from None
 
 
 class mtool(abc.ABC):
-	"""Class for Multicast tools.
+	"""
+	Class for Multicast tools.
 
 		Utility class for CLI tools of the Multicast package. setupArgs() and doStep() are
 		abstract and need to be implemented by subclasses.
@@ -395,7 +381,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def buildArgs(cls, calling_parser_group):
-		"""Will build the argparse parser.
+		"""
+		Will build the argparse parser.
 
 		Utility Function to build the argparse parser; see argparse.ArgumentParser for more.
 		returns argparse.ArgumentParser - the ArgumentParser to use.
@@ -466,7 +453,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def parseArgs(cls, arguments=None):
-		"""Will attempt to parse the given CLI arguments.
+		"""
+		Will attempt to parse the given CLI arguments.
 
 		See argparse.ArgumentParser for more.
 		param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
@@ -520,7 +508,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def checkToolArgs(cls, args):
-		"""Will handle the None case for arguments.
+		"""
+		Will handle the None case for arguments.
 
 		Used as a helper function.
 
@@ -566,7 +555,8 @@ class mtool(abc.ABC):
 		return [None] if args is None else args
 
 	def __call__(self, *args, **kwargs):
-		"""Call self as a function.
+		"""
+		Call self as a function.
 
 			Default implementation simply calls the abstract function doStep
 			and passes the given positional arguments, thus key-word arguments
@@ -589,14 +579,10 @@ class mtool(abc.ABC):
 		pass  # skipcq - abstract method
 
 
-try:
-	if 'multicast.skt' not in sys.modules:
-		from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
-	else:  # pragma: no branch
-		skt = sys.modules["""multicast.skt"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+if 'multicast.skt' not in sys.modules:
+	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+else:  # pragma: no branch
+	skt = sys.modules["""multicast.skt"""]
 
 
 genSocket = skt.genSocket
@@ -605,34 +591,22 @@ genSocket = skt.genSocket
 endSocket = skt.endSocket
 
 
-try:
-	if 'multicast.recv' not in sys.modules:
-		from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
-	else:  # pragma: no branch
-		recv = sys.modules["""multicast.recv"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+if 'multicast.recv' not in sys.modules:
+	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+else:  # pragma: no branch
+	recv = sys.modules["""multicast.recv"""]
 
 
-try:
-	if 'multicast.send' not in sys.modules:
-		from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
-	else:  # pragma: no branch
-		send = sys.modules["""multicast.send"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+if 'multicast.send' not in sys.modules:
+	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+else:  # pragma: no branch
+	send = sys.modules["""multicast.send"""]
 
 
-try:
-	if 'multicast.hear' not in sys.modules:
-		from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
-	else:  # pragma: no branch
-		hear = sys.modules["""multicast.hear"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+if 'multicast.hear' not in sys.modules:
+	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+else:  # pragma: no branch
+	hear = sys.modules["""multicast.hear"""]
 
 
 try:

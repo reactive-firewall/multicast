@@ -55,9 +55,9 @@ __doc__ = """
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
+		raise ModuleNotFoundError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.") from None
 except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
@@ -65,8 +65,8 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] OS Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
 
 
 try:
@@ -74,8 +74,8 @@ try:
 		import unittest
 	else:  # pragma: no branch
 		unittest = sys.modules["""unittest"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] unittest Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
 
 
 try:
@@ -83,8 +83,8 @@ try:
 		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		Process = sys.modules["""Process"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Process Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
 
 try:
@@ -92,8 +92,8 @@ try:
 		import subprocess
 	else:  # pragma: no branch
 		subprocess = sys.modules["""subprocess"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] subprocess Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
 
 
 try:
@@ -101,8 +101,8 @@ try:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.") from err
 
 
 try:
@@ -110,8 +110,8 @@ try:
 		import tests.profiling as profiling
 	else:  # pragma: no branch
 		profiling = sys.modules["""tests.profiling"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] profiling Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 
 __BLANK = str("""""")
@@ -172,7 +172,7 @@ def getCoverageCommand():
 		else:  # pragma: no branch
 			thecov = "exit 1 ; #"
 	except Exception:  # pragma: no branch
-		thecov = "exit 1 ; #"
+		thecov = "exit 1 ; #"  # handled error by suppressing it and indicating caller should abort.
 	return str(thecov)
 
 
@@ -216,7 +216,7 @@ def __check_cov_before_py():
 			if coverage.__name__ is not None:
 				thepython = str("{} -m coverage run -p").format(str(sys.executable))
 		except Exception:
-			thepython = str(sys.executable)
+			thepython = str(sys.executable)  # handled error by falling back on faile-safe value.
 	return str(thepython)
 
 
@@ -248,7 +248,7 @@ def getPythonCommand():
 		try:
 			thepython = str(sys.executable)
 		except Exception:
-			thepython = "exit 1 ; #"
+			thepython = "exit 1 ; #"  # handled error by suppressing it and indicating exit.
 	return str(thepython)
 
 
@@ -306,9 +306,9 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 
 	"""
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+		raise ImportError("[CWE-758] Failed to import system. WTF?!!") from None
 	if not args or args[0] is None:
-		raise RuntimeError("[CWE-1286] args must be an array of positional arguments")
+		raise RuntimeError("[CWE-1286] args must be an array of positional arguments") from None
 	else:
 		args = [*args]  # convert to an array
 	if str("coverage") in args[0]:
@@ -573,7 +573,7 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except BaseException as err:  # pragma: no branch
 		theOutput = None
-		raise RuntimeError(err)  # do not suppress all errors
+		raise RuntimeError(err) from err  # do not suppress all errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 

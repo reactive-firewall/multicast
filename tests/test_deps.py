@@ -27,29 +27,29 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
 		from context import os as _os
 		from context import sys as _sys
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 try:
 	if 're' not in _sys.modules:
 		import re
 	else:  # pragma: no branch
 		re = _sys.modules["""re"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] re Failed to import.")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] re Failed to import.") from _cause
 
 try:
 	if 'venv' not in _sys.modules:
 		import venv
 	else:  # pragma: no branch
 		venv = _sys.modules["""venv"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] venv Failed to import.")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] venv Failed to import.") from _cause
 
 
 class TestRequirementsTxt(context.BasicUsageTestSuite):

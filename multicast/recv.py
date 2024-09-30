@@ -30,7 +30,10 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast RECV Features.
+"""Provides multicast RECV Features.
+
+Use for receiving multicast messages. Contains classes and functions to handle receiving messages
+from multicast groups.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -198,21 +201,22 @@ try:
 	]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
-			baton = ImportError(
+			baton = ModuleNotFoundError(
 				str("[CWE-440] module failed to import {}.").format(str(unit))
 			)  # pragma: no cover
 			baton.module = unit  # pragma: no cover
-			raise baton  # pragma: no cover
+			raise baton from None  # pragma: no cover
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
-	"""Will join the given multicast group(s).
+	"""
+	Will join the given multicast group(s).
 
 	The JOIN function. Will start to listen on the given port of an interface for multicast
 	messages to the given group(s).
@@ -272,12 +276,13 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
-		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
+		raise NotImplementedError("""[CWE-440] Not Implemented.""", err) from err  # pragma: no cover
 	return sock
 
 
 def tryrecv(msgbuffer, chunk, sock):
-	"""Will try to listen on the given socket directly into the given chunk for decoding.
+	"""
+	Will try to listen on the given socket directly into the given chunk for decoding.
 
 		If the read into the chunk results in content, the chunk will be decoded into the given
 		message buffer. Either way the message buffer will be returned.
@@ -339,7 +344,8 @@ def recvstep(msgbuffer, chunk, sock):
 
 
 class McastRECV(multicast.mtool):
-	"""Subclasses the multicast.mtool to provide the RECV functions.
+	"""
+	Subclasses the multicast.mtool to provide the RECV functions.
 
 		Testing:
 
@@ -394,7 +400,8 @@ class McastRECV(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -474,7 +481,8 @@ class McastRECV(multicast.mtool):
 
 	@staticmethod
 	def _hearstep(groups, port, iface=None, bind_group=None):
-		"""Will listen on the given port of an interface for multicast messages to the given group(s).
+		"""
+		Will listen on the given port of an interface for multicast messages to the given group(s).
 
 		The work-horse function.
 

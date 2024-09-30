@@ -31,7 +31,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""Python Multicast Broadcaster.
+"""Provides multicast broadcast features.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -164,15 +164,16 @@ try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ImportError(
 					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
-		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+				) from None
+		except Exception as _cause:  # pragma: no branch
+			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class McastSAY(multicast.mtool):
-	"""Multicast Broacaster tool.
+	"""
+	Multicast Broacaster tool.
 
 		Testing:
 
@@ -217,7 +218,8 @@ class McastSAY(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -297,7 +299,8 @@ class McastSAY(multicast.mtool):
 
 	@staticmethod
 	def _sayStep(group, port, data):
-		"""Will send the given data over the given port to the given group.
+		"""
+		Will send the given data over the given port to the given group.
 
 		The actual magic is handled here.
 		"""

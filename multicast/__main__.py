@@ -17,7 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The Main Entrypoint.
+"""The main entry point for the multicast package.
+
+This module provides the command-line interface and core functionalities for multicast
+communication.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -77,79 +80,51 @@ __file__ = """multicast/__main__.py"""
 
 try:
 	from . import sys as _sys
-except Exception:
+except Exception as impErr:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python"))
+	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
 
 
-try:
-	if 'multicast.__version__' not in _sys.modules:
-		from . import __version__ as __version__  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		__version__ = _sys.modules["""multicast.__version__"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.__version__ as __version__  # noqa. skipcq  -  used by --version argument.
+if 'multicast.__version__' not in _sys.modules:
+	from . import __version__ as __version__  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	__version__ = _sys.modules["""multicast.__version__"""]
 
 
-try:
-	if 'multicast._MCAST_DEFAULT_PORT' not in _sys.modules:
-		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq  -  used by port argument.
+if 'multicast._MCAST_DEFAULT_PORT' not in _sys.modules:
+	from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 
 
-try:
-	if 'multicast._MCAST_DEFAULT_GROUP' not in _sys.modules:
-		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq  -  used by group arg.
+if 'multicast._MCAST_DEFAULT_GROUP' not in _sys.modules:
+	from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 
 
-try:
-	if 'multicast.mtool' not in _sys.modules:
-		from . import mtool as mtool  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		mtool = _sys.modules["""multicast.mtool"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.mtool as mtool  # noqa  -  used by all arguments' CMD (sub-command).
+if 'multicast.mtool' not in _sys.modules:
+	from . import mtool as mtool  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	mtool = _sys.modules["""multicast.mtool"""]
 
 
-try:
-	if 'multicast.recv' not in _sys.modules:
-		from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		recv = _sys.modules["""multicast.recv"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.recv' not in _sys.modules:
+	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	recv = _sys.modules["""multicast.recv"""]
 
 
-try:
-	if 'multicast.send' not in _sys.modules:
-		from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		send = _sys.modules["""multicast.send"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.send' not in _sys.modules:
+	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	send = _sys.modules["""multicast.send"""]
 
 
-try:
-	if 'multicast.hear' not in _sys.modules:
-		from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		hear = _sys.modules["""multicast.hear"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.hear' not in _sys.modules:
+	from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	hear = _sys.modules["""multicast.hear"""]
 
 
 class McastNope(mtool):
@@ -462,8 +437,8 @@ class McastRecvHearDispatch(mtool):
 		This method selects either the `McastHEAR` or `McastRECV` class based on the daemon
 		dispatch flag and executes the corresponding step.
 
-		The RECV (via McastRECV) is the primitive sub-command to recieve a single multicas hunk.
-		The HEAR (via McastHEAR) is equivilant to running RECV in a loop to continually recive
+		The RECV (via McastRECV) is the primitive sub-command to receive a single multicas hunk.
+		The HEAR (via McastHEAR) is equivalent to running RECV in a loop to continually receive
 		multiple hunks. Most use-case will probably want to use HEAR instead of RECV.
 
 		Args:
@@ -582,6 +557,9 @@ def main(*argv):
 	"""
 	Do main event stuff.
 
+	Executes the multicast command-line interface, by parsing command-line arguments and dispatching
+	the appropriate multicast operations.
+
 	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
 	Regardless of errors the result as an 'exit code' (int) is returned.
 	The only exception is multicast.__main__.main(*args) which will exit with the underlying
@@ -647,6 +625,33 @@ def main(*argv):
 			>>> int(test_fixture) >= int(0)
 			True
 			>>> int(test_fixture) < int(4)
+			True
+			>>>
+
+
+		Testcase 2: main should error with usage.
+			A: Test that the multicast component is initialized.
+			B: Test that the recv component is initialized.
+			C: Test that the main(recv) function is initialized.
+			D: Test that the main(recv) function errors with a usage hint by default.
+
+			>>> multicast.recv is not None
+			True
+			>>> multicast.__main__.main is not None
+			True
+			>>> (test_fixture, junk_ignore) = multicast.__main__.main() #doctest: +ELLIPSIS
+			usage: multicast [-h | -V] [--use-std] [--deamon] CMD ...
+			multicast...
+			CRITICAL...
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_fixture) >= int(0)
+			True
+			>>> int(test_fixture) < int(4)
+			True
+			>>> type(junk_ignore)
+			<...str...>
+			>>> junk_ignore in "STOP"
 			True
 			>>>
 

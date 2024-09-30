@@ -28,15 +28,15 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
 		from context import os as _os
 		from context import BasicUsageTestSuite
 	from setup import readFile
 	from setup import parse_requirements_for_install_requires
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 class TestParseRequirements(BasicUsageTestSuite):
