@@ -172,7 +172,8 @@ except Exception as err:
 
 
 class McastSAY(multicast.mtool):
-	"""Multicast Broacaster tool.
+	"""
+	Multicast Broacaster tool.
 
 		Testing:
 
@@ -217,7 +218,8 @@ class McastSAY(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -297,7 +299,8 @@ class McastSAY(multicast.mtool):
 
 	@staticmethod
 	def _sayStep(group, port, data):
-		"""Will send the given data over the given port to the given group.
+		"""
+		Will send the given data over the given port to the given group.
 
 		The actual magic is handled here.
 		"""

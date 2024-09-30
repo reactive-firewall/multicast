@@ -368,7 +368,8 @@ except Exception as err:
 
 
 class mtool(abc.ABC):
-	"""Class for Multicast tools.
+	"""
+	Class for Multicast tools.
 
 		Utility class for CLI tools of the Multicast package. setupArgs() and doStep() are
 		abstract and need to be implemented by subclasses.
@@ -395,7 +396,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def buildArgs(cls, calling_parser_group):
-		"""Will build the argparse parser.
+		"""
+		Will build the argparse parser.
 
 		Utility Function to build the argparse parser; see argparse.ArgumentParser for more.
 		returns argparse.ArgumentParser - the ArgumentParser to use.
@@ -466,7 +468,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def parseArgs(cls, arguments=None):
-		"""Will attempt to parse the given CLI arguments.
+		"""
+		Will attempt to parse the given CLI arguments.
 
 		See argparse.ArgumentParser for more.
 		param str - arguments - the array of arguments to parse. Usually sys.argv[1:]
@@ -520,7 +523,8 @@ class mtool(abc.ABC):
 
 	@classmethod
 	def checkToolArgs(cls, args):
-		"""Will handle the None case for arguments.
+		"""
+		Will handle the None case for arguments.
 
 		Used as a helper function.
 
@@ -566,7 +570,8 @@ class mtool(abc.ABC):
 		return [None] if args is None else args
 
 	def __call__(self, *args, **kwargs):
-		"""Call self as a function.
+		"""
+		Call self as a function.
 
 			Default implementation simply calls the abstract function doStep
 			and passes the given positional arguments, thus key-word arguments

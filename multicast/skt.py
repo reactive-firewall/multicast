@@ -165,7 +165,7 @@ except Exception as err:
 
 
 def genSocket():
-	"""Will generate an unbound socket.socket object ready to receive network traffic.
+	"""Generates an unbound socket.socket object ready to receive network traffic.
 
 	Implementation allows reuse of socket (to allow another instance of python running
 	this script binding to the same ip/port).
@@ -212,7 +212,7 @@ def genSocket():
 
 
 def endSocket(sock=None):
-	"""Will generates an unbound socket.socket object ready to receive network traffic.
+	"""Closes a given socket.socket object.
 
 	Minimal Acceptance Testing:
 

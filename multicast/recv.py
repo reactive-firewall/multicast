@@ -30,7 +30,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast RECV Features.
+"""Multicast RECV Features.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -212,7 +212,8 @@ except Exception as err:
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
-	"""Will join the given multicast group(s).
+	"""
+	Will join the given multicast group(s).
 
 	The JOIN function. Will start to listen on the given port of an interface for multicast
 	messages to the given group(s).
@@ -277,7 +278,8 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 def tryrecv(msgbuffer, chunk, sock):
-	"""Will try to listen on the given socket directly into the given chunk for decoding.
+	"""
+	Will try to listen on the given socket directly into the given chunk for decoding.
 
 		If the read into the chunk results in content, the chunk will be decoded into the given
 		message buffer. Either way the message buffer will be returned.
@@ -339,7 +341,8 @@ def recvstep(msgbuffer, chunk, sock):
 
 
 class McastRECV(multicast.mtool):
-	"""Subclasses the multicast.mtool to provide the RECV functions.
+	"""
+	Subclasses the multicast.mtool to provide the RECV functions.
 
 		Testing:
 
@@ -394,7 +397,8 @@ class McastRECV(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -474,7 +478,8 @@ class McastRECV(multicast.mtool):
 
 	@staticmethod
 	def _hearstep(groups, port, iface=None, bind_group=None):
-		"""Will listen on the given port of an interface for multicast messages to the given group(s).
+		"""
+		Will listen on the given port of an interface for multicast messages to the given group(s).
 
 		The work-horse function.
 
