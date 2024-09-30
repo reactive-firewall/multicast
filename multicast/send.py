@@ -31,7 +31,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""Python Multicast Broadcaster.
+"""Provides multicast broadcast features.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 

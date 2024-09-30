@@ -30,7 +30,10 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""Multicast RECV Features.
+"""Provides multicast RECV Features.
+
+Use for receiving multicast messages. Contains classes and functions to handle receiving messages
+from multicast groups.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 

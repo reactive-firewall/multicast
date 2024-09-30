@@ -19,6 +19,8 @@
 
 """Provides multicast HEAR Features.
 
+Implements functionalities to listen to multicast messages and process them accordingly.
+
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
 	Minimal Acceptance Testing:
