@@ -583,7 +583,7 @@ class McastDispatch(mtool):
 def main(*argv):
 	"""
 	Do main event stuff.
-	
+
 	Executes the multicast command-line interface, by parsing command-line arguments and dispatching
 	the appropriate multicast operations.
 
