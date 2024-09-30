@@ -183,8 +183,8 @@ except Exception as importErr:
 
 
 try:
+	import threading
 	import socketserver
-	import threading as _threading
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
@@ -260,7 +260,7 @@ class McastServer(socketserver.UDPServer):
 			def kill_func(a_server):
 				if a_server is not None:
 					a_server.shutdown()
-			end_thread = _threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
+			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
 			end_thread.start()
 		super(McastServer, self).handle_error(request, client_address)
 

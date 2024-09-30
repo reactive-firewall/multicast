@@ -77,79 +77,51 @@ __file__ = """multicast/__main__.py"""
 
 try:
 	from . import sys as _sys
-except Exception:
+except Exception as impErr:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python")) from None
+	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
 
 
-try:
-	if 'multicast.__version__' not in _sys.modules:
-		from . import __version__ as __version__  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		__version__ = _sys.modules["""multicast.__version__"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.__version__ as __version__  # noqa. skipcq  -  used by --version argument.
+if 'multicast.__version__' not in _sys.modules:
+	from . import __version__ as __version__  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	__version__ = _sys.modules["""multicast.__version__"""]
 
 
-try:
-	if 'multicast._MCAST_DEFAULT_PORT' not in _sys.modules:
-		from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast._MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq  -  used by port argument.
+if 'multicast._MCAST_DEFAULT_PORT' not in _sys.modules:
+	from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 
 
-try:
-	if 'multicast._MCAST_DEFAULT_GROUP' not in _sys.modules:
-		from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast._MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq  -  used by group arg.
+if 'multicast._MCAST_DEFAULT_GROUP' not in _sys.modules:
+	from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 
 
-try:
-	if 'multicast.mtool' not in _sys.modules:
-		from . import mtool as mtool  # skipcq: PYL-C0414
-	else:  # pragma: no branch
-		mtool = _sys.modules["""multicast.mtool"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.mtool as mtool  # noqa  -  used by all arguments' CMD (sub-command).
+if 'multicast.mtool' not in _sys.modules:
+	from . import mtool as mtool  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	mtool = _sys.modules["""multicast.mtool"""]
 
 
-try:
-	if 'multicast.recv' not in _sys.modules:
-		from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		recv = _sys.modules["""multicast.recv"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.recv' not in _sys.modules:
+	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	recv = _sys.modules["""multicast.recv"""]
 
 
-try:
-	if 'multicast.send' not in _sys.modules:
-		from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		send = _sys.modules["""multicast.send"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.send' not in _sys.modules:
+	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	send = _sys.modules["""multicast.send"""]
 
 
-try:
-	if 'multicast.hear' not in _sys.modules:
-		from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-	else:  # pragma: no branch
-		hear = _sys.modules["""multicast.hear"""]
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
-	import multicast.hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+if 'multicast.hear' not in _sys.modules:
+	from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+else:  # pragma: no branch
+	hear = _sys.modules["""multicast.hear"""]
 
 
 class McastNope(mtool):
