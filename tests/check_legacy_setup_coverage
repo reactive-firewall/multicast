@@ -170,8 +170,14 @@ wait ;
 printf "%s\n" "End of Setup.py Test one-shot" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 
-${COVERAGE_CMD} combine 2>${_TEST_ROOT_DIR}/${ERR_FILE} || EXIT_CODE=2 ;
-${COVERAGE_CMD} xml --include=setup.py,multicast -o ${_TEST_ROOT_DIR}/test-reports/coverage_setup.xml || EXIT_CODE=2 ;
+# sloppy workaround for now
+if [[ ( -x $(command -v python3) ) ]] ; then
+	$(command -v python3) -m coverage combine 2>${_TEST_ROOT_DIR}/${ERR_FILE} || EXIT_CODE=2 ;
+	$(command -v python3) -m coverage xml --include=setup.py,multicast -o ${_TEST_ROOT_DIR}/test-reports/coverage_setup.xml || EXIT_CODE=2 ;
+elif [[ ( -x $(command -v coverage) ) ]] ; then
+	$(command -v coverage) combine 2>${_TEST_ROOT_DIR}/${ERR_FILE} || EXIT_CODE=2 ;
+	$(command -v coverage) xml --include=setup.py,multicast -o ${_TEST_ROOT_DIR}/test-reports/coverage_setup.xml || EXIT_CODE=2 ;
+fi
 
 wait ;
 cp -f ./${LOG_FILE} ${_TEST_ROOT_DIR}/test-reports/legacy_setup_version_log.log 2>./${ERR_FILE} ; wait ;
