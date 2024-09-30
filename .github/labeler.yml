@@ -88,5 +88,7 @@ Github:
       - README.md
 
 invalid:
+  - changed-files:
+    - any-glob-to-any-file:
       - .stickler.yml
       - .hound.yml
