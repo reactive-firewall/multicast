@@ -205,7 +205,8 @@ except Exception as err:
 
 
 class McastServer(socketserver.UDPServer):
-	"""Generic Subclasses socketserver.UDPServer for handling daemon function.
+	"""
+	Generic Subclasses socketserver.UDPServer for handling daemon function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -265,7 +266,8 @@ class McastServer(socketserver.UDPServer):
 
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling echo function.
+	"""
+	Subclasses socketserver.BaseRequestHandler for handling echo function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -300,7 +302,8 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
-	"""Subclasses socketserver.BaseRequestHandler for handling HEAR function.
+	"""
+	Subclasses socketserver.BaseRequestHandler for handling HEAR function.
 
 	Basically simplifies testing by allowing a simple HEAR back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -355,7 +358,8 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 
 class McastHEAR(multicast.mtool):
-	"""Subclasses multicast.mtool to provide the HEAR tooling.
+	"""
+	Subclasses multicast.mtool to provide the HEAR tooling.
 
 		Testing:
 
