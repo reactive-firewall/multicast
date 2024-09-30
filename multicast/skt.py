@@ -30,7 +30,9 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast socket Utility Functions.
+"""Socket utility functions for multicast communication.
+
+Provides helper functions for creating and managing multicast sockets.
 
 NOT intended for DIRECT use!
 
@@ -165,10 +167,15 @@ except Exception as err:
 
 
 def genSocket():
-	"""Generates an unbound socket.socket object ready to receive network traffic.
+	"""
+	Create and configure a multicast socket.
 
+	Generates an unbound socket.socket object ready to receive network traffic.
 	Implementation allows reuse of socket (to allow another instance of python running
 	this script binding to the same ip/port).
+
+	Returns:
+		socket.socket: A configured multicast socket ready for communication.
 
 	Minimal Acceptance Testing:
 

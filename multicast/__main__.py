@@ -17,7 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The Main Entrypoint.
+"""The main entry point for the multicast package.
+
+This module provides the command-line interface and core functionalities for multicast communication.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -581,6 +583,9 @@ class McastDispatch(mtool):
 def main(*argv):
 	"""
 	Do main event stuff.
+	
+	Executes the multicast command-line interface, by parsing command-line arguments and dispatching
+	the appropriate multicast operations.
 
 	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
 	Regardless of errors the result as an 'exit code' (int) is returned.
@@ -647,6 +652,33 @@ def main(*argv):
 			>>> int(test_fixture) >= int(0)
 			True
 			>>> int(test_fixture) < int(4)
+			True
+			>>>
+
+
+		Testcase 2: main should error with usage.
+			A: Test that the multicast component is initialized.
+			B: Test that the recv component is initialized.
+			C: Test that the main(recv) function is initialized.
+			D: Test that the main(recv) function errors with a usage hint by default.
+
+			>>> multicast.recv is not None
+			True
+			>>> multicast.__main__.main is not None
+			True
+			>>> (test_fixture, junk_ignore) = multicast.__main__.main() #doctest: +ELLIPSIS
+			usage: multicast [-h | -V] [--use-std] [--deamon] CMD ...
+			multicast...
+			CRITICAL...
+			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_fixture) >= int(0)
+			True
+			>>> int(test_fixture) < int(4)
+			True
+			>>> type(junk_ignore)
+			<...str...>
+			>>> junk_ignore in "STOP"
 			True
 			>>>
 
