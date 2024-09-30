@@ -104,7 +104,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
-			self.assertEqual(type(_fixture_port_num), type(int(0)))
+			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_SAY_args = [
 				"""--port""", str(_fixture_port_num),
 				"""--mcast-group""", """'224.0.0.1'""",
