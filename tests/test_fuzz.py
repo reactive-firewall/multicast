@@ -56,7 +56,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 
 	Methods:
 	- `test_multicast_sender_with_random_data(self, data)`: Tests sending and
-	  receiving random binary data using the multicast sender and receiver.
+		receiving random binary data using the multicast sender and receiver.
 
 	Note:
 	This test ensures that the multicast sender and receiver can handle binary
