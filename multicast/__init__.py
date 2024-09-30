@@ -321,7 +321,7 @@ try:
 	import sys
 	if sys.__name__ is None:
 		raise ModuleNotFoundError(
-			"FAIL: we could not import os. We're like in the matrix! ABORT."
+			"FAIL: we could not import sys. We're like in the matrix! ABORT."
 		) from None
 except Exception as err:
 	raise ImportError(err) from err
