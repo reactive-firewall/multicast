@@ -24,9 +24,6 @@ import struct
 import abc
 
 
-"""Contains the Python Multicast library."""
-
-
 # skipcq
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",

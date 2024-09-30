@@ -73,10 +73,8 @@ def readFile(filename):
 	try:
 		expected_files = ["""E.md""", """requirements.txt"""]
 		if not any(aexpected_file in filename for aexpected_file in expected_files):
-			raise ValueError(str(
-				"""[CWE-706] Access to the file {} was not expected."""
-			).format(filename)) from None
-		with open(str("""./{}""").format(str(filename))) as f:
+			raise ValueError(f"[CWE-706] Access to the file {filename} was not expected.") from None
+		with open(f"./{filename}") as f:
 			theResult = f.read()
 	except Exception as err:
 		theResult = str(
@@ -116,7 +114,7 @@ def parse_requirements_for_install_requires(requirements_text):
 			version = match.group(3)
 			if operator == '>=' and version:
 				# Keep only the minimum required version
-				install_requires.append(str("{pkg}>={ver}").format(pkg=package, ver=version))
+				install_requires.append(f"{package}>={version}")
 			elif version:
 				# Include the package without version or with simplified specifier
 				install_requires.append(package)
