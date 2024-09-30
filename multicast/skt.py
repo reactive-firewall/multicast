@@ -161,7 +161,7 @@ except Exception as err:
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err
 
 
 def genSocket():

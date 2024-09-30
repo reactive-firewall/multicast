@@ -79,7 +79,7 @@ try:
 	from . import sys as _sys
 except Exception:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python"))
+	raise ImportError(str("[CWE-440] Error Importing Python")) from None
 
 
 try:
@@ -462,8 +462,8 @@ class McastRecvHearDispatch(mtool):
 		This method selects either the `McastHEAR` or `McastRECV` class based on the daemon
 		dispatch flag and executes the corresponding step.
 
-		The RECV (via McastRECV) is the primitive sub-command to recieve a single multicas hunk.
-		The HEAR (via McastHEAR) is equivilant to running RECV in a loop to continually recive
+		The RECV (via McastRECV) is the primitive sub-command to receive a single multicas hunk.
+		The HEAR (via McastHEAR) is equivalent to running RECV in a loop to continually receive
 		multiple hunks. Most use-case will probably want to use HEAR instead of RECV.
 
 		Args:

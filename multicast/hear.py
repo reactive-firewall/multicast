@@ -195,13 +195,13 @@ try:
 	for unit in depends:
 		try:
 			if unit.__name__ is None:  # pragma: no branch
-				raise ImportError(
+				raise ModuleNotFoundError(
 					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
+				) from None
 		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class McastServer(socketserver.UDPServer):
@@ -351,7 +351,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				)
 			)
 			if """STOP""" in str(data):
-				raise RuntimeError("SHUTDOWN")
+				raise RuntimeError("SHUTDOWN") from None
 
 
 class McastHEAR(multicast.mtool):

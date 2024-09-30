@@ -320,51 +320,53 @@ _BLANK = str("""""")
 try:
 	import sys
 	if sys.__name__ is None:
-		raise ImportError("FAIL: we could not import os. We're like in the matrix! ABORT.")
+		raise ModuleNotFoundError(
+			"FAIL: we could not import os. We're like in the matrix! ABORT."
+		) from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
 	import argparse
 	if argparse.__name__ is None:
-		raise ImportError("FAIL: we could not import argparse. ABORT.")
+		raise ModuleNotFoundError("FAIL: we could not import argparse. ABORT.") from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
 	import unicodedata
 	if unicodedata.__name__ is None:
-		raise ImportError("FAIL: we could not import unicodedata. ABORT.")
+		raise ModuleNotFoundError("FAIL: we could not import unicodedata. ABORT.") from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
 	import socket
 	if socket.__name__ is None:
-		raise ImportError("FAIL: we could not import socket. ABORT.")
+		raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
 	else:  # pragma: no branch
 		socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
 	import struct
 	if struct.__name__ is None:
-		raise ImportError("FAIL: we could not import struct. ABORT.")
+		raise ModuleNotFoundError("FAIL: we could not import struct. ABORT.") from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
 	import abc
 	if abc.__name__ is None:
-		raise ImportError("FAIL: we could not import Abstract base class. ABORT.")
+		raise ModuleNotFoundError("FAIL: we could not import Abstract base class. ABORT.") from None
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class mtool(abc.ABC):

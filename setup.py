@@ -44,8 +44,8 @@ try:
 			from setuptools.config import read_configuration
 		except Exception:
 			from setuptools.config.setupcfg import read_configuration
-except Exception:
-	raise NotImplementedError("""[CWE-440] Not Implemented.""")
+except Exception as err:
+	raise NotImplementedError("""[CWE-440] Not Implemented.""") from err
 
 
 def readFile(filename):
@@ -75,7 +75,7 @@ def readFile(filename):
 		if not any(aexpected_file in filename for aexpected_file in expected_files):
 			raise ValueError(str(
 				"""[CWE-706] Access to the file {} was not expected."""
-			).format(filename))
+			).format(filename)) from None
 		with open(str("""./{}""").format(str(filename))) as f:
 			theResult = f.read()
 	except Exception as err:

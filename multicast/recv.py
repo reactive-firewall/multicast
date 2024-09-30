@@ -198,17 +198,17 @@ try:
 	]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
-			baton = ImportError(
+			baton = ModuleNotFoundError(
 				str("[CWE-440] module failed to import {}.").format(str(unit))
 			)  # pragma: no cover
 			baton.module = unit  # pragma: no cover
-			raise baton  # pragma: no cover
+			raise baton from None  # pragma: no cover
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
@@ -272,7 +272,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
-		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
+		raise NotImplementedError("""[CWE-440] Not Implemented.""", err) from err  # pragma: no cover
 	return sock
 
 

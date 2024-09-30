@@ -164,11 +164,11 @@ try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ImportError(
 					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
-		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+				) from None
+		except Exception as _cause:  # pragma: no branch
+			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class McastSAY(multicast.mtool):

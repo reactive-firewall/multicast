@@ -27,12 +27,12 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
 		from context import sys as _sys
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 class BasicTestSuite(context.BasicUsageTestSuite):
@@ -105,7 +105,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 				multicast.main(["--help"])
 			theResult = True
 		except Exception:
-			theResult = False
+			theResult = False  # suppress non-testing errors
 		self.assertTrue(theResult)
 
 	def test_IsNone_WHEN_given_corner_case_input(self):
