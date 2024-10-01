@@ -26,9 +26,9 @@
 # argparse>=1.4.0
 # argparse - builtin - PSF license 3.7 = 62.6.0
 # setuptools - MIT license
-setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
+setuptools>=75.0
 # virtualenv - MIT license
-virtualenv>=15.0.1
+virtualenv>=20.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 # tox - MIT license
@@ -56,10 +56,10 @@ pytest-enabler>=1.0.1
 # pytest-flake8 - BSD license
 pytest-flake8>=1.0.7
 # coverage - Apache 2.0 license
-coverage>=6.2
+coverage>=7.2
 # wheel - MIT license
-wheel>=0.37.0
+wheel>=0.44
 # pip - MIT license
-pip>=19.0
+pip>=22.0
 # build - MIT license
-# build>=0.5.1, !=1.0.3, !=0.6, !=0.6.1 !=1.1.0 !=1.2.0
+build>=1.2.1
