@@ -347,7 +347,7 @@ class McastRecvHearDispatch(mtool):
 				True
 				>>> multicast.__main__.main is not None
 				True
-				>>> tst_fxtr_args = ['''HEAR''', '''--deamon''', '''--port=1234''']
+				>>> tst_fxtr_args = ['''HEAR''', '''--daemon''', '''--port=1234''']
 				>>> (test_fixture, junk_ignore) = multicast.__main__.main(tst_fxtr_args)
 				>>> test_fixture is not None
 				True
@@ -426,8 +426,8 @@ class McastRecvHearDispatch(mtool):
 			)
 
 	@staticmethod
-	def _help_deamon_dispatch(*args, **kwargs):
-		_useHear = kwargs.get("is_deamon", False)
+	def _help_daemon_dispatch(*args, **kwargs):
+		_useHear = kwargs.get("is_daemon", False)
 		return _useHear
 
 	def doStep(self, *args, **kwargs):
@@ -448,7 +448,7 @@ class McastRecvHearDispatch(mtool):
 		Returns:
 			The result of the selected multicast class's `doStep` method.
 		"""
-		if self._help_deamon_dispatch(*args, **kwargs):
+		if self._help_daemon_dispatch(*args, **kwargs):
 			__stub_class = hear.McastHEAR
 		else:
 			__stub_class = recv.McastRECV
@@ -640,7 +640,7 @@ def main(*argv):
 			>>> multicast.__main__.main is not None
 			True
 			>>> (test_fixture, junk_ignore) = multicast.__main__.main() #doctest: +ELLIPSIS
-			usage: multicast [-h | -V] [--use-std] [--deamon] CMD ...
+			usage: multicast [-h | -V] [--use-std] [--daemon] CMD ...
 			multicast...
 			CRITICAL...
 			>>> type(test_fixture) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS

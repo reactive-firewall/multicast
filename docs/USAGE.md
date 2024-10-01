@@ -18,12 +18,18 @@ _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multica
 _fixture_host_BIND_arg = None  # Assuming this variable needs an initial value
 _fixture_HEAR_args = [
 	"--port", _fixture_PORT_arg,
-	"--join-mcast-groups", _fixture_mcast_GRP_arg,
-	"--bind-group", _fixture_mcast_GRP_arg
+	"--groups", _fixture_mcast_GRP_arg,
+	"--group", _fixture_mcast_GRP_arg
 ]
 
 # spawn a listening proc
 
+def print_loop_stub(func):
+	for _ in range(5):
+		print(str(func()))
+
+
+@print_loop_stub
 def inputHandle():
 	test_RCEV = multicast.recv.McastRECV()
 	buffer_string = str("""""")
@@ -36,13 +42,12 @@ def inputHandle():
 	if didWork:
 		buffer_string += result
 	return buffer_string
-def print_loop_stub(func):
-    for _ in range(5):
-        print(str(func()))
+
+# alternatively
 
 p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+				name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
 			)
 p.start()
 
@@ -55,7 +60,7 @@ and elsewhere (like another function or even module) for the sender:
 
 _fixture_SAY_args = [
 	"""--port""", _fixture_PORT_arg,
-	"""--mcast-group""", _fixture_mcast_GRP_arg,
+	"""--group""", _fixture_mcast_GRP_arg,
 	"""--message""", """'test message'"""
 ]
 try:
@@ -83,7 +88,7 @@ The CLI is actually not the best way to use this kind of library, so it should n
 CLI should work like so:
 
 ```plain
-multicast (SAY|RECV|HEAR) [-h|--help] [--use-std] [--daemon] [--port PORT] [--iface IFACE] [--pipe|-m MESSAGE|--message MESSAGE] [--group BIND_GROUP] [--groups [JOIN_MCAST_GROUPS ...]]
+multicast [-h|--help] [--use-std] [--daemon] (SAY|RECV|HEAR) [-h|--help] [--port PORT] [--iface IFACE] [--pipe|-m MESSAGE|--message MESSAGE] [--group BIND_GROUP] [--groups [JOIN_MCAST_GROUPS ...]]
 ```
 
 The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogous to `send` listen/accept and echo functions of a 1-to-1 connection.

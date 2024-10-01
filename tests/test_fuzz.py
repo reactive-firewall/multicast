@@ -46,6 +46,7 @@ try:
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
+
 class HypothesisTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite that uses Hypothesis to perform fuzz testing on the multicast sender and receiver.
@@ -107,13 +108,13 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_SAY_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--mcast-group""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'""",
 				"""--message""", str("""'{d}'""").format(d=data)
 			]
 			_fixture_HEAR_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,

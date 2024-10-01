@@ -100,9 +100,11 @@ try:
 	from tests import test_manifest
 	from tests import test_build
 	from tests import test_usage
+	from tests import test_fuzz
 
 	depends = [
-		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest, test_usage
+		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest, test_usage,
+		test_fuzz
 	]
 	for unit_test in depends:
 		try:

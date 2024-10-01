@@ -306,13 +306,13 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			_fixture_SAY_args = [
 				"""--port""", """59991""",
-				"""--mcast-group""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'""",
 				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
 				"""--port""", """59991""",
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -357,13 +357,13 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_SAY_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--mcast-group""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'""",
 				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -401,8 +401,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			_fixture_HEAR_args = [
 				"""--port""", """59992""",
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,

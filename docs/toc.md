@@ -26,14 +26,14 @@
 
 * Send a message using:
   ```shell
-  python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello, Multicast!"
+  python3 -m multicast SAY --group 224.1.1.2 --port 59595 --message "Hello, Multicast!"
   ```
 
 ### Step 5: Receiving Messages
 
 * Receive messages by running:
   ```shell
-  python3 -m multicast RECV --use-std --port 59595 --join-mcast-groups 224.1.1.2
+  python3 -m multicast RECV --use-std --port 59595 --groups 224.1.1.2
   ```
 
 **You're all set! Enjoy using Multicast for your projects.**
@@ -46,12 +46,12 @@
 :maxdepth: 2
 :Name: Documentation
 apidocs/index
-/README.md
-/FAQ.md
-/CI.md
-/USAGE.md
+/README
+/FAQ
+/CI
+/USAGE
 :Name: License
-/LICENSE.md
+/LICENSE
 ```
 
 ## Overview
@@ -72,11 +72,11 @@ Multicast is a Python module designed to simplify raw multicast communication in
 
 ### Documentation Resources
 
-- [README](README.md): Introduction and installation instructions.
-- [Usage Guide](USAGE.md): Detailed usage examples and API documentation.
-- [FAQ](FAQ.md): Frequently asked questions and troubleshooting tips.
-- [CI Processes](CI.md): Information on continuous integration and testing strategies.
-- [License](LICENSE.md): Licensing information and acknowledgments.
+- [README](README): Introduction and installation instructions.
+- [Usage Guide](USAGE): Detailed usage examples and API documentation.
+- [FAQ](FAQ): Frequently asked questions and troubleshooting tips.
+- [CI Processes](CI): Information on continuous integration and testing strategies.
+- [License](LICENSE): Licensing information and acknowledgments.
 
 
 ---

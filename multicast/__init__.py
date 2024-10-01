@@ -441,7 +441,7 @@ class mtool(abc.ABC):
 				"""--use-std""", dest='is_std', default=False, action='store_true'
 			)
 			calling_parser_group.add_argument(
-				"""--deamon""", dest='is_deamon', default=False, action='store_true'
+				"""--daemon""", dest='is_daemon', default=False, action='store_true'
 			)
 		subparsers = calling_parser_group.add_subparsers(
 			title="Tools", dest='cmd_tool',

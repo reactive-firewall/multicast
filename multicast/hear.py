@@ -339,16 +339,17 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		))
 		if data is not None:
 			myID = str(socket.getsockname()[0])
-			print(
-				str("{me} HEAR: [{you} SAID {what}]").format(
-					me=myID, you=self.client_address, what=str(data)
+			if (_sys.stdout.isatty()):  # pragma: no cover
+				print(
+					str("{me} HEAR: [{you} SAID {what}]").format(
+						me=myID, you=self.client_address, what=str(data)
+					)
 				)
-			)
-			print(
-				str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(
-					me=myID, you=self.client_address, what=str(data)
+				print(
+					str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(
+						me=myID, you=self.client_address, what=str(data)
+					)
 				)
-			)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
 				str("HEAR [ {what} SAID {you} ] from {me}").format(
