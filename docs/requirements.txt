@@ -36,10 +36,10 @@ pip>=22.0
 # build - MIT license
 build>=1.1.1, !=1.2.0
 # sphinx - BSD license
-sphinx>=5.2
+sphinx>=7.4
 # sphinx-autodoc2 - MIT license
 sphinx-autodoc2>=0.5.0
 # myst-parser - MIT license
 myst-parser[linkify]>=4.0.0
 # sphinxawesome-theme - MIT license
-sphinxawesome-theme>=0.5.0
+sphinxawesome-theme>=5.2
