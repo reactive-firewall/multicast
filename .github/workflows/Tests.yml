@@ -509,7 +509,7 @@ jobs:
       if: ${{ success() }}
     - name: Test Dependencies with py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        hash -p ./.github/tool_shlock_helper.sh shlock ;
+        hash -p ./.github/tool_shlock_helper.sh shlock ; export TMPDIR=./ ;
         ./tests/check_pip 2>&1 >> $GITHUB_STEP_SUMMARY || echo "::warning file=tests/check_pip,line=1,endLine=1,title=SKIPPED::SKIP Requirements Tests." ;
       shell: bash
       if: ${{ !cancelled() }}
