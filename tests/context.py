@@ -70,6 +70,15 @@ except Exception as err:  # pragma: no branch
 
 
 try:
+	if 'random' not in sys.modules:
+		import random
+	else:  # pragma: no branch
+		random = sys.modules["""random"""]
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Random Failed to import.") from err
+
+
+try:
 	if 'unittest' not in sys.modules:
 		import unittest
 	else:  # pragma: no branch
@@ -826,12 +835,27 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
+	@staticmethod
+	def _always_generate_random_port_WHEN_called():
+		"""
+		Generates a pseudo-random port number within the dynamic/private port range.
+
+		This method returns a random port number between 49152 and 65535,
+		compliant with RFC 6335, suitable for temporary testing purposes to
+		avoid port conflicts.
+
+		Returns:
+			int: A random port number between 49152 and 65535.
+		"""
+		return random.randint(49152, 65535)
+
 	def setUp(self):
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if not self._thepython:
 			self.skipTest(str("""No python cmd to test with!"""))
+		self._the_test_port = self._always_generate_random_port_WHEN_called()
 
 	def _get_package_version(self):
 		"""
@@ -868,6 +892,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 		if (self._thepython is not None) and (len(self._thepython) <= 0):
 			self.fail(str("""No python cmd to test with!"""))
 		self.test_absolute_truth_and_meaning()
+
+	def tearDown(self):
+		"""Overrides unittest.TestCase.tearDown(unittest.TestCase).
+			Defaults is to reset the random port test fixture.
+		"""
+		if self._the_test_port:
+			self._the_test_port = None
 
 	@classmethod
 	def tearDownClass(cls):

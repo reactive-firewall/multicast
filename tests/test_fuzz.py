@@ -42,9 +42,10 @@ try:
 		from context import unittest
 		from hypothesis import given, strategies as st
 		from context import Process
-		import random as _random
+		from context import random as _random
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
+
 
 class HypothesisTestSuite(context.BasicUsageTestSuite):
 	"""

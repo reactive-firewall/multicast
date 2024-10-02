@@ -81,11 +81,15 @@
 ################################################################################
 
 import socket
+import socketserver
 import random
 
 
 class MCastClient(object):  # skipcq: PYL-R0205
-	"""For use as a test fixture. A trivial implementation of a socket-based object with a function
+	"""
+	For use as a test fixture.
+	
+	A trivial implementation of a socket-based object with a function
 	named say. The say function of this class performs a send and recv on a given socket and
 	then prints out simple diognostics about the content sent and any response received.
 
@@ -132,7 +136,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 	"""The source port for the client."""
 
 	def __init__(self, *args, **kwargs):
-		"""Initialize a MCastClient object with optional group address and source port.
+		"""
+		Initialize a MCastClient object with optional group address and source port.
 
 		The client can be initialized with or without specifying a group address and source port.
 		If no source port is provided, a random port between 50000 and 59999 is generated.
@@ -208,8 +213,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 	@staticmethod
 	def say(address, port, conn, msg):
-		"""Send a message to a specified multicast address and port,
-		then receive and print the response.
+		"""
+		Send a message to a specified multicast address and port, then receive and print it.
 
 		This function sends a UTF-8 encoded message to the specified multicast address and port
 		using the provided connection. It then waits for a response, decodes it, and prints both
@@ -265,8 +270,40 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		print(str("Received: {}").format(received))  # skipcq: PYL-C0209  -  must remain compatible
 
 
+class MyUDPHandler(socketserver.BaseRequestHandler):
+	"""
+	Subclasses socketserver.BaseRequestHandler for handling echo function.
+
+	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
+	data, after printing the sender's ip out.
+
+	Meta Testing:
+
+		First set up test fixtures by importing test context.
+
+			>>> import tests.MulticastUDPClient as MulticastUDPClient
+			>>> from MulticastUDPClient import MyUDPHandler as MyUDPHandler
+			>>>
+
+		Testcase 1: MyUDPHandler should be automatically imported.
+
+			>>> MyUDPHandler.__name__ is not None
+			True
+			>>>
+
+	"""
+
+	def handle(self):
+		data = self.request[0].strip()
+		socket = self.request[1]
+		print(str("{} wrote:").format(self.client_address[0]))
+		print(data)
+		socket.sendto(data.upper(), self.client_address)
+
+
 def main():
-	"""The main test operations.
+	"""
+	The main test operations.
 
 	Testing:
 

@@ -69,7 +69,6 @@ try:
 		from context import unittest
 		from context import subprocess
 		from context import Process
-	import random as _random
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
@@ -342,16 +341,11 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
-	@staticmethod
-	def _always_generate_random_port_WHEN_called():
-		"""Outputs a psuedo-random, RFC-6335 compliant, port number."""
-		return _random.randint(49152, 65535)
-
 	def test_hear_works_WHEN_fuzzed_and_say_works(self):
 		"""Tests the basic send and recv test. Skips if fuzzing broke SAY fixture."""
 		theResult = False
 		fail_fixture = str("""SAY --> HEAR == error""")
-		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))

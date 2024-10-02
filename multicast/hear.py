@@ -267,42 +267,6 @@ class McastServer(socketserver.UDPServer):
 		super(McastServer, self).handle_error(request, client_address)
 
 
-class MyUDPHandler(socketserver.BaseRequestHandler):
-	"""
-	Subclasses socketserver.BaseRequestHandler for handling echo function.
-
-	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
-	data, after printing the sender's ip out.
-
-	Minimal Acceptance Testing:
-
-	First set up test fixtures by importing multicast.
-
-	Testcase 0: Multicast should be importable.
-
-		>>> import multicast
-		>>> multicast.hear is not None
-		True
-		>>> from multicast.hear import MyUDPHandler as MyUDPHandler
-		>>>
-
-	Testcase 1: MyUDPHandler should be automatically imported.
-
-		>>> MyUDPHandler.__name__ is not None
-		True
-		>>>
-
-
-	"""
-
-	def handle(self):
-		data = self.request[0].strip()
-		socket = self.request[1]
-		print(str("{} wrote:").format(self.client_address[0]))
-		print(data)
-		socket.sendto(data.upper(), self.client_address)
-
-
 class HearUDPHandler(socketserver.BaseRequestHandler):
 	"""
 	Subclasses socketserver.BaseRequestHandler for handling HEAR function.
