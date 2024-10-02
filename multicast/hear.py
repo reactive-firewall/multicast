@@ -264,7 +264,8 @@ class McastServer(socketserver.UDPServer):
 					a_server.shutdown()
 			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
 			end_thread.start()
-		super(McastServer, self).handle_error(request, client_address)
+		else:
+			super(McastServer, self).handle_error(request, client_address)
 
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
