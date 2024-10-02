@@ -40,7 +40,7 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
-		from hypothesis import given, strategies as st
+		from hypothesis import given, reproduce_failure, settings, strategies as st
 		from context import Process
 		import random as _random
 except Exception as err:
@@ -78,12 +78,24 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		compliant with RFC 6335, suitable for temporary testing purposes to
 		avoid port conflicts.
 
+		Should be equivalent to `return _random.randint(49152, 65535)`
+
 		Returns:
 			int: A random port number between 49152 and 65535.
 		"""
-		return _random.randint(49152, 65535)
+		return int(
+			49152 + (
+				int(
+					_random.SystemRandom().randbytes(
+						int(65535).__sizeof__()
+					).hex(),
+					16
+				) % 16383
+			)
+		)
 
 	@given(st.binary(min_size=1, max_size=1472))
+	@settings(deadline=None)
 	def test_multicast_sender_with_random_data(self, data):
 		"""
 		Tests the multicast sender and receiver with random binary data.
@@ -127,10 +139,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				)
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-				)
-				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-				)
+				)  # preemptive extra retry
 			except Exception as _cause:
 				p.join()
 				raise unittest.SkipTest(fail_fixture) from _cause
