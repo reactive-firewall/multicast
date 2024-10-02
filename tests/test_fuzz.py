@@ -40,7 +40,9 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
-		from hypothesis import given, reproduce_failure, settings, strategies as st
+		from hypothesis import given
+		from hypothesis import settings
+		from hypothesis import strategies as st
 		from context import Process
 		import random as _random
 except Exception as err:
