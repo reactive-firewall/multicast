@@ -329,25 +329,26 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 	def handle(self):
 		data = self.request[0].strip()
 		socket = self.request[1]
+		safe_data = str(data).replace('\r', '').replace('%', '%%')
 		print(str("{} SAYS: {} to {}").format(
-			self.client_address[0], str(data), "ALL"
+			self.client_address[0], safe_data, "ALL"
 		))
 		if data is not None:
 			myID = str(socket.getsockname()[0])
 			print(
 				str("{me} HEAR: [{you} SAID {what}]").format(
-					me=myID, you=self.client_address, what=str(data)
+					me=myID, you=self.client_address, what=safe_data
 				)
 			)
 			print(
 				str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(
-					me=myID, you=self.client_address, what=str(data)
+					me=myID, you=self.client_address, what=safe_data
 				)
 			)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
 				str("HEAR [ {what} SAID {you} ] from {me}").format(
-					me=myID, you=self.client_address, what=data.upper()
+					me=myID, you=self.client_address, what=safe_data.upper()
 				)
 			)
 			if """STOP""" in str(data):
