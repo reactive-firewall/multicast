@@ -350,10 +350,10 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
 	"""
-	Subclasses socketserver.BaseRequestHandler for handling echo function.
+	Subclasses socketserver.BaseRequestHandler to handle echo functionality.
 
-	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
-	data, after printing the sender's ip out.
+	Simplifies testing by echoing back the received string data in uppercase,
+	after printing the sender's IP address.
 
 	Meta Testing:
 

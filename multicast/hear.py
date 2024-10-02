@@ -298,12 +298,12 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 	def handle(self):
 		data = self.request[0].strip()
-		socket = self.request[1]
+		sock = self.request[1]
 		print(str("{} SAYS: {} to {}").format(
 			self.client_address[0], str(data), "ALL"
 		))
 		if data is not None:
-			myID = str(socket.getsockname()[0])
+			myID = str(sock.getsockname()[0])
 			print(
 				str("{me} HEAR: [{you} SAID {what}]").format(
 					me=myID, you=self.client_address, what=str(data)
