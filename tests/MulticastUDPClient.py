@@ -290,7 +290,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			)
 
 	@staticmethod
-	def say(address, port, conn, msg):
+	def say(address, port, sock, msg):
 		"""
 		Send a message to a specified multicast address and port, then receive and print it.
 
@@ -301,7 +301,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		Args:
 			address (str): The multicast group address to send the message to.
 			port (int): The port number to send the message to.
-			conn (socket.socket): The socket connection to use for sending and receiving.
+			sock (socket.socket): The socket connection to use for sending and receiving.
 			msg (str): The message to be sent.
 
 		Returns:
@@ -342,8 +342,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			for multicast communication.
 
 		"""
-		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
-		received = str(conn.recv(1024), "utf-8")
+		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))
+		received = str(sock.recv(1024), "utf-8")
 		print(str("Sent:     {}").format(msg))  # skipcq: PYL-C0209  -  must remain compatible
 		print(str("Received: {}").format(received))  # skipcq: PYL-C0209  -  must remain compatible
 
