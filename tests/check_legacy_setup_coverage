@@ -164,7 +164,7 @@ printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 printf "%s\n" "Start of Setup.py Test one-shot:" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 printf "%s\n" "" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;
 
-{ ${COVERAGE_CMD} setup.py --name --version --license 2>${_TEST_ROOT_DIR}/${ERR_FILE} | grep --count -oE "^([0-9].){2}[0-9]$" 2>${_TEST_ROOT_DIR}/${ERR_FILE} || printf "%s\n" "FAIL: Setup.py version check failed" 1>&2 ;} 2>${_TEST_ROOT_DIR}/${ERR_FILE} >> ${_TEST_ROOT_DIR}/${LOG_FILE} & : ;
+{ ${COVERAGE_CMD} setup.py --name --version --license 2>${_TEST_ROOT_DIR}/${ERR_FILE} | grep --count -oE "^([0-9].){2}[0-9](a0)?$" 2>${_TEST_ROOT_DIR}/${ERR_FILE} || printf "%s\n" "FAIL: Setup.py version check failed" 1>&2 ;} 2>${_TEST_ROOT_DIR}/${ERR_FILE} >> ${_TEST_ROOT_DIR}/${LOG_FILE} & : ;
 
 wait ;
 printf "%s\n" "End of Setup.py Test one-shot" >> ${_TEST_ROOT_DIR}/${LOG_FILE} ; wait ;

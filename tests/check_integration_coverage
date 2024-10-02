@@ -107,26 +107,27 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./multicast ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if [[ -d ../.git ]] ; then
+	_TEST_ROOT_DIR="../" ;
+elif [[ -d ./.git ]] ; then
+	_TEST_ROOT_DIR=$(pwd) ;
+elif [[ ( -d $(git rev-parse --show-toplevel 2>/dev/null) ) ]] ; then
+	_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
 else
-	printf "%s\n" "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2 ;
+	EXIT_CODE=40
 fi
 
-TEST_MCAST_PORT=59595;
+TEST_MCAST_PORT=$((((49152 + (($RANDOM+$RANDOM+$RANDOM)*$RANDOM)) % 16383)+ 49152));
 TEST_MCAST_GROUP='224.0.0.1' ;
 export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m"
 
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
-printf "%s\n" "Start of Log:" > ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "Start of Integration Test one-shot:" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast RECV --use-std --port ${TEST_MCAST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
+printf "%s\n\n" "Start of Log:" > ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "Will use host-port: [${TEST_MCAST_GROUP} : ${TEST_MCAST_PORT}]" >> ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "Start of Integration Test one-shot:" >> ./${LOG_FILE} ; wait ;
+( sleep 1 ; ${COVERAGE_CMD} multicast RECV --use-std --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --groups ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
 	${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
@@ -134,11 +135,9 @@ done ;
 
 ${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
 ${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
-printf "%s\n" "End of Integration Test one-shot" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "End of Integration Test one-shot" >> ./${LOG_FILE} ; wait ;
 
-printf "%s\n" "Start of Integration Test daemon:" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "Start of Integration Test daemon:" >> ./${LOG_FILE} ; wait ;
 ( sleep 1 ; ${COVERAGE_CMD} multicast --daemon HEAR --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
 
 for PCOUNT in $(seq 1 5) ; do
@@ -148,8 +147,7 @@ done ;
 ${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
 ${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
 wait ;
-printf "%s\n" "End of Integration Test daemon" >> ./${LOG_FILE} ; wait ;
-printf "%s\n" "" >> ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "End of Integration Test daemon" >> ./${LOG_FILE} ; wait ;
 
 $(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml --include=multicast/* -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
