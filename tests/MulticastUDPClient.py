@@ -80,12 +80,92 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-import socket
-import random
+__module__ = """tests.MulticastUDPClient"""
+"""This is a testing related stand-alone utilities module."""
+
+
+try:
+	import sys
+	if sys.__name__ is None:  # pragma: no branch
+		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.") from None
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
+
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
+
+
+try:
+	if 'functools' not in sys.modules:
+		import functools
+	else:  # pragma: no branch
+		functools = sys.modules["""functools"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
+
+
+try:
+	if 'socket' not in sys.modules:
+		import socket
+	else:  # pragma: no branch
+		socket = sys.modules["""socket"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
+
+
+try:
+	if 'socketserver' not in sys.modules:
+		import socketserver
+	else:  # pragma: no branch
+		socketserver = sys.modules["""socketserver"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
+
+
+try:
+	if 'random' not in sys.modules:
+		import random
+	else:  # pragma: no branch
+		random = sys.modules["""random"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton from badErr
 
 
 class MCastClient(object):  # skipcq: PYL-R0205
-	"""For use as a test fixture. A trivial implementation of a socket-based object with a function
+	"""
+	For use as a test fixture.
+
+	A trivial implementation of a socket-based object with a function
 	named say. The say function of this class performs a send and recv on a given socket and
 	then prints out simple diognostics about the content sent and any response received.
 
@@ -125,6 +205,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 	"""
 
+	__module__ = """tests.MulticastUDPClient.MCastClient"""
+
 	_group_addr = None
 	"""The multicast group address."""
 
@@ -132,7 +214,8 @@ class MCastClient(object):  # skipcq: PYL-R0205
 	"""The source port for the client."""
 
 	def __init__(self, *args, **kwargs):
-		"""Initialize a MCastClient object with optional group address and source port.
+		"""
+		Initialize a MCastClient object with optional group address and source port.
 
 		The client can be initialized with or without specifying a group address and source port.
 		If no source port is provided, a random port between 50000 and 59999 is generated.
@@ -207,9 +290,9 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			)
 
 	@staticmethod
-	def say(address, port, conn, msg):
-		"""Send a message to a specified multicast address and port,
-		then receive and print the response.
+	def say(address, port, sock, msg):
+		"""
+		Send a message to a specified multicast address and port, then receive and print it.
 
 		This function sends a UTF-8 encoded message to the specified multicast address and port
 		using the provided connection. It then waits for a response, decodes it, and prints both
@@ -218,7 +301,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		Args:
 			address (str): The multicast group address to send the message to.
 			port (int): The port number to send the message to.
-			conn (socket.socket): The socket connection to use for sending and receiving.
+			sock (socket.socket): The socket connection to use for sending and receiving.
 			msg (str): The message to be sent.
 
 		Returns:
@@ -259,14 +342,48 @@ class MCastClient(object):  # skipcq: PYL-R0205
 			for multicast communication.
 
 		"""
-		conn.sendto(bytes(msg + "\n", "utf-8"), (address, port))
-		received = str(conn.recv(1024), "utf-8")
+		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))
+		received = str(sock.recv(1024), "utf-8")
 		print(str("Sent:     {}").format(msg))  # skipcq: PYL-C0209  -  must remain compatible
 		print(str("Received: {}").format(received))  # skipcq: PYL-C0209  -  must remain compatible
 
 
+class MyUDPHandler(socketserver.BaseRequestHandler):
+	"""
+	Subclasses socketserver.BaseRequestHandler to handle echo functionality.
+
+	Simplifies testing by echoing back the received string data in uppercase,
+	after printing the sender's IP address.
+
+	Meta Testing:
+
+		First set up test fixtures by importing test context.
+
+			>>> import tests.MulticastUDPClient as MulticastUDPClient
+			>>> from MulticastUDPClient import MyUDPHandler as MyUDPHandler
+			>>>
+
+		Testcase 1: MyUDPHandler should be automatically imported.
+
+			>>> MyUDPHandler.__name__ is not None
+			True
+			>>>
+
+	"""
+
+	__module__ = """tests.MulticastUDPClient.MyUDPHandler"""
+
+	def handle(self):
+		data = self.request[0].strip()
+		sock = self.request[1]
+		print(str("{} wrote:").format(self.client_address[0]))
+		print(data)
+		sock.sendto(data.upper(), self.client_address)
+
+
 def main():
-	"""The main test operations.
+	"""
+	The main test operations.
 
 	Testing:
 
