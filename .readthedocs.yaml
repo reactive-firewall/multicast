@@ -25,6 +25,8 @@ build:
     pre_build:
       - make build || true
       - make build-docs || true
+    post_build:
+      - ln -sf ./toc.html $READTHEDOCS_OUTPUT/html/index.html || true
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
