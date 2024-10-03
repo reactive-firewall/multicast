@@ -8,6 +8,7 @@ version: 2
 python:
   install:
     - requirements: requirements.txt
+    - requirements: tests/requirements.txt
     - requirements: docs/requirements.txt
 
 # Set the OS, Python version and other tools you might need
@@ -20,15 +21,18 @@ build:
       - git fetch --unshallow || true
       - git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' || true
       - git fetch --all --tags || true
+      - make clean || true
+      - make purge || true
     post_install:
       - make clean || true
     pre_build:
       - make build || true
-      - make build-docs || true
+      - make -j1 build-docs || true
     post_build:
-      - cp -vfRp www/html $READTHEDOCS_OUTPUT/html || true
       - cp -vfRp docs/www/html $READTHEDOCS_OUTPUT/html || true
       - ls -lap .
+      - ls -lap docs
+      - ls -lap docs/www
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
