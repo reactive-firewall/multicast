@@ -26,8 +26,7 @@ build:
       - make build || true
       - make build-docs || true
     post_build:
-      - ls -lap
-      - ln -sf ./www/html $READTHEDOCS_OUTPUT/html || true
+      - cp -fRp ./docs/www/html $READTHEDOCS_OUTPUT/html || true
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
