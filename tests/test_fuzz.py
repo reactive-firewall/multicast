@@ -44,7 +44,6 @@ try:
 		from hypothesis import settings
 		from hypothesis import strategies as st
 		from context import Process
-		from context import random as _random
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
@@ -70,31 +69,6 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 	__module__ = """tests.test_fuzz"""
 
 	__name__ = """tests.test_fuzz.HypothesisTestSuite"""
-
-	@staticmethod
-	def _always_generate_random_port_WHEN_called():
-		"""
-		Generates a pseudo-random port number within the dynamic/private port range.
-
-		This method returns a random port number between 49152 and 65535,
-		compliant with RFC 6335, suitable for temporary testing purposes to
-		avoid port conflicts.
-
-		Should be equivalent to `return _random.randint(49152, 65535)`
-
-		Returns:
-			int: A random port number between 49152 and 65535.
-		"""
-		return int(
-			49152 + (
-				int(
-					_random.SystemRandom().randbytes(
-						int(65535).__sizeof__()
-					).hex(),
-					16
-				) % 16383
-			)
-		)
 
 	@given(st.binary(min_size=1, max_size=1472))
 	@settings(deadline=None)

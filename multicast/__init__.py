@@ -89,7 +89,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """2.0.0-alpha"""
+__version__ = """2.0.0-beta"""
 """The version of this program.
 
 	Minimal Acceptance Testing:
@@ -592,19 +592,19 @@ endSocket = skt.endSocket
 
 
 if 'multicast.recv' not in sys.modules:
-	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	recv = sys.modules["""multicast.recv"""]
 
 
 if 'multicast.send' not in sys.modules:
-	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	send = sys.modules["""multicast.send"""]
 
 
 if 'multicast.hear' not in sys.modules:
-	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	hear = sys.modules["""multicast.hear"""]
 

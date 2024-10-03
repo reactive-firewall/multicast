@@ -80,14 +80,17 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-__module__ = """tests.MulticastUDPClient"""
+__module__ = """tests"""
 """This is a testing related stand-alone utilities module."""
+
+
+__name__ = """tests.MulticastUDPClient"""  # skipcq: PYL-W0622
 
 
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.") from None
+		raise ModuleNotFoundError("[CWE-758] OMG! we could not import sys! ABORT.") from None
 except Exception as badErr:  # pragma: no branch
 	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
@@ -102,7 +105,7 @@ try:
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
@@ -115,7 +118,7 @@ try:
 	else:  # pragma: no branch
 		functools = sys.modules["""functools"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
@@ -128,7 +131,7 @@ try:
 	else:  # pragma: no branch
 		socket = sys.modules["""socket"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
@@ -141,7 +144,7 @@ try:
 	else:  # pragma: no branch
 		socketserver = sys.modules["""socketserver"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
@@ -154,7 +157,7 @@ try:
 	else:  # pragma: no branch
 		random = sys.modules["""random"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
@@ -407,7 +410,7 @@ def main():
 
 	"""
 	HOST, PORT = "224.0.0.1", 59991
-	data = "This is a test"
+	data = "TEST This is a test"
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 	tsts_fxr = MCastClient()
 	print(str((HOST, PORT)))

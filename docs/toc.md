@@ -39,21 +39,6 @@
 **You're all set! Enjoy using Multicast for your projects.**
 
 
-
-## Contents
-
-```{toctree}
-:maxdepth: 2
-:Name: Documentation
-apidocs/index
-/README
-/FAQ
-/CI
-/USAGE
-:Name: License
-/LICENSE
-```
-
 ## Overview
 
 Multicast is a Python module designed to simplify raw multicast communication in Python applications. It offers intuitive interfaces for sending and receiving multicast messages, enabling developers to implement efficient and robust multicast functionality with ease.
@@ -68,16 +53,28 @@ Multicast is a Python module designed to simplify raw multicast communication in
 
 - **Installation**: Install the package using `make install` or via `pip`.
 - **Quickstart**: Refer to the [Quickstart](#quickstart) section for immediate setup instructions.
-- **Examples**: Explore detailed examples and API references in the [Usage Guide](USAGE.md).
+- **Examples**: Explore detailed examples and API references in the [Usage Guide](./USAGE).
 
 ### Documentation Resources
 
-- [README](README): Introduction and installation instructions.
-- [Usage Guide](USAGE): Detailed usage examples and API documentation.
-- [FAQ](FAQ): Frequently asked questions and troubleshooting tips.
-- [CI Processes](CI): Information on continuous integration and testing strategies.
-- [License](LICENSE): Licensing information and acknowledgments.
+- [README](./README): Introduction and installation instructions.
+- [Usage Guide](./USAGE): Detailed usage examples and API documentation.
+- [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
+- [CI Processes](./CI): Information on continuous integration and testing strategies.
+- [License](./LICENSE): Licensing information and acknowledgments.
 
+## Contents
+
+```{toctree}
+:maxdepth: 2
+:Name: Documentation
+apidocs/index
+/README
+/FAQ
+/CI
+/USAGE
+/LICENSE
+```
 
 ---
 ### Copyright (c) 2021-2024, Mr. Walls

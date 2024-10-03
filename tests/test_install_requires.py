@@ -36,7 +36,7 @@ try:
 	from setup import readFile
 	from setup import parse_requirements_for_install_requires
 except Exception as _cause:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context") from _cause
+	raise ImportError("[CWE-758] Failed to import setup or test context") from _cause
 
 
 class TestParseRequirements(BasicUsageTestSuite):

@@ -96,6 +96,7 @@ The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogous to `sen
 ### `SAY`
 
 The `SAY` command is used to send data messages via multicast datagrams.
+* Note: the `--message` flag is expected with the `SAY` command, otherwise it behaves like `NOOP`.
 * Note: the `--daemon` flag has no effect on the `SAY` command.
 
 ### `RECV`

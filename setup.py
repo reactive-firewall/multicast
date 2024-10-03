@@ -124,45 +124,36 @@ def parse_requirements_for_install_requires(requirements_text):
 	return install_requires
 
 
-requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
-"""The list of production requirements of this program."""
-
-
-conf_dict = None
-
-
-with warnings.catch_warnings():
-	warnings.simplefilter("ignore")
-	conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
-
-
-readme = readFile("""README.md""")
-"""The multi-line description and/or summary of this program."""
-
-SLA = readFile("""LICENSE.md""")
-"""The "Software License Agreement" of this program."""
-
-try:
-	class_tags = [
-		str("""Development Status :: 4 - Beta"""),
-		str("""Environment :: Console"""),
-		str("""Intended Audience :: Developers"""),
-		str("""Operating System :: MacOS :: MacOS X"""),
-		str("""Operating System :: POSIX :: Linux"""),
-		str("""License :: OSI Approved :: MIT License"""),
-		str("""Programming Language :: Python :: 3"""),
-		str("""Programming Language :: Python :: 3 :: Only"""),
-		str("""Programming Language :: Python :: 3.12"""),
-		str("""Programming Language :: Python :: 3.11"""),
-		str("""Programming Language :: Python :: 3.10"""),
-		str("""Topic :: Software Development :: Libraries :: Python Modules"""),
-		str("""Topic :: System :: Networking"""),
-		str("""Topic :: Network""")
-	]
-except Exception:
-	class_tags = str("""Development Status :: 4 - Beta""")
-
 if __name__ == '__main__':
+	requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
+	"""The list of production requirements of this program."""
+	conf_dict = None
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
+	readme = readFile("""README.md""")
+	"""The multi-line description and/or summary of this program."""
+	SLA = readFile("""LICENSE.md""")
+	"""The "Software License Agreement" of this program."""
+	try:
+		class_tags = [
+			str("""Development Status :: 4 - Beta"""),
+			str("""Environment :: Console"""),
+			str("""Intended Audience :: Developers"""),
+			str("""Operating System :: MacOS :: MacOS X"""),
+			str("""Operating System :: POSIX :: Linux"""),
+			str("""License :: OSI Approved :: MIT License"""),
+			str("""Programming Language :: Python :: 3"""),
+			str("""Programming Language :: Python :: 3 :: Only"""),
+			str("""Programming Language :: Python :: 3.12"""),
+			str("""Programming Language :: Python :: 3.11"""),
+			str("""Programming Language :: Python :: 3.10"""),
+			str("""Topic :: Software Development :: Libraries :: Python Modules"""),
+			str("""Topic :: System :: Networking""")
+		]
+	except Exception:
+		class_tags = str("""Development Status :: 4 - Beta""")
+	# finally the setup
 	setup(
 		name=conf_dict["""metadata"""]["""name"""],
 		version=conf_dict["""metadata"""]["""version"""],

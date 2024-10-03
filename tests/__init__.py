@@ -103,8 +103,8 @@ try:
 	from tests import test_fuzz
 
 	depends = [
-		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest, test_usage,
-		test_fuzz
+		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
+		test_usage, test_fuzz
 	]
 	for unit_test in depends:
 		try:
@@ -136,7 +136,7 @@ except Exception as _cause:  # pragma: no branch
 
 test_cases = (
 	test_basic.BasicTestSuite, test_deps.TestRequirementsTxt, test_build.TestPEP517Build,
-	test_manifest.TestManifestInclusion,
+	test_manifest.TestManifestInclusion, test_install_requires.TestParseRequirements,
 	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite
 )
 

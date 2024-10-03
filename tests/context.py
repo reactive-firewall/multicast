@@ -844,10 +844,21 @@ class BasicUsageTestSuite(unittest.TestCase):
 		compliant with RFC 6335, suitable for temporary testing purposes to
 		avoid port conflicts.
 
+		Should be equivalent to `return random.randint(49152, 65535)`
+
 		Returns:
 			int: A random port number between 49152 and 65535.
 		"""
-		return random.randint(49152, 65535)
+		return int(
+			49152 + (
+				int(
+					random.SystemRandom().randbytes(
+						int(65535).__sizeof__()
+					).hex(),
+					16
+				) % 16383
+			)
+		)
 
 	def setUp(self):
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
@@ -875,8 +886,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 			self.assertIsNotNone(multicast.__version__)
 			mcast_version = multicast.__version__
 			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
-			# refactor alpha tags
-			mcast_version = mcast_version.replace("-alpha", "a0", 1)
+			# refactor alpha/beta tags
+			mcast_version = mcast_version.replace("-alpha", "a0", 1).replace("-beta", "b0", 1)
 			return mcast_version
 		except ImportError:
 			self.fail("""Failed to import the multicast package to retrieve version.""")
