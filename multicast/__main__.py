@@ -202,6 +202,12 @@ class McastNope(mtool):
 		The meaning of Nothing. This function should be self-explanitory;
 		it does 'no operation' i.e. nothing.
 
+		This serves as a placeholder when no specific operation is required.
+
+		Args:
+			*args: Variable length argument list (unused).
+			**kwargs: Arbitrary keyword arguments (unused).
+
 		Minimal Acceptance Testing:
 
 		First set up test fixtures by importing multicast.
@@ -233,16 +239,22 @@ class McastNope(mtool):
 
 	def doStep(self, *args, **kwargs):
 		"""
-		Executes a no-operation step.
+		Overrides the `doStep` method from `mtool` to perform no action.
 
 		This method calls the `NoOp` function with the provided arguments and returns the result.
+		This serves as a placeholder or default action when no specific operation is required.
 
 		Args:
 			*args: Positional arguments passed to `NoOp`.
 			**kwargs: Keyword arguments passed to `NoOp`.
 
+		Args:
+			*args: Variable length argument list (unused).
+			**kwargs: Arbitrary keyword arguments (unused).
+
 		Returns:
-			The result of the `NoOp` function.
+			tuple: A "tuple" set to None.
+
 		"""
 		return self.NoOp(*args, **kwargs)
 
@@ -427,12 +439,29 @@ class McastRecvHearDispatch(mtool):
 
 	@staticmethod
 	def _help_daemon_dispatch(*args, **kwargs):
+		"""
+		Provide help information for daemon dispatching.
+
+		Internal method to display help messages related to the `--daemon` option
+		and how it affects the dispatching of sub-commands.
+
+		Args:
+			*args: Additional positional arguments.
+			**kwargs: Parsed command-line arguments.
+
+		Returns:
+			boolean: True if daemon mode is to be used, otherwise False.
+
+		"""
 		_useHear = kwargs.get("is_daemon", False)
 		return _useHear
 
 	def doStep(self, *args, **kwargs):
 		"""
 		Executes a multicast step based on the daemon dispatch.
+
+		Overrides the `doStep` method from `mtool` to determine and execute
+		the correct sub-command based on provided arguments.
 
 		This method selects either the `McastHEAR` or `McastRECV` class based on the daemon
 		dispatch flag and executes the corresponding step.
@@ -442,11 +471,12 @@ class McastRecvHearDispatch(mtool):
 		multiple hunks. Most use-case will probably want to use HEAR instead of RECV.
 
 		Args:
-			*args: Positional arguments for the multicast step.
-			**kwargs: Keyword arguments for the multicast step.
+			*args: Variable length argument list containing command-line arguments.
+			**kwargs: Arbitrary keyword arguments.
 
 		Returns:
-			The result of the selected multicast class's `doStep` method.
+			tuple: The result of the dispatched sub-command's `doStep` method.
+
 		"""
 		if self._help_daemon_dispatch(*args, **kwargs):
 			__stub_class = hear.McastHEAR
@@ -571,8 +601,11 @@ def main(*argv):
 		= 3:  Any undefined (but assumed erroneous) state
 		=<0:  implicitly erroneous and treated same as abs(exit_code) would be.
 
-	param iterable - argv - the array of arguments. Usually _sys.argv[1:]
-	returns int - the Namespace parsed with the key-value pairs.
+	Args:
+		*argv: the array of arguments. Usually _sys.argv[1:]
+
+	Returns:
+		tuple: the underlying exit code int, and optional detail string.
 
 	Minimal Acceptance Testing:
 

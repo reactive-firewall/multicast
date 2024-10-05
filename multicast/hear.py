@@ -235,11 +235,33 @@ class McastServer(socketserver.UDPServer):
 	"""
 
 	def server_activate(self):
+		"""
+		Activate the server to begin handling requests.
+
+		Overrides the base class method to set up the server after binding.
+
+		Returns:
+			None
+		"""
 		print(str("server_activate"))
 		self.open_for_request()
 		super(McastServer, self).server_activate()
 
 	def open_for_request(self):
+		"""
+		Prepare the server to accept requests.
+
+		Overrides the base class method to set up a new listening UDP socket before the
+		server starts processing requests.
+
+		UDP Sockets are considered ephemeral.
+		Sequentially, the old socket is recycled, or replaced, yielding a fungable socket, with the
+		same port and bound ip, which is then used to join the same multicast group(s), at which
+		point the new socket has transparently replaced the old socket.
+
+		Returns:
+			None
+		"""
 		print(str("open_request"))
 		old_socket = self.socket
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
@@ -247,19 +269,61 @@ class McastServer(socketserver.UDPServer):
 		self.socket = recv.joinstep([tmp_addr], tmp_prt, None, tmp_addr, multicast.genSocket())
 
 	def server_bind(self):
+		"""
+		Bind the server to the specified address.
+
+		Overrides the base class method to handle multicast group binding.
+
+		Returns:
+			None
+		"""
 		print(str("server_bind"))
 		super(McastServer, self).server_bind()
 		print(str("bound on: {}").format(str(self.socket.getsockname())))
 
 	def close_request(self, request):
+		"""
+		Clean up after handling a request.
+
+		Overrides the base class method to call open_for_request to close and regenerate the
+		UDP socket, in addition to closing the request as normal.
+
+		Args:
+			request: The request object to close.
+
+		Returns:
+			None
+		"""
 		print(str("close_request"))
 		self.open_for_request()
 		super(McastServer, self).close_request(request)
 
 	def handle_error(self, request, client_address):
+		"""
+		Handle errors that occur during request processing.
+
+		Overrides the base class method to handle requests with STOP in them,
+		resulting in a graceful server shutdown. Otherwise forwards the call to super.
+
+		Args:
+			request: The request being handled when the error occurred.
+			client_address: The client address associated with the request.
+
+		Returns:
+			None
+		"""
 		print(str("handle_error"))
 		if request is not None and request[0] is not None and """STOP""" in str(request[0]):
 			def kill_func(a_server):
+				"""
+				Terminate the server.
+
+				Args:
+					a_server: The server instance to terminate.
+
+				Returns:
+					None
+				"""
 				if a_server is not None:
 					a_server.shutdown()
 			end_thread = threading.Thread(name="Kill_Thread", target=kill_func, args=[self])
@@ -297,6 +361,14 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 	"""
 
 	def handle(self):
+		"""
+		Process incoming UDP requests.
+
+		Overrides the base class method to define how incoming data is handled.
+
+		Returns:
+			None
+		"""
 		(data, sock) = self.request
 		print(str("{} SAYS: {} to {}").format(
 			self.client_address[0], data.strip(), "ALL"
@@ -381,7 +453,21 @@ class McastHEAR(multicast.mtool):
 		pass  # skipcq - Optional abstract method
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Execute the HEAR operation for multicast communication.
+
+		Overrides the `doStep` method from `mtool` to set up a server that listens for
+		multicast messages and processes them accordingly.
+
+		Args:
+			*args: Variable length argument list containing command-line arguments.
+			**kwargs: Arbitrary keyword arguments.
+
+		Returns:
+			tuple: A tuple containing a status indicator and an optional result message.
+		"""
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		with McastServer((HOST, PORT), HearUDPHandler) as server:
 			server.serve_forever()
+		return (0, None)

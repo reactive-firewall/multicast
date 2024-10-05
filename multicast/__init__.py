@@ -575,8 +575,24 @@ class mtool(abc.ABC):
 
 	@abc.abstractmethod
 	def doStep(self, *args):  # pragma: no cover
-		"""Abstracts the __call__ behavior for sub-classing the tool."""
-		pass  # skipcq - abstract method
+		"""
+		Abstracts the __call__ behavior for sub-classing the tool.
+
+		This method should be overridden by subclasses to implement the specific functionality
+		of each multicast tool. It accepts variable positional and keyword arguments as needed
+		by the specific implementation.
+
+		Args:
+			*args: Variable length argument list.
+			**kwargs: Arbitrary keyword arguments.
+
+		Returns:
+			tuple: A tuple containing a status indicator and a result message.
+
+		Raises:
+			NotImplementedError: If the subclass does not implement this method.
+		"""
+		raise NotImplementedError("Subclasses must implement this method.")
 
 
 if 'multicast.skt' not in sys.modules:

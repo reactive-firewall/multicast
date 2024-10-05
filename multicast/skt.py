@@ -219,7 +219,13 @@ def genSocket():
 
 
 def endSocket(sock=None):
-	"""Closes a given socket.socket object.
+	"""Close a multicast socket and release resources.
+
+	Args:
+		sock (socket.socket, optional): The socket to close. Defaults to None.
+
+	Returns:
+		None
 
 	Minimal Acceptance Testing:
 

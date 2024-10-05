@@ -300,9 +300,18 @@ class McastSAY(multicast.mtool):
 	@staticmethod
 	def _sayStep(group, port, data):
 		"""
-		Will send the given data over the given port to the given group.
+		Internal method to send a message via multicast.
 
+		Will send the given data over the given port to the given group.
 		The actual magic is handled here.
+
+		Args:
+			group (str): Multicast group address to send the message to.
+			port (int): Port number to use for sending.
+			data (str): Message data to be sent.
+
+		Returns:
+			bool: True if the message was sent successfully, False otherwise.
 		"""
 		sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
 		try:
@@ -315,6 +324,19 @@ class McastSAY(multicast.mtool):
 			multicast.endSocket(sock)
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Execute the SAY operation to send multicast messages.
+
+		Overrides the `doStep` method from `mtool` to send messages based on
+		provided arguments.
+
+		Args:
+			*args: Variable length argument list containing command-line arguments.
+			**kwargs: Arbitrary keyword arguments.
+
+		Returns:
+			tuple: A tuple containing a status indicator and result message.
+		"""
 		return self._sayStep(
 			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
