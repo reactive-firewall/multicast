@@ -373,6 +373,53 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 	__module__ = """tests.MulticastUDPClient.MyUDPHandler"""
 
 	def handle(self):
+		"""
+		Handle incoming UDP requests.
+
+		This method overrides the `handle` method from `socketserver.BaseRequestHandler`
+		to process incoming UDP messages. It receives a message from a client, echoes it
+		back in uppercase, and prints diagnostic information.
+
+		Meta Testing:
+
+			First set up test fixtures by importing test context.
+
+				>>> import socket
+				>>> import threading
+				>>> from tests.MulticastUDPClient import MyUDPHandler
+				>>>
+
+			Testcase 1: Test handling a simple message.
+
+				>>> import socketserver
+				>>> server = socketserver.UDPServer(('localhost', 0), MyUDPHandler)
+				>>> threading.Thread(target=server.serve_forever, daemon=True).start()
+				>>> client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+				>>> client_socket.sendto("hello world\n", server.server_address)
+				>>> data, _ = client_socket.recvfrom(1024)
+				>>> data
+				b'HELLO WORLD\n'
+				>>> server.shutdown()
+				>>>
+
+			Testcase 2: Test handling an empty message.
+
+				>>> import socketserver
+				>>> server = socketserver.UDPServer(('localhost', 0), MyUDPHandler)
+				>>> threading.Thread(target=server.serve_forever, daemon=True).start()
+				>>> client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+				>>> client_socket.sendto("\n", server.server_address)
+				>>> data, _ = client_socket.recvfrom(1024)
+				>>> data
+				b'\n'
+				>>> server.shutdown()
+				>>>
+
+		Note:
+			This method assumes that the incoming request tuple contains a string and a socket,
+			as per `socketserver.BaseRequestHandler` for datagram services.
+
+		"""
 		data = self.request[0].strip()
 		sock = self.request[1]
 		print(str("{} wrote:").format(self.client_address[0]))
