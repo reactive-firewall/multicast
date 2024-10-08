@@ -362,12 +362,57 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 	def handle(self):
 		"""
-		Process incoming UDP requests.
+		Handles incoming UDP requests in the HEAR functionality.
 
 		Overrides the base class method to define how incoming data is handled.
 
-		Returns:
-			None
+		By default:
+		Processes the incoming data from the client, logs the messages,
+		and sends a response back. If the data contains the
+		keyword "STOP", it raises a `RuntimeError` to
+		initiate server shutdown.
+
+		Minimal Acceptance Testing:
+
+			First set up test fixtures by importing multicast.
+
+			>>> import multicast
+			>>>
+
+			Testcase 0: Ensure `HearUDPHandler` can be imported.
+
+			>>> import multicast
+			>>> from multicast.hear import HearUDPHandler
+			>>> HearUDPHandler.__name__ is not None
+			True
+			>>>
+
+			Testcase 1: Verify the `handle` method exists.
+
+			>>> handler = HearUDPHandler(request=('Test data', None), client_address=('127.0.0.1', 59999), server=None)
+			>>> hasattr(handler, 'handle')
+			True
+			>>>
+
+			Testcase 2: `handle` processes data correctly.
+
+			>>> handler.request = ('Hello, Multicast!', None)
+			>>> handler.client_address = ('192.168.0.2', 51234)
+			>>> handler.handle()
+			192.168.0.2 SAYS: Hello, Multicast! to ALL
+			>>>
+
+			Testcase 3: `handle` raises `RuntimeError` on "STOP" command.
+
+			>>> handler.request = ('STOP', None)
+			>>> try:
+			...     handler.handle()
+			... except RuntimeError as e:
+			...     print(e)
+			SHUTDOWN
+			>>>
+
+
 		"""
 		(data, sock) = self.request
 		print(str("{} SAYS: {} to {}").format(

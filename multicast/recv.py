@@ -309,7 +309,7 @@ def tryrecv(msgbuffer, chunk, sock):
 		sock (socket.socket): The socket to receive data from.
 
 	Returns:
-		bool: True if data was received, False otherwise.
+		list: The message buffer possibly updated with any newly received data.
 
 	Minimal Acceptance Testing:
 
@@ -359,7 +359,7 @@ def recvstep(msgbuffer, chunk, sock):
 		sock (socket.socket): The socket to receive data from.
 
 	Returns:
-		None
+		list: Updated message buffer with received messages.
 	"""
 	try:
 		msgbuffer = tryrecv(msgbuffer, chunk, sock)
@@ -531,7 +531,10 @@ class McastRECV(multicast.mtool):
 			bind_group (str, optional): Specific group address to bind to.
 
 		Returns:
-			tuple: A tuple containing a status indicator and result message.
+			str: Any received message buffer as a string. May be empty.
+			
+		Raises:
+			NotImplementedError: if joining the multicast group is unsupported on the current system.
 
 		Minimal Acceptance Testing:
 

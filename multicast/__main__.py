@@ -440,10 +440,10 @@ class McastRecvHearDispatch(mtool):
 	@staticmethod
 	def _help_daemon_dispatch(*args, **kwargs):
 		"""
-		Provide help information for daemon dispatching.
+		Helps checking flags for daemon dispatching.
 
-		Internal method to display help messages related to the `--daemon` option
-		and how it affects the dispatching of sub-commands.
+		Internal method to check the `--daemon` option
+		and interpret how it affects the dispatching of sub-commands.
 
 		Args:
 			*args: Additional positional arguments.
