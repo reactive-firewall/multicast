@@ -48,14 +48,6 @@ __module__ = """tests"""
 
 
 try:
-	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.") from None
-except Exception as err:  # pragma: no branch
-	raise ImportError(err) from err
-
-
-try:
 	try:
 		import context
 	except Exception as ImportErr:  # pragma: no branch

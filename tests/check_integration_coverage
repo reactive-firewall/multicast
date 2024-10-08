@@ -107,19 +107,16 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
-if [[ -d ../.git ]] ; then
-	_TEST_ROOT_DIR="../" ;
-elif [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR=$(pwd) ;
-elif [[ ( -d $(git rev-parse --show-toplevel 2>/dev/null) ) ]] ; then
-	_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
 else
-	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2 ;
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 
-TEST_MCAST_PORT=$((((49152 + (($RANDOM+$RANDOM+$RANDOM)*$RANDOM)) % 16383)+ 49152));
+TEST_MCAST_PORT=$(((RANDOM % 16384) + 49152));
 TEST_MCAST_GROUP='224.0.0.1' ;
 export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p -m"
 

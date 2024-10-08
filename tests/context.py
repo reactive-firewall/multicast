@@ -54,10 +54,10 @@ __doc__ = """
 
 try:
 	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.") from None
-except Exception as err:  # pragma: no branch
-	raise ImportError(err) from err
+	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
+except ImportError as err:
+	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
 
 try:
@@ -315,7 +315,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 
 	"""
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] Failed to import system. WTF?!!") from None
+		raise ImportError("[CWE-758] Failed to import system.") from None
 	if not args or args[0] is None:
 		raise RuntimeError("[CWE-1286] args must be an array of positional arguments") from None
 	else:

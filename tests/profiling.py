@@ -35,14 +35,10 @@ __module__ = """tests.profiling"""
 
 try:
 	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.") from None
-except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
+	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
+except ImportError as err:
+	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
 
 try:

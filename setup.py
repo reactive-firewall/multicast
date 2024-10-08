@@ -151,8 +151,9 @@ if __name__ == '__main__':
 			str("""Topic :: Software Development :: Libraries :: Python Modules"""),
 			str("""Topic :: System :: Networking""")
 		]
-	except Exception:
-		class_tags = str("""Development Status :: 4 - Beta""")
+	except Exception as e:
+		print(f"Warning: Error occurred while setting class_tags: {e}")
+		class_tags = ["Development Status :: 4 - Beta"]
 	# finally the setup
 	setup(
 		name=conf_dict["""metadata"""]["""name"""],

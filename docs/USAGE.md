@@ -24,8 +24,15 @@ _fixture_HEAR_args = [
 
 # spawn a listening proc
 
-def print_loop_stub(func):
-	for _ in range(5):
+def print_loop_stub(func, iterations=5):
+	"""
+	Execute and print the result of a function multiple times.
+
+	Args:
+		func (callable): The function to be executed.
+		iterations (int, optional): Number of times to execute the function. Defaults to 5.
+	"""
+	for _ in range(iterations):
 		print(str(func()))
 
 

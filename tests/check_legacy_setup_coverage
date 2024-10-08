@@ -140,15 +140,12 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
-if [[ -d ../.git ]] ; then
-	_TEST_ROOT_DIR="../" ;
-elif [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR=$(pwd) ;
-elif [[ ( -d $(git rev-parse --show-toplevel 2>/dev/null) ) ]] ; then
-	_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
 else
-	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2 ;
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 

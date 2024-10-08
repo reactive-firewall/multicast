@@ -31,7 +31,7 @@ try:
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
-		from context import os as _os
+		from context import os
 		from context import BasicUsageTestSuite
 	from setup import readFile
 	from setup import parse_requirements_for_install_requires
@@ -54,8 +54,8 @@ class TestParseRequirements(BasicUsageTestSuite):
 	def tearDown(self):
 		"""Clean up the temporary requirements file"""
 		try:
-			if _os.path.exists(self.requirements_file):
-				_os.remove(self.requirements_file)
+			if os.path.exists(self.requirements_file):
+				os.remove(self.requirements_file)
 		finally:
 			super(TestParseRequirements, self).tearDown()
 

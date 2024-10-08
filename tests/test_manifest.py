@@ -32,8 +32,8 @@ try:
 	else:
 		from context import unittest
 		from context import subprocess
-		from context import os as _os
-		from context import sys as _sys
+		from context import os
+		from context import sys
 		from context import BasicUsageTestSuite
 	import tarfile
 except Exception as _cause:  # pragma: no branch
@@ -48,7 +48,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		super(TestManifestInclusion, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'setup.py', 'clean', '--all'
 		]
 		# Clean previous builds
@@ -70,16 +70,16 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		"""
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'setup.py', 'sdist', '--formats=gztar'
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running sdist"), str(theBuildtxt))
-		dist_dir = _os.path.join(_os.getcwd(), 'dist')
-		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
+		dist_dir = os.path.join(os.getcwd(), 'dist')
+		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		self.assertTrue(len(dist_files) > 0, 'No files found in dist directory.')
-		sdist_path = _os.path.join(dist_dir, dist_files[0])
+		sdist_path = os.path.join(dist_dir, dist_files[0])
 		# Open the tar.gz file to inspect contents
 		with tarfile.open(sdist_path, 'r:gz') as tar:
 			members = tar.getnames()

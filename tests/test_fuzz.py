@@ -21,29 +21,20 @@ __module__ = """tests"""
 
 
 try:
-	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.") from None
-except Exception as err:  # pragma: no branch
-	raise ImportError(err) from err
-
-
-try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _:  # pragma: no branch
+		del _  # skipcq - cleanup any error vars early
 		from . import context
 	if context.__name__ is None:
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
+		from context import Process
 		from hypothesis import given
 		from hypothesis import settings
 		from hypothesis import strategies as st
-		from context import Process
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
