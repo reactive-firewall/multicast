@@ -532,7 +532,6 @@ class McastRECV(multicast.mtool):
 
 		Returns:
 			str: Any received message buffer as a string. May be empty.
-			
 		Raises:
 			NotImplementedError: if joining the multicast group is unsupported on the current system.
 
