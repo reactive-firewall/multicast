@@ -73,7 +73,7 @@ try:
 		import random
 	else:  # pragma: no branch
 		random = sys.modules["""random"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Random Failed to import.") from err
 
 
