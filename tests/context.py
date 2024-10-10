@@ -54,10 +54,10 @@ __doc__ = """
 
 try:
 	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] sys.modules is not available or empty.") from None
+except ImportError as err:
+	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
 
 try:
@@ -65,8 +65,16 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] OS Failed to import.")
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
+
+try:
+	if 'random' not in sys.modules:
+		import random
+	else:  # pragma: no branch
+		random = sys.modules["""random"""]
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Random Failed to import.") from err
 
 
 try:
@@ -74,8 +82,8 @@ try:
 		import unittest
 	else:  # pragma: no branch
 		unittest = sys.modules["""unittest"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] unittest Failed to import.")
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
 
 
 try:
@@ -83,8 +91,8 @@ try:
 		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		Process = sys.modules["""Process"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Process Failed to import.")
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
 
 try:
@@ -92,8 +100,8 @@ try:
 		import subprocess
 	else:  # pragma: no branch
 		subprocess = sys.modules["""subprocess"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] subprocess Failed to import.")
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
 
 
 try:
@@ -101,8 +109,8 @@ try:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.") from err
 
 
 try:
@@ -110,8 +118,8 @@ try:
 		import tests.profiling as profiling
 	else:  # pragma: no branch
 		profiling = sys.modules["""tests.profiling"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] profiling Failed to import.")
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 
 __BLANK = str("""""")
@@ -172,7 +180,7 @@ def getCoverageCommand():
 		else:  # pragma: no branch
 			thecov = "exit 1 ; #"
 	except Exception:  # pragma: no branch
-		thecov = "exit 1 ; #"
+		thecov = "exit 1 ; #"  # handled error by suppressing it and indicating caller should abort.
 	return str(thecov)
 
 
@@ -216,7 +224,7 @@ def __check_cov_before_py():
 			if coverage.__name__ is not None:
 				thepython = str("{} -m coverage run -p").format(str(sys.executable))
 		except Exception:
-			thepython = str(sys.executable)
+			thepython = str(sys.executable)  # handled error by falling back on faile-safe value.
 	return str(thepython)
 
 
@@ -248,11 +256,11 @@ def getPythonCommand():
 		try:
 			thepython = str(sys.executable)
 		except Exception:
-			thepython = "exit 1 ; #"
+			thepython = "exit 1 ; #"  # handled error by suppressing it and indicating exit.
 	return str(thepython)
 
 
-def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
+def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	"""
 	Modifies the input command arguments to include coverage-related options when applicable.
 
@@ -262,7 +270,7 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 	Not intended to be run directly.
 
 	Args:
-		args (list): A list of command arguments, defaulting to [None].
+		*args (list): A list of command arguments; should not be pass None.
 
 	Returns:
 		list: The modified list of arguments with 'coverage run' options added as applicable.
@@ -276,37 +284,41 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 
 		Testcase 1: Function should return unmodified arguments if 'coverage' is missing.
 
-			>>> _context.checkCovCommand(["python", "script.py"])
+			>>> _context.checkCovCommand("python", "script.py")
 			['python', 'script.py']
 
 		Testcase 2: Function should modify arguments when 'coverage' is the first argument.
 			A.) Missing 'run'
 
-			>>> _context.checkCovCommand(["coverage", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("coverage", "script.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 3: Function should modify arguments when 'coverage run' is in the first argument.
 			A.) NOT missing 'run'
 
-			>>> _context.checkCovCommand(["coverage run", "script.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("coverage run", "script.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'script.py']
 
 		Testcase 4: Function should handle coverage command with full path.
 
-			>>> _context.checkCovCommand(["/usr/bin/coverage", "test.py"])  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand("/usr/bin/coverage", "test.py")  #doctest: +ELLIPSIS
 			['...', 'run', '-p', '--context=Integration', '--source=multicast', 'test.py']
 
 		Testcase 5: Function should handle coverage invoked via sys.executable.
 
 			>>> import sys as _sys
 			>>> test_fixture = [str("{} -m coverage run").format(_sys.executable), "test.py"]
-			>>> _context.checkCovCommand(test_fixture)  #doctest: +ELLIPSIS
+			>>> _context.checkCovCommand(*test_fixture)  #doctest: +ELLIPSIS
 			[..., '-m', 'coverage', 'run', '-p', '...', '--source=multicast', 'test.py']
 
 
 	"""
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] Failed to import system. WTF?!!")
+		raise ImportError("[CWE-758] Failed to import system.") from None
+	if not args or args[0] is None:
+		raise ValueError("[CWE-1286] args must be an array of positional arguments") from None
+	else:
+		args = [*args]  # convert to an array
 	if str("coverage") in args[0]:
 		i = 1
 		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
@@ -324,7 +336,7 @@ def checkCovCommand(args=[None]):  # skipcq: PYL-W0102  - [] != [None]
 		for k, ktem in enumerate(extra_args):
 			offset = i + k
 			args.insert(offset, ktem)
-	return args
+	return [*args]
 
 
 def checkStrOrByte(theInput):
@@ -468,7 +480,7 @@ def checkPythonCommand(args, stderr=None):
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
-				args = checkCovCommand(args)
+				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except Exception as err:  # pragma: no branch
 		theOutput = None
@@ -476,30 +488,100 @@ def checkPythonCommand(args, stderr=None):
 			if err.output is not None:
 				theOutput = err.output
 		except Exception:
-			theOutput = None
+			theOutput = None  # suppress all errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
 
 @profiling.do_cprofile
-def timePythonCommand(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
-	return checkPythonCommand(args, stderr)
+def timePythonCommand(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
+	"""
+	Function for backend subprocess check_output command.
+
+	Args:
+		args (array): An array of positional command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+		Returns:
+			The output of checkPythonCommand.
+	"""
+	return checkPythonCommand(args, stderr=stderr)
 
 
-def checkPythonFuzzing(args=[None], stderr=None):  # skipcq: PYL-W0102  - [] != [None]
-	"""function for backend subprocess check_output command"""
+def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
+	"""
+	Function for backend subprocess check_output command with improved error handling.
+
+	Args:
+		args (list): A list of command arguments to be executed.
+		stderr (Optional[int]): File descriptor for stderr redirection.
+		Defaults to None.
+
+	Returns:
+		str: The command output as a string.
+
+	Raises:
+		RuntimeError: If an error occurs during command execution.
+
+	Meta Testing:
+
+		First set up test fixtures by importing test context.
+
+			>>> import tests.context as _context
+			>>>
+
+		Testcase 1: Function should raise RuntimeError when args is None.
+
+			>>> _context.checkPythonFuzzing(None)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 2: Function should raise RuntimeError when args is an empty list.
+
+			>>> _context.checkPythonFuzzing([])  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...
+
+		Testcase 3: Function should return output when valid arguments are provided.
+
+			>>> import sys as _sys
+			>>> test_fixture_3 = [str(_sys.executable), '-c', 'print("Hello, Fuzzing!")']
+			>>> _context.checkPythonFuzzing(test_fixture_3)
+			'Hello, Fuzzing!\\n'
+
+		Testcase 4: Function should handle coverage command and return output. Coverage will fail.
+
+			>>> test_fixture_4 = [
+			...     'coverage run', '-c', 'print("Coverage Fuzzing!")'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_4)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			RuntimeError: ...Command '['coverage', 'run',...'-c'...]' returned...exit status 1...
+			>>>
+
+		Testcase 5: Function should capture stderr when specified.
+
+			>>> import subprocess as _subprocess
+			>>> test_fixture_5 = [
+			...     str(_sys.executable), '-c', 'import sys; print("Error", file=sys.stderr)'
+			... ]
+			>>> _context.checkPythonFuzzing(test_fixture_5, stderr=_subprocess.STDOUT)
+			'Error\\n'
+
+
+	"""
 	theOutput = None
 	try:
-		if args is None or args == [None]:  # pragma: no branch
+		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage") in args[0]:
-				args = checkCovCommand(args)
+				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except BaseException as err:  # pragma: no branch
 		theOutput = None
-		raise RuntimeError(err)
+		raise RuntimeError(err) from err  # do not suppress all errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
@@ -752,12 +834,51 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
+	@staticmethod
+	def _always_generate_random_port_WHEN_called():
+		"""
+		Generates a pseudo-random port number within the dynamic/private port range.
+
+		This method returns a random port number between 49152 and 65535,
+		compliant with RFC 6335, suitable for temporary testing purposes to
+		avoid port conflicts.
+
+		Returns:
+			int: A random port number between 49152 and 65535.
+		"""
+		return random.SystemRandom().randint(49152, 65535)
+
 	def setUp(self):
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if not self._thepython:
 			self.skipTest(str("""No python cmd to test with!"""))
+		self._the_test_port = self._always_generate_random_port_WHEN_called()
+
+	def _get_package_version(self):
+		"""
+		Retrieve the current version of the package.
+
+		This helper method imports the package and extracts the __version__ attribute.
+
+		Returns:
+			str: The version string of the package.
+
+		Raises:
+			AssertionError: If the version string cannot be retrieved.
+
+		"""
+		try:
+			self.assertIsNotNone(multicast.__module__)
+			self.assertIsNotNone(multicast.__version__)
+			mcast_version = multicast.__version__
+			self.assertIsInstance(mcast_version, str, """Version is not a string.""")
+			# Refactor alpha/beta tags
+			mcast_version = mcast_version.replace("-alpha", "a0").replace("-beta", "b0")
+			return mcast_version
+		except ImportError:
+			self.fail("""Failed to import the multicast package to retrieve version.""")
 
 	@unittest.skipUnless(True, """Insanitty Test. Good luck debugging.""")
 	def test_absolute_truth_and_meaning(self):
@@ -770,6 +891,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 		if (self._thepython is not None) and (len(self._thepython) <= 0):
 			self.fail(str("""No python cmd to test with!"""))
 		self.test_absolute_truth_and_meaning()
+
+	def tearDown(self):
+		"""Overrides unittest.TestCase.tearDown(unittest.TestCase).
+			Defaults is to reset the random port test fixture.
+		"""
+		if self._the_test_port:
+			self._the_test_port = None
 
 	@classmethod
 	def tearDownClass(cls):

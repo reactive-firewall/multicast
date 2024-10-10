@@ -48,14 +48,6 @@ __module__ = """tests"""
 
 
 try:
-	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-440] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
-
-
-try:
 	try:
 		import context
 	except Exception as ImportErr:  # pragma: no branch
@@ -63,15 +55,14 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from context import subprocess
 		from context import Process
-	import random as _random
-except Exception:
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as err:
+	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
 class MulticastTestSuite(context.BasicUsageTestSuite):
@@ -306,13 +297,13 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			_fixture_SAY_args = [
 				"""--port""", """59991""",
-				"""--mcast-group""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'""",
 				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
 				"""--port""", """59991""",
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -329,9 +320,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture)
+				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
@@ -342,28 +333,23 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
-	@staticmethod
-	def _always_generate_random_port_WHEN_called():
-		"""Outputs a psuedo-random, RFC-6335 compliant, port number."""
-		return _random.randint(49152, 65535)
-
 	def test_hear_works_WHEN_fuzzed_and_say_works(self):
 		"""Tests the basic send and recv test. Skips if fuzzing broke SAY fixture."""
 		theResult = False
 		fail_fixture = str("""SAY --> HEAR == error""")
-		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_SAY_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--mcast-group""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'""",
 				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
 				"""--port""", str(_fixture_port_num),
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -380,9 +366,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture)
+				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
@@ -401,8 +387,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			_fixture_HEAR_args = [
 				"""--port""", """59992""",
-				"""--join-mcast-groups""", """'224.0.0.1'""",
-				"""--bind-group""", """'224.0.0.1'"""
+				"""--groups""", """'224.0.0.1'""",
+				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -416,9 +402,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
-			except Exception:
+			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(sub_fail_fixture)
+				raise unittest.SkipTest(sub_fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode, fail_fixture)
 			self.assertEqual(int(p.exitcode), int(0))

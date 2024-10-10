@@ -108,14 +108,13 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./multicast ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
 else
-	echo "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+	EXIT_CODE=40
 fi
 
 # This File  MUST BE GIT-IGNORED

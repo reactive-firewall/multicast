@@ -2,20 +2,33 @@
 Multicast:
   - changed-files:
     - any-glob-to-any-file:
-      - setup.py
+      - 'setup.*'
       - multicast/*.py
       - LICENSE
       - LICENSE.md
+      - pyproject.toml
 
 # Add 'Lint' label to any lint file changes
 Linter:
   - changed-files:
     - any-glob-to-any-file:
-      - .hound.yml
       - .yamllint.conf
       - .flake8.ini
       - .deepsource.toml
+      - tests/check_s*
+      - tests/check_c*
+      - tests/check_pip
+
+# Add 'bash lang' label to any bash file changes
+Bash Lang:
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/*.bash
       - tests/check_*
+      - .github/*.bash
+      - .github/*.sh
+      - .circleci/*.bash
+      - '*.bash'
 
 # Add 'Lang' label to any python file changes
 Python Lang:
@@ -28,13 +41,24 @@ Configs:
   - changed-files:
     - any-glob-to-any-file:
       - '*.yml'
-      - ./**/*.yml
+      - './**/*.yml'
+      - './.**/*.yml'
       - '*.ini'
       - '*.toml'
       - '*.cfg'
+      - '*.conf'
       - requirements.txt
       - test-requirements.txt
       - tests/requirements.txt
+      - docs/requirements.txt
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.md'
+      - './**/*.md'
+      - docs/**/*
+      - docs/*
 
 # Add 'test' label
 Testing:
@@ -51,8 +75,6 @@ CI:
     - any-glob-to-any-file:
       - tests/*.py
       - tests/requirements.txt
-      - .stickler.yml
-      - .hound.yml
       - .travis.yml
       - .appveyor.yml
       - .github/workflows/*
@@ -64,3 +86,9 @@ Github:
       - .github/**/*
       - .github/*
       - README.md
+
+invalid:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .stickler.yml
+      - .hound.yml

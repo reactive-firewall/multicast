@@ -30,7 +30,9 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast socket Utility Functions.
+"""Socket utility functions for multicast communication.
+
+Provides helper functions for creating and managing multicast sockets.
 
 NOT intended for DIRECT use!
 
@@ -161,14 +163,19 @@ except Exception as err:
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err
 
 
 def genSocket():
-	"""Will generate an unbound socket.socket object ready to receive network traffic.
+	"""
+	Create and configure a multicast socket.
 
+	Generates an unbound socket.socket object ready to receive network traffic.
 	Implementation allows reuse of socket (to allow another instance of python running
 	this script binding to the same ip/port).
+
+	Returns:
+		socket.socket: A configured multicast socket ready for communication.
 
 	Minimal Acceptance Testing:
 
@@ -212,7 +219,13 @@ def genSocket():
 
 
 def endSocket(sock=None):
-	"""Will generates an unbound socket.socket object ready to receive network traffic.
+	"""Close a multicast socket and release resources.
+
+	Args:
+		sock (socket.socket, optional): The socket to close. Defaults to None.
+
+	Returns:
+		None
 
 	Minimal Acceptance Testing:
 

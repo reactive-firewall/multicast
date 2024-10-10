@@ -26,33 +26,18 @@
 
 * Send a message using:
   ```shell
-  python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello, Multicast!"
+  python3 -m multicast SAY --group 224.1.1.2 --port 59595 --message "Hello, Multicast!"
   ```
 
 ### Step 5: Receiving Messages
 
 * Receive messages by running:
   ```shell
-  python3 -m multicast RECV --use-std --port 59595 --join-mcast-groups 224.1.1.2
+  python3 -m multicast RECV --use-std --port 59595 --groups 224.1.1.2
   ```
 
 **You're all set! Enjoy using Multicast for your projects.**
 
-
-
-## Contents
-
-```{toctree}
-:maxdepth: 2
-:Name: Documentation
-apidocs/index
-/README.md
-/FAQ.md
-/CI.md
-/USAGE.md
-:Name: License
-/LICENSE.md
-```
 
 ## Overview
 
@@ -68,16 +53,28 @@ Multicast is a Python module designed to simplify raw multicast communication in
 
 - **Installation**: Install the package using `make install` or via `pip`.
 - **Quickstart**: Refer to the [Quickstart](#quickstart) section for immediate setup instructions.
-- **Examples**: Explore detailed examples and API references in the [Usage Guide](USAGE.md).
+- **Examples**: Explore detailed examples and API references in the [Usage Guide](./USAGE).
 
 ### Documentation Resources
 
-- [README](README.md): Introduction and installation instructions.
-- [Usage Guide](USAGE.md): Detailed usage examples and API documentation.
-- [FAQ](FAQ.md): Frequently asked questions and troubleshooting tips.
-- [CI Processes](CI.md): Information on continuous integration and testing strategies.
-- [License](LICENSE.md): Licensing information and acknowledgments.
+- [README](./README): Introduction and installation instructions.
+- [Usage Guide](./USAGE): Detailed usage examples and API documentation.
+- [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
+- [CI Processes](./CI): Information on continuous integration and testing strategies.
+- [License](./LICENSE): Licensing information and acknowledgments.
 
+## Contents
+
+```{toctree}
+:maxdepth: 2
+:Name: Documentation
+apidocs/index
+/README
+/FAQ
+/CI
+/USAGE
+/LICENSE
+```
 
 ---
 ### Copyright (c) 2021-2024, Mr. Walls

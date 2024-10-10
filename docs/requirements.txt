@@ -22,7 +22,7 @@
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
 # setuptools - MIT license
-setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
+setuptools>=75.0
 # virtualenv - MIT license
 #virtualenv>=15.0.1
 # pgpy - BSD 3-Clause licensed
@@ -30,16 +30,16 @@ setuptools>=38.0, !=71.0.1, !=72.0, !=69.4.0, !=69.3.0, !=60.3.0, !=59.1
 # tox - MIT license
 #tox>=3.0.0, !=3.16.1
 # wheel - MIT license
-wheel>=0.37.0
+wheel>=0.44
 # pip - MIT license
-pip>=19.0
+pip>=22.0
 # build - MIT license
-# build>=0.5.1, !=1.0.3, !=0.6, !=0.6.1 !=1.1.0 !=1.2.0
+build>=1.2.1, !=1.2.2.post1
 # sphinx - BSD license
-sphinx>=5.2
+sphinx>=7.0
 # sphinx-autodoc2 - MIT license
 sphinx-autodoc2>=0.5.0
 # myst-parser - MIT license
 myst-parser[linkify]>=4.0.0
 # sphinxawesome-theme - MIT license
-sphinxawesome-theme>=0.5.0
+sphinxawesome-theme>=5.2

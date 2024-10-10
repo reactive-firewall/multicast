@@ -30,7 +30,10 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""multicast RECV Features.
+"""Provides multicast RECV Features.
+
+Use for receiving multicast messages. Contains classes and functions to handle receiving messages
+from multicast groups.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -198,24 +201,38 @@ try:
 	]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
-			baton = ImportError(
+			baton = ModuleNotFoundError(
 				str("[CWE-440] module failed to import {}.").format(str(unit))
 			)  # pragma: no cover
 			baton.module = unit  # pragma: no cover
-			raise baton  # pragma: no cover
+			raise baton from None  # pragma: no cover
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
-	"""Will join the given multicast group(s).
+	"""
+	Join multicast groups to prepare for receiving messages.
+
+
+	Configures the socket to join specified multicast groups on a given port.
 
 	The JOIN function. Will start to listen on the given port of an interface for multicast
 	messages to the given group(s).
+
+	Args:
+		groups (list): List of multicast group addresses to join.
+		port (int): Port number to bind the socket to.
+		iface (str, optional): Network interface to use.
+		bind_group (str, optional): Specific group address to bind to.
+		isock (socket.socket, optional): Existing socket to configure.
+
+	Returns:
+		socket.socket: Configured socket ready to receive multicast messages.
 
 	Minimal Acceptance Testing:
 
@@ -272,18 +289,31 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
-		raise NotImplementedError("""[CWE-440] Not Implemented.""", err)  # pragma: no cover
+		raise OSError("[CWE-440] Socket operation failed.") from err  # pragma: no cover
 	return sock
 
 
 def tryrecv(msgbuffer, chunk, sock):
-	"""Will try to listen on the given socket directly into the given chunk for decoding.
+	"""
+	Attempt to receive data on the given socket and decode it into the message buffer.
 
-		If the read into the chunk results in content, the chunk will be decoded into the given
-		message buffer. Either way the message buffer will be returned.
+	Will try to listen on the given socket directly into the given chunk for decoding.
+	If the read into the chunk results in content, the chunk will be decoded and appended
+	to the caller-instantiated `msgbuffer`, which is a collection of strings (or None).
+	After decoding, `chunk` is zeroed for memory efficiency and security. Either way the
+	message buffer will be returned.
 
+	Tries to receive data without blocking and appends it to the message buffer.
 
-		Minimal Acceptance Testing:
+	Args:
+		msgbuffer (list or None): Caller-instantiated collection to store received messages.
+		chunk (variable or None): Caller-instantiated variable for raw received data.
+		sock (socket.socket): The socket to receive data from.
+
+	Returns:
+		list: The message buffer possibly updated with any newly received data.
+
+	Minimal Acceptance Testing:
 
 		First set up test fixtures by importing multicast.
 
@@ -320,6 +350,19 @@ def tryrecv(msgbuffer, chunk, sock):
 
 
 def recvstep(msgbuffer, chunk, sock):
+	"""
+	Receive messages continuously until interrupted.
+
+	Listens on the socket and accumulates messages into the buffer.
+
+	Args:
+		msgbuffer (list): Buffer to store received messages.
+		chunk (int): Maximum number of bytes to read per message.
+		sock (socket.socket): The socket to receive data from.
+
+	Returns:
+		list: Updated message buffer with received messages.
+	"""
 	try:
 		msgbuffer = tryrecv(msgbuffer, chunk, sock)
 	except KeyboardInterrupt:  # pragma: no branch
@@ -339,7 +382,8 @@ def recvstep(msgbuffer, chunk, sock):
 
 
 class McastRECV(multicast.mtool):
-	"""Subclasses the multicast.mtool to provide the RECV functions.
+	"""
+	Subclasses the multicast.mtool to provide the RECV functions.
 
 		Testing:
 
@@ -394,7 +438,8 @@ class McastRECV(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -474,10 +519,23 @@ class McastRECV(multicast.mtool):
 
 	@staticmethod
 	def _hearstep(groups, port, iface=None, bind_group=None):
-		"""Will listen on the given port of an interface for multicast messages to the given group(s).
+		"""
+		Will listen on the given port of an interface for multicast messages to the given group(s).
 
 		The work-horse function.
 
+		Internal method to set up receiving multicast messages.
+
+		Args:
+			groups (list): Multicast groups to join.
+			port (int): Port number for receiving messages.
+			iface (str, optional): Network interface to use.
+			bind_group (str, optional): Specific group address to bind to.
+
+		Returns:
+			str: Any received message buffer as a string. May be empty.
+		Raises:
+			NotImplementedError: if joining the multicast group is unsupported on the current system.
 
 		Minimal Acceptance Testing:
 
@@ -524,6 +582,19 @@ class McastRECV(multicast.mtool):
 		return msgbuffer
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Execute the RECV operation to receive multicast messages.
+
+		Overrides the `doStep` method from `mtool` to start receiving messages
+		based on provided arguments.
+
+		Args:
+			*args: Variable length argument list containing command-line arguments.
+			**kwargs: Arbitrary keyword arguments.
+
+		Returns:
+			tuple: A tuple containing received data and a status indicator.
+		"""
 		response = self._hearstep(
 			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok

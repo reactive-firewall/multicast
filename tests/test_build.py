@@ -27,15 +27,15 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
+		from context import sys
+		from context import os
 		from context import unittest
 		from context import subprocess
-		from context import os as _os
-		from context import sys as _sys
 		from context import BasicUsageTestSuite
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 class TestPEP517Build(BasicUsageTestSuite):
@@ -46,7 +46,7 @@ class TestPEP517Build(BasicUsageTestSuite):
 		"""Test building the package using PEP 517 standards."""
 		# Arguments need to clean
 		build_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'setup.py', 'clean', '--all'
 		]
 		# Build the source distribution
@@ -54,7 +54,7 @@ class TestPEP517Build(BasicUsageTestSuite):
 		self.assertIn(str("running clean"), str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'-m', 'build', '--sdist', '--wheel'
 		]
 		# Build the source distribution
@@ -62,16 +62,19 @@ class TestPEP517Build(BasicUsageTestSuite):
 		self.assertIn(str("running build"), str(theBuildtxt))
 		self.assertIn(str("""Successfully built"""), str(theBuildtxt))
 		# Verify that the dist directory contains the expected files
-		dist_dir = _os.path.join(_os.getcwd(), 'dist')
-		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
+		dist_dir = os.path.join(os.getcwd(), 'dist')
+		version = self._get_package_version()
+		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		expected_files = [
-			'multicast-1.5.0.tar.gz',
-			'multicast-1.5.0-py2.py3-none-any.whl',
+			f"multicast-{version}.tar.gz",
+			f"multicast-{version}-py3-none-any.whl",
 		]
 		for expected_file in expected_files:
 			self.assertIn(
 				expected_file, dist_files,
-				str('Missing {expected} in  dist directory.').format(expected=expected_file)
+				str('Missing {expected} in dist directory. Looking for version {version}').format(
+					expected=expected_file, version=version
+				)
 			)
 
 

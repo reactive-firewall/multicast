@@ -44,9 +44,9 @@ __module__ = """tests"""
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-440] OMG! we could not import sys. ABORT. ABORT.")
+		raise ModuleNotFoundError("[CWE-440] OMG! we could not import sys. ABORT. ABORT.") from None
 except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 try:
@@ -54,8 +54,8 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] OS Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
 
 
 try:
@@ -63,8 +63,8 @@ try:
 		import unittest
 	else:  # pragma: no branch
 		unittest = sys.modules["""unittest"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] unittest Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
 
 
 try:
@@ -72,8 +72,8 @@ try:
 		import functools
 	else:  # pragma: no branch
 		functools = sys.modules["""functools"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] functools Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] functools Failed to import.") from err
 
 
 try:
@@ -81,8 +81,8 @@ try:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] multicast Failed to import.")
+except Exception as err:  # pragma: no branch
+	raise ImportError("[CWE-440] multicast Failed to import.") from err
 
 
 try:
@@ -100,25 +100,20 @@ try:
 	from tests import test_manifest
 	from tests import test_build
 	from tests import test_usage
+	from tests import test_fuzz
 
 	depends = [
-		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest, test_usage
+		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
+		test_usage, test_fuzz
 	]
 	for unit_test in depends:
 		try:
 			if unit_test.__name__ is None:  # pragma: no branch
 				raise ImportError(
 					str("Test module failed to import even the {} tests.").format(str(unit_test))
-				)
+				) from None
 		except Exception as impErr:  # pragma: no branch
-			print(str(''))
-			print(str(type(impErr)))
-			print(str(impErr))
-			print(str((impErr.args)))
-			print(str(''))
-			impErr = None
-			del impErr  # skipcq - cleanup any error leaks early
-			raise ImportError(str("[CWE-758] Test module failed completely."))
+			raise ImportError(str("[CWE-758] Test module failed completely.")) from impErr
 except Exception as badErr:  # pragma: no branch
 	print(str(''))
 	print(str(type(badErr)))
@@ -135,13 +130,13 @@ try:
 		from tests import context
 	else:  # pragma: no branch
 		context = sys.modules["""tests.context"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] context Failed to import.")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
 
 test_cases = (
 	test_basic.BasicTestSuite, test_deps.TestRequirementsTxt, test_build.TestPEP517Build,
-	test_manifest.TestManifestInclusion,
+	test_manifest.TestManifestInclusion, test_install_requires.TestParseRequirements,
 	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite
 )
 
@@ -168,8 +163,8 @@ def load_tests(loader, tests, pattern):
 			import doctest
 		else:  # pragma: no branch
 			doctest = sys.modules["""doctest"""]
-	except Exception:  # pragma: no branch
-		raise ImportError("[CWE-440] doctest Failed to import.")
+	except Exception as _cause:  # pragma: no branch
+		raise ImportError("[CWE-440] doctest Failed to import.") from _cause
 	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)
 	suite = unittest.TestSuite()
 	for test_class in test_cases:

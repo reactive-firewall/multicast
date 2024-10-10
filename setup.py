@@ -44,8 +44,8 @@ try:
 			from setuptools.config import read_configuration
 		except Exception:
 			from setuptools.config.setupcfg import read_configuration
-except Exception:
-	raise NotImplementedError("""[CWE-440] Not Implemented.""")
+except Exception as err:
+	raise NotImplementedError("""[CWE-440] Not Implemented.""") from err
 
 
 def readFile(filename):
@@ -73,10 +73,8 @@ def readFile(filename):
 	try:
 		expected_files = ["""E.md""", """requirements.txt"""]
 		if not any(aexpected_file in filename for aexpected_file in expected_files):
-			raise ValueError(str(
-				"""[CWE-706] Access to the file {} was not expected."""
-			).format(filename))
-		with open(str("""./{}""").format(str(filename))) as f:
+			raise ValueError(f"[CWE-706] Access to the file {filename} was not expected.") from None
+		with open(f"./{filename}") as f:
 			theResult = f.read()
 	except Exception as err:
 		theResult = str(
@@ -116,7 +114,7 @@ def parse_requirements_for_install_requires(requirements_text):
 			version = match.group(3)
 			if operator == '>=' and version:
 				# Keep only the minimum required version
-				install_requires.append(str("{pkg}>={ver}").format(pkg=package, ver=version))
+				install_requires.append(f"{package}>={version}")
 			elif version:
 				# Include the package without version or with simplified specifier
 				install_requires.append(package)
@@ -126,47 +124,37 @@ def parse_requirements_for_install_requires(requirements_text):
 	return install_requires
 
 
-requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
-"""The list of production requirements of this program."""
-
-
-conf_dict = None
-
-
-with warnings.catch_warnings():
-	warnings.simplefilter("ignore")
-	conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
-
-
-readme = readFile("""README.md""")
-"""The multi-line description and/or summary of this program."""
-
-SLA = readFile("""LICENSE.md""")
-"""The "Software License Agreement" of this program."""
-
-try:
-	class_tags = [
-		str("""Development Status :: 4 - Beta"""),
-		str("""Environment :: Console"""),
-		str("""Intended Audience :: Developers"""),
-		str("""Operating System :: MacOS :: MacOS X"""),
-		str("""Operating System :: POSIX :: Linux"""),
-		str("""License :: OSI Approved :: MIT License"""),
-		str("""Programming Language :: Python :: 3"""),
-		str("""Programming Language :: Python :: 3 :: Only"""),
-		str("""Programming Language :: Python :: 3.12"""),
-		str("""Programming Language :: Python :: 3.11"""),
-		str("""Programming Language :: Python :: 3.10"""),
-		str("""Programming Language :: Python :: 3.9"""),
-		str("""Programming Language :: Python :: 3.8"""),
-		str("""Topic :: Software Development :: Libraries :: Python Modules"""),
-		str("""Topic :: System :: Networking"""),
-		str("""Topic :: Network""")
-	]
-except Exception:
-	class_tags = str("""Development Status :: 4 - Beta""")
-
 if __name__ == '__main__':
+	requirements = parse_requirements_for_install_requires(readFile("""requirements.txt"""))
+	"""The list of production requirements of this program."""
+	conf_dict = None
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
+	readme = readFile("""README.md""")
+	"""The multi-line description and/or summary of this program."""
+	SLA = readFile("""LICENSE.md""")
+	"""The "Software License Agreement" of this program."""
+	try:
+		class_tags = [
+			str("""Development Status :: 4 - Beta"""),
+			str("""Environment :: Console"""),
+			str("""Intended Audience :: Developers"""),
+			str("""Operating System :: MacOS :: MacOS X"""),
+			str("""Operating System :: POSIX :: Linux"""),
+			str("""License :: OSI Approved :: MIT License"""),
+			str("""Programming Language :: Python :: 3"""),
+			str("""Programming Language :: Python :: 3 :: Only"""),
+			str("""Programming Language :: Python :: 3.12"""),
+			str("""Programming Language :: Python :: 3.11"""),
+			str("""Programming Language :: Python :: 3.10"""),
+			str("""Topic :: Software Development :: Libraries :: Python Modules"""),
+			str("""Topic :: System :: Networking""")
+		]
+	except Exception as e:
+		print(f"Warning: Error occurred while setting class_tags: {e}")
+		class_tags = ["Development Status :: 4 - Beta"]
+	# finally the setup
 	setup(
 		name=conf_dict["""metadata"""]["""name"""],
 		version=conf_dict["""metadata"""]["""version"""],

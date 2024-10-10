@@ -28,16 +28,16 @@ try:
 		del ImportErr  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
-		raise ImportError("[CWE-758] Failed to import context")
+		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
 		from context import subprocess
-		from context import os as _os
-		from context import sys as _sys
+		from context import os
+		from context import sys
 		from context import BasicUsageTestSuite
 	import tarfile
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context")
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 class TestManifestInclusion(BasicUsageTestSuite):
@@ -48,35 +48,12 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		super(TestManifestInclusion, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'setup.py', 'clean', '--all'
 		]
 		# Clean previous builds
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running clean"), str(theCleantxt))
-
-	def _get_package_version(self):
-		"""
-		Retrieve the current version of the package.
-
-		This helper method imports the package and extracts the __version__ attribute.
-
-		Returns:
-			str: The version string of the package.
-
-		Raises:
-			AssertionError: If the version string cannot be retrieved.
-
-		"""
-		try:
-			from .context import multicast
-			self.assertIsNotNone(multicast.__module__)
-			self.assertIsNotNone(multicast.__version__)
-			mcast_version = multicast.__version__
-			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
-			return mcast_version
-		except ImportError:
-			self.fail("""Failed to import the multicast package to retrieve version.""")
 
 	def _build_sdist_and_get_members(self):
 		"""Build the source distribution and return the list of member files and package version.
@@ -93,16 +70,16 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		"""
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(_sys.executable),
+			str("{} -m coverage run").format(sys.executable),
 			'setup.py', 'sdist', '--formats=gztar'
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running sdist"), str(theBuildtxt))
-		dist_dir = _os.path.join(_os.getcwd(), 'dist')
-		dist_files = sorted(_os.listdir(dist_dir), reverse=True)
+		dist_dir = os.path.join(os.getcwd(), 'dist')
+		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		self.assertTrue(len(dist_files) > 0, 'No files found in dist directory.')
-		sdist_path = _os.path.join(dist_dir, dist_files[0])
+		sdist_path = os.path.join(dist_dir, dist_files[0])
 		# Open the tar.gz file to inspect contents
 		with tarfile.open(sdist_path, 'r:gz') as tar:
 			members = tar.getnames()
