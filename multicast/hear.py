@@ -19,7 +19,7 @@
 
 """Provides multicast HEAR Features.
 
-Implements functionalities to listen to multicast messages and process them accordingly.
+Provides functionality to listen to and process multicast messages.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -208,7 +208,7 @@ except Exception as err:
 
 class McastServer(socketserver.UDPServer):
 	"""
-	Generic Subclasses socketserver.UDPServer for handling daemon function.
+	Generic Subclasses socketserver.UDPServer for handling '--daemon' function.
 
 	Basically simplifies testing by allowing a trivial echo back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -334,7 +334,7 @@ class McastServer(socketserver.UDPServer):
 
 class HearUDPHandler(socketserver.BaseRequestHandler):
 	"""
-	Subclasses socketserver.BaseRequestHandler for handling HEAR function.
+	Subclass of socketserver.BaseRequestHandler for handling the HEAR function.
 
 	Basically simplifies testing by allowing a simple HEAR back (case-insensitive) of string
 	data, after printing the sender's ip out.
@@ -415,9 +415,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 		"""
 		(data, sock) = self.request
-		print(str("{} SAYS: {} to {}").format(
-			self.client_address[0], data.strip(), "ALL"
-		))
+		print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
 			myID = str(sock.getsockname()[0])
 			if (_sys.stdout.isatty()):  # pragma: no cover
@@ -440,7 +438,9 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 class McastHEAR(multicast.mtool):
 	"""
-	Subclasses multicast.mtool to provide the HEAR tooling.
+	Provides the HEAR tooling by subclassing multicast.mtool.
+
+	This class sets up a multicast server that listens for messages and processes them accordingly.
 
 		Testing:
 

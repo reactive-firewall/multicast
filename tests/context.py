@@ -55,7 +55,7 @@ __doc__ = """
 try:
 	import sys
 	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
+		raise ModuleNotFoundError("[CWE-440] sys.modules is not available or empty.") from None
 except ImportError as err:
 	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
@@ -65,9 +65,8 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
-
 
 try:
 	if 'random' not in sys.modules:
@@ -83,7 +82,7 @@ try:
 		import unittest
 	else:  # pragma: no branch
 		unittest = sys.modules["""unittest"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
 
 
@@ -92,7 +91,7 @@ try:
 		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		Process = sys.modules["""Process"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
 
@@ -101,7 +100,7 @@ try:
 		import subprocess
 	else:  # pragma: no branch
 		subprocess = sys.modules["""subprocess"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
 
 
@@ -119,7 +118,7 @@ try:
 		import tests.profiling as profiling
 	else:  # pragma: no branch
 		profiling = sys.modules["""tests.profiling"""]
-except Exception as err:  # pragma: no branch
+except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 
@@ -271,7 +270,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	Not intended to be run directly.
 
 	Args:
-		*args (list): A list of command arguments, defaulting to [None].
+		*args (list): A list of command arguments; should not be pass None.
 
 	Returns:
 		list: The modified list of arguments with 'coverage run' options added as applicable.
@@ -317,7 +316,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system.") from None
 	if not args or args[0] is None:
-		raise RuntimeError("[CWE-1286] args must be an array of positional arguments") from None
+		raise ValueError("[CWE-1286] args must be an array of positional arguments") from None
 	else:
 		args = [*args]  # convert to an array
 	if str("coverage") in args[0]:
@@ -844,21 +843,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 		compliant with RFC 6335, suitable for temporary testing purposes to
 		avoid port conflicts.
 
-		Should be equivalent to `return random.randint(49152, 65535)`
-
 		Returns:
 			int: A random port number between 49152 and 65535.
 		"""
-		return int(
-			49152 + (
-				int(
-					random.SystemRandom().randbytes(
-						int(65535).__sizeof__()
-					).hex(),
-					16
-				) % 16383
-			)
-		)
+		return random.SystemRandom().randint(49152, 65535)
 
 	def setUp(self):
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
@@ -885,9 +873,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 			self.assertIsNotNone(multicast.__module__)
 			self.assertIsNotNone(multicast.__version__)
 			mcast_version = multicast.__version__
-			self.assertEqual(type(mcast_version), type(str("")), """Version is not a string.""")
-			# refactor alpha/beta tags
-			mcast_version = mcast_version.replace("-alpha", "a0", 1).replace("-beta", "b0", 1)
+			self.assertIsInstance(mcast_version, str, """Version is not a string.""")
+			# Refactor alpha/beta tags
+			mcast_version = mcast_version.replace("-alpha", "a0").replace("-beta", "b0")
 			return mcast_version
 		except ImportError:
 			self.fail("""Failed to import the multicast package to retrieve version.""")

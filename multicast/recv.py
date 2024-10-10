@@ -289,13 +289,13 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
 	except Exception as err:  # pragma: no branch
-		raise NotImplementedError("""[CWE-440] Not Implemented.""", err) from err  # pragma: no cover
+		raise OSError("[CWE-440] Socket operation failed.") from err  # pragma: no cover
 	return sock
 
 
 def tryrecv(msgbuffer, chunk, sock):
 	"""
-	Attempt to receive a single message from the socket.
+	Attempt to receive data on the socket and decode it into the message buffer.
 
 	Will try to listen on the given socket directly into the given chunk for decoding.
 	If the read into the chunk results in content, the chunk will be decoded into the given
@@ -303,10 +303,12 @@ def tryrecv(msgbuffer, chunk, sock):
 
 	Tries to receive data without blocking and appends it to the message buffer.
 
-	Args:
-		msgbuffer (list): Buffer to store received messages.
-		chunk (int): Maximum number of bytes to read.
-		sock (socket.socket): The socket to receive data from.
+    This function listens on the given socket and decodes the received data into the caller-instantiated `chunk` variable. If `chunk` contains data, it is decoded and appended to the caller-instantiated `msgbuffer`, which is a collection of strings (or None). After decoding, `chunk` is zeroed for memory efficiency and security.
+
+    Args:
+        msgbuffer (list or None): Caller-instantiated collection to store received messages.
+        chunk (variable or None): Caller-instantiated variable for raw received data.
+        sock (socket.socket): The socket to receive data from.
 
 	Returns:
 		list: The message buffer possibly updated with any newly received data.

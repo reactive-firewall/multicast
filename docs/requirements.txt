@@ -34,7 +34,7 @@ wheel>=0.44
 # pip - MIT license
 pip>=22.0
 # build - MIT license
-build>=1.1.1, !=1.2.0
+build>=1.2.1, !=1.2.2.post1
 # sphinx - BSD license
 sphinx>=7.0
 # sphinx-autodoc2 - MIT license
