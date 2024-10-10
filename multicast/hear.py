@@ -406,7 +406,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 		"""
 		(data, sock) = self.request
-		if not sock:
+		if data is None or not sock:
 			return  # nothing to do -- fail fast.
 		print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
@@ -422,7 +422,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
 				str("HEAR [ {what} SAID {you} ] from {me}").format(
-					me=myID, you=self.client_address, what=_sim_data_str.upper()
+					me=myID, you=self.client_address, what=data.upper()
 				)
 			)
 			if """STOP""" in str(data):
