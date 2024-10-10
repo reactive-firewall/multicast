@@ -295,20 +295,20 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 def tryrecv(msgbuffer, chunk, sock):
 	"""
-	Attempt to receive data on the socket and decode it into the message buffer.
+	Attempt to receive data on the given socket and decode it into the message buffer.
 
 	Will try to listen on the given socket directly into the given chunk for decoding.
-	If the read into the chunk results in content, the chunk will be decoded into the given
-	message buffer. Either way the message buffer will be returned.
+	If the read into the chunk results in content, the chunk will be decoded and appended
+	to the caller-instantiated `msgbuffer`, which is a collection of strings (or None).
+	After decoding, `chunk` is zeroed for memory efficiency and security. Either way the
+	message buffer will be returned.
 
 	Tries to receive data without blocking and appends it to the message buffer.
 
-    This function listens on the given socket and decodes the received data into the caller-instantiated `chunk` variable. If `chunk` contains data, it is decoded and appended to the caller-instantiated `msgbuffer`, which is a collection of strings (or None). After decoding, `chunk` is zeroed for memory efficiency and security.
-
-    Args:
-        msgbuffer (list or None): Caller-instantiated collection to store received messages.
-        chunk (variable or None): Caller-instantiated variable for raw received data.
-        sock (socket.socket): The socket to receive data from.
+	Args:
+		msgbuffer (list or None): Caller-instantiated collection to store received messages.
+		chunk (variable or None): Caller-instantiated variable for raw received data.
+		sock (socket.socket): The socket to receive data from.
 
 	Returns:
 		list: The message buffer possibly updated with any newly received data.

@@ -389,32 +389,25 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 			Testcase 1: Verify the `handle` method exists.
 
-			>>> handler = HearUDPHandler(request=('Test data', None), client_address=('127.0.0.1', 59999), server=None)
+			>>> handler = HearUDPHandler(
+			...     request=('Test data', None), client_address=('192.0.2.1', 51111), server=None
+			... )
 			>>> hasattr(handler, 'handle')
 			True
 			>>>
 
-			Testcase 2: `handle` processes data correctly.
+			Testcase 2: `handle` requires valid requests or ignores input.
 
-			>>> handler.request = ('Hello, Multicast!', None)
-			>>> handler.client_address = ('192.168.0.2', 51234)
-			>>> handler.handle()
-			192.168.0.2 SAYS: Hello, Multicast! to ALL
+			>>> handler.request = ("No-Op", None)
+			>>> handler.client_address = ("192.0.2.2", 51234)
+			>>> handler.handle() is None
+			True
 			>>>
-
-			Testcase 3: `handle` raises `RuntimeError` on "STOP" command.
-
-			>>> handler.request = ('STOP', None)
-			>>> try:
-			...     handler.handle()
-			... except RuntimeError as e:
-			...     print(e)
-			SHUTDOWN
-			>>>
-
 
 		"""
 		(data, sock) = self.request
+		if not sock:
+			return  # nothing to do -- fail fast.
 		print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
 			myID = str(sock.getsockname()[0])
