@@ -170,8 +170,8 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "include HISTORY.md" >>"$@" ;
 	$(QUIET)$(ECHO) "recursive-include . *.txt" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitignore" >>"$@" ;
-	$(QUIET)$(ECHO) "exclude .tox.ini" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .deepsource.toml" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .*.ini" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.yml" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
@@ -187,7 +187,7 @@ build: init ./setup.py MANIFEST.in
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -290,6 +290,8 @@ cleanup:
 	$(QUIET)$(RM) ./src/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./test_env/**/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./test_env/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.hypothesis/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.hypothesis/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./src/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) tests/__pycache__ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) multicast/__pycache__ 2>$(ERROR_LOG_PATH) || true
@@ -301,6 +303,7 @@ cleanup:
 	$(QUIET)$(RMDIR) ./test_env/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.hypothesis/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;
 
 build-docs: ./docs/ ./docs/Makefile docs-reqs
@@ -340,7 +343,7 @@ must_be_root:
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
 user-install: build
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=19.0" "setuptools>=38.0" "wheel>=0.37" "build>=1.0.1" 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 	$(QUITE)$(WAIT)

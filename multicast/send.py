@@ -31,7 +31,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-"""Python Multicast Broadcaster.
+"""Provides multicast broadcast features.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
@@ -164,15 +164,16 @@ try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ImportError(
 					str("[CWE-440] module failed to import {}.").format(str(unit))
-				)
-		except Exception:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely."))
+				) from None
+		except Exception as _cause:  # pragma: no branch
+			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
 except Exception as err:
-	raise ImportError(err)
+	raise ImportError(err) from err
 
 
 class McastSAY(multicast.mtool):
-	"""Multicast Broacaster tool.
+	"""
+	Multicast Broacaster tool.
 
 		Testing:
 
@@ -217,7 +218,8 @@ class McastSAY(multicast.mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
-		"""Will attempt add send args.
+		"""
+		Will attempt add send args.
 
 			Testing:
 
@@ -297,9 +299,19 @@ class McastSAY(multicast.mtool):
 
 	@staticmethod
 	def _sayStep(group, port, data):
-		"""Will send the given data over the given port to the given group.
+		"""
+		Internal method to send a message via multicast.
 
+		Will send the given data over the given port to the given group.
 		The actual magic is handled here.
+
+		Args:
+			group (str): Multicast group address to send the message to.
+			port (int): Port number to use for sending.
+			data (str): Message data to be sent.
+
+		Returns:
+			bool: True if the message was sent successfully, False otherwise.
 		"""
 		sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
 		try:
@@ -312,6 +324,19 @@ class McastSAY(multicast.mtool):
 			multicast.endSocket(sock)
 
 	def doStep(self, *args, **kwargs):
+		"""
+		Execute the SAY operation to send multicast messages.
+
+		Overrides the `doStep` method from `mtool` to send messages based on
+		provided arguments.
+
+		Args:
+			*args: Variable length argument list containing command-line arguments.
+			**kwargs: Arbitrary keyword arguments.
+
+		Returns:
+			tuple: A tuple containing a status indicator and result message.
+		"""
 		return self._sayStep(
 			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok

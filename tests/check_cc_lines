@@ -100,15 +100,13 @@ fi
 _TEST_FILE_VALIDATOR="echo "
 
 # THIS IS THE ACTUAL TEST
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR="./" ;
-	_TEST_FILE_VALIDATOR="git ls-files"
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR=$(pwd) ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
 else
-	printf "%s\n" "FAIL: missing valid folder or file" >&2 ;
-	EXIT_CODE=1
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+	EXIT_CODE=40
 fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)

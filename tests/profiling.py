@@ -35,14 +35,10 @@ __module__ = """tests.profiling"""
 
 try:
 	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton
+	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
+except ImportError as err:
+	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
 
 try:
@@ -51,11 +47,11 @@ try:
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
-	raise baton
+	raise baton from badErr
 
 
 try:
@@ -64,11 +60,11 @@ try:
 	else:  # pragma: no branch
 		functools = sys.modules["""functools"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
-	raise baton
+	raise baton from badErr
 
 
 try:
@@ -80,7 +76,7 @@ except Exception as badErr:  # pragma: no branch
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
-	raise baton
+	raise baton from badErr
 
 
 try:
@@ -89,25 +85,25 @@ try:
 	else:  # pragma: no branch
 		cProfile = sys.modules["""cProfile"""]
 except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
-	raise baton
+	raise baton from badErr
 
 
 try:
 	try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as ImportErr:  # pragma: no branch
-		raise ImportError(ImportErr, str("[CWE-758] Profile module failed completely."))
+	except Exception as impErr:  # pragma: no branch
+		raise ImportError(impErr, str("[CWE-758] Profile module failed completely.")) from impErr
 except Exception as badErr:  # pragma: no branch
 	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = badErr
-	raise baton
+	raise baton from badErr
 
 
 class timewith():
@@ -259,9 +255,9 @@ except ImportError:  # pragma: no cover
 		return inner
 
 
-def main(argv=None):  # pragma: no cover
+def main(*argv):  # pragma: no cover
 	"""The Main Event makes no sense to profiling."""
-	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
+	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?") from None
 
 
 if __name__ in '__main__':  # pragma: no cover

@@ -15,11 +15,19 @@ https://github.com/reactive-firewall/multicast/.github/CONTRIBUTING.md
 
 ```bash
 # cd /MY-AWESOME-DEV-PATH
-git clone https://github.com/reactive-firewall/multicast.git multicast
-cd ./multicast
+# Retrieve a copy of the project, for example clone the source repository
+git clone https://github.com/reactive-firewall/multicast.git multicast && cd ./multicast
+
+# Make sure you are using stable if in production
 git checkout stable
+
+# Optionally check your environment is compatible
 # make clean ; make test ; make clean ;
+
+# Install the module
 make install ;
+
+# Use the module
 python3 -m multicast --help ;
 ```
 #### DONE
@@ -33,7 +41,7 @@ If all went well, `multicast` is now installed and working :tada:
 
 ```bash
 # cd /MY-AWESOME-DEV-PATH
-python3 -m multicast HEAR --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
+python3 -m multicast --daemon HEAR --use-std --port 59595 --group 224.0.0.1
 ```
 
 Caveat: `RECV` is much more useful if actually used in a loop like:
@@ -41,7 +49,7 @@ Caveat: `RECV` is much more useful if actually used in a loop like:
 ```bash
 # cd /MY-AWESOME-DEV-PATH
 while true ; do  # until user Ctrl+C interrupts
-python3 -m multicast RECV --use-std --port 59595 --join-mcast-groups 224.0.0.1 --bind-group 224.0.0.1
+python3 -m multicast RECV --use-std --port 59595 --group 224.0.0.1 --groups 224.0.0.1
 done
 ```
 
@@ -52,7 +60,7 @@ done
 
 ```bash
 # cd /MY-AWESOME-DEV-PATH
-python3 -m multicast SAY --mcast-group 224.1.1.2 --port 59595 --message "Hello World!"
+python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 ```
 
 
@@ -71,25 +79,28 @@ _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multica
 _fixture_host_BIND_arg = """224.0.0.1"""
 _fixture_HEAR_args = [
 	"""--port""", _fixture_PORT_arg,
-	"""--join-mcast-groups""", _fixture_mcast_GRP_arg,
-	"""--bind-group""", _fixture_host_BIND_arg
+	"""--groups""", _fixture_mcast_GRP_arg,
+	"""--group""", _fixture_host_BIND_arg
 ]
 
 # spawn a listening proc
 
+def printLoopStub(func):
+	for i in range( 0, 5 ):
+		print( str( func() ) )
+
+@printLoopStub
 def inputHandler():
 	test_RCEV = multicast.recv.McastRECV()
 	buffer_string = str("""""")
 	buffer_string += test_RCEV._hearstep([_fixture_mcast_GRP_arg], _fixture_PORT_arg, _fixture_host_BIND_arg, _fixture_mcast_GRP_arg)
 	return buffer_string
 
-def printLoopStub(func):
-	for i in range( 0, 5 ):
-		print( str( func() ) )
+# alternatively listen as a server
 
 p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+				name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
 			)
 p.start()
 
@@ -102,7 +113,7 @@ and elsewhere (like another function or even module) for the sender:
 
 _fixture_SAY_args = [
 	"""--port""", _fixture_PORT_arg,
-	"""--mcast-group""", _fixture_mcast_GRP_arg,
+	"""--group""", _fixture_mcast_GRP_arg,
 	"""--message""", """'test message'"""
 ]
 try:
@@ -163,6 +174,8 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 
 `-1` is used to mean *many* of unspecified length and otherwise functions as `1`
 
+* these values loosely map to the principle of _none-one-many_, 0 is none, 1 is, unsurprisingly, one, and everything else is many. From this practice it is possible to infer how to handle the result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-values)` ).
+
 #### CLI exit code meanings
 
 `0` *success*
@@ -171,12 +184,9 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 
 `2 >` *failure* of specific reason
 
+* Any exit value outside the range of `0-255` inclusive should be decoded with the formula: `| input % 256 |` which will yield the correct exit code.
 
-#### Everything Else
-_(extra exit code meanings)_
-
-Other codes (such as `126`) may or may not have meanings (such as skip) but are not handled within the scope of the Multicast Project at this time.
-
+* These are inline with [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)'s POSIX-based guidelines.
 
 ***
 #### Copyright (c) 2021-2024, Mr. Walls
