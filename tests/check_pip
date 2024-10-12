@@ -101,15 +101,36 @@ umask 137
 export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
 # set remaining variables
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
-# fail fast if missing something
-test -x $(command -v grep) || exit 126 ;
-test -x $(command -v python3) || exit 126 ;
-test -x $(command -v git) || exit 126 ;
-test -x $(command -v pip) || exit 126 ;
-test -x $(command -v pip-audit) || exit 126 ;  # optional tool
-test -x $(command -v pip-licenses) || exit 126 ;
+
+# Function to check if a command exists.
+
+# USAGE:
+#	~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#	exits 64 -- missing required argument
+#	exits 126 -- check complete and has failed, can not find given command.
+#	returns successful -- check complete and command found to be executable.
+function check_command() {
+	test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
+	local cmd="$1" ;
+	test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+
+# Check required commands
+check_command grep ;
+check_command python3 ;
+check_command git ;
+check_command tee ;
+check_command pip ;
+# check_command pip-audit ; # optional
+check_command pip-license ;
+# CEP-5 locking
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
-test -x "$(command -v shlock)" || exit 126 ;
+check_command shlock ;
 
 # Set default exitcode to failure until sure we won't need to abort
 EXIT_CODE=1

@@ -67,12 +67,31 @@ umask 137
 LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
 EXIT_CODE=1
 
-test -x $(command -v grep) || exit 126 ;
-test -x $(command -v curl) || exit 126 ;
-test -x $(command -v find) || exit 126 ;
-test -x $(command -v git) || exit 126 ;
+# Function to check if a command exists.
+
+# USAGE:
+#  ~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#    exits 64 -- missing required argument
+#    exits 126 -- check complete and has failed, can not find given command.
+#    returns successful -- check complete and command found to be executable.
+function check_command() {
+    test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
+    local cmd="$1" ;
+    test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+
+# Check required commands
+check_command grep ;
+check_command curl ;
+check_command find ;
+check_command git ;
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
-test -x "$(command -v shlock)" || exit 126 ;
+check_command shlock ;
 
 
 function cleanup() {
