@@ -20,11 +20,18 @@ jobs:
       - name: Install Apt-Get Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y yamllint checkmake
+          sudo apt-get install -y yamllint golang-go
+          go version
       - name: Lint Workflow YAML
         run: |
           yamllint -f github --no-warnings .github/workflows/makefile-lint.yml
-
+      - name: Install Apt-Get Dependencies
+        if: ${{ success() }}
+        run: |
+          git clone https://github.com/mrtazz/checkmake
+          cd checkmake
+          make
+          cd ..
       - name: Get makefiles Files
         id: makefiles
         shell: bash
