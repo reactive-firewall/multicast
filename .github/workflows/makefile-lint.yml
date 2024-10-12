@@ -1,0 +1,55 @@
+# .github/workflows/makefile-lint.yml
+---
+name: Markefile Lint
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main", "master", "stable", feature*]
+  pull_request:
+    branches: ["main", "master", "stable"]
+
+permissions: {}  # Setting default permissions to none for enhanced security
+
+jobs:
+  makefile-lint:
+    permissions:
+      contents: read
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Apt-Get Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yamllint checkmake
+      - name: Lint Workflow YAML
+        run: |
+          yamllint -f github --no-warnings .github/workflows/makefile-lint.yml
+
+      - name: Get makefiles Files
+        id: makefiles
+        shell: bash
+        run: |
+          FILES=$(git ls-files --exclude-standard -- Makefile 2>/dev/null)
+          if [ -z "$FILES" ]; then
+            printf "%s\n" "No Makefiles found."
+            printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
+          else
+            printf "%s\n" "Makefiles found:"
+            printf "%s\n" "$FILES"
+            # Replace line breaks with spaces for tools
+            FILES="${FILES//$'\n'/ }"
+            printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
+          fi
+        if: ${{ success() }}
+      - name: Lint Makefiles Files
+        if: ${{ !cancelled() }}
+        run: |
+          FILE="${{ steps.makefiles.outputs.files }}" ;
+          printf "::group::%s\n" "${FILE}" ;
+          {\
+          { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' | cut -d: -f 3-5 ;} 2>/dev/null |\
+          grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
+          xargs -L1 -I{} printf "::warning:%s:0: Checkmake linter complained. See https://github.com/reactive-firewall/multicast/actions/runs/${{ github.run_id }}\n" ;} ;
+          wait ;
+          printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
+        if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
