@@ -148,7 +148,7 @@ handle_signals
 # Set pip-audit options
 AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
 # List of Allowed Licenses delimited by semicolon ;
-ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License"
+ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;Unlicense;"
 # Set pip-licenses options
 LICENSE_OPTIONS="--from=mixed"
 
