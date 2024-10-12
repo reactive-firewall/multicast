@@ -188,6 +188,29 @@ From the [documentation](https://github.com/reactive-firewall/multicast/blob/v1.
 
 * These are inline with [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)'s POSIX-based guidelines.
 
+
+### How do I build the documentation?
+
+* Typicly the documentation will be automatically build by CI/CD and posted to the official
+  documentation site.
+
+* However if one still wishes to manually build the documentation, there is a make target for this:
+
+  ```bash
+  make build-docs
+  ```
+
+### Building Documentation with a Custom Git Reference
+
+  By default, the documentation links to the `stable` branch on GitHub. To override this and link to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
+
+  ```bash
+  export DOCS_BUILD_REF=$(${GIT:-git} rev-parse --verify HEAD)
+  make build-docs  # or your own documentation build command
+  ```
+
+  This command dynamically sets `DOCS_BUILD_REF` to the current Git commit hash, ensuring that documentation links point to the exact version of your code.
+
 ***
 #### Copyright (c) 2021-2024, Mr. Walls
 [MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

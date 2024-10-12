@@ -97,6 +97,7 @@ jobs:
       LANG: en_US.UTF-8
       LC_CTYPE: en_US.UTF-8
       SHELL: /bin/bash
+      # DOCS_BUILD_REF: {{ .Environment.CIRCLE_SHA1 }}
     working_directory: ~/multicast
     steps:
       - restore_cache:
