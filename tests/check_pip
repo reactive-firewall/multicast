@@ -127,7 +127,7 @@ check_command git ;
 check_command tee ;
 check_command pip ;
 # check_command pip-audit ; # optional
-check_command pip-license ;
+check_command pip-licenses ;
 # CEP-5 locking
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 check_command shlock ;
