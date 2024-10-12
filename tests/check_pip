@@ -161,17 +161,19 @@ fi
 # lazy defined functions should be defined now that this is the only script instance.
 
 function report_summary() {
+	printf "::group::%s\n" "Results" ;
 	# Improved reporting based on EXIT_CODE
 	case "${EXIT_CODE}" in
-		0) printf "%s\n" "OK: Found no detected requirements errors." ;;
-		1) printf "%s\n" "FAIL: General failure during script execution." >&2 ;;
-		3) printf "%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
-		4) printf "%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
-		5) printf "%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
-		6) printf "%s\n" "FAIL: pip install failed." >&2 ;;
-		126) printf "%s\n" "SKIP: Unable to continue script execution." >&2 ;;
-		*) printf "%s\n" "FAIL: Detected requirements errors." >&2 ;;
+		0) printf "::notice title=OK::%s\n" "OK: Found no detected requirements errors." ;;
+		1) printf "::error file=check_pip,title=CHECK-PIP::%s\n" "FAIL: General failure during script execution." >&2 ;;
+		3) printf "::error file=check_pip,title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
+		4) printf "::error file=check_pip,title=SECURITY::%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
+		5) printf "::error file=check_pip,title=LICENSE::%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
+		6) printf "::error file=check_pip,title=INSTALL::%s\n" "FAIL: pip install failed." >&2 ;;
+		126) printf "::warning file=check_pip,title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
+		*) printf "::error file=check_pip,title=FAILED::%s\n" "FAIL: Detected requirements errors." >&2 ;;
 	esac
+	printf "::endgroup::\n" ;
 }
 
 function navigate_dirs_by_git() {
@@ -179,8 +181,9 @@ function navigate_dirs_by_git() {
 		if [ -z "${_TEST_ROOT_DIR}" ]; then
 			_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 		fi
+		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 	else
-		printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+		printf "::error title=MIA::%s\n" "FAIL: missing valid repository or source structure" >&2
 		EXIT_CODE=40
 	fi
 }
@@ -189,34 +192,37 @@ function navigate_dirs_by_git() {
 _TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
 navigate_dirs_by_git
 
+printf "::debug::%s\n" "Reading from repository ${_TEST_ROOT_DIR} ..." ;
 # Get a list of files to check using git ls-tree with filtering (and careful shell globing)
 FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/**/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null || EXIT_CODE=3)
 
 # THIS IS THE ACTUAL TEST
+printf "::debug::%s\n" "Starting checks ..." ;
 # Iterate over files and run checks
 for req_file in $FILES_TO_CHECK; do
-	printf "\t%s\n" "Checking ${req_file}" ;
+	printf "::group::%s\n" "Checking ${req_file}" ;
 	if [[ ( -x $(command -v pip-audit) ) ]] && [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-		printf "\t\t%s\n" "Auditing ${req_file} for security vulnerabilities..."
+		printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities..."
 		{ pip-audit $AUDIT_OPTIONS "${req_file}" || EXIT_CODE=4 ;} ; wait ;
 	fi ;
 	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-		printf "\t\t%s\n" "Checking licenses in $req_file..." ;
+		printf "::debug::%s\n" "Checking licenses in $req_file..." ;
 		if [[ ( $(pip install -r "$req_file" --quiet 2>&1 >/dev/null || false) ) ]] ; then
 			{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || EXIT_CODE=5 ;} ; wait ;
 		else
 			[[ ("${EXIT_CODE}" -eq 0) ]] && EXIT_CODE=6
-			printf "\t%s\n" "FAIL: pip install failed for $req_file." >&2
+			printf "::warning file=${req_file},line=1,title=PIP::%s\n" "pip install failed for $req_file." >&2
 		fi
 	else
-		printf "\t%s\n" "FAIL: Found requirements errors." >&2 ;
+		printf "::error title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
 	fi
+	printf "::endgroup::\n" ;
 done
 
-# summary reporting
+printf "::debug::%s\n" "Summary reporting ..." ;
 report_summary
 
-# cleaning up
+printf "::debug::%s\n" "Cleaning up ..." ;
 cleanup || rm -f ${LOCK_FILE} 2>/dev/null || : ;
 
 # unset when done
@@ -226,5 +232,6 @@ unset ALLOW_LICENSES 2>/dev/null || : ;
 unset LICENSE_OPTIONS 2>/dev/null || : ;
 
 wait ;
+printf "::debug::%s\n" "All done." ;
 # Exit with the appropriate code
 exit ${EXIT_CODE:-255} ;
