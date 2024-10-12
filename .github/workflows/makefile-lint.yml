@@ -42,7 +42,6 @@ jobs:
           fi
         if: ${{ success() }}
       - name: Lint Makefiles Files
-        if: ${{ !cancelled() }}
         run: |
           FILE="${{ steps.makefiles.outputs.files }}" ;
           printf "::group::%s\n" "${FILE}" ;
