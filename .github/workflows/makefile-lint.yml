@@ -1,6 +1,6 @@
 # .github/workflows/makefile-lint.yml
 ---
-name: Markefile Lint
+name: Makefile Lint
 on:  # yamllint disable-line rule:truthy
   push:
     branches: ["main", "master", "stable", feature*]
