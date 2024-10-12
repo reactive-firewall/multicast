@@ -1,0 +1,50 @@
+# .github/workflows/markdown-lint.yml
+---
+name: Markdown Lint
+on:
+  push:
+    branches: ["main", "master", draft, draft*]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions: {}  # Setting default permissions to none for enhanced security
+
+jobs:
+  markdown-lint:
+    permissions:
+      contents: read
+      statuses: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Apt-Get Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yamllint npm
+
+      - name: Lint Workflow YAML
+        run: |
+          yamllint -f github --no-warnings .github/workflows/markdown-lint.yml
+
+      - name: Install NPM Dependencies
+        run: |
+          sudo npm install -g markdownlint
+          sudo npm install -g markdownlint-cli
+
+      - name: Lint YAML config for markdown
+        run: |
+          yamllint -f github --no-warnings .markdownlint.yaml
+
+      - name: Lint Markdown Files with YAML config
+        if: ${{ !cancelled() }}
+        run: |
+          git ls-files --exclude-standard -z -- *.md **/*.md |\
+          xargs -0 -I{} markdownlint "{}" --config .markdownlint.yaml ;
+
+      - name: Lint Markdown Files with JSON config
+        if: ${{ !cancelled() }}
+        run: |
+          git ls-files --exclude-standard -z -- *.md **/*.md |\
+          xargs -0 -I{} markdownlint "{}" --config .markdownlint.json ;
