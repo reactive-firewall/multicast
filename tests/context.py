@@ -105,6 +105,17 @@ except ImportError as err:  # pragma: no branch
 
 
 try:
+	if 'packaging' not in sys.modules:
+		import packaging
+		from packaging import version
+	else:  # pragma: no branch
+		packaging = sys.modules["""packaging"""]
+		from packaging import version
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from err
+
+
+try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
@@ -856,27 +867,31 @@ class BasicUsageTestSuite(unittest.TestCase):
 			self.skipTest(str("""No python cmd to test with!"""))
 		self._the_test_port = self._always_generate_random_port_WHEN_called()
 
-	def _get_package_version(self):
+	def _should_get_package_version_WHEN_valid(self):
 		"""
 		Retrieve the current version of the package.
 
 		This helper method imports the package and extracts the __version__ attribute.
 
 		Returns:
-			str: The version string of the package.
+			version -- The version string of the package.
 
 		Raises:
-			AssertionError: If the version string cannot be retrieved.
+			AssertionError -- If the version string cannot be retrieved.
 
 		"""
 		try:
-			self.assertIsNotNone(multicast.__module__)
-			self.assertIsNotNone(multicast.__version__)
-			mcast_version = multicast.__version__
-			self.assertIsInstance(mcast_version, str, """Version is not a string.""")
+			self.assertIsNotNone(multicast.__module__, """Version will be efectivly None.""")
+			self.assertIsNotNone(multicast.__version__, """Version is not valid.""")
+			_raw_version_fixture = multicast.__version__
+			self.assertIsInstance(_raw_version_fixture, str, """Version is not a string.""")
+			# Strip custom tags
+			# stuff like: mcast_version = mcast_version.replace("-hotfix", "").replace("-hf", "")
 			# Refactor alpha/beta tags
-			mcast_version = mcast_version.replace("-alpha", "a0").replace("-beta", "b0")
-			return mcast_version
+			parsed_version = version.parse(_raw_version_fixture)
+			self.assertIsNotNone(parsed_version, """Version is not valid.""")
+			self.assertIsInstance(parsed_version, version, """Version is not valid.""")
+			return parsed_version
 		except ImportError:
 			self.fail("""Failed to import the multicast package to retrieve version.""")
 
