@@ -556,7 +556,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       LC_CTYPE: "en_US.utf-8"
-      DOCS_BUILD_REF: ${{ env.DOCS_BUILD_REF }}
+      DOCS_BUILD_REF: ${{ github.sha }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
