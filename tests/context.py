@@ -890,7 +890,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			# Refactor alpha/beta tags
 			parsed_version = version.parse(_raw_version_fixture)
 			self.assertIsNotNone(parsed_version, """Version is not valid.""")
-			self.assertIsInstance(parsed_version, version, """Version is not valid.""")
+			self.assertIsInstance(parsed_version, version.Version, """Version is not valid.""")
 			return parsed_version
 		except ImportError:
 			self.fail("""Failed to import the multicast package to retrieve version.""")
