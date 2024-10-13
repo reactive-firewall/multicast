@@ -28,6 +28,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install checkmake
         if: ${{ success() }}
+        env:
+          BUILDER_Name: "ci"
+          BUILDER_EMAIL: "no-reply@localhost"
         run: |
           git clone https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
