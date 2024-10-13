@@ -25,10 +25,11 @@ jobs:
       - name: Lint Workflow YAML
         run: |
           yamllint -f github --no-warnings .github/workflows/makefile-lint.yml
-      - name: Install Apt-Get Dependencies
+      - uses: actions/checkout@v4
+      - name: Install checkmake
         if: ${{ success() }}
         run: |
-          git clone https://github.com/mrtazz/checkmake
+          git clone https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
           make
           cd ..
