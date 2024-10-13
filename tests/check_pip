@@ -145,10 +145,12 @@ handle_signals
 
 # lazy defined variables should be defined now that this is the only script instance.
 
+# set the script-file to check_pip
+SCRIPT_FILE="tests/check_pip"
 # Set pip-audit options
 AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
 # List of Allowed Licenses delimited by semicolon ;
-ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;Unlicense;"
+ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;"
 # Set pip-licenses options
 LICENSE_OPTIONS="--from=mixed"
 
@@ -165,13 +167,13 @@ function report_summary() {
 	# Improved reporting based on EXIT_CODE
 	case "${EXIT_CODE}" in
 		0) printf "::notice title=OK::%s\n" "OK: Found no detected requirements errors." ;;
-		1) printf "::error file=check_pip,title=CHECK-PIP::%s\n" "FAIL: General failure during script execution." >&2 ;;
-		3) printf "::error file=check_pip,title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
-		4) printf "::error file=check_pip,title=SECURITY::%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
-		5) printf "::error file=check_pip,title=LICENSE::%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
-		6) printf "::error file=check_pip,title=INSTALL::%s\n" "FAIL: pip install failed." >&2 ;;
-		126) printf "::warning file=check_pip,title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
-		*) printf "::error file=check_pip,title=FAILED::%s\n" "FAIL: Detected requirements errors." >&2 ;;
+		1) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CHECK-PIP::%s\n" "FAIL: General failure during script execution." >&2 ;;
+		3) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
+		4) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SECURITY::%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
+		5) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=LICENSE::%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
+		6) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=INSTALL::%s\n" "FAIL: pip install failed." >&2 ;;
+		126) printf "::warning file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
+		*) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=FAILED::%s\n" "FAIL: Detected requirements errors." >&2 ;;
 	esac
 	printf "::endgroup::\n" ;
 }
@@ -183,7 +185,7 @@ function navigate_dirs_by_git() {
 		fi
 		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 	else
-		printf "::error title=MIA::%s\n" "FAIL: missing valid repository or source structure" >&2
+		printf "::error file=file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
 		EXIT_CODE=40
 	fi
 }
@@ -202,19 +204,19 @@ printf "::debug::%s\n" "Starting checks ..." ;
 for req_file in $FILES_TO_CHECK; do
 	printf "::group::%s\n" "Checking ${req_file}" ;
 	if [[ ( -x $(command -v pip-audit) ) ]] && [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-		printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities..."
+		printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities ..."
 		{ pip-audit $AUDIT_OPTIONS "${req_file}" || EXIT_CODE=4 ;} ; wait ;
 	fi ;
 	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-		printf "::debug::%s\n" "Checking licenses in $req_file..." ;
+		printf "::debug::%s\n" "Checking licenses in $req_file ..." ;
 		if [[ ( $(pip install -r "$req_file" --quiet 2>&1 >/dev/null || false) ) ]] ; then
 			{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || EXIT_CODE=5 ;} ; wait ;
 		else
-			[[ ("${EXIT_CODE}" -eq 0) ]] && EXIT_CODE=6
-			printf "::warning file=${req_file},line=1,title=PIP::%s\n" "pip install failed for $req_file." >&2
+			[[ ("${EXIT_CODE}" -eq 0) ]] && EXIT_CODE=6 && \
+			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "pip install failed for $req_file." >&2
 		fi
 	else
-		printf "::error title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
+		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
 	fi
 	printf "::endgroup::\n" ;
 done
@@ -232,6 +234,6 @@ unset ALLOW_LICENSES 2>/dev/null || : ;
 unset LICENSE_OPTIONS 2>/dev/null || : ;
 
 wait ;
-printf "::debug::%s\n" "All done." ;
+printf "::debug::%s\n" "Check-pip done." ;
 # Exit with the appropriate code
 exit ${EXIT_CODE:-255} ;
