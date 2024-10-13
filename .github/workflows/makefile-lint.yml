@@ -29,7 +29,7 @@ jobs:
       - name: Install checkmake
         if: ${{ success() }}
         env:
-          BUILDER_Name: "ci"
+          BUILDER_NAME: "ci"
           BUILDER_EMAIL: "no-reply@localhost"
         run: |
           git clone https://github.com/mrtazz/checkmake.git checkmake
