@@ -60,8 +60,7 @@ jobs:
           { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' |\
           cut -d: -f 3-5 ;} 2>/dev/null |\
           grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
-          xargs -L1 -I{} printf "::warning file=${FILE},title=LINT::%s\n" {}\
-          ;} ;
+          xargs -L1 printf "::warning file=${FILE},title=LINT::%s\n" ;}
           wait ;
           printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
         if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
