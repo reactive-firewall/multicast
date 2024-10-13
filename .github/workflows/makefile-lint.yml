@@ -20,7 +20,7 @@ jobs:
       - name: Install Apt-Get Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y yamllint golang-go
+          sudo apt-get install -y yamllint golang-go pandoc
           go version
       - name: Lint Workflow YAML
         run: |
