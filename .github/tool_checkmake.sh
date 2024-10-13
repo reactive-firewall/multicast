@@ -62,7 +62,15 @@
 #
 # .github/tool_checkmake.sh
 FILE="${1}" ;
-EMSG="Checkmate linter complained.";
+EMSG="Checkmake linter complained.";
+
+# Check if file exists
+if [[ !( -f "${FILE}" ) ]]; then
+    printf "%s\n" "::error file=${FILE},title=MISSING:: File '${FILE}' not found." >&2
+    exit 1
+fi
+
+# Main functionality
 { { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' |\
 cut -d: -f 3-5 ;} 2>/dev/null |\
 grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
