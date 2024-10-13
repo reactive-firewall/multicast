@@ -53,9 +53,11 @@ jobs:
           FILE="${{ steps.makefiles.outputs.files }}" ;
           printf "::group::%s\n" "${FILE}" ;
           {\
-          { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' | cut -d: -f 3-5 ;} 2>/dev/null |\
+          { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' |\
+          cut -d: -f 3-5 ;} 2>/dev/null |\
           grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
-          xargs -L1 -I{} printf "::warning:%s:0: Checkmake linter complained. See https://github.com/reactive-firewall/multicast/actions/runs/${{ github.run_id }}\n" ;} ;
+          xargs -L1 -I{} printf "::warning file=${FILE},title=LINT::%s\n" {}\
+          ;} ;
           wait ;
           printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
         if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
