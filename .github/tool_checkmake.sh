@@ -66,5 +66,5 @@ EMSG="Checkmate linter complained.";
 { { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' |\
 cut -d: -f 3-5 ;} 2>/dev/null |\
 grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
-xargs -L1 -I{} printf "::warning file=${FILE},title=LINT::%s ${EMSG}\n" {} ;}
+xargs -I{} printf "::warning file=${FILE},title=LINT::%s ${EMSG}\n" {} >&2 ;}
 wait ;
