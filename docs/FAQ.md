@@ -50,13 +50,13 @@ messages, no more than one at a time.
 
 > [!IMPORTANT]
 > Caveat: `RECV` is much more useful if actually used in a loop like:
-> 
-> ```bash
-> # cd /MY-AWESOME-DEV-PATH
-> while true ; do  # until user Ctrl+C interrupts
->     python3 -m multicast RECV --use-std --port 59595 --group 224.0.0.1 --groups 224.0.0.1
-> done
-> ```
+
+```bash
+# cd /MY-AWESOME-DEV-PATH
+while true ; do  # until user Ctrl+C interrupts
+    python3 -m multicast RECV --use-std --port 59595 --group 224.0.0.1 --groups 224.0.0.1
+done
+```
 
 ### How do I use this to send UDP Multicast?
 
@@ -203,8 +203,8 @@ instead of `None` to indicate exit code `1` by returning a `boolean` success val
 `-1` is used to mean _many_ of unspecified length and otherwise functions as `1`
 
 * these values loosely map to the principle of _none-one-many_, 0 is none, 1 is, unsurprisingly,
-one, and everything else is many. From this practice it is possible to infer how to handle the
-result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-values)` ).
+  one, and everything else is many. From this practice it is possible to infer how to handle the
+  result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-values)` ).
 
 #### CLI exit code meanings
 
@@ -215,7 +215,7 @@ result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-va
 `2 <` **failure** of specific reason
 
 * Any exit value outside the range of `0-255` inclusive should be decoded with the formula:
-`| input % 256 |` which will yield the correct exit code.
+  `| input % 256 |` which will yield the correct exit code.
 
 > [!NOTE]
 > These are inline with

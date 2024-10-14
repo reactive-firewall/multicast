@@ -27,6 +27,7 @@
 ### Step 4: Sending Messages
 
 * Send a message using:
+
   ```shell
   python3 -m multicast SAY --group 224.1.1.2 --port 59595 --message "Hello, Multicast!"
   ```
@@ -34,6 +35,7 @@
 ### Step 5: Receiving Messages
 
 * Receive messages by running:
+
   ```shell
   python3 -m multicast RECV --use-std --port 59595 --groups 224.1.1.2
   ```

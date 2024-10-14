@@ -83,22 +83,22 @@ gitGraph;
 
 > [!TIP]
 > In a rush to get this module working? Then try using this in your own test workflow
-> 
-> ```bash
-> #cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
-> make clean ; # cleans up from any previous tests hopefully
-> make test ; # runs the tests
-> make clean ; # cleans up for next test
-> ```
+
+```bash
+#cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
+make clean ; # cleans up from any previous tests hopefully
+make test ; # runs the tests
+make clean ; # cleans up for next test
+```
 
 > [!TIP]
 > Use PEP8 to check python code style? Great! Try this:
-> 
-> ```bash
-> make clean ; # cleans up from any previous tests hopefully
-> make test-style ; # runs the project's tests for style
-> make clean ; # cleans up for next test
-> ```
+
+```bash
+make clean ; # cleans up from any previous tests hopefully
+make test-style ; # runs the project's tests for style
+make clean ; # cleans up for next test
+```
 
 ***
 
