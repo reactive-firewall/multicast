@@ -102,7 +102,7 @@ def inputHandler():
         groups=[_fixture_mcast_GRP_arg], port=_fixture_PORT_arg,
         iface=None, group=_fixture_host_BIND_arg
     )
-    if disWork:
+    if didWork:
         out_string += buffer_string
     return out_string
 
