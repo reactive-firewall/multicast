@@ -187,11 +187,14 @@ From the
 #### Default Port
 
 > [!IMPORTANT]
-> The **default** multicast destination port is `59595`.
+> The **default** UDP port used by `multicast` is `59595`.
 
 From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
+
+* For `SAY` the port refers to the destination port.
+* for `RECV` and `HEAR` the port refers to the port to listen on.
 
 > [!CAUTION]
 > It is best to specify the port in use at this time as the default has yet to be properly
