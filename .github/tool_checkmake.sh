@@ -65,7 +65,7 @@ FILE="${1}" ;
 EMSG="Checkmake linter complained.";
 
 # Check if file exists
-if [[ !( -f "${FILE}" ) ]]; then
+if [[ ! ( -f "${FILE}" ) ]]; then
     printf "%s\n" "::error file=${FILE},title=MISSING:: File '${FILE}' not found." >&2
     exit 1
 fi

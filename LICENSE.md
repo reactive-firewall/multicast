@@ -90,7 +90,7 @@ The Code of Conduct is adapted from the
 available at
 [http://contributor-covenant.org/version/1/4](http://contributor-covenant.org/version/1/4/)
 Copyright (c) 2014 by Coraline Ada Ehmke.
-which was under BSD-2 Clause license.
+which was under CC BY 4.0 license.
 See
 [CC BY 4.0 License](https://github.com/EthicalSource/contributor_covenant/blob/release/LICENSE.md)
 for details.
