@@ -18,6 +18,7 @@ Continuous integration testing is handled by GitHub Actions and the generous Cir
 > and can be reset before and after with: `make clean` and `make purge`
 
 You can find all the testing code in the aptly named `tests/` directory.
+
 * Unit-testing is primarily done with the `unittest` framework.
 * Functional testing is done via additional checks, including an end-to-end check invoking an
   actual pair of processes to test that `SAY` and `HEAR` indeed work together.
@@ -82,7 +83,6 @@ gitGraph;
 
 > [!TIP]
 > In a rush to get this module working? Then try using this in your own test workflow
->
 > ```bash
 > #cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
 > make clean ; # cleans up from any previous tests hopefully
@@ -92,7 +92,6 @@ gitGraph;
 
 > [!TIP]
 > Use PEP8 to check python code style? Great! Try this:
->
 > ```bash
 > make clean ; # cleans up from any previous tests hopefully
 > make test-style ; # runs the project's tests for style
