@@ -1,6 +1,7 @@
 # CI
 
 ## Service providers
+
 ***
 
 Continuous integration testing is handled by GitHub Actions and the generous CircleCI service.
@@ -8,20 +9,34 @@ Continuous integration testing is handled by GitHub Actions and the generous Cir
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/workflow/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/workflow/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
 [![DeepSource](https://app.deepsource.com/gh/reactive-firewall/multicast.svg/?label=active+issues&show_trend=true&token=SZUDMH7AtX399xLmONFAkiD6)](https://app.deepsource.com/gh/reactive-firewall/multicast/)
 
+## Testing
 
-## MATs
 ***
 
+> [!IMPORTANT]
+> Testing is initiated with the bash command: `make test-pytest` or just `make test`
+> and can be reset before and after with: `make clean` and `make purge`
+
+You can find all the testing code in the aptly named `tests/` directory.
+* Unit-testing is primarily done with the `unittest` framework.
+* Functional testing is done via additional checks, including an end-to-end check invoking an
+  actual pair of processes to test that `SAY` and `HEAR` indeed work together.
+
+### MATs
+
 Minimal acceptance testing is run across multiple versions of Python to ensure stable behavior
-across a wide range of environments. Feature development and non-security related bug fixes are
-done on development branches and then merged into the
+across a wide range of environments. MATs are also automated as part of the CI proceses, and run
+for each push to the repository.
+Feature development and non-security related bug fixes are done on development branches and
+then merged into the
 [default branch (master)](https://github.com/reactive-firewall/multicast/blob/master/) for further
-integration testing. This ensures the [stable](https://github.com/reactive-firewall/multicast/blob/stable/)
-branch remains acceptable for production use.
+integration testing. This ensures the
+[release brnach (stable)](https://github.com/reactive-firewall/multicast/blob/stable/) remains
+acceptable for production use.
 
 ```mermaid
 %%{init: { 'gitGraph': {'mainBranchName': 'master'}} }%%
-gitGraph
+gitGraph;
   commit id: "start"
   branch master
   checkout master
@@ -63,37 +78,29 @@ gitGraph
   commit id: "yet another small improvement"
 ```
 
+### As a Dependency, Testing
 
-## Testing
-***
+> [!TIP]
+> In a rush to get this module working? Then try using this in your own test workflow
+>
+> ```bash
+> #cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
+> make clean ; # cleans up from any previous tests hopefully
+> make test ; # runs the tests
+> make clean ; # cleans up for next test
+> ```
 
-You can find all the testing code in the aptly named `tests/` directory.
-* Unit-testing is primarily done with the `unittest` framework.
-* Functional testing is done via additional checks, including an end-to-end check invoking an
-  actual pair of processes to test that `SAY` and `RECV` indeed work together.
-
-
-## Dev Dependency Testing
-***
-
-### In a rush to get this module working? Then try using this in your own test workflow
-
-```bash
-#cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
-make clean ; # cleans up from any previous tests hopefully
-make test ; # runs the tests
-make clean ; # cleans up for next test
-```
-
-#### Use PEP8 to check python code style? Great! Try this
-
-```bash
-make clean ; # cleans up from any previous tests hopefully
-make test-style ; # runs the tests for style
-make clean ; # cleans up for next test
-```
-
+> [!TIP]
+> Use PEP8 to check python code style? Great! Try this:
+>
+> ```bash
+> make clean ; # cleans up from any previous tests hopefully
+> make test-style ; # runs the project's tests for style
+> make clean ; # cleans up for next test
+> ```
 
 ***
+
 #### Copyright (c) 2021-2024, Mr. Walls
+
 [MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
