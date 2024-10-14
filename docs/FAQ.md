@@ -150,16 +150,16 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 ### What are the defaults?
 
 > [!IMPOTRANT]
-> The **default** multicast group address is `224.0.0.1`
+> The **default** multicast group address is `224.0.0.1`.
 
 From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
 > The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
 > on the rational that this group address will be treated as a local-net multicast
-> (caveat: one should use link-local for ipv6)
+> (caveat: one should use link-local for ipv6).
 
 > [!IMPORTANT]
-> The **default** multicast Time-to-Live (TTL) is `1`
+> The **default** multicast Time-to-Live (TTL) is `1`.
 
 From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
 > ... If the
@@ -176,7 +176,7 @@ From the
 > of none, one or many.
 
 > [!IMPORTANT]
-> The **default** multicast destination port is `59595`
+> The **default** multicast destination port is `59595`.
 
 From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):

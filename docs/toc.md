@@ -1,4 +1,4 @@
-# Welcome to Multicast's documentation!
+# Welcome to Multicast's documentation
 
 ## Quickstart
 
@@ -20,6 +20,7 @@
 ### Step 3: Install the Package
 
 * Run:
+
   ```shell
   make install
   ```
