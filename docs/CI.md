@@ -26,13 +26,13 @@ You can find all the testing code in the aptly named `tests/` directory.
 ### MATs
 
 Minimal acceptance testing is run across multiple versions of Python to ensure stable behavior
-across a wide range of environments. MATs are also automated as part of the CI proceses, and run
+across a wide range of environments. MATs are also automated as part of the CI processes, and run
 for each push to the repository.
 Feature development and non-security related bug fixes are done on development branches and
 then merged into the
 [default branch (master)](https://github.com/reactive-firewall/multicast/blob/master/) for further
 integration testing. This ensures the
-[release brnach (stable)](https://github.com/reactive-firewall/multicast/blob/stable/) remains
+[release branch (stable)](https://github.com/reactive-firewall/multicast/blob/stable/) remains
 acceptable for production use.
 
 ```mermaid

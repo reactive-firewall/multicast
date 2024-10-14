@@ -44,8 +44,8 @@ If all went well, `multicast` is now installed and working :tada:
 python3 -m multicast --daemon HEAR --use-std --port 59595 --group 224.0.0.1
 ```
 
-Most users will want to stick to using `HEAR` when reciving multicast from the CLI. Alternitively,
-users can use `RECV` _(by ommiting the `--daemon` flag)_ to recieve individual UDP
+Most users will want to stick to using `HEAR` when receiving multicast from the CLI. Alternatively,
+users can use `RECV` _(by omitting the `--daemon` flag)_ to receive individual UDP
 messages, no more than one at a time.
 
 > [!IMPORTANT]
