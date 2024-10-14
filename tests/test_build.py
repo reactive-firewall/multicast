@@ -63,18 +63,16 @@ class TestPEP517Build(BasicUsageTestSuite):
 		self.assertIn(str("""Successfully built"""), str(theBuildtxt))
 		# Verify that the dist directory contains the expected files
 		dist_dir = os.path.join(os.getcwd(), 'dist')
-		version = self._get_package_version()
+		pkg_version = str(self._should_get_package_version_WHEN_valid())
 		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		expected_files = [
-			f"multicast-{version}.tar.gz",
-			f"multicast-{version}-py3-none-any.whl",
+			f"multicast-{pkg_version}.tar.gz",
+			f"multicast-{pkg_version}-py3-none-any.whl",
 		]
 		for expected_file in expected_files:
 			self.assertIn(
 				expected_file, dist_files,
-				str('Missing {expected} in dist directory. Looking for version {version}').format(
-					expected=expected_file, version=version
-				)
+				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}"
 			)
 
 
