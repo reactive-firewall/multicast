@@ -149,6 +149,8 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 
 ### What are the defaults?
 
+#### Default Multicast Group
+
 > [!IMPOTRANT]
 > The **default** multicast group address is `224.0.0.1`.
 
@@ -157,6 +159,13 @@ From the
 > The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
 > on the rational that this group address will be treated as a local-net multicast
 > (caveat: one should use link-local for ipv6).
+
+#### Default Multicast Bind Address
+
+> [!NOTE]
+> The **default** multicast bind address is the **default** group. This is efectivly `224.0.0.1`.
+
+#### Default TTL
 
 > [!IMPORTANT]
 > The **default** multicast Time-to-Live (TTL) is `1`.
@@ -174,6 +183,8 @@ From the
 > explicit value that could traverse beyond the local connected network should be
 > chosen by the caller rather than the default value. This is in line with the principle
 > of none, one or many.
+
+#### Default Port
 
 > [!IMPORTANT]
 > The **default** multicast destination port is `59595`.
