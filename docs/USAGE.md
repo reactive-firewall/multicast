@@ -14,48 +14,48 @@ from multiprocessing import Process
 _fixture_PORT_arg = int(59595)
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_IFACE_arg = NONE # Assuming this variable needs an initial value
+_fixture_host_IFACE_arg = None # Initial value representing no specific interface
 _fixture_HEAR_args = [
-	"--port", _fixture_PORT_arg,
-	"--groups", _fixture_mcast_GRP_arg,
-	"--group", _fixture_mcast_GRP_arg
+    "--port", _fixture_PORT_arg,
+    "--groups", _fixture_mcast_GRP_arg,
+    "--group", _fixture_mcast_GRP_arg
 ]
 
 # spawn a listening proc
 
 def print_loop_stub(func, iterations=5):
-	"""
-	Execute and print the result of a function multiple times.
+    """
+    Execute and print the result of a function multiple times.
 
-	Args:
-		func (callable): The function to be executed.
-		iterations (int, optional): Number of times to execute the function. Defaults to 5.
-	"""
-	for _ in range(iterations):
-		print(str(func()))
+    Args:
+        func (callable): The function to be executed.
+        iterations (int, optional): Number of times to execute the function. Defaults to 5.
+    """
+    for _ in range(iterations):
+        print(str(func()))
 
 @print_loop_stub
 def inputHandle():
-	test_RCEV = multicast.recv.McastRECV()
-	buffer_string = str("""""")
-	(didWork, result) = test_RCEV.doStep(
-		groups=[_fixture_mcast_GRP_arg],
-		port=_fixture_PORT_arg,
-		iface=None,
-		group=_fixture_host_BIND_arg,
-	)
-	if didWork:
-		buffer_string += result
-	return buffer_string
+    test_RCEV = multicast.recv.McastRECV()
+    buffer_string = str("""""")
+    (didWork, result) = test_RCEV.doStep(
+        groups=[_fixture_mcast_GRP_arg],
+        port=_fixture_PORT_arg,
+        iface=None,
+        group=_fixture_host_BIND_arg,
+    )
+    if didWork:
+        buffer_string += result
+    return buffer_string
 
 inputHandle()
 
 # alternatively
 
 p = Process(
-				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
-			)
+    target=multicast.__main__.McastDispatch().doStep,
+    name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
+)
 p.start()
 
 # ... probably will return with nothing outside a handler function in a loop
@@ -68,16 +68,16 @@ _and elsewhere (like another function or even module) for the sender:_
 # assuming already did 'import multicast'
 
 _fixture_SAY_args = [
-	"""--port""", _fixture_PORT_arg,
-	"""--group""", _fixture_mcast_GRP_arg,
-	"""--message""", """'test message'"""
+    """--port""", _fixture_PORT_arg,
+    """--group""", _fixture_mcast_GRP_arg,
+    """--message""", """'test message'"""
 ]
 try:
-	multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-	# Hint: use a loop to repeat or different arguments to vary message.
+    multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+    # Hint: use a loop to repeat or different arguments to vary message.
 except Exception:
-	p.join()
-	raise RuntimeError("Multicast operation failed.")
+    p.join()
+    raise RuntimeError("Multicast operation failed.")
 
 # clean up some stuff
 p.join() # if not already handled don't forget to join the process and other overhead
@@ -117,6 +117,7 @@ The `SAY` command is used to send data messages via multicast datagrams.
 
 The `RECV` command is used to receive multicast datagrams by listening or "joining" a multicast
 group.
+
 * If the `--use-std` flag is set, the output is printed to the standard-output.
 * This command is purely for testing or interfacing with external components and not intended as a
   first-class API

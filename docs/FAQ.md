@@ -50,6 +50,7 @@ messages, no more than one at a time.
 
 > [!IMPORTANT]
 > Caveat: `RECV` is much more useful if actually used in a loop like:
+> 
 > ```bash
 > # cd /MY-AWESOME-DEV-PATH
 > while true ; do  # until user Ctrl+C interrupts
@@ -189,17 +190,17 @@ From the
 
 #### Python function return code meanings
 
-`0` is the default and implies *success*, and means the process has essentially (or actually)
+`0` is the default and implies _success_, and means the process has essentially (or actually)
 returned nothing (or `None`)
 
-`1` is used when a *single* result is returned (caveat: functions may return a single `tuple`
+`1` is used when a _single_ result is returned (caveat: functions may return a single `tuple`
 instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result
 (which may also be encapsulated as an iterable if needed) )
 
-`2` is used to indicate a *value and reason* are returned (caveat: functions may return a single
+`2` is used to indicate a _value and reason_ are returned (caveat: functions may return a single
 `tuple` with a single value and reason and the value can be a `tuple`)
 
-`-1` is used to mean *many* of unspecified length and otherwise functions as `1`
+`-1` is used to mean _many_ of unspecified length and otherwise functions as `1`
 
 * these values loosely map to the principle of _none-one-many_, 0 is none, 1 is, unsurprisingly,
 one, and everything else is many. From this practice it is possible to infer how to handle the
@@ -207,11 +208,11 @@ result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-va
 
 #### CLI exit code meanings
 
-`0` *success*
+`0` **success**
 
-`1` *non-success* - and is often accompanied by warnings or errors
+`1` **non-success** - and is often accompanied by warnings or errors
 
-`2 <` *failure* of specific reason
+`2 <` **failure** of specific reason
 
 * Any exit value outside the range of `0-255` inclusive should be decoded with the formula:
 `| input % 256 |` which will yield the correct exit code.
