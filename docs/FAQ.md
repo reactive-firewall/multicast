@@ -151,7 +151,7 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 
 #### Default Multicast Group
 
-> [!IMPOTRANT]
+> [!IMPORTANT]
 > The **default** multicast group address is `224.0.0.1`.
 
 From the
