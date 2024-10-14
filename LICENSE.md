@@ -20,13 +20,12 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-
-
 ***
 
 ## Included Licenses and additional Acknowledgments included with package
 
-* Files: `tests/context.py`, `tests/test_basic.py`, and `tests/test_usage.py`
+### Files: `tests/context.py`, `tests/test_basic.py`, and `tests/test_usage.py`
+
 ***
 Copyright (c) 2017-2022, Python Test Repo Template
 ALSO Licensed under MIT
@@ -34,9 +33,19 @@ You may obtain a copy of the License at
 [MIT License](http://www.github.com/reactive-firewall/python-repo/LICENSE.md)
 ***
 
-## Third-party Acknowledgments
+### Files: `.github/workflows/markdown-lint.yml`, and `.github/workflows/yaml-lint.yml`
 
-* Files: `multicast/send.py` and `multicast/recv.py`
+***
+Copyright (c) 2017-2024, Your Milage May Vary
+ALSO Licensed under MIT
+You may obtain a copy of the License at
+[MIT License](http://www.github.com/reactive-firewall/ymmv/LICENSE.md)
+***
+
+## Third-party Acknowledgments :bow:
+
+### Files: `multicast/send.py` and `multicast/recv.py`
+
 ***
 Some code (namely: run, and parseArgs) was modified/derived from
 [This answer on stackoverflow](https://stackoverflow.com/a/52791404)
@@ -46,25 +55,44 @@ See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
 The code in `parseArgs`, `run`, and `main` are thus also under
 CC-by-sa-4
 See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
+_NO ASSOCIATION._
 ***
-NO ASSOCIATION
 
-* Files: `tests/profiling.py`
+### Files: `tests/profiling.py`
+
 ***
 Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from
-[profiling-python-like-a-boss](https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154)
+[profiling...like-a-boss](https://github.com/zapier/profiling-python-like-a-boss/tree/1ab93a1154)
 Copyright (c) 2013, Zapier Inc. All rights reserved.
 which was under BSD-3 Clause license.
-See [BSD-3 Clause license](https://github.com/zapier/profiling-python-like-a-boss/blob/1ab93a1154/LICENSE.md) for details.
+See
+[BSD-3 Clause](https://github.com/zapier/profiling-python-like-a-boss/blob/1ab93a1154/LICENSE.md)
+license for details.
+_NO ASSOCIATION._
 ***
-NO ASSOCIATION
 
-* Files: `docs/config.py`
+### Files: `docs/config.py`
+
 ***
 Some code (namely: Sphinx setup output config) was modified/derived from
-[Sphinx documentation](https://github.com/sphinx-doc/sphinx/blob/569fde84d49c984282355c768c16426af83132e2/doc/conf.py)
+[Sphinx documentation](https://github.com/sphinx-doc/sphinx/blob/569fde84/doc/conf.py)
 Copyright (c) 2007-2024 by the Sphinx team. All rights reserved.
 which was under BSD-2 Clause license.
-See [BSD License](https://github.com/sphinx-doc/sphinx/blob/569fde84d49c984282355c768c16426af83132e2/LICENSE.rst) for details.
+See [BSD License](https://github.com/sphinx-doc/sphinx/blob/569fde84/LICENSE.rst) for details.
+_NO ASSOCIATION._
 ***
-NO ASSOCIATION
+
+### Files: `.github/CODE_OF_CONDUCT.md`
+
+***
+The Code of Conduct is adapted from the
+[Contributor Covenant](http://contributor-covenant.org), version 1.4,
+available at
+[http://contributor-covenant.org/version/1/4](http://contributor-covenant.org/version/1/4/)
+Copyright (c) 2014 by Coraline Ada Ehmke.
+which was under BSD-2 Clause license.
+See
+[CC BY 4.0 License](https://github.com/EthicalSource/contributor_covenant/blob/release/LICENSE.md)
+for details.
+_NO ASSOCIATION._
+***
