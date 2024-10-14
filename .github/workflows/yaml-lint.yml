@@ -1,0 +1,51 @@
+# .github/workflows/yaml-lint.yml
+---
+name: YAML Lint
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main", "master", "stable", feature*]
+  pull_request:
+    branches: ["main", "master", "stable"]
+
+permissions: {}  # Setting default permissions to none for enhanced security
+
+jobs:
+  yaml-lint:
+    permissions:
+      contents: read
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Workflow YAML
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .github/workflows/yaml-lint.yml
+          config_file: .yamllint.conf
+          format: github
+          no_warnings: true
+        if: ${{ !cancelled() }}
+      - name: Get YAML Files
+        id: yamlfiles
+        shell: bash
+        run: |
+          FILES=$(git ls-files --exclude-standard -- *.yaml *.yml **/*.yml ./.circleci/*.yml ./.github/**/*.yml )
+          if [ -z "$FILES" ]; then
+            printf "%s\n" "No YAML files found."
+            printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
+          else
+            printf "%s\n" "YAML files found:"
+            printf "%s\n" "$FILES"
+            # Replace line breaks with spaces for yamllint
+            FILES="${FILES//$'\n'/ }"
+            printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
+          fi
+        if: ${{ success() }}
+      - name: Lint YAML Files
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: ${{ steps.yamlfiles.outputs.files }}
+          config_file: .yamllint.conf
+          format: github
+          no_warnings: true
+        if: ${{ !cancelled() && steps.yamlfiles.outputs.files != '' }}

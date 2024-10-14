@@ -26,6 +26,10 @@ SRCDIR        = .
 # change this to the directory you store python code in
 PROJECT_DOC_SRC_DIR = multicast
 
+# By default, the documentation links to the `stable` branch on GitHub.
+# To override this and link to the specific commit you're working on,
+# set the `DOCS_BUILD_REF` environment variable
+
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter

@@ -1,4 +1,4 @@
-# Welcome to Multicast's documentation!
+# Welcome to Multicast's documentation
 
 ## Quickstart
 
@@ -13,6 +13,7 @@ Jump directly to the [Quickstart](./toc)
 - [License](./LICENSE): Licensing information and acknowledgments.
 
 ---
+
 ### Copyright (c) 2021-2024, Mr. Walls
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

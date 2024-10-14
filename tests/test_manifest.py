@@ -83,8 +83,8 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		# Open the tar.gz file to inspect contents
 		with tarfile.open(sdist_path, 'r:gz') as tar:
 			members = tar.getnames()
-		version = self._get_package_version()
-		return members, version
+		pkg_version = str(self._should_get_package_version_WHEN_valid())
+		return members, pkg_version
 
 	def test_sdist_includes_required_files(self):
 		"""Test that the source distribution includes all required files.
@@ -92,8 +92,8 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		This test verifies that the source distribution includes all expected files by building
 		the sdist and checking if the required files are present in the tar archive.
 		"""
-		members, version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(version)
+		members, pkg_version = self._build_sdist_and_get_members()
+		package_prefix = str("""multicast-{}""").format(pkg_version)
 		expected_files = [
 			str("""{}/README.md""").format(package_prefix),
 			str("""{}/LICENSE.md""").format(package_prefix),
@@ -121,8 +121,8 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		This test ensures that unwanted files and directories are not included in the source distribution
 		by building the sdist and verifying that these files are absent from the tar archive.
 		"""
-		members, version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(version)
+		members, pkg_version = self._build_sdist_and_get_members()
+		package_prefix = str("""multicast-{}""").format(pkg_version)
 		unwanted_files = [
 			str("""{}/.gitignore""").format(package_prefix),
 			str("""{}/.github/""").format(package_prefix),

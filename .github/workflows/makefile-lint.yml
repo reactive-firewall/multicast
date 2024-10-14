@@ -1,0 +1,61 @@
+# .github/workflows/makefile-lint.yml
+---
+name: Makefile Lint
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main", "master", "stable", feature*]
+  pull_request:
+    branches: ["main", "master", "stable"]
+
+permissions: {}  # Setting default permissions to none for enhanced security
+
+jobs:
+  makefile-lint:
+    permissions:
+      contents: read
+      statuses: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Apt-Get Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yamllint golang-go pandoc
+          go version
+      - name: Lint Workflow YAML
+        run: |
+          yamllint -f github --no-warnings .github/workflows/makefile-lint.yml
+      - uses: actions/checkout@v4
+      - name: Install checkmake
+        if: ${{ success() }}
+        env:
+          BUILDER_NAME: "ci"
+          BUILDER_EMAIL: "no-reply@localhost"
+        run: |
+          git clone https://github.com/mrtazz/checkmake.git checkmake
+          cd checkmake
+          make
+          cd ..
+      - name: Get makefiles Files
+        id: makefiles
+        shell: bash
+        run: |
+          FILES=$(git ls-files --exclude-standard -- Makefile 2>/dev/null)
+          if [ -z "$FILES" ]; then
+            printf "%s\n" "No Makefiles found."
+            printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
+          else
+            printf "%s\n" "Makefiles found:"
+            printf "%s\n" "$FILES"
+            # Replace line breaks with spaces for tools
+            FILES="${FILES//$'\n'/ }"
+            printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
+          fi
+        if: ${{ success() }}
+      - name: Lint Makefiles Files
+        run: |
+          FILE="${{ steps.makefiles.outputs.files }}" ;
+          printf "::group::%s\n" "${FILE}" ;
+          .github/tool_checkmake.sh "${FILE}" ;
+          printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
+        if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
