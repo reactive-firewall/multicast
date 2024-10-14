@@ -1,6 +1,7 @@
 # Welcome to Multicast's documentation!
 
 ## Quickstart
+
 **Welcome to the Multicast Python Library! Let's get you started quickly.**
 
 ### Step 1: Install Python 3
@@ -10,6 +11,7 @@
 ### Step 2: Clone the Repository
 
 * Open your terminal and run:
+
   ```shell
   git clone https://github.com/reactive-firewall/multicast.git
   cd multicast
@@ -38,30 +40,35 @@
 
 **You're all set! Enjoy using Multicast for your projects.**
 
+---
 
 ## Overview
 
-Multicast is a Python module designed to simplify raw multicast communication in Python applications. It offers intuitive interfaces for sending and receiving multicast messages, enabling developers to implement efficient and robust multicast functionality with ease.
+Multicast is a Python module designed to simplify raw multicast communication in Python
+applications. It offers intuitive interfaces for sending and receiving multicast messages,
+enabling developers to implement efficient and robust multicast functionality with ease.
 
 ### Key Features
 
-- **Simple API**: Easy-to-use functions for sending (`send`) and receiving (`recv`) multicast messages.
-- **Command-Line Interface**: Convenient CLI commands (`SAY`, `RECV`, `HEAR`) for quick testing and debugging.
-- **Cross-Platform Support**: Compatible with Linux, and macOS.
+* **Simple API**: Easy-to-use functions for sending (`send`) and receiving (`recv`) multicast
+  messages.
+* **Command-Line Interface**: Convenient CLI commands (`SAY`, `RECV`, `HEAR`) for quick testing
+  and debugging.
+* **Cross-Platform Support**: Compatible with Linux, and macOS.
 
 ### Getting Started
 
-- **Installation**: Install the package using `make install` or via `pip`.
-- **Quickstart**: Refer to the [Quickstart](#quickstart) section for immediate setup instructions.
-- **Examples**: Explore detailed examples and API references in the [Usage Guide](./USAGE).
+* **Installation**: Install the package using `make install` or via `pip`.
+* **Quickstart**: Refer to the [Quickstart](#quickstart) section for immediate setup instructions.
+* **Examples**: Explore detailed examples and API references in the [Usage Guide](./USAGE).
 
 ### Documentation Resources
 
-- [README](./README): Introduction and installation instructions.
-- [Usage Guide](./USAGE): Detailed usage examples and API documentation.
-- [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
-- [CI Processes](./CI): Information on continuous integration and testing strategies.
-- [License](./LICENSE): Licensing information and acknowledgments.
+* [README](./README): Introduction and installation instructions.
+* [Usage Guide](./USAGE): Detailed usage examples and API documentation.
+* [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
+* [CI Processes](./CI): Information on continuous integration and testing strategies.
+* [License](./LICENSE): Licensing information and acknowledgments.
 
 ## Contents
 
@@ -77,6 +84,7 @@ apidocs/index
 ```
 
 ---
+
 ### Copyright (c) 2021-2024, Mr. Walls
 
 [![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
