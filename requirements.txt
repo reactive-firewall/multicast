@@ -31,7 +31,7 @@ setuptools>=75.0
 # pip - MIT license
 pip>=22.0
 # build - MIT license
-build>=1.1.1
+build>=1.1.1, !=1.2.2.post1
 # multicast - MIT license
 #-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
 # wheel - MIT license

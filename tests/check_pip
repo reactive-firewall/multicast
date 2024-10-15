@@ -171,10 +171,18 @@ SCRIPT_FILE="tests/check_pip"
 # Set pip-audit options
 AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
 # List of Allowed Licenses delimited by semicolon ;
-ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;"
+ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;The Unlicense (Unlicense);Mozilla Public License 2.0 (MPL 2.0);"
 # Set pip-licenses options
 LICENSE_OPTIONS="--from=mixed"
-
+# Set pip options
+PIP_COMMON_FLAGS="--require-virtualenv --use-pep517 --exists-action s --upgrade --upgrade-strategy only-if-needed --quiet"
+# Set Env and OS specific pip options
+if [[ $( \uname -s ) == "*arwin" ]] ; then
+	PIP_ENV_FLAGS="--break-system-packages"
+	LICENSE_OPTIONS="--python python3 ${LICENSE_OPTIONS} --ignore-packages certifi"
+else
+	PIP_ENV_FLAGS=""
+fi ;
 # Enable auto-fix if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"
@@ -211,13 +219,66 @@ function navigate_dirs_by_git() {
 	fi
 }
 
+function check_license_when_given_req() {
+	local SUB_CODE=${EXIT_CODE-0}
+	umask 007
+	printf "::debug::%s\n" "need venv ..." ;
+	# Create a temporary directory for the virtual environment
+	temp_dir=$(mktemp -d)
+
+	# Enter the temporary directory
+	cd "$temp_dir"
+
+	# Create a virtual environment using venv
+	python3 -m venv venv
+
+	# Activate the virtual environment
+	source venv/bin/activate
+
+	umask 037
+	# 2>&1 >/dev/null
+	python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "pip-licenses>=5.0" || SUB_CODE=6 ;
+	wait ;
+	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
+	# Install the given Python modules using pip
+	for module in $@ ; do
+		printf "::debug::%s\n" "Checking license from package '$module' ..." ;
+		REQ_SPEC=$(grep -F "$module" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
+		ERR_MSG="pip install '$module' failed for $req_file." ;
+		if [[ ( $(python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null || false) ) ]] ;
+		then
+			printf "::debug::%s\n" "Fetched license from package '$module' ..." ;
+			[[ ("${SUB_CODE}" -eq 0) ]] && : ;
+		else
+			[[ ("${SUB_CODE}" -eq 0) ]] && SUB_CODE=6 && \
+			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "${ERR_MSG}" >&2
+		fi
+		unset ERR_MSG 2>/dev/null || : ;
+	done
+
+	# Use pip-licenses to list the licenses of the installed packages
+	{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || SUB_CODE=5 ;} ; wait ;
+
+	# Deactivate the virtual environment
+	deactivate
+
+	# return to starting dir
+	cd ${OLD_PWD} ;
+
+	# Remove the temporary directory and all of its contents
+	rm -rf "$temp_dir"
+	umask 137 ;
+	wait ;
+	return $SUB_CODE
+}
+
 # THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
 _TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
 navigate_dirs_by_git
 
 printf "::debug::%s\n" "Reading from repository ${_TEST_ROOT_DIR} ..." ;
 # Get a list of files to check using git ls-tree with filtering (and careful shell globing)
-FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/**/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null || EXIT_CODE=3)
+FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/test/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null || EXIT_CODE=3)
 
 # THIS IS THE ACTUAL TEST
 printf "::debug::%s\n" "Starting checks ..." ;
@@ -230,12 +291,9 @@ for req_file in $FILES_TO_CHECK; do
 	fi ;
 	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 		printf "::debug::%s\n" "Checking licenses in $req_file ..." ;
-		if [[ ( $(pip install -r "$req_file" --quiet 2>&1 >/dev/null || false) ) ]] ; then
-			{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || EXIT_CODE=5 ;} ; wait ;
-		else
-			[[ ("${EXIT_CODE}" -eq 0) ]] && EXIT_CODE=6 && \
-			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "pip install failed for $req_file." >&2
-		fi
+		# filter for only pkg from requirements file
+		PKG_TO_CHECK=$( { cat <"$req_file" | tr '><=' '=' | cut -d\= -f 1-1 | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d' | xargs -I{} grep -o -m1 -F "{}" "$req_file" | grep -ovE "^pip|setuptools|wheel|build|hypothesis|certifi$" | sort -u ; wait ;} 2>/dev/null );
+		check_license_when_given_req ${PKG_TO_CHECK} ; EXIT_CODE=$?
 	else
 		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
 	fi
