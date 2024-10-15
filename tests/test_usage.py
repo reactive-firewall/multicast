@@ -132,7 +132,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNone(test_fixture)
 				self.assertTupleEqual(
 					tst_dispatch.useTool(tst_in),
-					tuple((False, None)),  # skipcq: PTC-W0020  - This is test-code.
+					(False, None),  # skipcq: PTC-W0020  - This is test-code.
 					fail_fixture
 				)
 			theResult = True
@@ -246,7 +246,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			self.assertTupleEqual(
 				multicast.__main__.main(["HEAR", "--hex"]),
-				tuple((0, (True, (False, None))))  # skipcq: PTC-W0020  - This is test-code.
+				(0, (True, (False, None)))  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -261,10 +261,10 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.main(NOOP) == Error""")
 		try:
 			self.assertIsNotNone(multicast.__main__.main(["NOOP"]), fail_fixture)
-			self.assertIsNotNone(tuple(multicast.__main__.main(["NOOP"]))[0])  # skipcq: PTC-W0020
+			self.assertIsNotNone(multicast.__main__.main(["NOOP"])[0])  # skipcq: PTC-W0020
 			self.assertTupleEqual(
 				multicast.__main__.main(["NOOP"]),
-				tuple((0, tuple((True, None)))),  # skipcq: PTC-W0020  - This is test-code.
+				(0, (True, None)),  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -281,7 +281,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(multicast.__main__.McastDispatch().doStep("HELP", []))
 			self.assertTupleEqual(
 				multicast.__main__.McastDispatch().doStep(["HELP"], []),
-				tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
+				(int(2), "NoOp"),  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -399,7 +399,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				test_cls = multicast.__main__.McastDispatch()
 				self.assertTupleEqual(
 					test_cls.doStep("NOOP", []),
-					tuple((int(2), "NoOp")),  # skipcq: PTC-W0020  - This is test-code.
+					(int(2), "NoOp"),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
 			except Exception as _cause:

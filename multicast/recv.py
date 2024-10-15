@@ -607,5 +607,5 @@ class McastRECV(multicast.mtool):
 			print(str(response))
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		_result = (len(response) > 0) is True
-		return tuple((_result, None if not _result else response))  # skipcq: PTC-W0020  - intended
+		return (_result, None if not _result else response)  # skipcq: PTC-W0020  - intended
 
