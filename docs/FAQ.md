@@ -236,7 +236,6 @@ instead of `None` to indicate exit code `1` by returning a `boolean` success val
 > [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)'s
 > POSIX-based guidelines.
 
-
 ### How do I build the documentation?
 
 * Typicly the documentation will be automatically build by CI/CD and posted to the official
