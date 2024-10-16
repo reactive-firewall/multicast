@@ -504,9 +504,6 @@ jobs:
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
-    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build ;
-      if: ${{ success() }}
     - name: Test Dependencies with py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         hash -p ./.github/tool_shlock_helper.sh shlock ; export TMPDIR=./ ;
@@ -568,7 +565,6 @@ jobs:
         pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
         pip install -r ./requirements.txt ;
         pip install -r ./tests/requirements.txt || true ;
-        pip install --upgrade -r ./docs/requirements.txt || true ;
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
