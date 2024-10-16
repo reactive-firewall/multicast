@@ -138,6 +138,14 @@ EXIT_CODE=1
 
 # end of bootstraping, use functions below this point
 
+# Function to check if a command exists.
+
+# USAGE:
+#	~$ cleanup
+# Arguments:
+#	N/A
+# Results:
+#	returns -- once cleanup has been done on a best-effort case.
 function cleanup() {
 	rm -f ${LOCK_FILE} 2>/dev/null || : ; wait ;
 	# unset when done
