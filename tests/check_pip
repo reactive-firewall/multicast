@@ -246,7 +246,7 @@ function check_license_when_given_req() {
 		printf "::debug::%s\n" "Checking license from package '$module' ..." ;
 		REQ_SPEC=$(grep -F "$module" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
 		ERR_MSG="pip install '$module' failed for $req_file." ;
-		if [[ ("${SUB_CODE}" -eq 0) ]] && [[ ( $(python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null || false) ) ]] ;
+		if [[ ("${SUB_CODE}" -eq 0) ]] && python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null ;
 		then
 			printf "::debug::%s\n" "Fetched license from package '$module' ..." ;
 		else
