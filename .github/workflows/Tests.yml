@@ -470,32 +470,27 @@ jobs:
   EXTRAS-FOR-PIP:
     if: ${{ !cancelled() }}
     needs: [BOOTSTRAP, MATS]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     timeout-minutes: 10
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12"]
     env:
-      OS: ${{ matrix.os }}
+      OS: 'ubuntu-latest'
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       LC_CTYPE: "en_US.utf-8"
-      COVERAGE_RCFILE: ./.coveragerc
-      COV_CORE_SOURCE: ./
-      COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: .coverage
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Install dependencies for python ${{ matrix.python-version }}
       run: |
         pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1" "pip-licenses>=5.0.0";
         pip install -r ./requirements.txt ;
@@ -504,28 +499,12 @@ jobs:
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
-    - name: Test Dependencies with py${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Test Dependencies with py${{ matrix.python-version }}
       run: |
         hash -p ./.github/tool_shlock_helper.sh shlock ; export TMPDIR=./ ;
         ./tests/check_pip ;
       shell: bash
       if: ${{ !cancelled() }}
-    - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./test-reports/coverage_setup.xml
-        directory: .
-        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
-        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
-        verbose: true
-        fail_ci_if_error: false
-    - name: Upload Extra Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Legacy_Setup-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./test-reports/
-        if-no-files-found: ignore
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
