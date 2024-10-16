@@ -66,4 +66,4 @@ wheel>=0.44
 # pip - MIT license
 pip>=22.0
 # build - MIT license
-build>=1.2.1
+build>=1.2.1, !=1.2.2.post1

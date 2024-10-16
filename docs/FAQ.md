@@ -236,7 +236,6 @@ instead of `None` to indicate exit code `1` by returning a `boolean` success val
 > [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)'s
 > POSIX-based guidelines.
 
-
 ### How do I build the documentation?
 
 * Typicly the documentation will be automatically build by CI/CD and posted to the official
@@ -250,14 +249,16 @@ instead of `None` to indicate exit code `1` by returning a `boolean` success val
 
 ### Building Documentation with a Custom Git Reference
 
-  By default, the documentation links to the `stable` branch on GitHub. To override this and link to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
+  By default, the documentation links to the `stable` branch on GitHub. To override this and link
+  to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
 
   ```bash
   export DOCS_BUILD_REF=$(${GIT:-git} rev-parse --verify HEAD)
   make build-docs  # or your own documentation build command
   ```
 
-  This command dynamically sets `DOCS_BUILD_REF` to the current Git commit hash, ensuring that documentation links point to the exact version of your code.
+  This command dynamically sets `DOCS_BUILD_REF` to the current Git commit hash, ensuring that
+  documentation links point to the exact version of your code.
 
 ***
 

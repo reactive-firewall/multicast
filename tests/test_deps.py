@@ -69,7 +69,9 @@ class TestRequirementsTxt(context.BasicUsageTestSuite):
 		pattern = re.compile(
 			r'^\s*'
 			r'[a-zA-Z0-9_\-\.]+'
-			r'(?:,?\s?(?:==|!=|>=|<=|>|<)\s?[0-9\.]+)+'
+			r'(?:,?\s?(?:==|!=|>=|<=|>|<)\s?[0-9]+'
+			r'(?:\.[0-9]+)*(?:[a-zA-Z]+[0-9]*)?'
+			r'(?:\.[a-zA-Z]+[0-9]*)*)+'
 			r'(?:\s*(?:#.*)?)$'
 		)
 		with open('tests/requirements.txt', 'r') as req_file:
