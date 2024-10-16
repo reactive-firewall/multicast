@@ -124,6 +124,7 @@ export -f check_command
 check_command grep ;
 check_command python3 ;
 check_command git ;
+check_command sed ;
 check_command tee ;
 check_command pip ;
 # check_command pip-audit ; # optional
@@ -245,10 +246,9 @@ function check_license_when_given_req() {
 		printf "::debug::%s\n" "Checking license from package '$module' ..." ;
 		REQ_SPEC=$(grep -F "$module" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
 		ERR_MSG="pip install '$module' failed for $req_file." ;
-		if [[ ( $(python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null || false) ) ]] ;
+		if [[ ("${SUB_CODE}" -eq 0) ]] && [[ ( $(python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null || false) ) ]] ;
 		then
 			printf "::debug::%s\n" "Fetched license from package '$module' ..." ;
-			[[ ("${SUB_CODE}" -eq 0) ]] && : ;
 		else
 			[[ ("${SUB_CODE}" -eq 0) ]] && SUB_CODE=6 && \
 			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "${ERR_MSG}" >&2
@@ -266,7 +266,7 @@ function check_license_when_given_req() {
 	cd "${OLDPWD}" ;
 
 	# Remove the temporary directory and all of its contents
-	rm -rf "$temp_dir"
+	rm -rf "${temp_dir}" || : ;
 	umask 137 ;
 	wait ;
 	return $SUB_CODE
@@ -295,7 +295,7 @@ for req_file in $FILES_TO_CHECK; do
 		PKG_TO_CHECK=$( { cat <"$req_file" | tr '><=' '=' | cut -d\= -f 1-1 | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d' | xargs -I{} grep -o -m1 -F "{}" "$req_file" | grep -ovE "^pip|setuptools|wheel|build|hypothesis|certifi$" | sort -u ; wait ;} 2>/dev/null );
 		check_license_when_given_req ${PKG_TO_CHECK} ; EXIT_CODE=$?
 	else
-		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
+		printf "::error file=${req_file},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
 	fi
 	printf "::endgroup::\n" ;
 done
