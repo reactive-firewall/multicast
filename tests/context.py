@@ -133,6 +133,16 @@ except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 
+try:
+	if 'tests.exceptions' not in sys.modules:
+		import tests.exceptions
+	else:  # pragma: no branch
+		tests.exceptions = sys.modules["""tests.exceptions"""]
+	from tests.exceptions import CommandExecutionError
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
+
+
 __BLANK = str("""""")
 """
 	A literally named variable to improve readability of code when using a blank string.
