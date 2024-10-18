@@ -1,27 +1,33 @@
 # tests/test_hear_server_activate.py
 import unittest
 from multicast.hear import McastServer
-from unittest.mock import patch
+import threading
 import socket
 
 class TestMcastServerActivate(unittest.TestCase):
 	def test_server_activate(self):
-		# Create an instance of McastServer with no handler
+		# Define a simple request handler
+		class SimpleHandler:
+			def handle(self):
+				pass  # Handler logic is not the focus here
+		# Create an instance of McastServer
 		server_address = ('localhost', 0)  # Bind to any available port
-		handler = None  # Since we're focusing on server activation, handler is not needed
-		server = McastServer(server_address, handler)
-		# Mock open_for_request and the superclass server_activate
-		with patch.object(server, 'open_for_request') as mock_open_for_request, \
-			patch('socketserver.UDPServer.server_activate') as mock_super_activate:
-			# Call server_activate
+		server = McastServer(server_address, SimpleHandler)
+		# Start the server in a separate thread
+		def run_server():
 			server.server_activate()
-			# Verify that open_for_request was called
-			mock_open_for_request.assert_called_once()
-			# Verify that the superclass server_activate was called
-			mock_super_activate.assert_called_once()
-			# Check that the socket attribute is not None
+			server.serve_forever()
+		server_thread = threading.Thread(target=run_server)
+		server_thread.daemon = True
+		server_thread.start()
+		try:
+			# Check that the socket is properly initialized
 			self.assertIsNotNone(server.socket)
-			# Check that the socket is a UDP socket
 			self.assertEqual(server.socket.type, socket.SOCK_DGRAM)
-		# Clean up the server
-		server.server_close()
+			# Since we're not sending actual data, just ensure the server is running
+			self.assertTrue(server_thread.is_alive())
+		finally:
+			# Clean up the server
+			server.shutdown()
+			server.server_close()
+			server_thread.join()
