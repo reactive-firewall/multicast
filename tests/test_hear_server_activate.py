@@ -1,10 +1,49 @@
-# tests/test_hear_server_activate.py
-import unittest
-from multicast.hear import McastServer
-import threading
-import socket
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-class TestMcastServerActivate(unittest.TestCase):
+# Python Test Repo Template
+# ..................................
+# Copyright (c) 2017-2024, Mr. Walls
+# ..................................
+# Licensed under MIT (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# ..........................................
+# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# ..........................................
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+__module__ = """tests"""
+
+
+try:
+	try:
+		import context
+	except Exception as _:  # pragma: no branch
+		del _  # skipcq - cleanup any error vars early
+		from . import context
+	if context.__name__ is None:
+		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
+	else:
+		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+		from context import unittest
+		from unittest.mock import patch
+		import socket
+		from multicast.hear import McastServer
+except Exception as err:
+	raise ImportError("[CWE-758] Failed to import test context") from err
+
+
+class TestMcastServerActivate(context.BasicUsageTestSuite):
+
+	__module__ = """tests.test_hear_server_activate"""
+
+	__name__ = """tests.test_hear_server_activate.TestMcastServerActivate"""
+
 	def test_server_activate(self):
 		# Define a simple request handler
 		class SimpleHandler:

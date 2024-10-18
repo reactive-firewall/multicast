@@ -291,4 +291,4 @@ def endSocket(sock=None):
 		except OSError as err:  # pragma: no branch
 			sock = None  # So catch and zero the socket
 	if sock:
-		raise ResouceWarning()
+		raise ResourceWarning()
