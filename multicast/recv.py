@@ -579,6 +579,7 @@ class McastRECV(multicast.mtool):
 		chunk = None
 		msgbuffer = recvstep(msgbuffer, chunk, sock)
 		# about 969 bytes in base64 encoded as chars
+		multicast.endSocket(sock)
 		return msgbuffer
 
 	def doStep(self, *args, **kwargs):

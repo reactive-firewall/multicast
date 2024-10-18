@@ -263,10 +263,12 @@ class McastServer(socketserver.UDPServer):
 			None
 		"""
 		print(str("open_request"))
+		# enter critical section
 		old_socket = self.socket
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
 		multicast.endSocket(old_socket)
 		self.socket = recv.joinstep([tmp_addr], tmp_prt, None, tmp_addr, multicast.genSocket())
+		# exit critical section
 
 	def server_bind(self):
 		"""
@@ -408,11 +410,13 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		(data, sock) = self.request
 		if data is None or not sock:
 			return  # nothing to do -- fail fast.
+		else:
+			data = str(data, encoding='utf8')  # needed b/c some implementations decode some do not.
 		print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
 			myID = str(sock.getsockname()[0])
 			if (_sys.stdout.isatty()):  # pragma: no cover
-				_sim_data_str = data.strip().replace('\r', '').replace('%', '%%')
+				_sim_data_str = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
 				print(str("{me} HEAR: [{you} SAID {what}]").format(
 					me=myID, you=self.client_address, what=str(_sim_data_str)
 				))
