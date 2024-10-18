@@ -187,6 +187,7 @@ except Exception as importErr:
 try:
 	import threading
 	import socketserver
+	import warnings
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
@@ -244,7 +245,9 @@ class McastServer(socketserver.UDPServer):
 			None
 		"""
 		print(str("server_activate"))
-		self.open_for_request()
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			self.open_for_request()
 		super(McastServer, self).server_activate()
 
 	def open_for_request(self):
@@ -268,6 +271,7 @@ class McastServer(socketserver.UDPServer):
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
 		multicast.endSocket(old_socket)
 		self.socket = recv.joinstep([tmp_addr], tmp_prt, None, tmp_addr, multicast.genSocket())
+		old_socket = None  # release for GC
 		# exit critical section
 
 	def server_bind(self):
@@ -281,7 +285,9 @@ class McastServer(socketserver.UDPServer):
 		"""
 		print(str("server_bind"))
 		super(McastServer, self).server_bind()
+		# enter critical section
 		print(str("bound on: {}").format(str(self.socket.getsockname())))
+		# exit critical section
 
 	def close_request(self, request):
 		"""
@@ -297,7 +303,9 @@ class McastServer(socketserver.UDPServer):
 			None
 		"""
 		print(str("close_request"))
-		self.open_for_request()
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			self.open_for_request()
 		super(McastServer, self).close_request(request)
 
 	def handle_error(self, request, client_address):

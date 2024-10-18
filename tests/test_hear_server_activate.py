@@ -31,18 +31,18 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
-		from unittest.mock import patch
+		import threading
 		import socket
 		from multicast.hear import McastServer
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
-class TestMcastServerActivate(context.BasicUsageTestSuite):
+class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = """tests.test_hear_server_activate"""
 
-	__name__ = """tests.test_hear_server_activate.TestMcastServerActivate"""
+	__name__ = """tests.test_hear_server_activate.McastServerActivateTestSuite"""
 
 	def test_server_activate(self):
 		# Define a simple request handler
@@ -50,7 +50,7 @@ class TestMcastServerActivate(context.BasicUsageTestSuite):
 			def handle(self):
 				pass  # Handler logic is not the focus here
 		# Create an instance of McastServer
-		server_address = ('localhost', 0)  # Bind to any available port
+		server_address = ('224.0.0.2', 0)  # Bind to any available port
 		server = McastServer(server_address, SimpleHandler)
 		# Start the server in a separate thread
 		def run_server():
@@ -70,3 +70,7 @@ class TestMcastServerActivate(context.BasicUsageTestSuite):
 			server.shutdown()
 			server.server_close()
 			server_thread.join()
+
+
+if __name__ == '__main__':
+	unittest.main()

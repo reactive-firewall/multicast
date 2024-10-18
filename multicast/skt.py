@@ -288,7 +288,7 @@ def endSocket(sock=None):
 				sock.detach()
 			finally:
 				sock.close()  # Some systems won't close
-		except OSError as err:  # pragma: no branch
+		except OSError:  # pragma: no branch
 			sock = None  # So catch and zero the socket
 	if sock:
-		raise ResourceWarning()
+		sock.close()
