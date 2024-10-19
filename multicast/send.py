@@ -344,7 +344,7 @@ class McastSAY(multicast.mtool):
 		"""
 		# skipcq: PYL-W0212 - module ok
 		return self._sayStep(
-			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),
+			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
 			None if "data" not in kwargs else str(kwargs["data"]),
 		)
