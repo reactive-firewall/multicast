@@ -334,6 +334,10 @@ class McastSAY(multicast.mtool):
 			*args: Variable length argument list containing command-line arguments.
 			**kwargs: Arbitrary keyword arguments.
 
+		- group (str): Multicast group address (default: multicast._MCAST_DEFAULT_GROUP)
+		- port (int): Port number (default: multicast._MCAST_DEFAULT_PORT)
+		- data (str, list, or bytes): Message data to be sent. If set to ['-'], reads from stdin.
+
 		Returns:
 			tuple: A tuple containing a status indicator and result message.
 		"""
@@ -344,6 +348,11 @@ class McastSAY(multicast.mtool):
 			# Read from stdin in chunks
 			while True:
 				chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
+				try:
+					chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
+				except IOError as e:
+					print(f"Error reading from stdin: {e}", file=sys.stderr)
+					break
 				if not chunk:
 					break
 				self._sayStep(group, port, chunk)
