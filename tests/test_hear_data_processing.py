@@ -57,11 +57,6 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
-			_fixture_SAY_args = {
-				"""port""": str(_fixture_port_num),
-				"""group""": """'224.0.0.1'""",
-				"""data""": b''
-			}
 			_fixture_HEAR_args = [
 				"""--port""", str(_fixture_port_num),
 				"""--groups""", """'224.0.0.1'""",
