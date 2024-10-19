@@ -337,9 +337,20 @@ class McastSAY(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and result message.
 		"""
-		return self._sayStep(
-			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
-			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
-			None if "data" not in kwargs else str(kwargs["data"]),
-		)
-
+		group = kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP])
+		port = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)
+		data = kwargs.get("data")
+		if data == ['-']:
+			# Read from stdin in chunks
+			while True:
+				chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
+				if not chunk:
+					break
+				self._sayStep(group, port, chunk)
+		elif isinstance(data, list):
+			# Join multiple arguments into a single string
+			message = str(""" """).join(data)
+			self._sayStep(group, port, message)
+		else:
+			message = str(data, encoding='utf8')
+			self._sayStep(group, port, message)
