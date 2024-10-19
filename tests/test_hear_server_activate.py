@@ -33,7 +33,6 @@ try:
 		from context import unittest
 		import threading
 		import socket
-		from multicast.hear import McastServer
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
@@ -51,11 +50,13 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 				pass  # Handler logic is not the focus here
 		# Create an instance of McastServer
 		server_address = ('224.0.0.2', 0)  # Bind to any available port
-		server = McastServer(server_address, SimpleHandler)
+		server = multicast.hear.McastServer(server_address, SimpleHandler)
 		# Start the server in a separate thread
+
 		def run_server():
 			server.server_activate()
 			server.serve_forever()
+
 		server_thread = threading.Thread(target=run_server)
 		server_thread.daemon = True
 		server_thread.start()
@@ -74,3 +75,4 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 if __name__ == '__main__':
 	unittest.main()
+

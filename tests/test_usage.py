@@ -161,7 +161,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(rtn_val_b)
 			self.assertNotEqual(int(tst_err_rslt_a), int(0))
 			self.assertNotEqual(int(tst_err_rslt_a), int(1))
-			self.assertNotEqual(int(tst_err_rslt_b), int(1))
+			self.assertNotEqual(int(tst_err_rslt_b), int(1), str(rtn_val_b))
 			self.assertNotEqual(int(tst_err_rslt_a), int(2))
 			self.assertNotEqual(int(tst_err_rslt_b), int(2))
 			self.assertNotEqual(rtn_val_a, rtn_val_b)

@@ -50,36 +50,33 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_SAY_args = [
-				"""--port""", _fixture_port_num,
-				"""--group""", """224.0.0.1""",
-				"""--message""", """'STOP Test'"""
-			]
 			_fixture_HEAR_kwargs = {
 				"""port""": _fixture_port_num,
 				"""group""": """224.0.0.1"""
 			}
+			self.assertIsNotNone(_fixture_HEAR_kwargs)
 			p = Process(
 				target=multicast.hear.McastHEAR().doStep,
 				name="HEAR", kwargs=_fixture_HEAR_kwargs
 			)
+			p.daemon = True
 			p.start()
 			self.assertIsNotNone(p)
 			self.assertTrue(p.is_alive())
 			try:
-				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-				)
-				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-				)
-				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
-				)
+				sender = multicast.send.McastSAY()
+				self.assertIsNotNone(sender)
+				while p.is_alive():
+					sender(group="224.0.0.1", port=_fixture_port_num, ttl=1, data="STOP Test")
+					p.join(1)
+				self.assertFalse(p.is_alive())
 			except Exception as _cause:
-				p.join()
+				p.join(3)
+				if p.is_alive():
+					p.terminate()
+					p.close()
 				raise unittest.SkipTest(fail_fixture) from _cause
-			p.join()
+			p.join(15)
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))

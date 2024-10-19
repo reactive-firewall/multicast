@@ -293,6 +293,11 @@ class McastSAY(multicast.mtool):
 				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
+				"""--groups""", required=False, nargs='*',
+				dest="""groups""",
+				help="""multicast groups (ip addrs) to listen to join."""
+			)
+			parser.add_argument(
 				"""-m""", """--message""", nargs='+', dest="""data""",
 				default=str("""PING from {name}: group: {group}, port: {port}""")
 			)
@@ -337,8 +342,9 @@ class McastSAY(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and result message.
 		"""
+		# skipcq: PYL-W0212 - module ok
 		return self._sayStep(
-			kwargs.get("group", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
+			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
 			None if "data" not in kwargs else str(kwargs["data"]),
 		)

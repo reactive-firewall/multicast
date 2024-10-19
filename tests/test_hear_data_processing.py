@@ -73,12 +73,9 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			)
 			p.start()
 			try:
-				self.assertIsNotNone(
-					multicast.send.McastSAY().doStep([], **_fixture_SAY_args)
-				)
-				self.assertIsNotNone(
-					multicast.send.McastSAY().doStep([], **_fixture_SAY_args)
-				)  # preemptive extra retry
+				while p.is_alive():
+					sender(group="224.0.0.1", port=_fixture_port_num, ttl=1, data="STOP Test")
+					p.join(1)
 				_fixture_SAY_args.data = """STOP"""
 				self.assertIsNotNone(
 					multicast.send.McastSAY().doStep([], **_fixture_SAY_args)

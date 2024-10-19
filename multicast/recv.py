@@ -273,7 +273,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 	"""
-	if groups is None:
+	if not groups:
 		groups = []
 	if isock is None:
 		sock = multicast.genSocket()
