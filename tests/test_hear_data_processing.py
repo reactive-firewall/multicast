@@ -73,17 +73,17 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			)
 			p.start()
 			try:
-				while p.is_alive():
-					sender(group="224.0.0.1", port=_fixture_port_num, ttl=1, data="STOP Test")
-					p.join(1)
-				_fixture_SAY_args.data = """STOP"""
-				self.assertIsNotNone(
-					multicast.send.McastSAY().doStep([], **_fixture_SAY_args)
-				)  # preemptive extra retry
+				sender = multicast.send.McastSAY()
+				self.assertIsNotNone(sender)
+				sender(group='224.0.0.1', port=_fixture_port_num, ttl=1, data=b'')
+				sender(group='224.0.0.1', port=_fixture_port_num, ttl=1, data="""STOP""")
 			except Exception as _cause:
-				p.join()
+				p.join(3)
+				if p.is_alive():
+					p.terminate()
+					p.close()
 				raise unittest.SkipTest(fail_fixture) from _cause
-			p.join()
+			p.join(5)
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))
