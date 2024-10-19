@@ -37,6 +37,15 @@ except Exception as err:
 
 
 class HearCleanupTestSuite(context.BasicUsageTestSuite):
+	"""
+	Test suite for verifying the cleanup behavior of the multicast hearing mechanism.
+
+	This suite tests that the `McastHEAR` class correctly releases resources
+	and terminates gracefully when the hearing process receives a "STOP Test"
+	message. It ensures that sockets are properly closed and no lingering
+	processes remain after execution, adhering to the expected cleanup
+	protocols.
+	"""
 
 	__module__ = """tests.test_hear_cleanup"""
 

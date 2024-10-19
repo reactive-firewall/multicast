@@ -246,7 +246,7 @@ class McastServer(socketserver.UDPServer):
 		"""
 		print(str("server_activate"))
 		with warnings.catch_warnings():
-			warnings.simplefilter("ignore")
+			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
 		super(McastServer, self).server_activate()
 
@@ -304,7 +304,7 @@ class McastServer(socketserver.UDPServer):
 		"""
 		print(str("close_request"))
 		with warnings.catch_warnings():
-			warnings.simplefilter("ignore")
+			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
 		super(McastServer, self).close_request(request)
 
