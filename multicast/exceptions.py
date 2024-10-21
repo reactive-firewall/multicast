@@ -160,6 +160,9 @@ class CommandExecutionError(RuntimeError):
 		message (str) -- Description of the error.
 		exit_code (int) -- The exit code associated with the error.
 
+	Raises:
+		TypeError: If exit_code is not an integer.
+
 	Meta-Testing:
 
 		Testcase 1: Initialization with message and exit code.
@@ -201,6 +204,18 @@ class CommandExecutionError(RuntimeError):
 				'Error message'
 				>>> error.exit_code
 				2
+
+			Testcase 2: Initialization with different call to init:
+				A. - Initializes a CommandExecutionError with a specific exit code.
+				B. - Checks the message is still set, as super class would.
+				C. - check the specific exit code is 64.
+
+				>>> pre_made_args = ["A Pre-made Error Message", int(64)]
+				>>> error = CommandExecutionError(*pre_made_args)
+				>>> error.message
+				'A Pre-made Error Message'
+				>>> error.exit_code
+				64
 		"""
 		if len(args) > 0 and isinstance(args[-1], int):
 			exit_code = args[-1]
@@ -238,7 +253,8 @@ Provides a mapping between exit codes and their corresponding exception classes 
 
 The `EXIT_CODES` dictionary serves as a centralized mapping for standard exit codes used within
 the multicast module. Each key represents an exit code (as an integer), and each value is a tuple
-containing the associated exception class (or `None` if not applicable) and a human-readable description of the exit condition.
+containing the associated exception class (or `None` if not applicable) and a human-readable
+description of the exit condition.
 
 CEP-8 Compliance:
 	In accordance with [CEP-8]
@@ -321,7 +337,7 @@ def get_exit_code_from_exception(exc):
 	"""
 	Retrieve the exit code associated with a specific exception.
 
-	Parameters:
+	Arguments:
 		exc (BaseException): The exception instance from which to retrieve the exit code.
 
 	Returns:
@@ -330,14 +346,16 @@ def get_exit_code_from_exception(exc):
 	Raises:
 		TypeError: If the provided argument is not an instance of BaseException.
 
-	Meta-Testing:
+	Testing:
 
 		Testcase 1: Exception with a mapped exit code.
+
 			>>> exc = FileNotFoundError('No such file or directory')
 			>>> get_exit_code_from_exception(exc)
 			66
 
 		Testcase 2: Exception without a specific exit code.
+
 			>>> exc = Exception('Generic error')
 			>>> get_exit_code_from_exception(exc)
 			70
@@ -360,13 +378,13 @@ def exit_on_exception(func):
 	exceptions (which may be raised by modules like `argparse`) and other base exceptions result
 	in the program exiting with meaningful exit codes and error messages.
 
-	Parameters:
+	Arguments:
 		func (callable): The function to be wrapped by the decorator.
 
 	Returns:
 		callable: The wrapped function with enhanced exception handling.
 
-	Meta-Testing:
+	Testing:
 
 		Testcase 1: Successful execution without exceptions.
 			A. Define a function that returns a value.
@@ -426,3 +444,10 @@ def exit_on_exception(func):
 			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 	return wrapper
+
+
+__all__ = [
+	"""__package__""", """__module__""", """__name__""", "__doc__",
+	"CommandExecutionError", "EXCEPTION_EXIT_CODES", "EXIT_CODES",
+	"get_exit_code_from_exception", "exit_on_exception"
+]
