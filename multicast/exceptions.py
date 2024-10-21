@@ -446,8 +446,9 @@ def exit_on_exception(func):
 	return wrapper
 
 
+# skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", "__doc__",
+	"""__package__""", """__module__""", """__name__""", "__doc__",  # skipcq: PYL-E0603
 	"CommandExecutionError", "EXCEPTION_EXIT_CODES", "EXIT_CODES",
 	"get_exit_code_from_exception", "exit_on_exception"
 ]
