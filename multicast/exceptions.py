@@ -256,14 +256,16 @@ def get_exit_code_from_exception(exc):
 		Testcase 1: Exception with a mapped exit code.
 			>>> exc = FileNotFoundError('No such file or directory')
 			>>> get_exit_code_from_exception(exc)
-			66  # Exit code for FileNotFoundError
+			66
 
 		Testcase 2: Exception without a specific exit code.
 			>>> exc = Exception('Generic error')
 			>>> get_exit_code_from_exception(exc)
-			70  # Default exit code for internal software error
+			70
 
 	"""
+	if type(exc) in EXCEPTION_EXIT_CODES:
+		return EXCEPTION_EXIT_CODES[type(exc)]
 	for exc_class in EXCEPTION_EXIT_CODES:
 		if isinstance(exc, exc_class):
 			return EXCEPTION_EXIT_CODES[exc_class]
@@ -274,7 +276,10 @@ def exit_on_exception(func):
 	"""
 	Decorator that wraps a function to handle exceptions and exit with appropriate exit codes.
 
-	This decorator captures exceptions raised by the wrapped function and handles them by mapping them to predefined exit codes specified in `EXIT_CODES`. It ensures that both `SystemExit` exceptions (which may be raised by modules like `argparse`) and other base exceptions result in the program exiting with meaningful exit codes and error messages.
+	This decorator captures exceptions raised by the wrapped function and handles them by mapping
+	them to predefined exit codes specified in `EXIT_CODES`. It ensures that both `SystemExit`
+	exceptions (which may be raised by modules like `argparse`) and other base exceptions result
+	in the program exiting with meaningful exit codes and error messages.
 
 	Parameters:
 		func (callable): The function to be wrapped by the decorator.
@@ -303,7 +308,9 @@ def exit_on_exception(func):
 			>>> @exit_on_exception
 			... def system_exit_func():
 			...     raise SystemExit(64)
-			>>> system_exit_func()  # Exits with code 64
+			>>> system_exit_func()  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			SystemExit...64...
 
 		Testcase 3: Function raises a general exception.
 			A. Define a function that raises a `ValueError`.
@@ -313,8 +320,9 @@ def exit_on_exception(func):
 			>>> @exit_on_exception
 			... def error_func():
 			...     raise ValueError("Invalid value")
-			>>> error_func()  # Exits with code 65
-
+			>>> error_func()  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			SystemExit...65...
 	"""
 	def wrapper(*args, **kwargs):
 		try:
@@ -327,7 +335,7 @@ def exit_on_exception(func):
 					f"{EXIT_CODES.get(exit_code, (1, 'General Error'))[1]}: {exc}",
 					file=sys.stderr
 				)
-			raise SystemExit(code=exit_code) from exc
+			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 		except BaseException as exc:
 			exit_code = get_exit_code_from_exception(exc)
@@ -336,6 +344,6 @@ def exit_on_exception(func):
 					f"{EXIT_CODES[exit_code][1]}: {exc}",
 					file=sys.stderr
 				)
-			raise SystemExit(code=exit_code) from exc
+			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 	return wrapper
