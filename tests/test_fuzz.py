@@ -124,8 +124,23 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=3, max_size=15))
 	@settings(deadline=None)
 	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text):
-		"""Test case template for invalid fuzzed input to multicast CLI."""
+		"""
+		Test the multicast CLI's response to invalid fuzzed input.
+
+		This test case uses Hypothesis to generate random strings of ASCII letters
+		and digits, then passes them as arguments to the multicast CLI. It verifies
+		that the CLI correctly identifies and reports these as invalid inputs.
+
+		Args:
+			text (str): A randomly generated string of ASCII letters and digits,
+				with length between 3 and 15 characters.
+
+		Assertions:
+			- The CLI output contains "invalid choice:" message
+			- The CLI output includes the invalid input text
+		"""
 		theResult = False
+		fail_fixture = str("""XZY? --> Multicast != error""")
 		if (self._thepython is not None):
 			try:
 				args = [
@@ -147,7 +162,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err  # skipcq - cleanup any error leaks early
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult, fail_fixture)
 
 
 if __name__ == '__main__':
