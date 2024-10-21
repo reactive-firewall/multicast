@@ -32,7 +32,6 @@ severity:
 # Set the confidence levels to report.
 # Including all levels to catch all potential issues.
 confidence:
-  - LOW
   - MEDIUM
   - HIGH
 
