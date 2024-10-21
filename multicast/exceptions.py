@@ -167,7 +167,7 @@ class CommandExecutionError(RuntimeError):
 			B. - checks inheritance.
 			C. - checks each attribute.
 
-			>>> error = CommandExecutionError("Failed to execute command", exit_code=1)
+			>>> error = CommandExecutionError("Failed to execute command", 1)
 			>>> isinstance(error, RuntimeError)
 			True
 			>>> error.message
@@ -186,6 +186,9 @@ class CommandExecutionError(RuntimeError):
 			*args: Variable length argument list.
 			**kwargs: Arbitrary keyword arguments.
 
+		Raises:
+			TypeError: if the exit_code is not an int.
+
 		Meta-Testing:
 
 			Testcase 1: Initialization with different exit code:
@@ -199,9 +202,13 @@ class CommandExecutionError(RuntimeError):
 				>>> error.exit_code
 				2
 		"""
-		exit_code = kwargs.pop("exit_code", 1)
-		message = args[0] if args else kwargs.get("message", "An error occurred")
-		super().__init__(message)
+		if len(args) > 0 and isinstance(args[-1], int):
+			exit_code = args[-1]
+			args = args[:-1]
+		else:
+			exit_code = kwargs.pop("exit_code", 1)
+		super().__init__(*args, **kwargs)
+		self.message = args[0] if args else kwargs.get("message", "An error occurred")
 		self.exit_code = exit_code
 
 
