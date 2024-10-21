@@ -27,9 +27,15 @@ import abc
 # skipcq
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
+	"""__doc__""", """exceptions""", """exceptions.CommandExecutionError""",
+	"""exceptions.get_exit_code_from_exception""",
+	"""exceptions.get_exit_code_from_exception.__func__""",
+	"""exceptions.exit_on_exception""", """exceptions.exit_on_exception.__func__""",
+	"""get_exit_code_from_exception""", """exit_on_exception""",
+	"""skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
 	"""skt.__file__""", """skt.genSocket""", """skt.genSocket.__func__""", """genSocket""",
 	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
+	"""EXIT_CODES""", """EXCEPTION_EXIT_CODES""",
 	"""_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
 	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""",
@@ -350,6 +356,25 @@ if struct.__name__ is None:
 
 if abc.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import Abstract base class. ABORT.") from None
+
+
+global EXIT_CODES  # skipcq: PYL-W0604
+global EXCEPTION_EXIT_CODES  # skipcq: PYL-W0604
+if 'multicast.exceptions' not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+	from . import exceptions  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+else:  # pragma: no branch
+	exceptions = sys.modules["""multicast.exceptions"""]
+
+EXIT_CODES = exceptions.EXIT_CODES
+
+EXCEPTION_EXIT_CODES = exceptions.EXCEPTION_EXIT_CODES
+
+CommandExecutionError = exceptions.CommandExecutionError
+
+get_exit_code_from_exception = exceptions.get_exit_code_from_exception
+
+exit_on_exception = exceptions.exit_on_exception
 
 
 class mtool(abc.ABC):
