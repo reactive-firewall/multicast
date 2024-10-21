@@ -31,7 +31,9 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
+		from context import subprocess
 		from context import Process
+		from context import string
 		from hypothesis import given
 		from hypothesis import settings
 		from hypothesis import strategies as st
@@ -118,6 +120,34 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			context.debugtestError(err)
 			self.skipTest(fail_fixture)
 		self.assertTrue(theResult, fail_fixture)
+
+	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=3, max_size=15))
+	@settings(deadline=None)
+	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text):
+		"""Test case template for invalid fuzzed input to multicast CLI."""
+		theResult = False
+		if (self._thepython is not None):
+			try:
+				args = [
+					str(self._thepython),
+					str("-m"),
+					str("multicast"),
+					str(
+						text
+					)
+				]
+				theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+				# or simply:
+				self.assertIsNotNone(theOutputtxt)
+				self.assertIn(str("invalid choice:"), str(theOutputtxt))
+				self.assertIn(str(text), str(theOutputtxt))
+				theResult = True
+			except Exception as err:
+				context.debugtestError(err)
+				err = None
+				del err  # skipcq - cleanup any error leaks early
+				theResult = False
+		assert theResult
 
 
 if __name__ == '__main__':

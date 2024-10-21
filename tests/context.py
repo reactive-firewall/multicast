@@ -78,6 +78,15 @@ except ImportError as err:  # pragma: no branch
 
 
 try:
+	if 'string' not in sys.modules:
+		import string
+	else:  # pragma: no branch
+		string = sys.modules["""string"""]
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] String Failed to import.") from err
+
+
+try:
 	if 'unittest' not in sys.modules:
 		import unittest
 	else:  # pragma: no branch

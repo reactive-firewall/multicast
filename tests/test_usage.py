@@ -59,6 +59,8 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
+		import io
+		from unittest.mock import patch
 		from context import subprocess
 		from context import Process
 except Exception as err:
@@ -379,6 +381,28 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
+	def test_say_works_WHEN_using_stdin(self):
+		"""Tests the basic send with streamed input test case."""
+		theResult = False
+		fail_fixture = str("""STDIN --> SAY == error""")
+		_fixture_port_num = self._the_test_port
+		try:
+			say = multicast.send.McastSAY()
+			self.assertIsNotNone(say)
+			self.assertIsNotNone(_fixture_port_num)
+			test_input = "Test message from stdin"
+			self.assertIsNotNone(test_input)
+			with patch('sys.stdin', io.StringIO(test_input)):
+				self.assertIsNone(say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num))
+			# Assert that the result is as expected
+			# You might need to modify this based on what _sayStep returns
+			theResult = True  # or whatever the expected output is
+		except Exception as err:
+			context.debugtestError(err)
+			self.skipTest(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
 	def test_recv_Errors_WHEN_say_not_used(self):
 		"""Tests the basic noop recv test"""
 		theResult = False
@@ -691,7 +715,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		if (self._thepython is not None):
 			try:
-				for test_case in ["BAdInPut", "1", "exit"]:
+				for test_case in ["BAdInPut", int(1), "exit"]:
 					args = [
 						str(self._thepython),
 						str("-m"),
