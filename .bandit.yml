@@ -1,0 +1,62 @@
+# .bandit.yml
+# Strict configuration for Bandit to enforce comprehensive security checks.
+
+# Define the directories to exclude from scanning.
+exclude_dirs:
+  []
+
+# Specify files or directories to skip.
+skipped_files:
+  []
+
+# Indicate the targets to scan.
+targets:
+  - "."
+
+# Configure plugins (tests).
+plugins:
+  # Include all tests for strict scanning.
+  include:
+    - "*"
+  # Exclude no tests.
+  exclude:
+    - ""
+
+# Set the severity levels to report.
+# Including all levels ensures that even minor issues are reported.
+severity:
+  - LOW
+  - MEDIUM
+  - HIGH
+
+# Set the confidence levels to report.
+# Including all levels to catch all potential issues.
+confidence:
+  - LOW
+  - MEDIUM
+  - HIGH
+
+# Specify the output format for the reports.
+format: "txt"
+
+# Include code snippets in the output for easier debugging.
+show_code: true
+
+# Define profiles if needed.
+profiles:
+  full_audit:
+    include:
+      - "*"
+    exclude:
+      - ""
+  fast_audit:
+    include:
+      - "multicast/*"
+    exclude:
+      - "tests/*"
+
+# Enable recursive scanning to cover all subdirectories.
+recursive: true
+
+# Disable any inline skips to ensure all code is analyzed.
+inline_skips: false
