@@ -233,9 +233,88 @@ EXIT_CODES = {
 	143: (SystemExit, 'Terminated (SIGTERM)'),
 	255: (None, 'Exit Status Out of Range'),
 }
+"""
+Provides a mapping between exit codes and their corresponding exception classes and messages.
+
+The `EXIT_CODES` dictionary serves as a centralized mapping for standard exit codes used within
+the multicast module. Each key represents an exit code (as an integer), and each value is a tuple
+containing the associated exception class (or `None` if not applicable) and a human-readable description of the exit condition.
+
+CEP-8 Compliance:
+	In accordance with [CEP-8]
+	guidelines, this mapping facilitates consistent error handling and exit code management
+	throughout the module. By associating specific exceptions with standard exit codes, the
+	application adheres to predictable behavior in response to various error conditions, enhancing
+	maintainability and debugging efficiency.
+
+	Specific codes are detailed more in CEP-8.
+
+Usage Example:
+	```python
+		from multicast.exceptions import EXIT_CODES
+		from multicast.exceptions import get_exit_code_from_exception
+
+		try:
+			# Code that may raise an exception
+			pass
+		except Exception as e:
+			exit_code = get_exit_code_from_exception(e)
+			sys.exit(exit_code)
+	```
+
+Testing:
+
+	Testcase 0: EXIT_CODES should be automatically imported.
+
+		>>> import multicast
+		>>> import multicast.exceptions
+		>>> multicast.EXIT_CODES != None
+		True
+		>>> isInstance(multicast.EXIT_CODES, dict)
+		True
+
+"""
 
 
 EXCEPTION_EXIT_CODES = {exc: code for code, (exc, _) in EXIT_CODES.items() if exc}
+"""
+	Dictionary mapping exception classes to their associated exit codes.
+
+	Use this dictionary to retrieve the exit code corresponding to a given exception class.
+
+Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.exceptions.
+
+	>>> import multicast.exceptions as exceptions
+	>>> exceptions.__name__
+	'multicast.exceptions'
+
+	Testcase 0: EXCEPTION_EXIT_CODES should be initializable.
+
+		>>> from multicast.exceptions import EXCEPTION_EXIT_CODES
+		>>> EXCEPTION_EXIT_CODES is not None
+		True
+
+	Testcase 1: EXCEPTION_EXIT_CODES should map exceptions to exit codes.
+		A. - check `RuntimeError` is mapped to `1`.
+		B. - check `FileNotFoundError` is mapped to `66`.
+
+		>>> EXCEPTION_EXIT_CODES[RuntimeError]
+		1
+		>>> EXCEPTION_EXIT_CODES[FileNotFoundError]
+		66
+
+	Testcase 2: EXCEPTION_EXIT_CODES should not include None entries.
+		A. - Test reverse map is not none.
+		B. - Test reverse map contains only non-None.
+
+		>>> None is EXCEPTION_EXIT_CODES
+		False
+		>>> None in EXCEPTION_EXIT_CODES
+		False
+
+"""
 
 
 def get_exit_code_from_exception(exc):
