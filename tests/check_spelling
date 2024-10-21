@@ -127,6 +127,9 @@ check_command git ;
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 check_command shlock ;
 
+
+SCRIPT_FILE="test/check_spelling"
+
 # Set codespell options
 CODESPELL_OPTIONS="--quiet-level=4 --builtin clear,rare,code -L assertIn"
 
@@ -153,6 +156,19 @@ else
 		exit 126 ;
 fi
 
+function report_summary() {
+	printf "::group::%s\n" "Results" ;
+	# Improved reporting based on EXIT_CODE
+	case "${EXIT_CODE}" in
+		0) printf "::notice title=OK::%s\n" "OK: Found no detected spelling errors." ;;
+		1) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CHECK-SPELLING::%s\n" "FAIL: General failure during script execution." >&2 ;;
+		3) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
+		126) printf "::warning file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
+		*) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=FAILED::%s\n" "FAIL: Detected spelling errors." >&2 ;;
+	esac
+	printf "::endgroup::\n" ;
+}
+
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST
@@ -161,8 +177,9 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 	if [ -z "${_TEST_ROOT_DIR}" ]; then
 		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 	fi
-else
-	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
+	else
+		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 
@@ -172,23 +189,19 @@ FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- *.md *.py *.txt 
 # Enable auto-correction if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	CODESPELL_OPTIONS="--write-changes --interactive 2 ${CODESPELL_OPTIONS}"
-	printf "%s\n" "Auto-correction enabled."
+	printf "::debug::%s\n" "Auto-correction enabled."
 fi
 
 # THIS IS THE ACTUAL TEST
 # Iterate over files and run codespell
 for FILE in $FILES_TO_CHECK; do
-	printf "%s\n" "Checking ${FILE}" ;
+	printf "::group::%s\n" "Checking ${FILE}" ;
 	{ codespell $CODESPELL_OPTIONS "${FILE}" || EXIT_CODE=$? ;} 2>/dev/null ; wait ;
+	printf "::endgroup::\n" ;
 done
 
 # cleaning up and reporting
-
-if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-	printf "%s\n" "OK: Found no detected spelling errors." ;
-else
-	printf "%s\n" "FAIL: Found spelling errors." ;
-fi
+report_summary
 
 cleanup || rm -f ${LOCK_FILE} 2>/dev/null || : ;
 

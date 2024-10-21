@@ -134,11 +134,11 @@ except ImportError as err:  # pragma: no branch
 
 
 try:
-	if 'tests.exceptions' not in sys.modules:
-		import tests.exceptions
+	if 'multicast.exceptions' not in sys.modules:
+		import multicast.exceptions
 	else:  # pragma: no branch
-		tests.exceptions = sys.modules["""tests.exceptions"""]
-	from tests.exceptions import CommandExecutionError
+		multicast.exceptions = sys.modules["""multicast.exceptions"""]
+	from multicast.exceptions import CommandExecutionError
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
 
@@ -556,13 +556,13 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 
 			>>> _context.checkPythonFuzzing(None)  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...
+			multicast.exceptions.CommandExecutionError: ...
 
 		Testcase 2: Function should raise RuntimeError when args is an empty list.
 
 			>>> _context.checkPythonFuzzing([])  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...
+			multicast.exceptions.CommandExecutionError: ...
 
 		Testcase 3: Function should return output when valid arguments are provided.
 
@@ -578,7 +578,8 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 			... ]
 			>>> _context.checkPythonFuzzing(test_fixture_4)  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...Command '['coverage', 'run',...'-c'...]' returned...exit status 1...
+			multicast.exceptions.CommandExecutionError: ...Command...
+			'['coverage', 'run',...'-c'...]' returned...exit status 1...
 			>>>
 
 		Testcase 5: Function should capture stderr when specified.
