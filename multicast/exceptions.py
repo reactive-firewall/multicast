@@ -199,13 +199,9 @@ class CommandExecutionError(RuntimeError):
 				>>> error.exit_code
 				2
 		"""
-		if len(args) > 0 and isinstance(args[-1], int):
-			exit_code = args[-1]
-			args = args[:-1]
-		else:
-			exit_code = kwargs.pop("exit_code", 1)
-		super().__init__(*args, **kwargs)
-		self.message = args[0] if args else kwargs.get("message", "An error occurred")
+		exit_code = kwargs.pop("exit_code", 1)
+		message = args[0] if args else kwargs.get("message", "An error occurred")
+		super().__init__(message)
 		self.exit_code = exit_code
 
 
@@ -249,7 +245,7 @@ def exit_on_exception(func):
 		except SystemExit as exc:
 			# Handle SystemExit exceptions, possibly from argparse
 			exit_code = exc.code if isinstance(exc.code, int) else 2
-			if (sys.stdout.isatty()):
+			if (sys.stderr.isatty()):
 				print(
 					f"{EXIT_CODES.get(exit_code, (1, 'General Error'))[1]}: {exc}",
 					file=sys.stderr

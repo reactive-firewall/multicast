@@ -128,7 +128,7 @@ hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 check_command shlock ;
 
 
-SCRIPT_FILE="test/check_spelling"
+SCRIPT_FILE="tests/check_spelling"
 
 # Set codespell options
 CODESPELL_OPTIONS="--quiet-level=4 --builtin clear,rare,code -L assertIn"
