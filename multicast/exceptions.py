@@ -239,6 +239,31 @@ EXCEPTION_EXIT_CODES = {exc: code for code, (exc, _) in EXIT_CODES.items() if ex
 
 
 def get_exit_code_from_exception(exc):
+	"""
+	Retrieve the exit code associated with a specific exception.
+
+	Parameters:
+		exc (BaseException): The exception instance from which to retrieve the exit code.
+
+	Returns:
+		int: The exit code corresponding to the given exception.
+
+	Raises:
+		TypeError: If the provided argument is not an instance of BaseException.
+
+	Meta-Testing:
+
+		Testcase 1: Exception with a mapped exit code.
+			>>> exc = FileNotFoundError('No such file or directory')
+			>>> get_exit_code_from_exception(exc)
+			66  # Exit code for FileNotFoundError
+
+		Testcase 2: Exception without a specific exit code.
+			>>> exc = Exception('Generic error')
+			>>> get_exit_code_from_exception(exc)
+			70  # Default exit code for internal software error
+
+	"""
 	for exc_class in EXCEPTION_EXIT_CODES:
 		if isinstance(exc, exc_class):
 			return EXCEPTION_EXIT_CODES[exc_class]
@@ -246,6 +271,51 @@ def get_exit_code_from_exception(exc):
 
 
 def exit_on_exception(func):
+	"""
+	Decorator that wraps a function to handle exceptions and exit with appropriate exit codes.
+
+	This decorator captures exceptions raised by the wrapped function and handles them by mapping them to predefined exit codes specified in `EXIT_CODES`. It ensures that both `SystemExit` exceptions (which may be raised by modules like `argparse`) and other base exceptions result in the program exiting with meaningful exit codes and error messages.
+
+	Parameters:
+		func (callable): The function to be wrapped by the decorator.
+
+	Returns:
+		callable: The wrapped function with enhanced exception handling.
+
+	Meta-Testing:
+
+		Testcase 1: Successful execution without exceptions.
+			A. Define a function that returns a value.
+			B. Decorate it with `@exit_on_exception`.
+			C. Call the function and confirm it returns the expected value.
+
+			>>> @exit_on_exception
+			... def sample_func():
+			...     return "Success"
+			>>> sample_func()
+			'Success'
+
+		Testcase 2: Function raises `SystemExit` exception.
+			A. Define a function that raises `SystemExit`.
+			B. Decorate it with `@exit_on_exception`.
+			C. Call the function and verify it exits with the correct exit code.
+
+			>>> @exit_on_exception
+			... def system_exit_func():
+			...     raise SystemExit(64)
+			>>> system_exit_func()  # Exits with code 64
+
+		Testcase 3: Function raises a general exception.
+			A. Define a function that raises a `ValueError`.
+			B. Decorate it with `@exit_on_exception`.
+			C. Call the function and verify it exits with the mapped exit code.
+
+			>>> @exit_on_exception
+			... def error_func():
+			...     raise ValueError("Invalid value")
+			>>> error_func()  # Exits with code 65
+
+	"""
 	def wrapper(*args, **kwargs):
 		try:
 			return func(*args, **kwargs)
