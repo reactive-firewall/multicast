@@ -142,6 +142,16 @@ except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 
+try:
+	if 'multicast.exceptions' not in sys.modules:
+		import multicast.exceptions
+	else:  # pragma: no branch
+		multicast.exceptions = sys.modules["""multicast.exceptions"""]
+	from multicast.exceptions import CommandExecutionError
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
+
+
 __BLANK = str("""""")
 """
 	A literally named variable to improve readability of code when using a blank string.
@@ -555,13 +565,13 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 
 			>>> _context.checkPythonFuzzing(None)  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...
+			multicast.exceptions.CommandExecutionError: ...
 
 		Testcase 2: Function should raise RuntimeError when args is an empty list.
 
 			>>> _context.checkPythonFuzzing([])  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...
+			multicast.exceptions.CommandExecutionError: ...
 
 		Testcase 3: Function should return output when valid arguments are provided.
 
@@ -577,7 +587,8 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 			... ]
 			>>> _context.checkPythonFuzzing(test_fixture_4)  #doctest: +IGNORE_EXCEPTION_DETAIL
 			Traceback (most recent call last):
-			RuntimeError: ...Command '['coverage', 'run',...'-c'...]' returned...exit status 1...
+			multicast.exceptions.CommandExecutionError: ...Command...
+			'['coverage', 'run',...'-c'...]' returned...exit status 1...
 			>>>
 
 		Testcase 5: Function should capture stderr when specified.
@@ -594,14 +605,16 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 	theOutput = None
 	try:
 		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
-			theOutput = subprocess.check_output(["exit 1 ; #"])
+			theOutput = None
+			_exc_msg = "No command arguments provided to execute."
+			raise CommandExecutionError(str(_exc_msg), exit_code=66) from None
 		else:
 			if str("coverage") in args[0]:
 				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
 	except BaseException as err:  # pragma: no branch
 		theOutput = None
-		raise RuntimeError(err) from err  # do not suppress all errors
+		raise CommandExecutionError(str(err), exit_code=2) from err  # do not suppress errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 

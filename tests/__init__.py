@@ -101,10 +101,14 @@ try:
 	from tests import test_build
 	from tests import test_usage
 	from tests import test_fuzz
+	from tests import test_hear_server_activate
+	from tests import test_hear_cleanup
+	from tests import test_hear_data_processing
 
 	depends = [
 		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
-		test_usage, test_fuzz
+		test_usage, test_fuzz, test_hear_server_activate, test_hear_cleanup,
+		test_hear_data_processing
 	]
 	for unit_test in depends:
 		try:
@@ -137,7 +141,9 @@ except Exception as _cause:  # pragma: no branch
 test_cases = (
 	test_basic.BasicTestSuite, test_deps.TestRequirementsTxt, test_build.TestPEP517Build,
 	test_manifest.TestManifestInclusion, test_install_requires.TestParseRequirements,
-	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite
+	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite,
+	test_hear_server_activate.McastServerActivateTestSuite,
+	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite
 )
 
 

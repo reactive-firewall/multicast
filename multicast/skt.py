@@ -283,7 +283,9 @@ def endSocket(sock=None):
 	"""
 	if sock is not None:  # pragma: no branch
 		try:
-			sock.close()
-			sock.shutdown(_socket.SHUT_RD)  # pragma: no cover
+			try:
+				sock.shutdown(_socket.SHUT_RD)  # pragma: no cover
+			finally:
+				sock.close()  # Some systems won't close
 		except OSError:  # pragma: no branch
-			sock = None
+			sock = None  # So catch and zero the socket

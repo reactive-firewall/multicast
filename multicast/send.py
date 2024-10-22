@@ -293,6 +293,11 @@ class McastSAY(multicast.mtool):
 				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
+				"""--groups""", required=False, nargs='*',
+				dest="""groups""",
+				help="""multicast groups (ip addrs) to listen to join."""
+			)
+			parser.add_argument(
 				"""-m""", """--message""", nargs='+', dest="""data""",
 				default=str("""PING from {name}: group: {group}, port: {port}""")
 			)
@@ -333,15 +338,16 @@ class McastSAY(multicast.mtool):
 		Args:
 			*args: Variable length argument list containing command-line arguments.
 			**kwargs: Arbitrary keyword arguments.
-
-		- group (str): Multicast group address (default: multicast._MCAST_DEFAULT_GROUP)
-		- port (int): Port number (default: multicast._MCAST_DEFAULT_PORT)
-		- data (str, list, or bytes): Message data to be sent. If set to ['-'], reads from stdin.
+			- group (str): Multicast group address (default: multicast._MCAST_DEFAULT_GROUP)
+			- port (int): Port number (default: multicast._MCAST_DEFAULT_PORT)
+			- data (str, list, or bytes): Message to be sent. If set to ['-'], reads from stdin.
 
 		Returns:
-			tuple: A tuple containing a status indicator and result message.
+			tuple: A tuple containing a status indicator and optional error message.
 		"""
-		group = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
+		group = kwargs.get(
+			"group", multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
+		)
 		port = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		data = kwargs.get("data")
 		if data == ['-']:
