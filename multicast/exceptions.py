@@ -436,7 +436,7 @@ def exit_on_exception(func):
 			# otherwise sys.exit(exit_code)
 		except BaseException as exc:
 			exit_code = get_exit_code_from_exception(exc)
-			if (sys.stdout.isatty()):
+			if (sys.stderr.isatty()):
 				print(
 					f"{EXIT_CODES[exit_code][1]}: {exc}",
 					file=sys.stderr
