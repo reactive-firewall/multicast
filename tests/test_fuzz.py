@@ -208,7 +208,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(test_input)
 				with patch('sys.stdin', io.StringIO(test_input)):
 					self.assertIsNone(
-						say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
+						sender.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
 					)
 				self.assertIsNotNone(p)
 				self.assertTrue(p.is_alive())
