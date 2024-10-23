@@ -353,7 +353,6 @@ class McastSAY(multicast.mtool):
 		if data == ['-']:
 			# Read from stdin in chunks
 			while True:
-				chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
 				try:
 					chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
 				except IOError as e:
