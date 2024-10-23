@@ -93,7 +93,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """2.0.0-beta"""
+__version__ = """2.0.0-rc3"""
 """The version of this program.
 
 	Minimal Acceptance Testing:

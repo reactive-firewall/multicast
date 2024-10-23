@@ -137,9 +137,10 @@ if __name__ == '__main__':
 	"""The "Software License Agreement" of this program."""
 	try:
 		class_tags = [
-			str("""Development Status :: 4 - Beta"""),
+			str("""Development Status :: 5 - Production/Stable"""),
 			str("""Environment :: Console"""),
 			str("""Intended Audience :: Developers"""),
+			str("""Operating System :: POSIX"""),
 			str("""Operating System :: MacOS :: MacOS X"""),
 			str("""Operating System :: POSIX :: Linux"""),
 			str("""License :: OSI Approved :: MIT License"""),
@@ -153,7 +154,7 @@ if __name__ == '__main__':
 		]
 	except Exception as e:
 		print(f"Warning: Error occurred while setting class_tags: {e}")
-		class_tags = ["Development Status :: 4 - Beta"]
+		class_tags = ["Development Status :: 5 - Production/Stable"]
 	# finally the setup
 	setup(
 		name=conf_dict["""metadata"""]["""name"""],
