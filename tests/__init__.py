@@ -95,6 +95,7 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
 	from tests import profiling as profiling  # skipcq: PYL-C0414
 	from tests import test_basic
+	from tests import test_exceptions
 	from tests import test_deps
 	from tests import test_install_requires
 	from tests import test_manifest
@@ -108,7 +109,7 @@ try:
 	depends = [
 		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
 		test_usage, test_fuzz, test_hear_server_activate, test_hear_cleanup,
-		test_hear_data_processing
+		test_hear_data_processing, test_exceptions
 	]
 	for unit_test in depends:
 		try:
@@ -139,10 +140,10 @@ except Exception as _cause:  # pragma: no branch
 
 
 test_cases = (
-	test_basic.BasicTestSuite, test_deps.TestRequirementsTxt, test_build.TestPEP517Build,
-	test_manifest.TestManifestInclusion, test_install_requires.TestParseRequirements,
-	test_usage.MulticastTestSuite, test_usage.BasicIntegrationTestSuite,
-	test_hear_server_activate.McastServerActivateTestSuite,
+	test_basic.BasicTestSuite, test_exceptions.TestExceptions, test_deps.TestRequirementsTxt,
+	test_build.TestPEP517Build, test_manifest.TestManifestInclusion,
+	test_install_requires.TestParseRequirements, test_usage.MulticastTestSuite,
+	test_usage.BasicIntegrationTestSuite, test_hear_server_activate.McastServerActivateTestSuite,
 	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite
 )
 
