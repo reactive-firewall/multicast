@@ -651,6 +651,60 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
+	def test_Usage_Error_WHEN_the_help_sub_command_is_called(self):
+		"""Test case for multicast* [HEAR|RECV] --help."""
+		theResult = False
+		fail_fixture = str("""multicast [HEAR|RECV] --help == not helpful""")
+		try:
+			inner_fixtures = [
+				("--daemon {}", "HEAR"), ("{}", "HEAR"),
+				("--daemon {}", "RECV"), ("{}", "RECV"), ("{}", "SAY")
+			]
+			if (self._thepython is not None):
+				for test_case_o in [".__main__", ""]:
+					for test_case_i in inner_fixtures:
+						self.assertIsInstance(test_case_i, tuple)
+						args = [
+							str(self._thepython),
+							str("-m"),
+							str("multicast{}").format(
+								str(
+									test_case_o
+								)
+							),
+							str(test_case_i[0]).format(
+								str(
+									test_case_i[1]
+								)
+							),
+							str("--help")
+						]
+						theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+						context.debugBlob(theOutputtxt)
+						# now test it
+						try:
+							if isinstance(theOutputtxt, bytes):
+								theOutputtxt = theOutputtxt.decode('utf8')
+						except UnicodeDecodeError:
+							theOutputtxt = str(repr(bytes(theOutputtxt)))
+						# or simply:
+						self.assertIsNotNone(theOutputtxt)
+						self.assertIn(str("""usage:"""), str(theOutputtxt))
+						if (str("""usage:""") in str(theOutputtxt)):
+							theResult = True or theResult
+						else:
+							theResult = False
+							context.debugUnexpectedOutput(
+								str("usage:"), str(theOutputtxt), self._thepython
+							)
+		except Exception as err:
+			context.debugtestError(err)
+			err = None
+			del err  # skipcq - cleanup any error leaks early
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
+
 	def test_profile_WHEN_the_noop_command_is_called(self):
 		"""Test case template for profiling"""
 		theResult = False
