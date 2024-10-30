@@ -105,11 +105,12 @@ try:
 	from tests import test_hear_server_activate
 	from tests import test_hear_cleanup
 	from tests import test_hear_data_processing
+	from tests import test_hear_keyboard_interrupt
 
 	depends = [
 		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
 		test_usage, test_fuzz, test_hear_server_activate, test_hear_cleanup,
-		test_hear_data_processing, test_exceptions
+		test_hear_data_processing, test_exceptions, test_hear_keyboard_interrupt
 	]
 	for unit_test in depends:
 		try:
@@ -144,7 +145,8 @@ test_cases = (
 	test_build.TestPEP517Build, test_manifest.TestManifestInclusion,
 	test_install_requires.TestParseRequirements, test_usage.MulticastTestSuite,
 	test_usage.BasicIntegrationTestSuite, test_hear_server_activate.McastServerActivateTestSuite,
-	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite
+	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite,
+	test_hear_keyboard_interrupt.TestHearKeyboardInterrupt
 )
 
 
