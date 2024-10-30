@@ -1,9 +1,10 @@
 name: CI
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - master
       - stable
+      - HOTFIX-*
     tags:
       - v*
   pull_request:
@@ -14,11 +15,18 @@ on:
       - synchronize
       - ready_for_review
 
-# Declare default permissions as read only.
-permissions: read-all
+# Declare default permissions as none.
+permissions: {}
 
 jobs:
   BUILD:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: github.repository == 'reactive-firewall/multicast'
     runs-on: ubuntu-latest
     defaults:
@@ -43,6 +51,13 @@ jobs:
 
 
   BOOTSTRAP:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
@@ -124,6 +139,13 @@ jobs:
 
 
   MATS:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
@@ -167,6 +189,13 @@ jobs:
 
 
   COVERAGE:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
@@ -251,6 +280,13 @@ jobs:
 
 
   STYLE:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ubuntu-latest
@@ -289,6 +325,13 @@ jobs:
 
 
   INTEGRATION:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ success() }}
     needs: [MATS, COVERAGE]
     runs-on: ${{ matrix.os }}
@@ -398,6 +441,13 @@ jobs:
 
 
   EXTRAS-FOR-SETUP:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ success() }}
     needs: [BOOTSTRAP, MATS]
     runs-on: ${{ matrix.os }}
@@ -471,6 +521,13 @@ jobs:
 
 
   EXTRAS-FOR-PIP:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ !cancelled() }}
     needs: [BOOTSTRAP, MATS]
     runs-on: ubuntu-latest
@@ -519,6 +576,13 @@ jobs:
 
 
   DOCS:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ !cancelled() }}
     needs: [MATS, COVERAGE, EXTRAS-FOR-SETUP, EXTRAS-FOR-PIP]
     runs-on: ${{ matrix.os }}
@@ -578,6 +642,13 @@ jobs:
 
 
   TOX:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
     if: ${{ success() }}
     needs: [MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
     runs-on: ubuntu-latest

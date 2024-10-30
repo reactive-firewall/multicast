@@ -3,7 +3,7 @@
 name: Makefile Lint
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: ["main", "master", "stable", feature*]
+    branches: ["main", "master", "stable", patch-*, feature-*, HOTFIX-*]
   pull_request:
     branches: ["main", "master", "stable"]
 

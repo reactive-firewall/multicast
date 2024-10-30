@@ -1,9 +1,9 @@
 # .github/workflows/markdown-lint.yml
 ---
 name: Markdown Lint
-on:
+on:  # yamllint disable-line rule:truthy
   push:
-    branches: ["main", "master", draft, draft*]
+    branches: ["master", "stable", feature-*, patch-*, HOTFIX-*]
   pull_request:
     branches: ["main", "master"]
 

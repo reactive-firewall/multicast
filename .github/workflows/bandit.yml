@@ -11,12 +11,12 @@
 # https://pypi.org/project/bandit/ is Apache v2.0 licensed, by PyCQA
 
 name: Bandit
-on:
+on:  # yamllint disable-line rule:truthy
   push:
-    branches: [ "master", "stable", feature-*, HOTFIX-* ]
+    branches: ["master", "stable", feature-*, patch-*, HOTFIX-*]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "master", "stable" ]
+    branches: ["master", "stable"]
 
 permissions: {}
 
@@ -48,4 +48,3 @@ jobs:
           # skips: # optional, default is DEFAULT
           # path to a .bandit file that supplies command line arguments
           # ini_path: # optional, default is DEFAULT
-
