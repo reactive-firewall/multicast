@@ -29,6 +29,7 @@ try:
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
+		from context import sys
 		from context import unittest
 		from context import subprocess
 		import signal
@@ -51,7 +52,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_HEAR_args = [
-				"""coverage""", """multicast""",
+				str("{} -m coverage run").format(sys.executable), """multicast""",
 				"""--daemon""", """HEAR""",
 				"""--port""", str(_fixture_port_num),
 				"""--group""", """224.0.0.1"""
