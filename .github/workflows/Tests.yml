@@ -223,7 +223,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Windows' }}
-      run: pip install --upgrade pip
+      run: python -m pip install --upgrade pip
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         pip install --upgrade "pip>=22.0" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
