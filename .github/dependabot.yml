@@ -24,7 +24,7 @@ updates:
         dependency-type: "development"
         exclude-patterns:
           - "setuptools*"
-    allow: 
+    allow:
       - dependency-name: "setuptools"
         dependency-type: "production"
       - dependency-name: "pip"
