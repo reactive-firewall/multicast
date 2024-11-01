@@ -3,9 +3,9 @@
 name: Makefile Lint
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: ["main", "master", "stable", patch-*, feature-*, HOTFIX-*]
-  pull_request:
     branches: ["main", "master", "stable"]
+  pull_request:
+    branches: ["main", "master", "stable", feature-*, patch-*, HOTFIX-*]
 
 permissions: {}  # Setting default permissions to none for enhanced security
 

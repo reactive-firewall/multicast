@@ -3,9 +3,9 @@
 name: Markdown Lint
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: ["master", "stable", feature-*, patch-*, HOTFIX-*]
+    branches: ["main", "master", "stable"]
   pull_request:
-    branches: ["main", "master"]
+    branches: ["main", "master", "stable", feature-*, patch-*, HOTFIX-*]
 
 permissions: {}  # Setting default permissions to none for enhanced security
 
