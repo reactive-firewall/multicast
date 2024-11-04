@@ -90,26 +90,28 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_SAY_args = [
+				"""SAY""",
 				"""--port""", str(_fixture_port_num),
 				"""--group""", """'224.0.0.1'""",
 				"""--message""", str("""'{d}'""").format(d=data)
 			]
 			_fixture_HEAR_args = [
+				"""HEAR""",
 				"""--port""", str(_fixture_port_num),
 				"""--groups""", """'224.0.0.1'""",
 				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+				name="HEAR", args=[_fixture_HEAR_args]
 			)
 			p.start()
 			try:
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(_fixture_SAY_args)
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(_fixture_SAY_args)
 				)  # preemptive extra retry
 			except Exception as _cause:
 				p.join()
@@ -179,10 +181,11 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				with length between 56 and 2048 characters.
 
 		Assertions:
-			- ??? FIX ME
+			- FIX ME
 		"""
 		theResult = False
 		fail_fixture = str(f"stdin({text.__sizeof__()}) --> SAY == error")
+		sub_fail_fixture = str("""stdin({text.__sizeof__()}) --> SAY ?-> HEAR? == Error X-> HEAR""")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -207,13 +210,13 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				# ESSENTIAL PART OF THIS TEST
 				self.assertIsNotNone(test_input)
 				with patch('sys.stdin', io.StringIO(test_input)):
-					self.assertIsNone(
+					self.assertIsNotNone(
 						sender.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
 					)
 				self.assertIsNotNone(p)
 				self.assertTrue(p.is_alive())
 				while p.is_alive():
-					sender(group="224.0.0.1", port=_fixture_port_num, data="STOP Test")
+					sender(group="224.0.0.1", port=_fixture_port_num, data=["STOP", "Test"])
 					p.join(1)
 				self.assertFalse(p.is_alive())
 			except Exception as _cause:
@@ -221,11 +224,13 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				if p.is_alive():
 					p.terminate()
 					p.close()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(sub_fail_fixture) from _cause
 			p.join(5)
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))
+		except unittest.SkipTest as _skip_not_invalid:
+			raise unittest.SkipTest(fail_fixture) from _skip_not_invalid
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)

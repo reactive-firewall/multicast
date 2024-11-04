@@ -69,7 +69,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		A: Test that the multicast component is initialized.
 		B: Test that the hear component is initialized.
 		C: Test that the main(HEAR) function-flow is initialized.
-		D: Test that the main(HEAR) function-flow returns an int 0-3.
+		D: Test that the main(HEAR) function-flow returns an int 0-256.
 
 		>>> multicast.__main__ is not None
 		True
@@ -85,9 +85,9 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		True
 		>>> type(test_fixture) is type(0)
 		True
-		>>> int(test_fixture) < int(4)
+		>>> int(test_fixture) < int(256)
 		True
-		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(4))
+		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(156))
 		True
 		>>>
 
@@ -518,6 +518,18 @@ class McastHEAR(multicast.mtool):
 		"""
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
-		with McastServer((HOST, PORT), HearUDPHandler) as server:
-			server.serve_forever()
-		return (0, None)
+		_result = False
+		try:
+			with McastServer((HOST, PORT), HearUDPHandler) as server:
+				_result = True
+				server.serve_forever()
+		except KeyboardInterrupt as userInterrupt:
+			try:
+				old_sock = server.socket
+				if old_sock:
+					multicast.endSocket(old_sock)
+			finally:
+				raise KeyboardInterrupt("HEAR ended after interruption was signaled.") from userInterrupt
+		finally:
+			server.shutdown()
+		return (_result, None)

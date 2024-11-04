@@ -32,11 +32,15 @@
 		>>> import tests as _tests
 		>>> _tests.__module__ is not None
 		True
+		>>> _tests.__package__ is not None
+		True
 		>>>
 
 
 """
 
+__package__ = """tests"""
+"""This is multicast testing package."""
 
 __module__ = """tests"""
 """This is multicast testing module."""
@@ -101,15 +105,15 @@ try:
 	from tests import test_manifest
 	from tests import test_build
 	from tests import test_usage
-	from tests import test_fuzz
 	from tests import test_hear_server_activate
 	from tests import test_hear_cleanup
 	from tests import test_hear_data_processing
 	from tests import test_hear_keyboard_interrupt
+	from tests import test_fuzz
 
 	depends = [
 		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
-		test_usage, test_fuzz, test_hear_server_activate, test_hear_cleanup,
+		test_usage, test_hear_server_activate, test_hear_cleanup, test_fuzz,
 		test_hear_data_processing, test_exceptions, test_hear_keyboard_interrupt
 	]
 	for unit_test in depends:

@@ -261,7 +261,7 @@ def main(*argv):  # pragma: no cover
 
 
 if __name__ in '__main__':  # pragma: no cover
-	exitcode = 3
+	exitcode = 2
 	try:
 		exitcode = main(sys.argv[1:])
 	finally:

@@ -83,7 +83,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		A: Test that the multicast component is initialized.
 		B: Test that the recv component is initialized.
 		C: Test that the main(RECV) function-flow is initialized.
-		D: Test that the main(RECV) function-flow returns an int 0-3.
+		D: Test that the main(RECV) function-flow returns an int 0-255.
 
 		>>> multicast.__main__ is not None
 		True
@@ -99,9 +99,9 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		True
 		>>> type(test_fixture) is type(0)
 		True
-		>>> int(test_fixture) < int(4)
+		>>> int(test_fixture) < int(256)
 		True
-		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(4))
+		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(256))
 		True
 		>>>
 
@@ -457,7 +457,7 @@ class McastRECV(multicast.mtool):
 				A: Test that the multicast component is initialized.
 				B: Test that the recv component is initialized.
 				C: Test that the main(recv) function is initialized.
-				D: Test that the main(recv) function returns an int 0-3.
+				D: Test that the main(recv) function returns an int 0-255.
 
 				>>> multicast.recv is not None
 				True
@@ -471,7 +471,7 @@ class McastRECV(multicast.mtool):
 				<...int...>
 				>>> int(test_fixture) >= int(0)
 				True
-				>>> int(test_fixture) < int(4)
+				>>> int(test_fixture) < int(256)
 				True
 				>>>
 

@@ -68,8 +68,9 @@ init: ../docs/
 	@ln -sf ../LICENSE.md $(SRCDIR)/LICENSE.md
 
 clean:
-	@-rm -rf $(BUILDDIR)/* 2>/dev/null || true
-	@-rm -rfRd $(SRCDIR)/apidocs/* 2>/dev/null || true
+	@-rm -rf $(SRCDIR)/$(BUILDDIR)/* 2>/dev/null || true
+	@-rm -fd $(SRCDIR)/$(BUILDDIR) 2>/dev/null || true
+	@-rm -rfd $(SRCDIR)/apidocs/* 2>/dev/null || true
 	@-unlink $(SRCDIR)/README.md 2>/dev/null || true
 	@-unlink $(SRCDIR)/tests 2>/dev/null || true
 	@-unlink $(SRCDIR)/LICENSE.md 2>/dev/null || true

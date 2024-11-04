@@ -318,15 +318,14 @@ class McastSAY(multicast.mtool):
 		Returns:
 			bool: True if the message was sent successfully, False otherwise.
 		"""
-		sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
+		_success = False
+		sock = multicast.genSocket()
 		try:
-			sock.setsockopt(
-				_socket.IPPROTO_IP, _socket.IP_MULTICAST_TTL,
-				multicast._MCAST_DEFAULT_TTL  # skipcq: PYL-W0212  -  use of module-wide var.
-			)
 			sock.sendto(data.encode('utf8'), (group, port))
+			_success = True
 		finally:
 			multicast.endSocket(sock)
+		return _success
 
 	def doStep(self, *args, **kwargs):
 		"""
@@ -350,7 +349,9 @@ class McastSAY(multicast.mtool):
 		)
 		port = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		data = kwargs.get("data")
+		_result = False
 		if data == ['-']:
+			_result = True
 			# Read from stdin in chunks
 			while True:
 				try:
@@ -360,11 +361,12 @@ class McastSAY(multicast.mtool):
 					break
 				if not chunk:
 					break
-				self._sayStep(group, port, chunk)
+				_result = _result and self._sayStep(group, port, chunk)
 		elif isinstance(data, list):
 			# Join multiple arguments into a single string
 			message = str(""" """).join(data)
-			self._sayStep(group, port, message)
+			_result = self._sayStep(group, port, message)
 		else:
 			message = data.decode('utf8') if isinstance(data, bytes) else str(data)
-			self._sayStep(group, port, message)
+			_result = self._sayStep(group, port, message)
+		return (_result, None)  # skipcq: PTC-W0020  - intended

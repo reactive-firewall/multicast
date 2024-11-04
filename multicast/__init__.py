@@ -473,7 +473,7 @@ class mtool(abc.ABC):
 		return calling_parser_group
 
 	@classmethod
-	def parseArgs(cls, arguments=None):
+	def parseArgs(cls, arguments):
 		"""
 		Will attempt to parse the given CLI arguments.
 
@@ -595,7 +595,7 @@ class mtool(abc.ABC):
 		pass  # skipcq - abstract method
 
 	@abc.abstractmethod
-	def doStep(self, *args):  # pragma: no cover
+	def doStep(self, *args, **kwargs):  # pragma: no cover
 		"""
 		Abstracts the __call__ behavior for sub-classing the tool.
 

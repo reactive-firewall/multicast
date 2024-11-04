@@ -82,12 +82,12 @@ Minimal Acceptance Testing:
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automatically imported.
+	Testcase 1: exceptions should be automatically imported.
 
-		>>> multicast.recv.__package__ is not None
+		>>> multicast.exceptions.__package__ is not None
 		True
 		>>>
-		>>> multicast.recv.__package__ == multicast.__package__
+		>>> multicast.exceptions.__package__ == multicast.__package__
 		True
 		>>>
 
@@ -144,6 +144,7 @@ __name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
 try:
 	from . import sys  # skipcq: PYL-C0414
 	from . import argparse  # skipcq: PYL-C0414
+	import functools
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
@@ -179,6 +180,10 @@ class CommandExecutionError(RuntimeError):
 			1
 	"""
 
+	__module__ = """multicast.exceptions"""
+
+	__name__ = """multicast.exceptions.CommandExecutionError"""
+
 	def __init__(self, *args, **kwargs):
 		"""
 		Initialize CommandExecutionError with a message and exit code.
@@ -197,7 +202,7 @@ class CommandExecutionError(RuntimeError):
 			Testcase 1: Initialization with different exit code:
 				A. - Initializes a CommandExecutionError with a specific exit code.
 				B. - Checks the message is still set, as super class would.
-				C. - check the specific exit code is 2.
+				C. - Checks the specific exit code is Misuse-Error (2).
 
 				>>> error = CommandExecutionError("Error message", 2)
 				>>> error.message
@@ -208,21 +213,42 @@ class CommandExecutionError(RuntimeError):
 			Testcase 2: Initialization with different call to init:
 				A. - Initializes a CommandExecutionError with a specific exit code.
 				B. - Checks the message is still set, as super class would.
-				C. - check the specific exit code is 64.
+				C. - Checks the specific exit code is Usage-Error (64).
 
-				>>> pre_made_args = ["A Pre-made Error Message", int(64)]
+				>>> pre_made_args = ["Usage Error", int(64)]
+				>>> error = CommandExecutionError(*pre_made_args)
+				>>> error.message
+				'Usage Error'
+				>>> error.exit_code
+				64
+
+			Testcase 3: Initialization with different call to init:
+				A. - Initializes a CommandExecutionError with a specific exit code.
+				B. - Checks the message is still set, as super class would.
+				C. - Checks the cause is set, as super class would.
+				D. - Checks the specific exit code is sixty-five (65).
+
+				>>> pre_made_args = [ValueError("inner Cause"), "A Pre-made Error Message", int(65)]
 				>>> error = CommandExecutionError(*pre_made_args)
 				>>> error.message
 				'A Pre-made Error Message'
+				>>> error.__cause__  #doctest: +ELLIPSIS
+				ValueError...inner Cause...
 				>>> error.exit_code
-				64
+				65
 		"""
 		if len(args) > 0 and isinstance(args[-1], int):
 			exit_code = args[-1]
 			args = args[:-1]
 		else:
 			exit_code = kwargs.pop("exit_code", 1)
+		if len(args) > 0 and isinstance(args[0], BaseException):
+			__cause__ = args[0]
+			args = args[1:]
+		else:
+			__cause__ = kwargs.pop("__cause__", None)
 		super().__init__(*args, **kwargs)
+		self.__cause__ = __cause__
 		self.message = args[0] if args else kwargs.get("message", "An error occurred")
 		self.exit_code = exit_code
 
@@ -257,13 +283,15 @@ containing the associated exception class (or `None` if not applicable) and a hu
 description of the exit condition.
 
 CEP-8 Compliance:
-	In accordance with [CEP-8]
+	In accordance with
+	[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)
 	guidelines, this mapping facilitates consistent error handling and exit code management
 	throughout the module. By associating specific exceptions with standard exit codes, the
 	application adheres to predictable behavior in response to various error conditions, enhancing
 	maintainability and debugging efficiency.
 
-	Specific codes are detailed more in CEP-8.
+	Specific codes are detailed more in
+	[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161).
 
 Usage Example:
 	```python
@@ -421,6 +449,7 @@ def exit_on_exception(func):
 			Traceback (most recent call last):
 			SystemExit...65...
 	"""
+	@functools.wraps(func)
 	def wrapper(*args, **kwargs):
 		try:
 			return func(*args, **kwargs)
@@ -429,19 +458,19 @@ def exit_on_exception(func):
 			exit_code = exc.code if isinstance(exc.code, int) else 2
 			if (sys.stderr.isatty()):
 				print(
-					f"{EXIT_CODES.get(exit_code, (1, 'General Error'))[1]}: {exc}",
-					file=sys.stderr
-				)
-			raise SystemExit(exit_code) from exc
-			# otherwise sys.exit(exit_code)
-		except BaseException as exc:
-			exit_code = get_exit_code_from_exception(exc)
-			if (sys.stderr.isatty()):
-				print(
 					f"{EXIT_CODES[exit_code][1]}: {exc}",
 					file=sys.stderr
 				)
 			raise SystemExit(exit_code) from exc
+			# otherwise sys.exit(exit_code)
+		except BaseException as err:
+			exit_code = get_exit_code_from_exception(err)
+			if (sys.stderr.isatty()):
+				print(
+					f"{EXIT_CODES[exit_code][1]}: {err}",
+					file=sys.stderr
+				)
+			raise SystemExit(exit_code) from err
 			# otherwise sys.exit(exit_code)
 	return wrapper
 

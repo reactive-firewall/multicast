@@ -12,6 +12,7 @@ exclude_lines =
     pragma: no cover
     from . import
     pass
+    except ImportError
     except Exception
     except BaseException
     # Don't complain if tests don't hit defensive assertion code:

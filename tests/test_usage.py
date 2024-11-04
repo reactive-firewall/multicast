@@ -57,7 +57,9 @@ try:
 	if context.__name__ is None:
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
+		from collections import namedtuple
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+		from multicast import __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		import io
 		from unittest.mock import patch
@@ -145,31 +147,45 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	def test_say_is_stable_WHEN_calling_multicast_GIVEN_say_tool(self):
-		"""Tests the message argument for expected syntax given simple args"""
+		"""
+		Tests the message argument for expected syntax given simple args.
+
+		First check that the --message argument requires a message value, or exits(2) as per CEP-8.
+		Second check that providing the message value "test" is sufficient to succeed with exit(0).
+
+		Rational of these tests are simple enough, the mis-use of the SAY sub-command should result
+		in an argument error value of 2, due to misuse of shell/CLI builtin as per CEP-8, while a
+		value of 0 should indicate success.
+		"""
 		theResult = False
 		fail_fixture = str(
 			"""multicast.__main__.McastDispatch().useTool(SAY, message) != valid exit(0..3)"""
 		)
 		try:
-			(tst_err_rslt_a, rtn_val_a) = multicast.__main__.main(
-				["SAY", "--message"]
-			)
-			(tst_err_rslt_b, rtn_val_b) = multicast.__main__.main(
+			with self.assertRaises(SystemExit) as rtn_val_a:
+				_ = multicast.__main__.McastDispatch().doStep(
+					["SAY", "--message"]
+				)
+			(tst_err_rslt_b, rtn_val_b) = multicast.__main__.McastDispatch().doStep(
 				["SAY", "--message", "test"]
 			)
-			self.assertIsNotNone(tst_err_rslt_a)
-			self.assertIsNotNone(tst_err_rslt_b)
+			tst_err_rslt_a = rtn_val_a.exception.code
 			self.assertIsNotNone(rtn_val_a)
 			self.assertIsNotNone(rtn_val_b)
-			self.assertNotEqual(int(tst_err_rslt_a), int(0))
-			self.assertNotEqual(int(tst_err_rslt_a), int(1))
+			self.assertIsNotNone(tst_err_rslt_a)
+			self.assertIsNotNone(tst_err_rslt_b)
+			self.assertNotEqual(int(tst_err_rslt_a), int(0), str(rtn_val_a))
+			self.assertNotEqual(int(tst_err_rslt_a), int(1), str(rtn_val_a))
 			self.assertNotEqual(int(tst_err_rslt_b), int(1), str(rtn_val_b))
-			self.assertNotEqual(int(tst_err_rslt_a), int(2))
-			self.assertNotEqual(int(tst_err_rslt_b), int(2))
+			self.assertNotEqual(int(tst_err_rslt_b), int(2), str(rtn_val_b))
 			self.assertNotEqual(rtn_val_a, rtn_val_b)
+			self.assertNotEqual(tst_err_rslt_a, tst_err_rslt_b)
 			self.assertNotEqual(int(tst_err_rslt_b), int(tst_err_rslt_a))
 			self.assertNotEqual(int(tst_err_rslt_a), int(tst_err_rslt_b))
 			self.assertNotEqual(int(tst_err_rslt_b), int(3))
+			self.assertNotEqual(int(tst_err_rslt_a), int(3))
+			self.assertEqual(int(tst_err_rslt_a), int(2), str(rtn_val_a))
+			self.assertEqual(int(tst_err_rslt_b), int(0), str(rtn_val_b))
 			theResult = (int(tst_err_rslt_b) < int(tst_err_rslt_a))
 		except Exception as err:
 			context.debugtestError(err)
@@ -180,29 +196,31 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_recv_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(2)""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(1)""")
 		try:
-			(tst_err_rslt_c, rtn_val_c) = multicast.__main__.McastDispatch().doStep(
-				"RECV", ["--port", "test"]
-			)
-			(tst_err_rslt_d, rtn_val_d) = multicast.__main__.McastDispatch().doStep(
-				"RECV", ["--port=test", "group=None"]
-			)
-			self.assertIsNotNone(tst_err_rslt_c)
-			self.assertIsNotNone(tst_err_rslt_d)
+			with self.assertRaises(SystemExit) as rtn_val_c:
+				_ = multicast.__main__.McastDispatch().doStep(
+					["RECV", "--port", "test"]
+				)
+			with self.assertRaises(SystemExit) as rtn_val_d:
+				_ = multicast.__main__.McastDispatch().doStep(
+					["RECV", "--port=test", "group=None"]
+				)
 			self.assertIsNotNone(rtn_val_c)
 			self.assertIsNotNone(rtn_val_d)
-			self.assertIsNotNone(rtn_val_c[0])
-			self.assertIsNotNone(rtn_val_d[0])
+			tst_err_rslt_c = rtn_val_c.exception.code
+			tst_err_rslt_d = rtn_val_d.exception.code
+			self.assertIsNotNone(tst_err_rslt_c)
+			self.assertIsNotNone(tst_err_rslt_d)
 			self.assertNotEqual(int(tst_err_rslt_c), int(0))
 			self.assertNotEqual(int(tst_err_rslt_c), int(1))
+			self.assertNotEqual(int(tst_err_rslt_d), int(1))
 			self.assertNotEqual(int(tst_err_rslt_d), int(1))
 			self.assertEqual(int(tst_err_rslt_c), int(2))
 			self.assertEqual(int(tst_err_rslt_d), int(2))
 			self.assertEqual(int(tst_err_rslt_d), int(tst_err_rslt_c))
 			self.assertEqual(int(tst_err_rslt_c), int(tst_err_rslt_d))
 			self.assertNotEqual(int(tst_err_rslt_d), int(3))
-			self.assertEqual(rtn_val_c, rtn_val_d)
 			theResult = (int(tst_err_rslt_d) == int(tst_err_rslt_c))
 		except Exception as err:
 			context.debugtestError(err)
@@ -213,28 +231,55 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(2)""")
+		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HEAR, junk) != exit(2)""")
 		try:
-			(tst_err_rslt_e, rtn_val_e) = multicast.__main__.main(
-				["HEAR", "--port", "test"]
-			)
-			(tst_err_rslt_f, rtn_val_f) = multicast.__main__.main(
-				["HEAR", "--group", "None", "--iface=None"]
-			)
-			self.assertIsNotNone(tst_err_rslt_e)
-			self.assertIsNotNone(tst_err_rslt_f)
+			with self.assertRaises(SystemExit) as rtn_val_e:
+				_ = __main__.main(
+					["HEAR", "--port", "test"]
+				)
+			with self.assertRaises(SystemExit) as rtn_val_f:
+				_ = __main__.main(
+					["RECV", "--port", "test"]
+				)
 			self.assertIsNotNone(rtn_val_e)
 			self.assertIsNotNone(rtn_val_f)
+			tst_err_rslt_e = rtn_val_e.exception.code
+			tst_err_rslt_f = rtn_val_f.exception.code
+			self.assertIsNotNone(tst_err_rslt_e)
+			self.assertIsNotNone(tst_err_rslt_f)
 			self.assertNotEqual(int(tst_err_rslt_e), int(0))
-			self.assertNotEqual(int(tst_err_rslt_e), int(1))
 			self.assertNotEqual(int(tst_err_rslt_f), int(0))
-			self.assertNotEqual(int(tst_err_rslt_e), int(2))
-			self.assertNotEqual(int(tst_err_rslt_f), int(2))
+			self.assertNotEqual(int(tst_err_rslt_e), int(1))
+			self.assertNotEqual(int(tst_err_rslt_f), int(1))
+			self.assertEqual(int(tst_err_rslt_e), int(2), "CEP-8 Violation. REGRESSION in HEAR")
+			self.assertEqual(int(tst_err_rslt_f), int(2), "CEP-8 Violation. REGRESSION in RECV")
 			self.assertNotEqual(rtn_val_e, rtn_val_f)
-			self.assertNotEqual(int(tst_err_rslt_f), int(tst_err_rslt_e))
-			self.assertNotEqual(int(tst_err_rslt_e), int(tst_err_rslt_f))
-			self.assertNotEqual(int(tst_err_rslt_f), int(3))
-			theResult = (int(tst_err_rslt_f) < int(tst_err_rslt_e))
+			self.assertNotEqual(int(tst_err_rslt_e), int(3), "Regression. 3 != 64")
+			self.assertNotEqual(int(tst_err_rslt_f), int(3), "Regression. 3 != 64")
+			self.assertEqual(int(tst_err_rslt_f), int(tst_err_rslt_e))
+			theResult = (int(tst_err_rslt_f) == int(tst_err_rslt_e))
+		except Exception as err:
+			context.debugtestError(err)
+			self.fail(fail_fixture)
+			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	def test_hear_ignores_WHEN_calling_multicast_GIVEN_invalid_args(self):
+		"""Tests the group argument for new auto-default behavior given None."""
+		theResult = False
+		fail_fixture = str("""multicast.__main__.main(HEAR, group=None) == ERROR""")
+		try:
+			(rtn_val_f, tst_err_rslt_f) = __main__.main(
+				["HEAR", "--group", "None", "--iface=None"]
+			)
+			self.assertIsNotNone(rtn_val_f)
+			self.assertIsNotNone(tst_err_rslt_f)
+			self.assertNotEqual(int(tst_err_rslt_f[0]), int(1), "REGRESSION in JOIN")
+			self.assertNotEqual(int(tst_err_rslt_f[0]), int(70), "CEP-8 Violation.")
+			self.assertNotEqual(int(tst_err_rslt_f[0]), int(2), "CEP-8 Violation.")
+			self.assertNotEqual(int(tst_err_rslt_f[0]), int(3), "CEP-8 Violation.")
+			self.assertEqual(int(tst_err_rslt_f[0]), int(0), fail_fixture)
+			theResult = (int(tst_err_rslt_f[0]) == int(0))
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -248,7 +293,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		try:
 			self.assertTupleEqual(
 				multicast.__main__.main(["HEAR", "--hex"]),
-				(0, (True, (False, None)))  # skipcq: PTC-W0020  - This is test-code.
+				(70, (False, None))  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
 		except Exception as err:
@@ -280,11 +325,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HELP, []) == Empty""")
 		try:
-			self.assertIsNotNone(multicast.__main__.McastDispatch().doStep("HELP", []))
-			self.assertTupleEqual(
-				multicast.__main__.McastDispatch().doStep(["HELP"], []),
-				(int(2), "NoOp"),  # skipcq: PTC-W0020  - This is test-code.
-			)
+			with self.assertRaises(SystemExit) as rtn_val_h:
+				multicast.__main__.McastDispatch().doStep(["HELP"])
+			self.assertIsNotNone(rtn_val_h)
 			theResult = True
 		except Exception as err:
 			context.debugtestError(err)
@@ -296,6 +339,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		"""Tests the basic send and recv test"""
 		theResult = False
 		fail_fixture = str("""SAY --> HEAR == error""")
+		sub_fail_fixture = str("""SAY X-> HEAR == Error X-> HEAR :: (Error in SAY)""")
 		try:
 			_fixture_SAY_args = [
 				"""--port""", """59991""",
@@ -309,26 +353,28 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+				name="HEAR", args=(["""HEAR""", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
 				)
 			except Exception as _cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(sub_fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
-			self.assertEqual(int(p.exitcode), int(0))
+			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) <= int(0))
+		except unittest.SkipTest as invalidTest:
+			raise unittest.SkipTest(sub_fail_fixture) from invalidTest
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -349,24 +395,25 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				"""--message""", """'test message'"""
 			]
 			_fixture_HEAR_args = [
+				"""HEAR""",
 				"""--port""", str(_fixture_port_num),
 				"""--groups""", """'224.0.0.1'""",
 				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=("HEAR", _fixture_HEAR_args,)
+				name="HEAR", args=(["""HEAR""", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+					multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
 				)
 			except Exception as _cause:
 				p.join()
@@ -375,6 +422,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))
+		except unittest.SkipTest as invalidTest:
+			raise unittest.SkipTest("Fuzzing broke SAY fixture.") from invalidTest
 		except Exception as err:
 			context.debugtestError(err)
 			self.skipTest(fail_fixture)
@@ -409,21 +458,21 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""NOOP --> RECV != error""")
 		sub_fail_fixture = str("""NOOP X-> RECV == Error X-> RECV :: (Error in NOOP)""")
 		try:
-			_fixture_HEAR_args = [
+			_fixture_RECV_args = [
 				"""--port""", """59992""",
 				"""--groups""", """'224.0.0.1'""",
 				"""--group""", """'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="NOHEAR", args=("RECV", _fixture_HEAR_args,)
+				name="NOHEAR", args=(["RECV", _fixture_RECV_args])
 			)
 			p.start()
 			try:
 				test_cls = multicast.__main__.McastDispatch()
 				self.assertTupleEqual(
-					test_cls.doStep("NOOP", []),
-					(int(2), "NoOp"),  # skipcq: PTC-W0020  - This is test-code.
+					test_cls.doStep(["NOOP", []]),
+					(int(0), (True, None)),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
 			except Exception as _cause:
@@ -431,8 +480,10 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				raise unittest.SkipTest(sub_fail_fixture) from _cause
 			p.join()
 			self.assertIsNotNone(p.exitcode, fail_fixture)
-			self.assertEqual(int(p.exitcode), int(0))
+			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) <= int(0))
+		except unittest.SkipTest as invalidTest:
+			raise unittest.SkipTest(sub_fail_fixture) from invalidTest
 		except Exception as err:
 			context.debugtestError(err)
 			self.fail(fail_fixture)
@@ -656,14 +707,19 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		fail_fixture = str("""multicast [HEAR|RECV] --help == not helpful""")
 		try:
+			TestCase = namedtuple("TestCase", ["mode", "command"])
 			inner_fixtures = [
-				("--daemon {}", "HEAR"), ("{}", "HEAR"),
-				("--daemon {}", "RECV"), ("{}", "RECV"), ("{}", "SAY")
+				TestCase(mode="--daemon {}", command="HEAR"),
+				TestCase(mode="{}", command="HEAR"),
+				TestCase(mode="--daemon {}", command="RECV"),
+				TestCase(mode="{}", command="RECV"),
+				TestCase(mode="{}", command="SAY")
 			]
 			if (self._thepython is not None):
+				theResult = True
 				for test_case_o in [".__main__", ""]:
 					for test_case_i in inner_fixtures:
-						self.assertIsInstance(test_case_i, tuple)
+						self.assertIsInstance(test_case_i, TestCase)
 						args = [
 							str(self._thepython),
 							str("-m"),
@@ -672,9 +728,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 									test_case_o
 								)
 							),
-							str(test_case_i[0]).format(
+							str(test_case_i.mode).format(
 								str(
-									test_case_i[1]
+									test_case_i.command
 								)
 							),
 							str("--help")
@@ -691,7 +747,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						self.assertIsNotNone(theOutputtxt)
 						self.assertIn(str("""usage:"""), str(theOutputtxt))
 						if (str("""usage:""") in str(theOutputtxt)):
-							theResult = True or theResult
+							theResult = True and theResult
 						else:
 							theResult = False
 							context.debugUnexpectedOutput(

@@ -66,6 +66,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__doc__""",
 	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""TASK_OPTIONS""",
 ]
 
 
@@ -79,52 +80,59 @@ __file__ = """multicast/__main__.py"""
 
 
 try:
-	from . import sys as _sys
-except Exception as impErr:
+	from . import sys
+except ImportError as impErr:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
 
 
-if 'multicast.__version__' not in _sys.modules:
+if 'multicast.__version__' not in sys.modules:
 	from . import __version__ as __version__  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	__version__ = _sys.modules["""multicast.__version__"""]
+	__version__ = sys.modules["""multicast.__version__"""]
 
 
-if 'multicast._MCAST_DEFAULT_PORT' not in _sys.modules:
+if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
 	from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	_MCAST_DEFAULT_PORT = _sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
+	_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 
 
-if 'multicast._MCAST_DEFAULT_GROUP' not in _sys.modules:
+if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
 	from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	_MCAST_DEFAULT_GROUP = _sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
+	_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
 
 
-if 'multicast.mtool' not in _sys.modules:
+if 'multicast.exceptions' not in sys.modules:
+	# pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
+	from . import exceptions as exceptions  # skipcq: PYL-C0414
+else:  # pragma: no branch
+	exceptions = sys.modules["""multicast.exceptions"""]
+
+
+if 'multicast.mtool' not in sys.modules:
 	from . import mtool as mtool  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	mtool = _sys.modules["""multicast.mtool"""]
+	mtool = sys.modules["""multicast.mtool"""]
 
 
-if 'multicast.recv' not in _sys.modules:
+if 'multicast.recv' not in sys.modules:
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	recv = _sys.modules["""multicast.recv"""]
+	recv = sys.modules["""multicast.recv"""]
 
 
-if 'multicast.send' not in _sys.modules:
+if 'multicast.send' not in sys.modules:
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	send = _sys.modules["""multicast.send"""]
+	send = sys.modules["""multicast.send"""]
 
 
-if 'multicast.hear' not in _sys.modules:
+if 'multicast.hear' not in sys.modules:
 	from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	hear = _sys.modules["""multicast.hear"""]
+	hear = sys.modules["""multicast.hear"""]
 
 
 class McastNope(mtool):
@@ -256,7 +264,11 @@ class McastNope(mtool):
 			tuple: A "tuple" set to None.
 
 		"""
-		return self.NoOp(*args, **kwargs)
+		_None_from_NoOp = self.NoOp(*args, **kwargs)
+		return (
+			True if _None_from_NoOp is None else False,
+			None if _None_from_NoOp is None else _None_from_NoOp  # noqa
+		)
 
 
 class McastRecvHearDispatch(mtool):
@@ -530,17 +542,17 @@ class McastDispatch(mtool):
 		_is_done = False
 		if (tool is not None) and (tool in cached_list):
 			try:
-				theResult = TASK_OPTIONS[tool].__call__([], **kwargs)
-				_is_done = True
+				(_is_done, theResult) = TASK_OPTIONS[tool].__call__([], **kwargs)
 			except Exception as e:  # pragma: no branch
 				theResult = str(
 					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {errs}"""
 				).format(
 					t=tool, args=kwargs, errs=e
 				)
+				_is_done = False
 		return (_is_done, theResult)  # noqa
 
-	def doStep(self, *args):
+	def doStep(self, *args, **kwargs):
 		"""
 		Executes the multicast tool based on parsed arguments.
 
@@ -553,36 +565,40 @@ class McastDispatch(mtool):
 		Returns:
 			A tuple containing the exit status and the result of the tool execution.
 		"""
-		__EXIT_MSG = (1, "Unknown")
+		__EXIT_MSG = (64, exceptions.EXIT_CODES[64][1])
 		try:
-			try:
-				(argz, _) = type(self).parseArgs(*args)
-				service_cmd = argz.cmd_tool
-				argz.__dict__.__delitem__("""cmd_tool""")
-				_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
-				if _TOOL_MSG[0]:
-					__EXIT_MSG = (0, _TOOL_MSG)
-				elif (_sys.stdout.isatty()):  # pragma: no cover
-					print(_TOOL_MSG)
-			except Exception as inerr:  # pragma: no branch
-				w = str("WARNING - An error occurred while")
-				w += str(" handling the arguments.")
-				w += str(" Refused.")
-				if (_sys.stdout.isatty()):  # pragma: no cover
-					print(w)
-					print(str(inerr))
-					print(str(inerr.args))
-				del inerr  # skipcq - cleanup any error leaks early
-				__EXIT_MSG = (2, "NoOp")
-		except BaseException:  # pragma: no branch
-			e = str("CRITICAL - An error occurred while handling")
-			e += str(" the dispatch.")
-			if (_sys.stdout.isatty()):  # pragma: no cover
-				print(str(e))
-			__EXIT_MSG = (3, "STOP")
+			(argz, _) = type(self).parseArgs(*args)
+			service_cmd = argz.cmd_tool
+			argz.__dict__.__delitem__("""cmd_tool""")
+			_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
+			if _TOOL_MSG[0]:
+				__EXIT_MSG = (0, _TOOL_MSG)
+			else:
+				__EXIT_MSG = (70, _TOOL_MSG)
+				if (sys.stdout.isatty()):  # pragma: no cover
+					print(str(_TOOL_MSG))
+		except Exception as err:  # pragma: no branch
+			exit_code = exceptions.get_exit_code_from_exception(err)
+			__EXIT_MSG = (
+				False, str(
+					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {code} {errs}"""
+				).format(
+					t=__name__, args=args, code=exit_code, errs=err
+				)
+			)
+			if (sys.stderr.isatty()):
+				print(
+					"WARNING - An error occurred while handling the arguments. Refused.",
+					file=sys.stderr
+				)
+				print(
+					f"{exceptions.EXIT_CODES[exit_code][1]}: {err}\n{err.args}",
+					file=sys.stderr
+				)
 		return __EXIT_MSG  # noqa
 
 
+@exceptions.exit_on_exception
 def main(*argv):
 	"""
 	Do main event stuff.
@@ -597,12 +613,11 @@ def main(*argv):
 	The expected return codes are as follows:
 		= 0:  Any nominal state (i.e. no errors and possibly success)
 		≥ 1:  Any erroneous state (includes simple failure)
-		= 2:  Any failed state
-		= 3:  Any undefined (but assumed erroneous) state
+		> 2:  Any failed state
 		< 0:  Implicitly erroneous and treated the same as abs(exit_code) would be.
 
 	Args:
-		*argv: the array of arguments. Usually _sys.argv[1:]
+		*argv: the array of arguments. Usually sys.argv[1:]
 
 	Returns:
 		tuple: the underlying exit code int, and optional detail string.
@@ -695,9 +710,9 @@ def main(*argv):
 
 
 if __name__ in '__main__':
-	__EXIT_CODE = (2, "NoOp")
-	if (_sys.argv is not None) and (len(_sys.argv) > 1):
-		__EXIT_CODE = main(_sys.argv[1:])
-	elif (_sys.argv is not None):
+	__EXIT_CODE = (1, exceptions.EXIT_CODES[1][1])
+	if (sys.argv is not None) and (len(sys.argv) > 1):
+		__EXIT_CODE = main(sys.argv[1:])
+	elif (sys.argv is not None):
 		__EXIT_CODE = main([str(__name__), """-h"""])
 	exit(__EXIT_CODE[0])  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing

@@ -9,8 +9,14 @@ reviews:
     # Code Review Instructions
 
     - Ensure the code follows best practices and coding standards.
+    - Check for security vulnerabilities and potential issues.
+    - Ensure the code follows the **DRY, AHA, and SOLID** principles.
+    - Our "Code Review Checklist Guide" is documented in
+      [CEP-4](https://gist.github.com/reactive-firewall/cc041f10aad1d43a5ef15f50a6bbd5a5)
     - For **Python** code, follow
-      [PEP 20](https://www.python.org/dev/peps/pep-0020/) and
+      [PEP 20](https://www.python.org/dev/peps/pep-0020/),
+      [PEP 483](https://peps.python.org/pep-0483/),
+      [PEP 729](https://peps.python.org/pep-0729/), and
       [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)
       standards.
     - For **BASH** and **Shellscript** code, follow
@@ -19,8 +25,6 @@ reviews:
       standards.
     - Check all **BASH** files start with an
       [extensive disclaimer](https://gist.github.com/reactive-firewall/866b42d175ae3ebefcb2a5878b30ea17).
-    - Check for security vulnerabilities and potential issues.
-    - Ensure the code follows the **DRY, AHA, and SOLID** principles.
 
     # Documentation Review Instructions
     - Verify that documentation and comments are clear and comprehensive.
@@ -28,16 +32,20 @@ reviews:
     - Verify that technical documentation includes a "References" section at
       the end of documentation, using the same format as actual RFCs, with
       both "Normative References" and "Informative References".
+    - Ensure that that documentation and comments follow
+      [CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20)
 
     # Test Code Review Instructions
     - Ensure that test code is automated, comprehensive, and follows testing best practices.
     - Verify that all critical functionality is covered by tests.
-    - Ensure that test code follow
-      [CEP-8](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6)
+    - For **test** code, *also* follow
+      [CEP-9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6)
 
     # Misc.
     - Confirm that the code meets the project's requirements and objectives.
     - Confirm that copyright years are up-to date whenever a file is changed.
+    - For **Python** code, consider [PEP 290](https://peps.python.org/pep-0290/) whenever a python
+      (e.g. has the extension '.py') file is changed.
   request_changes_workflow: true
   high_level_summary: true
   high_level_summary_placeholder: '@coderabbitai summary'
@@ -81,7 +89,7 @@ reviews:
         3. You may assume the file 'README.md' will contain GitHub flavor Markdown.
     - path: '**/*.py'
       instructions: >-
-        When reviewing Python code for this project:
+        When reviewing **Python** code for this project:
 
         1. Prioritize portability over clarity, especially when dealing with cross-Python compatibility. However, with the priority in mind, do still consider improvements to clarity when relevant.
 
@@ -96,7 +104,7 @@ reviews:
         6. Verify Flake8's configuration file is located at ".flake8.ini"
     - path: tests/*
       instructions: >-
-        When reviewing test code:
+        When reviewing **test** code:
 
         1. Prioritize portability over clarity, especially when dealing with cross-Python compatibility. However, with the priority in mind, do still consider improvements to clarity when relevant.
 
@@ -167,6 +175,7 @@ reviews:
           - 'CEP-8'
           - 'CEP-7'
           - 'CEP-5'
+          - 'CEP-4'
           - 'Shellscript'
           - 'bash'
         disabled_rules:

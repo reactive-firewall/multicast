@@ -51,8 +51,10 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
+			_fixture_cmd = str("{} -m coverage run -p --context=Integration").format(sys.executable)
 			_fixture_HEAR_args = [
-				str("{} -m coverage run").format(sys.executable), """multicast""",
+				_fixture_cmd, """--source=multicast""",
+				"""-m""", """multicast""",
 				"""--daemon""", """HEAR""",
 				"""--port""", str(_fixture_port_num),
 				"""--group""", """224.0.0.1"""
@@ -68,9 +70,12 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				time.sleep(1)  # Allow server to start
 				process.send_signal(signal.SIGINT)
 				stdout, stderr = process.communicate(timeout=5)
-				self.assertIsNotNone(process.returncode)
-				self.assertEqual(int(process.returncode), int(1))
-				theResult = (int(process.returncode) <= int(1))
+				self.assertIsNotNone(stdout, "Incomplete Test.")
+				self.assertIsNotNone(stderr, "Incomplete Test.")
+				self.assertIsNotNone(process.returncode, "Incomplete Test.")
+				self.assertNotEqual(int(process.returncode), int(2), "Invalid Test Arguments.")
+				self.assertEqual(int(process.returncode), int(130), "CEP-8 VIOLATION.")
+				theResult = (int(process.returncode) >= int(1))
 			finally:
 				process.kill()
 		except Exception as err:
