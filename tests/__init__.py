@@ -145,7 +145,7 @@ except Exception as _cause:  # pragma: no branch
 
 
 test_cases = (
-	test_basic.BasicTestSuite, test_exceptions.TestExceptions, test_deps.TestRequirementsTxt,
+	test_basic.BasicTestSuite, test_exceptions.ExceptionsTestSuite, test_deps.TestRequirementsTxt,
 	test_build.TestPEP517Build, test_manifest.TestManifestInclusion,
 	test_install_requires.TestParseRequirements, test_usage.MulticastTestSuite,
 	test_usage.BasicIntegrationTestSuite, test_hear_server_activate.McastServerActivateTestSuite,
@@ -185,6 +185,11 @@ def load_tests(loader, tests, pattern):
 		tests = loader.loadTestsFromTestCase(test_class)
 		suite.addTests(tests)
 	suite.addTests(doctest.DocTestSuite(module=multicast, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.exceptions, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.skt, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.recv, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.send, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.hear, test_finder=finder))
 	return suite
 
 

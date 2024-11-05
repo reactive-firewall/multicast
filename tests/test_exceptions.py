@@ -36,9 +36,11 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-class TestExceptions(BasicUsageTestSuite):
+class ExceptionsTestSuite(BasicUsageTestSuite):
 
 	__module__ = """tests.test_exceptions"""
+
+	__name__ = """tests.test_exceptions.ExceptionsTestSuite"""
 
 	def test_command_execution_error_with_args(self):
 		error = multicast.exceptions.CommandExecutionError("Test error", 42)
@@ -48,6 +50,16 @@ class TestExceptions(BasicUsageTestSuite):
 	def test_command_execution_error_default_exit_code(self):
 		error = multicast.exceptions.CommandExecutionError("Test error")
 		self.assertEqual(error.exit_code, 1)
+
+	def test_command_execution_error_with_cause(self):
+		test_cause = RuntimeError("test")
+		self.assertIsNotNone(test_cause)
+		error = multicast.exceptions.CommandExecutionError(test_cause, "Test with cause", 77)
+		self.assertIsNotNone(error)
+		self.assertIsNotNone(error.__cause__)
+		self.assertEqual(error.__cause__, test_cause)
+		self.assertEqual(error.message, "Test with cause")
+		self.assertEqual(error.exit_code, 77)
 
 
 # leave this part

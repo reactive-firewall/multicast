@@ -434,7 +434,7 @@ def exit_on_exception(func):
 			>>> @exit_on_exception
 			... def system_exit_func():
 			...     raise SystemExit(64)
-			>>> system_exit_func()  #doctest: +IGNORE_EXCEPTION_DETAIL
+			>>> system_exit_func()  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
 			Traceback (most recent call last):
 			SystemExit...64...
 
@@ -446,7 +446,7 @@ def exit_on_exception(func):
 			>>> @exit_on_exception
 			... def error_func():
 			...     raise ValueError("Invalid value")
-			>>> error_func()  #doctest: +IGNORE_EXCEPTION_DETAIL
+			>>> error_func()  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
 			Traceback (most recent call last):
 			SystemExit...65...
 	"""
