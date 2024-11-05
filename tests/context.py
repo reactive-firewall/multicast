@@ -94,6 +94,24 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
 
+try:
+	if 'contextlib' not in sys.modules:
+		import contextlib
+	else:  # pragma: no branch
+		contextlib = sys.modules["""contextlib"""]
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] contextlib Failed to import.") from err
+
+
+try:
+	if 'contextlib.contextmanager' not in sys.modules:
+		from contextlib import contextmanager
+	else:  # pragma: no branch
+		contextlib.contextmanager = sys.modules["""contextlib.contextmanager"""]
+		contextmanager = contextlib.contextmanager
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] contextlib.contextmanager Failed to import.") from err
+
 
 try:
 	if 'Process' not in sys.modules:
@@ -830,6 +848,32 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 	print(__BLANK)
 	print(str("{}").format(str(actualOutput)))
 	print(__BLANK)
+
+
+@contextmanager
+def managed_process(process):
+	"""
+	Context manager for safely handling multiprocessing processes.
+
+	Ensures that the given process is properly terminated and cleaned up,
+	even if exceptions occur during execution. This includes terminating,
+	joining, and closing the process to prevent resource leaks.
+
+	Args:
+		process (multiprocessing.Process): The process to manage.
+
+	Yields:
+		multiprocessing.Process: The managed process within the context.
+	"""
+	try:
+		yield process
+	finally:
+		if process.is_alive():
+			process.terminate()
+			process.join(timeout=3)
+			if process.is_alive():
+				process.kill()
+		process.close()
 
 
 class BasicUsageTestSuite(unittest.TestCase):

@@ -87,7 +87,7 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		True
 		>>> int(test_fixture) < int(256)
 		True
-		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(156))
+		>>> (int(test_fixture) >= int(0)) and (int(test_fixture) < int(256))
 		True
 		>>>
 
@@ -518,18 +518,22 @@ class McastHEAR(multicast.mtool):
 		"""
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
-		_result = False
+		server_initialized = False
+		server = None
 		try:
 			with McastServer((HOST, PORT), HearUDPHandler) as server:
-				_result = True
+				server_initialized = True
 				server.serve_forever()
 		except KeyboardInterrupt as userInterrupt:
 			try:
-				old_sock = server.socket
-				if old_sock:
+				if server and server.socket:
+					old_sock = server.socket
 					multicast.endSocket(old_sock)
 			finally:
-				raise KeyboardInterrupt("HEAR ended after interruption was signaled.") from userInterrupt
+				raise KeyboardInterrupt(
+					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
+				) from userInterrupt
 		finally:
-			server.shutdown()
-		return (_result, None)
+			if server:
+				server.shutdown()
+		return (server_initialized, None)

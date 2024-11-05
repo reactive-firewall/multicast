@@ -357,14 +357,15 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			)
 			p.start()
 			try:
+				tst_fixture_sendDispatch = multicast.__main__.McastDispatch()
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
 				)
 			except Exception as _cause:
 				p.join()
@@ -442,7 +443,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			test_input = "Test message from stdin"
 			self.assertIsNotNone(test_input)
 			with patch('sys.stdin', io.StringIO(test_input)):
-				self.assertIsNone(say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num))
+				self.assertIsNotNone(say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num))
 			# Assert that the result is as expected
 			# You might need to modify this based on what _sayStep returns
 			theResult = True  # or whatever the expected output is

@@ -243,12 +243,13 @@ class CommandExecutionError(RuntimeError):
 		else:
 			exit_code = kwargs.pop("exit_code", 1)
 		if len(args) > 0 and isinstance(args[0], BaseException):
-			__cause__ = args[0]
+			cause = args[0]
 			args = args[1:]
 		else:
-			__cause__ = kwargs.pop("__cause__", None)
+			cause = kwargs.pop("__cause__", None)
 		super().__init__(*args, **kwargs)
-		self.__cause__ = __cause__
+		if cause is not None:
+			self.__cause__ = cause
 		self.message = args[0] if args else kwargs.get("message", "An error occurred")
 		self.exit_code = exit_code
 

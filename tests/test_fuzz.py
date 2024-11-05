@@ -174,14 +174,14 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		"""
 		Test the multicast send response to valid alnum input.
 
-		???
-
 		Args:
 			text (str): A randomly generated string of ASCII letters and digits,
 				with length between 56 and 2048 characters.
 
 		Assertions:
-			- FIX ME
+			- Verifies that the multicast sender can handle input from stdin
+			- Confirms the process exits successfully after sending the message
+			- Validates the receiver process terminates cleanly
 		"""
 		theResult = False
 		fail_fixture = str(f"stdin({text.__sizeof__()}) --> SAY == error")
@@ -201,34 +201,31 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			)
 			p.daemon = True
 			p.start()
-			self.assertIsNotNone(p)
-			self.assertTrue(p.is_alive())
-			try:
-				sender = multicast.send.McastSAY()
-				self.assertIsNotNone(sender)
-				test_input = str(text)
-				# ESSENTIAL PART OF THIS TEST
-				self.assertIsNotNone(test_input)
-				with patch('sys.stdin', io.StringIO(test_input)):
-					self.assertIsNotNone(
-						sender.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
-					)
-				self.assertIsNotNone(p)
-				self.assertTrue(p.is_alive())
-				while p.is_alive():
-					sender(group="224.0.0.1", port=_fixture_port_num, data=["STOP", "Test"])
-					p.join(1)
-				self.assertFalse(p.is_alive())
-			except Exception as _cause:
-				p.join(3)
-				if p.is_alive():
-					p.terminate()
-					p.close()
-				raise unittest.SkipTest(sub_fail_fixture) from _cause
-			p.join(5)
-			self.assertIsNotNone(p.exitcode)
-			self.assertEqual(int(p.exitcode), int(0))
-			theResult = (int(p.exitcode) <= int(0))
+			with context.managed_process(p) as managed_p:
+				self.assertIsNotNone(managed_p)
+				self.assertTrue(managed_p.is_alive())
+				try:
+					sender = multicast.send.McastSAY()
+					self.assertIsNotNone(sender)
+					test_input = str(text)
+					# ESSENTIAL PART OF THIS TEST
+					self.assertIsNotNone(test_input)
+					with patch('sys.stdin', io.StringIO(test_input)):
+						self.assertIsNotNone(
+							sender.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
+						)
+					self.assertIsNotNone(p)
+					self.assertTrue(p.is_alive())
+					while p.is_alive():
+						sender(group="224.0.0.1", port=_fixture_port_num, data=["STOP", "Test"])
+						managed_p.join(1)
+					self.assertFalse(managed_p.is_alive())
+				except Exception as _cause:
+					raise unittest.SkipTest(sub_fail_fixture) from _cause
+				self.assertFalse(managed_p.is_alive(), "RESOURCE LEAK")
+				self.assertIsNotNone(managed_p.exitcode)
+				self.assertEqual(int(managed_p.exitcode), int(0))
+				theResult = (int(managed_p.exitcode) <= int(0))
 		except unittest.SkipTest as _skip_not_invalid:
 			raise unittest.SkipTest(fail_fixture) from _skip_not_invalid
 		except Exception as err:

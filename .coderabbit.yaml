@@ -38,6 +38,8 @@ reviews:
     # Test Code Review Instructions
     - Ensure that test code is automated, comprehensive, and follows testing best practices.
     - Verify that all critical functionality is covered by tests.
+    - Ensure that the test coverage meets or exceeds the project's required threshold
+      (e.g., aiming for 100% coverage as per Issue #53).
     - For **test** code, *also* follow
       [CEP-9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6)
 
