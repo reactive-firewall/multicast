@@ -31,6 +31,7 @@ try:
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
+		from unittest.mock import MagicMock
 		from context import Process
 except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
@@ -38,7 +39,7 @@ except Exception as err:
 
 class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 	"""
-	A test suite that uses Hypothesis to perform fuzz testing on the multicast sender and receiver.
+	A test suite that checks empty data with the multicast sender and receiver.
 
 	"""
 
@@ -141,6 +142,31 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
+
+
+class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
+	"""
+	A test suite that uses MagicMock to perform light testing of the default handler for HEAR.
+
+	"""
+
+	__module__ = """tests.test_hear_data_processing"""
+
+	__name__ = """tests.test_hear_data_processing.HearHandleNoneDataTestSuite"""
+
+	def test_handle_none_data(self):
+		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		self.assertIsNotNone(_fixture_port_num)
+		self.assertIsInstance(_fixture_port_num, int)
+		handler = multicast.hear.HearUDPHandler(
+			request=(None, None),
+			client_address=('224.0.0.1', _fixture_port_num),
+			server=None
+		)
+		# Mock the socket to prevent actual network calls
+		handler.request = (None, MagicMock())
+		handler.handle()
+		# Ensure that no exceptions are raised
 
 
 if __name__ == '__main__':

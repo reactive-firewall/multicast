@@ -704,7 +704,17 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
 
 	def test_Usage_Error_WHEN_the_help_sub_command_is_called(self):
-		"""Test case for multicast* [HEAR|RECV] --help."""
+		"""
+		Test case for validating help output of multicast sub-commands.
+
+		This test ensures that the help output is correct for various sub-commands
+		(HEAR, RECV, SAY) in both daemon and non-daemon modes. It validates that
+		each command combination provides appropriate usage information.
+
+		Test fixtures use named tuples to organize:
+		- mode: daemon/non-daemon mode
+		- command: the sub-command being tested
+		"""
 		theResult = False
 		fail_fixture = str("""multicast [HEAR|RECV] --help == not helpful""")
 		try:
@@ -714,7 +724,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				TestCase(mode="{}", command="HEAR"),
 				TestCase(mode="--daemon {}", command="RECV"),
 				TestCase(mode="{}", command="RECV"),
-				TestCase(mode="{}", command="SAY")
+				TestCase(mode="{}", command="SAY"),
+				TestCase(mode="{}", command="NOOP")
 			]
 			if (self._thepython is not None):
 				theResult = True

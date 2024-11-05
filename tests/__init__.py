@@ -150,6 +150,7 @@ test_cases = (
 	test_install_requires.TestParseRequirements, test_usage.MulticastTestSuite,
 	test_usage.BasicIntegrationTestSuite, test_hear_server_activate.McastServerActivateTestSuite,
 	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite,
+	test_hear_data_processing.HearHandleNoneDataTestSuite,
 	test_hear_keyboard_interrupt.TestHearKeyboardInterrupt
 )
 

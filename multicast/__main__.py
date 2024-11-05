@@ -348,7 +348,10 @@ class McastRecvHearDispatch(mtool):
 	@classmethod
 	def setupArgs(cls, parser):
 		"""
-		Will attempt to add send args.
+		Will attempt to add hear args.
+
+		Both HEAR and RECV use the same arguments, and are differentiated only by the global,
+		'--daemon' argument during dispatch.
 
 		Testing:
 
@@ -427,26 +430,39 @@ class McastRecvHearDispatch(mtool):
 
 		"""
 		if parser is not None:  # pragma: no branch
-			parser.add_argument("""--port""", type=int, default=_MCAST_DEFAULT_PORT)
+			parser.add_argument(
+				"""--port""",
+				type=int, default=_MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+			)
 			__tmp_help = """local interface to use for listening to multicast data; """
 			__tmp_help += """if unspecified, any one interface may be chosen."""
 			parser.add_argument(
 				"""--iface""", default=None,
 				help=str(__tmp_help)
 			)
-			__tmp_help = """multicast groups (ip addrs) to bind to for the udp socket; """
+			__tmp_help = """multicast group (ip address) to bind-to for the udp socket; """
 			__tmp_help += """should be one of the multicast groups joined globally """
 			__tmp_help += """(not necessarily joined in this python program) """
 			__tmp_help += """in the interface specified by --iface. """
-			__tmp_help += """If unspecified, bind to 224.0.0.1 """
+			__tmp_help += f"If unspecified, bind-to {_MCAST_DEFAULT_GROUP} "
 			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
 			parser.add_argument(
-				"""--group""", default=_MCAST_DEFAULT_GROUP,
+				"""--group""",
+				default=_MCAST_DEFAULT_GROUP,  # skipcq: PYL-W0212 - module ok
 				help=str(__tmp_help)
 			)
+			__tmp_help = """multicast groups (ip addresses) to join globally; """
+			__tmp_help += """should be one of the multicast groups joined globally """
+			__tmp_help += """by the interface specified by --iface. """
+			__tmp_help += """If unspecified, or supplied an empty list, the default """
+			__tmp_help += """implementation will join """
+			__tmp_help += f"{_MCAST_DEFAULT_GROUP} (all addresses (all multicast addresses) "
+			__tmp_help += """of that interface) instead of not joining. NOTE: If you really need """
+			__tmp_help += """to NOT join the multicast group you should instead use the sockets """
+			__tmp_help += """module directly, as this module does not support such a use-case."""
 			parser.add_argument(
 				"""--groups""", default=[], nargs='*',
-				help="""multicast groups (ip addrs) to listen to join."""
+				help=str(__tmp_help)
 			)
 
 	@staticmethod
