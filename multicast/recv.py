@@ -341,6 +341,34 @@ def tryrecv(msgbuffer, chunk, sock):
 			>>> sk_fxtr.close()
 			>>>
 
+		Testcase 2: Mock overflow testing.
+
+			>>> import multicast
+			>>>
+			>>> multicast.recv is None
+			False
+			>>> multicast.recv.tryrecv is None
+			False
+			>>> type(multicast.recv.tryrecv) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<class 'function'>
+			>>> class mockSocket():
+			...     def recv(self, *args, **kwargs):
+			...         return b'it worked'
+			...
+			...     def close(self):
+			...         pass
+			...
+			...     def shutdown(self, *args, **kwargs):
+			...         pass
+			...
+			>>>
+			>>> sk_fxtr = mockSocket()
+			>>> tst_args = ("test added: ", None, sk_fxtr)
+			>>> multicast.recv.recvstep(*tst_args) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			'test added: it worked'
+			>>> sk_fxtr.close()
+			>>>
+
 	"""
 	chunk = sock.recv(1316)
 	if not (chunk is None):  # pragma: no branch
