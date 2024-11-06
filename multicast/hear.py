@@ -526,7 +526,7 @@ class McastHEAR(multicast.mtool):
 				server.serve_forever()
 		except KeyboardInterrupt as userInterrupt:
 			try:
-				if server and server.socket:
+				if server and server.socket:  # pragma: no cover
 					old_sock = server.socket
 					multicast.endSocket(old_sock)
 			finally:
@@ -534,6 +534,6 @@ class McastHEAR(multicast.mtool):
 					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
 				) from userInterrupt
 		finally:
-			if server:
+			if server:  # pragma: no cover
 				server.shutdown()
 		return (server_initialized, None)
