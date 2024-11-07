@@ -23,11 +23,16 @@ Minimal Acceptance Testing:
 
 	Testcase 0: Just set up test fixtures by importing multicast.
 
+		>>> __package__ is not None
+		True
+		>>>
+
 		>>> import multicast
 		>>>
 		>>> multicast.__package__ is not None
 		True
 		>>>
+
 
 """
 
@@ -46,6 +51,15 @@ try:
 			from setuptools.config.setupcfg import read_configuration
 except Exception as err:
 	raise NotImplementedError("""[CWE-440] Not Implemented.""") from err
+
+
+__package__ = """setup"""  # skipcq: PYL-W0622
+
+
+__module__ = """setup"""  # skipcq: PYL-W0622
+
+
+__name__ = """setup"""  # skipcq: PYL-W0622
 
 
 def readFile(filename):
