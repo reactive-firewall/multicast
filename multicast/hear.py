@@ -414,13 +414,21 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			True
 			>>>
 
+			Testcase 3: `handle` requires valid requests or ignores input.
+
+			>>> handler.request = ("The Test", multicast.genSocket())
+			>>> handler.client_address = ("224.0.1.2", 51234)
+			>>> handler.handle() is None
+			True
+			>>>
 		"""
 		(data, sock) = self.request
 		if data is None or not sock:
 			return  # nothing to do -- fail fast.
 		else:
-			data = str(data, encoding='utf8')  # needed b/c some implementations decode some do not.
-		print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
+			data = data.decode('utf8') if isinstance(data, bytes) else str(data)
+		if (_sys.stdout.isatty()):  # pragma: no cover
+			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
 			myID = str(sock.getsockname()[0])
 			if (_sys.stdout.isatty()):  # pragma: no cover

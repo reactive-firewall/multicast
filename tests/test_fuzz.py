@@ -126,7 +126,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=3, max_size=15))
-	@settings(deadline=None)
+	@settings(deadline=300)
 	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text):
 		"""
 		Test the multicast CLI's response to invalid fuzzed input.
@@ -169,7 +169,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=56, max_size=2048))
-	@settings(deadline=None)
+	@settings(deadline=2222)
 	def test_say_works_WHEN_using_stdin_GIVEN_alnum_of_any_size_fuzz_input(self, text):
 		"""
 		Test the multicast send response to valid alnum input.
