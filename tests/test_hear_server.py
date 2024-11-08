@@ -44,6 +44,15 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 
 	@staticmethod
 	def get_default_ip():
+		"""Get the default IP address of the machine.
+		
+		Returns:
+			str: The IP address of the default network interface.
+			
+		Note:
+			Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance.
+			Port 59095 is chosen as an arbitrary high port number.
+		"""
 		try:
 			# Create a socket connection to an external address
 			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,10 +60,11 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 			s.connect(("203.0.113.1", 59095))
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
+		except socket.error as e:
+			raise RuntimeError("Failed to determine default IP") from e
 		finally:
 			s.close()
 		return ip
-
 
 class McastServerTestSuite(McastHearTestSuite):
 
@@ -63,15 +73,21 @@ class McastServerTestSuite(McastHearTestSuite):
 	__name__ = """tests.test_hear_server.McastServerTestSuite"""
 
 	def test_handle_error_without_stop_in_request(self):
+		"""
+		Test McastServer.handle_error with a non-STOP request.
+
+		Verifies that the server properly handles requests without
+		the STOP command and cleans up resources.
+		"""
 		theResult = False
-		fail_fixture = str("""Mock(BLAH) --> Handller-HEAR == error""")
+		fail_fixture = str("""Mock(BLAH) --> Handler-HEAR == error""")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			# Create an instance of McastServer
-			server_adddress = ('224.0.0.1', _fixture_port_num)
-			server = multicast.hear.McastServer(server_adddress, multicast.hear.HearUDPHandler)
+			server_address = ('224.0.0.1', _fixture_port_num)
+			server = multicast.hear.McastServer(server_address, multicast.hear.HearUDPHandler)
 			client_address = (self.get_default_ip(), _fixture_port_num)
 			# Mock a request not containing "STOP"
 			request = (str("Regular message"), multicast.genSocket())
@@ -89,14 +105,14 @@ class McastServerTestSuite(McastHearTestSuite):
 
 	def test_handle_error_with_none_request(self):
 		theResult = False
-		fail_fixture = str("""Mock(EMPTY) --X Handller-HEAR != Safe""")
+		fail_fixture = str("""Mock(EMPTY) --X Handler-HEAR != Safe""")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			# Create an instance of McastServer
-			server_adddress = ('224.0.0.1', _fixture_port_num)
-			server = multicast.hear.McastServer(server_adddress, multicast.hear.HearUDPHandler)
+			server_address = ('224.0.0.1', _fixture_port_num)
+			server = multicast.hear.McastServer(server_address, multicast.hear.HearUDPHandler)
 			client_address = (self.get_default_ip(), _fixture_port_num)
 			# Mock None as a request
 			request = None
