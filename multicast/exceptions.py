@@ -285,6 +285,30 @@ class ShutdownCommandReceived(RuntimeError):
 	__name__ = """multicast.exceptions.ShutdownCommandReceived"""
 
 	def __init__(self, message="SHUTDOWN", *args, **kwargs):
+		"""
+		Initialize the ShutdownCommandReceived exception.
+
+		Args:
+			message (str): Optional custom message for the exception.
+
+		Testing:
+
+			Testcase 1: Default initialization.
+
+				>>> exc = ShutdownCommandReceived()
+				>>> isinstance(exc, ShutdownCommandReceived)
+				True
+				>>> exc.message
+				'SHUTDOWN'
+
+			Testcase 2: Initialization with custom message.
+
+				>>> exc = ShutdownCommandReceived("Custom shutdown message.")
+				>>> isinstance(exc, ShutdownCommandReceived)
+				True
+				>>> exc.message
+				'Custom shutdown message.'
+		"""
 		super().__init__(message, *args, **kwargs)
 		self.message = message
 
