@@ -288,8 +288,16 @@ class ShutdownCommandReceived(RuntimeError):
 		"""
 		Initialize the ShutdownCommandReceived exception.
 
-		Args:
+		The ShutdownComandRecived exception is used by the default handler
+		for the HEAR servers, to instruct the HEAR server to shutdown gracefully.
+
+		Parameters:
 			message (str): Optional custom message for the exception.
+			*args: Additional positional arguments passed to RuntimeError.
+			**kwargs: Additional keyword arguments passed to RuntimeError.
+
+		Raises:
+			TypeError: If message is not a string.
 
 		Testing:
 
@@ -308,9 +316,24 @@ class ShutdownCommandReceived(RuntimeError):
 				True
 				>>> exc.message
 				'Custom shutdown message.'
+
+			Testcase 3: Invalid message type.
+
+				>>> exc = ShutdownCommandReceived(123)  # doctest: +IGNORE_EXCEPTION_DETAIL
+				Traceback (most recent call last):
+				TypeError: message must be a string
+
+			Testcase 4: Exit code verification.
+
+				>>> exc = ShutdownCommandReceived()
+				>>> exc.exit_code == 143  # Verify SIGTERM exit code
+				True
 		"""
+		if not isinstance(message, str):
+			raise TypeError("[CWE-573] message must be a string")
 		super().__init__(message, *args, **kwargs)
 		self.message = message
+		self.exit_code = 143  # Use SIGTERM exit code for graceful shutdown
 
 
 EXIT_CODES = {
