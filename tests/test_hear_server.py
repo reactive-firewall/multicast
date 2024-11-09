@@ -45,10 +45,10 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 	@staticmethod
 	def get_default_ip():
 		"""Get the default IP address of the machine.
-		
+
 		Returns:
 			str: The IP address of the default network interface.
-			
+
 		Note:
 			Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance.
 			Port 59095 is chosen as an arbitrary high port number.
@@ -61,10 +61,11 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
 		except socket.error as e:
-			raise RuntimeError("Failed to determine default IP") from e
+			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from e
 		finally:
 			s.close()
 		return ip
+
 
 class McastServerTestSuite(McastHearTestSuite):
 
