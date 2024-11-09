@@ -237,7 +237,7 @@ html_show_copyright = True
 # html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
-#html_file_suffix = "html"
+# html_file_suffix = "html"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "multicast_doc"
