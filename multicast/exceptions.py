@@ -254,6 +254,41 @@ class CommandExecutionError(RuntimeError):
 		self.exit_code = exit_code
 
 
+class ShutdownCommandReceived(RuntimeError):
+	"""
+	Exception raised when a 'STOP' command is received during the HEAR operation.
+
+	This exception signals a graceful shutdown of the multicast server.
+
+	Attributes:
+		message (str): Description of the exception.
+
+	Testing:
+
+		Testcase 1: Initialization with default message.
+
+			>>> exc = ShutdownCommandReceived()
+			>>> isinstance(exc, RuntimeError)
+			True
+			>>> exc.message
+			'SHUTDOWN'
+
+		Testcase 2: Initialization with custom message.
+
+			>>> exc = ShutdownCommandReceived("Custom shutdown message.")
+			>>> exc.message
+			'Custom shutdown message.'
+	"""
+
+	__module__ = """multicast.exceptions"""
+
+	__name__ = """multicast.exceptions.ShutdownCommandReceived"""
+
+	def __init__(self, message="SHUTDOWN", *args, **kwargs):
+		super().__init__(message, *args, **kwargs)
+		self.message = message
+
+
 EXIT_CODES = {
 	0: (None, 'Success'),
 	1: (RuntimeError, 'General Error'),

@@ -438,7 +438,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				)
 			)
 			if """STOP""" in str(data):
-				raise RuntimeError("SHUTDOWN") from None
+				raise multicast.exceptions.ShutdownCommandReceived("SHUTDOWN") from None
 
 
 class McastHEAR(multicast.mtool):
