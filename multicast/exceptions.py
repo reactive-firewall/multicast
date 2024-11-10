@@ -328,6 +328,23 @@ class ShutdownCommandReceived(RuntimeError):
 				>>> exc = ShutdownCommandReceived()
 				>>> exc.exit_code == 143  # Verify SIGTERM exit code
 				True
+
+			Testcase 5: Error propagation with exit_on_exception.
+
+					>>> @exit_on_exception
+					... def test_func():
+					...     raise ShutdownCommandReceived()
+					>>> test_func()  # doctest: +IGNORE_EXCEPTION_DETAIL
+					Traceback (most recent call last):
+					SystemExit: 143
+
+			Testcase 6: Error message propagation.
+
+				>>> try:
+				...     raise ShutdownCommandReceived("Custom message")
+				... except ShutdownCommandReceived as e:
+				...     str(e) == "Custom message"
+				True
 		"""
 		if not isinstance(message, str):
 			raise TypeError("[CWE-573] message must be a string")
