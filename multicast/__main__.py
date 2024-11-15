@@ -266,8 +266,8 @@ class McastNope(mtool):
 		"""
 		_None_from_NoOp = self.NoOp(*args, **kwargs)
 		return (
-			True if _None_from_NoOp is None else False,
-			None if _None_from_NoOp is None else _None_from_NoOp  # noqa
+			_None_from_NoOp is None,
+			_None_from_NoOp  # noqa
 		)
 
 

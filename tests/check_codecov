@@ -87,12 +87,14 @@ function check_command() {
 # propagate/export function to sub-shells
 export -f check_command
 
+# Set up CEP-5 shlock helper
+hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed to register shlock helper. CEP-5 locking will not work." >&2 ; exit 78 ; } ;
+
 # Check required commands
 check_command grep ;
 check_command curl ;
 check_command gpgv ;
 check_command shasum ;
-hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 check_command shlock ;
 
 # sorry no windows support here

@@ -44,12 +44,26 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 	__name__ = """tests.test_hear_server_activate.McastServerActivateTestSuite"""
 
 	def test_server_activate(self):
+		"""
+		Test multicast server activation and socket initialization.
+
+		Verifies that:
+			1. Server socket is properly initialized
+			2. Socket type is set to SOCK_DGRAM
+			3. Server thread starts successfully
+			4. Cleanup is performed correctly
+		"""
+		# Define multicast constants
+		MCAST_GROUP = '224.0.0.2'
+		THREAD_JOIN_TIMEOUT = 5.0
+		final_result = False
+
 		# Define a simple request handler
 		class SimpleHandler:
 			def handle(self):
 				pass  # Handler logic is not the focus here
 		# Create an instance of McastServer
-		server_address = ('224.0.0.2', 0)  # Bind to any available port
+		server_address = (MCAST_GROUP, 0)  # Bind to any available port
 		server = multicast.hear.McastServer(server_address, SimpleHandler)
 		# Start the server in a separate thread
 
@@ -65,12 +79,14 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(server.socket)
 			self.assertEqual(server.socket.type, socket.SOCK_DGRAM)
 			# Since we're not sending actual data, just ensure the server is running
-			self.assertTrue(server_thread.is_alive())
+			final_result = server_thread.is_alive()
 		finally:
 			# Clean up the server
 			server.shutdown()
 			server.server_close()
-			server_thread.join()
+			server_thread.join(timeout=THREAD_JOIN_TIMEOUT)
+			self.assertFalse(server_thread.is_alive(), "Server thread did not terminate")
+		self.assertTrue(final_result)
 
 
 if __name__ == '__main__':

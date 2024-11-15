@@ -8,7 +8,7 @@ on:
     branches: ["master"]
 
 # Declare default permissions as read only.
-permissions: read-all
+permissions: {}
 
 jobs:
   analysis:
@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # Needed to upload the results to code-scanning dashboard.
+      contents: read
       security-events: write
 
     steps:

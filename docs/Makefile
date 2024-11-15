@@ -62,15 +62,15 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 init: ../docs/
-	@ln -sf ../"$(PROJECT_DOC_SRC_DIR)" $(SRCDIR)/"$(PROJECT_DOC_SRC_DIR)"
-	@ln -sf ../tests $(SRCDIR)/tests 2>/dev/null || true
-	@ln -sf ../README.md $(SRCDIR)/README.md
-	@ln -sf ../LICENSE.md $(SRCDIR)/LICENSE.md
+	@ln -s -f ../"$(PROJECT_DOC_SRC_DIR)" $(SRCDIR)/"$(PROJECT_DOC_SRC_DIR)"
+	@ln -s -f ../tests $(SRCDIR)/tests 2>/dev/null || true
+	@ln -s -f ../README.md $(SRCDIR)/README.md
+	@ln -s -f ../LICENSE.md $(SRCDIR)/LICENSE.md
 
 clean:
-	@-rm -rf $(SRCDIR)/$(BUILDDIR)/* 2>/dev/null || true
-	@-rm -fd $(SRCDIR)/$(BUILDDIR) 2>/dev/null || true
-	@-rm -rfd $(SRCDIR)/apidocs/* 2>/dev/null || true
+	@-rm -r -f $(SRCDIR)/$(BUILDDIR)/* 2>/dev/null || true
+	@-rm -f -d $(SRCDIR)/$(BUILDDIR) 2>/dev/null || true
+	@-rm -r -f -d $(SRCDIR)/apidocs/* 2>/dev/null || true
 	@-unlink $(SRCDIR)/README.md 2>/dev/null || true
 	@-unlink $(SRCDIR)/tests 2>/dev/null || true
 	@-unlink $(SRCDIR)/LICENSE.md 2>/dev/null || true

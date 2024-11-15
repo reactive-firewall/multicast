@@ -61,13 +61,46 @@
 ################################################################################
 #
 # .github/tool_checkmake.sh
-FILE="${1}" ;
-EMSG="Checkmake linter complained.";
+readonly SCRIPT_NAME="${0##*/}"
+
+# USAGE:
+#  ~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#    exits 64 -- missing required argument
+#    exits 126 -- check complete and has failed, can not find given command.
+#    returns successful -- check complete and command found to be executable.
+function check_command() {
+	test -z "$1" && { printf "%s\n" "::warning file=${SCRIPT_NAME},title=BUG::Command name is required to check for existence." >&2 ; exit 64 ; } ;
+	local cmd="$1" ;
+	test -x "$(command -v ${cmd})" || { printf "%s\n" "::error file=${SCRIPT_NAME},title=MISSING::Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+
+# Check required commands
+check_command sed ;
+check_command grep ;
+check_command cut ;
+check_command checkmake ;
+
+function usage() {
+	printf "Usage: %s <makefile_path>\n" "${SCRIPT_NAME}" >&2
+	exit 2
+}
+
+# Validate parameters
+if [[ ( "$#" -le 1 ) ]]; then
+	usage
+fi
+readonly FILE="${1}"
+readonly EMSG="Checkmake linter complained."
 
 # Check if file exists
 if [[ ! ( -f "${FILE}" ) ]]; then
-    printf "%s\n" "::error file=${FILE},title=MISSING:: File '${FILE}' not found." >&2
-    exit 1
+	printf "%s\n" "::error file=${FILE},title=MISSING::File '${FILE}' not found." >&2
+	exit 64
 fi
 
 # Main functionality

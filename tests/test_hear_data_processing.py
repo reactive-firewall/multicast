@@ -155,6 +155,13 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 	__name__ = """tests.test_hear_data_processing.HearHandleNoneDataTestSuite"""
 
 	def test_handle_none_data(self):
+		"""Test that HearUDPHandler properly handles None data without raising exceptions.
+
+		This test verifies that:
+			1. The handler initializes correctly with None request data
+			2. The handle() method executes without errors
+			3. The handler properly processes the None data case
+		"""
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)
@@ -165,8 +172,13 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 		)
 		# Mock the socket to prevent actual network calls
 		handler.request = (None, MagicMock())
+		mock_socket = handler.request[1]
 		handler.handle()
-		# Ensure that no exceptions are raised
+		# Verify that the handler processed the None data case correctly
+		self.assertEqual(
+			mock_socket.method_calls, [],
+			"Socket should not be used when data is None"
+		)
 
 
 if __name__ == '__main__':

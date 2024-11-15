@@ -5,7 +5,7 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches: ["main", "master", "stable"]
   pull_request:
-    branches: ["main", "master", "stable", feature-*, patch-*, HOTFIX-*]
+    branches: ["main", "master", "stable", "feature-*", "patch-*", "HOTFIX-*"]
 
 permissions: {}  # Setting default permissions to none for enhanced security
 
@@ -36,8 +36,8 @@ jobs:
           else
             printf "%s\n" "YAML files found:"
             printf "%s\n" "$FILES"
-            # Replace line breaks with spaces for yamllint
-            FILES="${FILES//$'\n'/ }"
+            # Handle filenames with spaces properly
+            FILES=$(printf "%s" "$FILES" | tr '\n' '\0' | xargs -0)
             printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           fi
         if: ${{ success() }}

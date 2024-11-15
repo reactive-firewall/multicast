@@ -16,7 +16,7 @@ on:  # yamllint disable-line rule:truthy
     branches: ["main", "master", "stable"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: ["main", "master", "stable", feature-*, patch-*, HOTFIX-*]
+    branches: ["main", "master", "stable", "feature-*", "patch-*", "HOTFIX-*"]
 
 permissions: {}
 
@@ -33,7 +33,7 @@ jobs:
         uses: reactive-firewall/python-bandit-scan@v2.1
         with: # optional arguments
           # exit with 0, even with results found
-          exit_zero: false # optional, default is DEFAULT
+          # exit_zero: false # optional, default is DEFAULT
           # Github token of the repository (automatically created by Github)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information.
           # File or directory to run bandit on

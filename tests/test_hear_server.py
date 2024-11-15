@@ -53,6 +53,7 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 			Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance.
 			Port 59095 is chosen as an arbitrary high port number.
 		"""
+		s = None
 		try:
 			# Create a socket connection to an external address
 			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -63,7 +64,8 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 		except socket.error as e:
 			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from e
 		finally:
-			s.close()
+			if s is not None:
+				s.close()
 		return ip
 
 

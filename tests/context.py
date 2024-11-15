@@ -104,11 +104,7 @@ except ImportError as err:  # pragma: no branch
 
 
 try:
-	if 'contextlib.contextmanager' not in sys.modules:
-		from contextlib import contextmanager
-	else:  # pragma: no branch
-		contextlib.contextmanager = sys.modules["""contextlib.contextmanager"""]
-		contextmanager = contextlib.contextmanager
+	from contextlib import contextmanager
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] contextlib.contextmanager Failed to import.") from err
 
@@ -873,7 +869,6 @@ def managed_process(process):
 			process.join(timeout=3)
 			if process.is_alive():
 				process.kill()
-		process.close()
 
 
 class BasicUsageTestSuite(unittest.TestCase):
