@@ -133,9 +133,8 @@ check_command pip ;
 if command -v pip-audit >/dev/null 2>&1; then
 	check_command pip-audit  # optional
 else
-	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP::pip-audit not found, skipping security checks"
+	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP::pip-audit not found, skipping security checks" ;
 fi
-check_command pip-licenses ;
 check_command pip-licenses ;
 check_command shlock ;
 

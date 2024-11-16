@@ -85,6 +85,12 @@ check_command grep ;
 check_command cut ;
 check_command checkmake ;
 
+# USAGE:
+#   ~$ usage
+# Arguments:
+#   None
+# Results:
+#   Prints usage information and exits with status code 2.
 function usage() {
 	printf "Usage: %s <makefile_path>\n" "${SCRIPT_NAME}" >&2
 	exit 2
@@ -104,8 +110,24 @@ if [[ ! ( -f "${FILE}" ) ]]; then
 fi
 
 # Main functionality
-{ { checkmake "${FILE}" | sed -e 's/   /:/g' | tr -s ':' |\
-cut -d: -f 3-5 ;} 2>/dev/null |\
-grep -F "${FILE}" | sed -E -e 's/^[[:space:]]+//g' |\
-xargs -I{} printf "::warning file=${FILE},title=LINT::%s ${EMSG}\n" {} >&2 ;}
-wait ;
+process_checkmake_output() {
+	local file="$1"
+	local emsg="$2"
+
+	if ! output=$(checkmake "${file}" 2>&1); then
+		printf "%s\n" "::error::checkmake failed: ${output}" >&2
+		return 1
+	fi
+
+	printf "%s\n" "${output}" | \
+		sed -e 's/   /:/g' | \
+		tr -s ':' | \
+		cut -d: -f 3-5 | \
+		grep -F "${file}" | \
+		sed -E -e 's/^[[:space:]]+//g' | \
+		while IFS= read -r line; do
+			printf "%s\n" "::warning file=${file},title=LINT::${line} ${emsg}" >&2
+		done
+}
+
+process_checkmake_output "${FILE}" "${EMSG}"
