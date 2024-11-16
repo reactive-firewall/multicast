@@ -16,7 +16,10 @@ jobs:
       statuses: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@4
+        with:
+          persist-credentials: false
       - name: Lint Workflow YAML
         uses: ibiqlik/action-yamllint@v3
         with:
@@ -36,8 +39,8 @@ jobs:
           else
             printf "%s\n" "YAML files found:"
             printf "%s\n" "$FILES"
-            # Handle filenames with spaces properly
-            FILES=$(printf "%s" "$FILES" | tr '\n' '\0' | xargs -0)
+            # Replace line breaks with spaces for GitHub Action Output
+            FILES="${FILES//$'\n'/ }"
             printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           fi
         if: ${{ success() }}

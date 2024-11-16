@@ -197,10 +197,11 @@ reviews:
       enabled: true
       configuration:
         extend_select:
+          - D  # Check documentation too
           - E  # Pycodestyle errors (style issues)
           - F  # PyFlakes codes (logical errors)
-          - W  # Pycodestyle warnings
           - N  # PEP 8 naming conventions
+          - W  # Pycodestyle warnings
         ignore:
           - W191
           - W391

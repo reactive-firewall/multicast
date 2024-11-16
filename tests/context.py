@@ -864,11 +864,16 @@ def managed_process(process):
 	try:
 		yield process
 	finally:
-		if process.is_alive():
-			process.terminate()
-			process.join(timeout=3)
+		try:
 			if process.is_alive():
-				process.kill()
+				process.terminate()
+				process.join(timeout=3)
+				if process.is_alive():
+					process.kill()
+		except Exception as e:
+			if (sys.stderr.isatty()):
+				# Log the error but don't re-raise as this is cleanup code
+				print(f"Error during process cleanup: {e}", file=sys.stderr)
 
 
 class BasicUsageTestSuite(unittest.TestCase):

@@ -130,7 +130,12 @@ check_command git ;
 check_command sed ;
 check_command tee ;
 check_command pip ;
-# check_command pip-audit ; # optional
+if command -v pip-audit >/dev/null 2>&1; then
+	check_command pip-audit  # optional
+else
+	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP::pip-audit not found, skipping security checks"
+fi
+check_command pip-licenses ;
 check_command pip-licenses ;
 check_command shlock ;
 
@@ -230,7 +235,7 @@ function navigate_dirs_by_git() {
 }
 
 function check_license_when_given_req() {
-	local req_file="${1}"
+	local req_file_input="${1}"
 	local SUB_CODE=${EXIT_CODE-0}
 	umask 007
 	printf "::debug::%s\n" "need venv ..." ;
@@ -291,6 +296,7 @@ if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 	printf "::debug::%s\n" "Reading from repository ${_TEST_ROOT_DIR} ..." ;
 	# Get a list of files to check using git ls-tree with filtering (and careful shell globing)
 	FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/test/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null || EXIT_CODE=3)
+	[[ ( $EXIT_CODE -eq 0 ) ]] || { printf "%s\n" "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=GIT::Failed to list requirements files using git ls-tree" >&2 ;}
 
 	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 		# THIS IS THE ACTUAL TEST

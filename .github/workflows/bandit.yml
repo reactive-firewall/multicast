@@ -7,7 +7,7 @@
 # This action will run Bandit on your codebase.
 # The results of the scan will be found under the Security tab of your repository.
 
-# https://github.com/marketplace/actions/bandit-scan is ISC licensed, by abirismyname
+# https://github.com/marketplace/actions/python-bandit-scan is ISC licensed
 # https://pypi.org/project/bandit/ is Apache v2.0 licensed, by PyCQA
 
 name: Bandit
@@ -28,7 +28,10 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@4
+        with:
+          persist-credentials: false
       - name: Bandit Scan
         uses: reactive-firewall/python-bandit-scan@v2.1
         with: # optional arguments
