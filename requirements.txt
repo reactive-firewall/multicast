@@ -29,7 +29,7 @@ setuptools>=75.0
 # virtualenv - MIT license
 #virtualenv>=15.0.1
 # pip - MIT license
-pip>=22.0
+pip>=24.3.1
 # build - MIT license
 build>=1.1.1, !=1.2.2.post1
 # multicast - MIT license
