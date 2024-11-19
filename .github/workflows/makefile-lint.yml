@@ -49,7 +49,7 @@ jobs:
             printf "%s\n" "${ERR_MSG_LINE}"
             exit 1;
           fi
-          make || { \
+          make && make install || { \
             ERR_MSG_STUB="Checkmake build failed." \
             ERR_DETS="file=.github/workflows/makefile-lint.yml,line=52,endLine=59,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
