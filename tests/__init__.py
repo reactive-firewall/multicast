@@ -39,7 +39,7 @@
 
 """
 
-__package__ = """tests"""
+__package__ = """tests"""  # skipcq: PYL-W0622
 """This is multicast testing package."""
 
 __module__ = """tests"""
