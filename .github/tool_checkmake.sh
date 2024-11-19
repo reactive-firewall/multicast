@@ -63,6 +63,12 @@
 # .github/tool_checkmake.sh
 readonly SCRIPT_NAME="${0##*/}"
 
+# local path fix-up
+if [[ -d "/usr/local/bin" ]] && [[ ":$PATH:" != *":/usr/local/bin:"* ]] ; then
+	PATH="${PATH:+"$PATH:"}/usr/local/bin" ;
+	export PATH ;
+fi
+
 # USAGE:
 #  ~$ check_command CMD
 # Arguments:
