@@ -235,6 +235,7 @@ function navigate_dirs_by_git() {
 
 function check_license_when_given_req() {
 	local req_file_input="${1}"
+	shift ;  # allows $@ to work as before
 	local SUB_CODE=${EXIT_CODE-0}
 	umask 007
 	printf "::debug::%s\n" "need venv ..." ;
