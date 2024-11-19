@@ -25,7 +25,7 @@ jobs:
           sudo apt-get update || exit 1
           sudo apt-get install -y yamllint golang-go pandoc || exit 1
           ERR_MSG_STUB="Go installation failed."
-          ERR_DETAILS="file=.github/workflow/makefile-lint.yml,line=25,endLine=30,title=FAILURE"
+          ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=25,endLine=30,title=FAILURE"
           ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
           go version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
       - name: Lint Workflow YAML
@@ -45,14 +45,14 @@ jobs:
           ACTUAL_SHA=$(git rev-parse HEAD)
           if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
             ERR_MSG_STUB="Checkmake repository hash verification failed."
-            ERR_DETAILS="file=.github/workflow/makefile-lint.yml,line=42,endLine=51,title=FAILURE"
+            ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=42,endLine=51,title=FAILURE"
             ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
             printf "%s\n" "${ERR_MSG_LINE}"
             exit 1;
           fi
           make || { \
             ERR_MSG_STUB="Checkmake build failed." \
-            ERR_DETS="file=.github/workflow/makefile-lint.yml,line=52,endLine=57,title=FAILURE" \
+            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=52,endLine=57,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
             exit 1; \
@@ -80,7 +80,7 @@ jobs:
           if [ ! -x "$TOOL_PATH" ]; then
             { \
             ERR_MSG_STUB="$TOOL_PATH not found or not executable." \
-            ERR_DETS="file=.github/workflow/makefile-lint.yml,line=79,endLine=88,title=FAILURE" \
+            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=79,endLine=88,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
             exit 1; \
@@ -89,7 +89,7 @@ jobs:
           FILE="${{ steps.makefiles.outputs.files }}" ;
           printf "::group::%s\n" "${FILE}" ;
           ERR_MSG_STUB="Linting failed."
-          ERR_DETS="file=.github/workflow/makefile-lint.yml,line=89,endLine=97,title=FAILURE"
+          ERR_DETS="file=.github/workflows/makefile-lint.yml,line=89,endLine=97,title=FAILURE"
           ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}"
           "$TOOL_PATH" "${FILE}" || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; } ;
           printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;

@@ -243,7 +243,7 @@ function check_license_when_given_req() {
 	temp_dir=$(mktemp -d)
 
 	# Enter the temporary directory
-	cd "$temp_dir"
+	cd "${temp_dir}"
 
 	# Create a virtual environment using venv
 	python3 -m venv venv
@@ -302,7 +302,7 @@ if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 		# THIS IS THE ACTUAL TEST
 		printf "::debug::%s\n" "Starting checks ..." ;
 		# Iterate over files and run checks
-		for req_file in $FILES_TO_CHECK; do
+		for req_file in ${FILES_TO_CHECK} ; do
 			printf "::group::%s\n" "Checking ${req_file}" ;
 			if [[ ( -x $(command -v pip-audit) ) ]] && [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 				printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities ..."
