@@ -71,8 +71,7 @@ python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 
 > [!WARNING]
 > Caveat: this module is still a BETA
-(https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_hear_cleanup.py#L54C2-L96C43)
-[Here is how it is tested right now]
+[Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_hear_cleanup.py#L54C2-L96C43)
 
 ```python3
 import multicast
@@ -150,10 +149,9 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 > Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and
 > the standard python `multiprocessing` module and its use.
 
-> [!TIP]
-> Another
-> [more CLI focused way to test](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
-> is another example of how to use the module.
+Here is a
+[more CLI focused way to test](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
+as another example of how to use the module.
 
 ### What are the defaults?
 
