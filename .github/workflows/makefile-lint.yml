@@ -31,7 +31,7 @@ jobs:
       - name: Lint Workflow YAML
         if: ${{ success() }}
         run: |
-          yamllint -f github --no-warnings .github/workflows/makefile-lint.yml
+          yamllint ${{ vars.YAML_ARGS }} .github/workflows/makefile-lint.yml
       - uses: actions/checkout@v4
       - name: Install checkmake
         if: ${{ success() }}

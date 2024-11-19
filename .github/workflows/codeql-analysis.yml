@@ -9,9 +9,9 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
+---
 name: "CodeQL"
-
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches: ["master", "stable"]
   pull_request:
@@ -64,9 +64,9 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
-    #   make bootstrap
-    #   make release
+    # - run: |
+    #    make bootstrap
+    #    make release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

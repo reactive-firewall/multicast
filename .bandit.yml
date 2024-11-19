@@ -1,4 +1,5 @@
 # .bandit.yml
+---
 # Strict configuration for Bandit to enforce comprehensive security checks.
 
 # Define the directories to exclude from scanning.

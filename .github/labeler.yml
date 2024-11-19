@@ -1,3 +1,5 @@
+# .github/labler.yml
+---
 # Add 'Multicast' label to any root file changes
 Multicast:
   - changed-files:

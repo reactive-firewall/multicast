@@ -15,6 +15,9 @@ jobs:
       contents: read
       statuses: write
     runs-on: ubuntu-latest
+    env:
+      YAML_ARGS: ${{ vars.YAML_ARGS }}
+      GIT_MATCH_PATTERN: "*.yaml *.yml **/*.yml ./.circleci/*.yml ./.github/**/*.yml"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,7 +35,7 @@ jobs:
         id: yamlfiles
         shell: bash
         run: |
-          FILES=$(git ls-files --exclude-standard -- *.yaml *.yml **/*.yml ./.circleci/*.yml ./.github/**/*.yml )
+          FILES=$(git ls-files --exclude-standard -- ${{ env.GIT_MATCH_PATTERN }} )
           if [ -z "$FILES" ]; then
             printf "%s\n" "No YAML files found."
             printf "%s\n" "files=" >> "$GITHUB_OUTPUT"

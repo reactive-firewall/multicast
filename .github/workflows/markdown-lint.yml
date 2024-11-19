@@ -32,7 +32,7 @@ jobs:
 
       - name: Lint Workflow YAML
         run: |
-          yamllint -f github --no-warnings .github/workflows/markdown-lint.yml
+          yamllint ${{ vars.YAML_ARGS }} .github/workflows/markdown-lint.yml
 
       - name: Install NPM Dependencies
         run: |
