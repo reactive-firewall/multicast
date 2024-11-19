@@ -89,6 +89,19 @@ export -f check_command
 check_command sed ;
 check_command grep ;
 check_command cut ;
+check_command go ;
+#  WORKAROUND: this is technical debt and will need cleaned up in the future.
+if command -v checkmake >/dev/null 2>&1; then
+	check_command checkmake  # it worked
+else
+	check_command xargs ;
+	check_command find ;
+	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=WORKAROUND::checkmake not found in expected location, trying workaround." ;
+	find . -type f -iname "checkmake" 2>/dev/null ;
+	find "/usr/local/bin" -type f -iname "checkmake" 2>/dev/null ;
+	wait ;
+fi
+
 check_command checkmake ;
 
 # USAGE:
@@ -121,19 +134,21 @@ process_checkmake_output() {
 	local emsg="$2"
 
 	if ! output=$(checkmake "${file}" 2>&1); then
-		printf "%s\n" "::error::checkmake failed: ${output}" >&2
-		return 1
-	fi
+		printf "%s\n" "::error::checkmake failed!"
 
-	printf "%s\n" "${output}" | \
-		sed -e 's/   /:/g' | \
-		tr -s ':' | \
-		cut -d: -f 3-5 | \
-		grep -F "${file}" | \
-		sed -E -e 's/^[[:space:]]+//g' | \
-		while IFS= read -r line; do
-			printf "%s\n" "::warning file=${file},title=LINT::${line} ${emsg}" >&2
-		done
+		printf "%s\n" "${output}" | \
+			sed -e 's/   /:/g' | \
+			tr -s ':' | \
+			cut -d: -f 3-5 | \
+			grep -F "${file}" | \
+			sed -E -e 's/^[[:space:]]+//g' | \
+			while IFS= read -r line; do
+				printf "%s\n" "::warning file=${file},title=LINT::${line}: ${emsg}" >&2
+			done
+		return 1
+	else
+		printf "%s\n" "::notice file=${file},title=LINT::OK - No lint errors." >&2
+	fi ;
 }
 
 process_checkmake_output "${FILE}" "${EMSG}"

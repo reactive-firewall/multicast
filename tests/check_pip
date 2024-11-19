@@ -61,7 +61,8 @@
 ################################################################################
 #
 # check_pip: Audit and validate Python requirements files.
-# This, best-effort, script audits and validates Python requirements files using tools like pip-audit and pip-licenses.
+# This, best-effort, script audits and validates Python requirements
+# files using tools like pip-audit and pip-licenses.
 # It accomplishes the following tasks:
 # 1. Sets up a safe execution environment with resource limits and UTF-8 encoding.
 # 2. Checks for the existence and executability of required commands.
@@ -258,8 +259,8 @@ function check_license_when_given_req() {
 	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
 	# Install the given Python modules using pip
 	for module in $@ ; do
-		printf "::debug::%s\n" "Checking license from package '$module' ..." ;
-		REQ_SPEC=$(grep -F "$module" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
+		printf "::debug::%s\n" "Checking license from package '${module}' ..." ;
+		REQ_SPEC=$(grep -F "${module}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
 		ERR_MSG="pip install '$module' failed for $req_file." ;
 		if [[ ("${SUB_CODE}" -eq 0) ]] && python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null ;
 		then
