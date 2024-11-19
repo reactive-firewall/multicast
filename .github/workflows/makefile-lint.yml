@@ -39,7 +39,7 @@ jobs:
           BUILDER_NAME: "makefile-lint"
           BUILDER_EMAIL: "no-reply@localhost"
         run: |
-          git clone --depth 1 --branch v0.2.2 https://github.com/mrtazz/checkmake.git checkmake
+          git clone --depth 1 --branch 0.2.2 https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
           EXPECTED_SHA="48ab7819837d1bdfcbac58e301478a06efebf4a8" # v0.2.2
           ACTUAL_SHA=$(git rev-parse HEAD)
