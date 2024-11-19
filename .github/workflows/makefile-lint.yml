@@ -55,7 +55,7 @@ jobs:
             ERR_DETS="file=.github/workflows/makefile-lint.yml,line=52,endLine=57,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
-            exit 1; \
+            exit 1 \
              ;}
           cd ..
       - name: Get makefiles Files
@@ -83,7 +83,7 @@ jobs:
             ERR_DETS="file=.github/workflows/makefile-lint.yml,line=79,endLine=88,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
-            exit 1; \
+            exit 1 \
             ;}
           fi
           FILE="${{ steps.makefiles.outputs.files }}" ;
