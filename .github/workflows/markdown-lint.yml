@@ -26,13 +26,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y yamllint npm
           ERR_MSG_STUB="yamllint installation failed."
-          ERR_DETAILS="file=.github/workflow/markdown-lint.yml,line=26,endLine=31,title=FAILURE"
+          ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=26,endLine=31,title=FAILURE"
           ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
           yamllint --version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
 
       - name: Lint Workflow YAML
         run: |
-          yamllint -f github --no-warnings .github/workflows/markdown-lint.yml
+          yamllint ${{ vars.YAML_ARGS }} .github/workflows/markdown-lint.yml
 
       - name: Install NPM Dependencies
         run: |

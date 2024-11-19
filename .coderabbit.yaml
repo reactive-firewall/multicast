@@ -1,4 +1,5 @@
 # .coderabbit.yaml
+---
 language: en
 early_access: true
 enable_free_tier: true

@@ -41,7 +41,7 @@ If all went well, `multicast` is now installed and working :tada:
 
 ```bash
 # cd /MY-AWESOME-DEV-PATH
-python3 -m multicast --daemon HEAR --use-std --port 59595 --group 224.0.0.1
+python3 -m multicast --daemon --use-std HEAR --port 59595 --group 224.0.0.1
 ```
 
 Most users will want to stick to using `HEAR` when receiving multicast from the CLI. Alternatively,
@@ -54,7 +54,7 @@ messages, no more than one at a time.
 ```bash
 # cd /MY-AWESOME-DEV-PATH
 while true ; do  # until user Ctrl+C interrupts
-    python3 -m multicast RECV --use-std --port 59595 --group 224.0.0.1 --groups 224.0.0.1
+    python3 -m multicast --use-std RECV --port 59595 --group 224.0.0.1 --groups 224.0.0.1
 done
 ```
 
@@ -71,22 +71,17 @@ python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 
 > [!WARNING]
 > Caveat: this module is still a BETA
-
-[Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/cdd577549c0bf7c2bcf85d1b857c86135778a9ed/tests/test_usage.py#L251-L554)
+(https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_hear_cleanup.py#L54C2-L96C43)
+[Here is how it is tested right now]
 
 ```python3
 import multicast
-from multiprocessing import Process as Process
+import random  # for random port
 
 # set up some stuff
-_fixture_PORT_arg = int(59595)
+_fixture_PORT_arg = int(random.SystemRandom().randint(49152, 65535))
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg = """224.0.0.1"""
-_fixture_HEAR_args = [
-    """--port""", _fixture_PORT_arg,
-    """--groups""", _fixture_mcast_GRP_arg,
-    """--group""", _fixture_host_BIND_arg
-]
 
 # spawn a listening proc
 
@@ -109,14 +104,22 @@ def inputHandler():
 inputHandler()
 
 # alternatively listen as a server
+# import multicast  # if not already done.
+from multiprocessing import Process as Process
 
+_fixture_HEAR_kwargs = {
+        """is_daemon""": True,
+        """port""": _fixture_PORT_arg,
+        """group""": _fixture_host_BIND_arg
+    }
 p = Process(
-                target=multicast.__main__.McastDispatch().doStep,
-                name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
-            )
+    target=multicast.hear.McastHEAR().doStep,
+    name="HEAR", kwargs=_fixture_HEAR_kwargs
+)
+p.daemon = _fixture_HEAR_kwargs["""is_daemon"""]
 p.start()
 
-# ... probably will return with nothing outside a handler function in a loop
+# ... use CTL+C (or signal 2) to shutdown the server 'p'
 ```
 
 _and elsewhere (like another function or even module) for the sender:_
@@ -131,7 +134,7 @@ _fixture_SAY_args = [
     """--message""", """'test message'"""
 ]
 try:
-    multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
+    multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
     # Hint: use a loop to repeat or different arguments to vary message.
 except Exception:
     p.join()
@@ -146,6 +149,11 @@ didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the e
 > [!WARNING]
 > Caveat: the above examples assume the reader is knowledgeable about general `IPC` theory and
 > the standard python `multiprocessing` module and its use.
+
+> [!TIP]
+> Another
+> [more CLI focused way to test](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
+> is another example of how to use the module.
 
 ### What are the defaults?
 
@@ -200,33 +208,13 @@ From the
 > It is best to specify the port in use at this time as the default has yet to be properly
 > assigned ( see related reactive-firewall/multicast#62 )
 
-### What does exit code _x_ mean?
-
-#### Python function return code meanings
-
-`0` is the default and implies _success_, and means the process has essentially (or actually)
-returned nothing (or `None`)
-
-`1` is used when a _single_ result is returned (caveat: functions may return a single `tuple`
-instead of `None` to indicate exit code `1` by returning a `boolean` success value, and result
-(which may also be encapsulated as an iterable if needed) )
-
-`2` is used to indicate a _value and reason_ are returned (caveat: functions may return a single
-`tuple` with a single value and reason and the value can be a `tuple`)
-
-`-1` is used to mean _many_ of unspecified length and otherwise functions as `1`
-
-* these values loosely map to the principle of _none-one-many_, 0 is none, 1 is, unsurprisingly,
-  one, and everything else is many. From this practice it is possible to infer how to handle the
-  result, (ie `(int(length-hint), None if len([*result-values])==0 else *result-values)` ).
-
-#### CLI exit code meanings
+### CLI exit code meanings
 
 `0` **success**
 
 `1` **non-success** - and is often accompanied by warnings or errors
 
-`2 <` **failure** of specific reason
+`2`-`225` **failure** of specific reason
 
 * Any exit value outside the range of `0-255` inclusive should be decoded with the formula:
   `| input % 256 |` which will yield the correct exit code.
