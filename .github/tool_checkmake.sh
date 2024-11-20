@@ -63,9 +63,9 @@
 # .github/tool_checkmake.sh
 readonly SCRIPT_NAME="${0##*/}"
 
-# local path fix-up
-if [[ -d "/usr/local/bin" ]] && [[ ":$PATH:" != *":/usr/local/bin:"* ]] ; then
-	PATH="${PATH:+"$PATH:"}/usr/local/bin" ;
+# local build path fix-up
+if [[ -d "./checkmake" ]] && [[ ":$PATH:" != *":./checkmake:"* ]] ; then
+	PATH="${PATH:+"$PATH:"}./checkmake" ;
 	export PATH ;
 fi
 
@@ -90,17 +90,6 @@ check_command sed ;
 check_command grep ;
 check_command cut ;
 check_command go ;
-#  WORKAROUND: this is technical debt and will need cleaned up in the future.
-if command -v checkmake >/dev/null 2>&1; then
-	check_command checkmake  # it worked
-else
-	check_command xargs ;
-	check_command find ;
-	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=WORKAROUND::checkmake not found in expected location, trying workaround." ;
-	find . -type f -iname "checkmake" 2>/dev/null ;
-	find "/usr/local/bin" -type f -iname "checkmake" 2>/dev/null ;
-	wait ;
-fi
 
 check_command checkmake ;
 
