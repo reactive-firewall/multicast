@@ -33,7 +33,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Bandit Scan
-        uses: reactive-firewall/python-bandit-scan@v2.1
+        uses: reactive-firewall/python-bandit-scan@v2.3
         with:  # optional arguments
           # exit with 0, even with results found
           exit_zero: true  # optional, default is DEFAULT
