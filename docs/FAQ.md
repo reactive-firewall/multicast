@@ -199,6 +199,10 @@ From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
 
+While developers and network admistrators must consider other factors in the real world deployment,
+it is fair to say any free port in the dynamic or "ephemeral" port range of `49152`-`65535` should
+work so far as this Multicast module is concerned.
+
 * For `SAY` the port refers to the destination port.
 * for `RECV` and `HEAR` the port refers to the port to listen on.
 

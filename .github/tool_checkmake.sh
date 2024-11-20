@@ -63,6 +63,12 @@
 # .github/tool_checkmake.sh
 readonly SCRIPT_NAME="${0##*/}"
 
+# local build path fix-up
+if [[ -d "./checkmake" ]] && [[ ":$PATH:" != *":./checkmake:"* ]] ; then
+	PATH="${PATH:+"$PATH:"}./checkmake" ;
+	export PATH ;
+fi
+
 # USAGE:
 #  ~$ check_command CMD
 # Arguments:
@@ -83,6 +89,8 @@ export -f check_command
 check_command sed ;
 check_command grep ;
 check_command cut ;
+check_command go ;
+
 check_command checkmake ;
 
 # USAGE:
@@ -115,19 +123,21 @@ process_checkmake_output() {
 	local emsg="$2"
 
 	if ! output=$(checkmake "${file}" 2>&1); then
-		printf "%s\n" "::error::checkmake failed: ${output}" >&2
-		return 1
-	fi
+		printf "%s\n" "::error::checkmake failed!"
 
-	printf "%s\n" "${output}" | \
-		sed -e 's/   /:/g' | \
-		tr -s ':' | \
-		cut -d: -f 3-5 | \
-		grep -F "${file}" | \
-		sed -E -e 's/^[[:space:]]+//g' | \
-		while IFS= read -r line; do
-			printf "%s\n" "::warning file=${file},title=LINT::${line} ${emsg}" >&2
-		done
+		printf "%s\n" "${output}" | \
+			sed -e 's/   /:/g' | \
+			tr -s ':' | \
+			cut -d: -f 3-5 | \
+			grep -F "${file}" | \
+			sed -E -e 's/^[[:space:]]+//g' | \
+			while IFS= read -r line; do
+				printf "%s\n" "::warning file=${file},title=LINT::${line} ${emsg}" >&2
+			done
+		return 1
+	else
+		printf "%s\n" "::notice file=${file},title=LINT::OK - No lint errors." >&2
+	fi ;
 }
 
 process_checkmake_output "${FILE}" "${EMSG}"
