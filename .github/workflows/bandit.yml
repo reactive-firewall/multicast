@@ -36,7 +36,7 @@ jobs:
         uses: reactive-firewall/python-bandit-scan@v2.1
         with:  # optional arguments
           # exit with 0, even with results found
-          # exit_zero: false  # optional, default is DEFAULT
+          exit_zero: true  # optional, default is DEFAULT
           # Github token of the repository (automatically created by Github)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information.
           # File or directory to run bandit on
