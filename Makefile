@@ -139,27 +139,10 @@ ifeq "$(RMDIR)" ""
 	RMDIR=$(RM)Rd
 endif
 
-.PHONY: cleanup init clean-docs must_be_root must_have_flake must_have_pytest uninstall
+.PHONY: all clean test cleanup init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
 
 help:
-	$(QUIET)$(ECHO) "HELP"
-	$(QUIET)$(ECHO) " * house-keeping" ;
-	$(QUIET)$(ECHO) "   make help - this help text" ;
-	$(QUIET)$(ECHO) "   make build - packages the module" ;
-	$(QUIET)$(ECHO) "   make clean - cleans up a bit" ;
-	$(QUIET)$(ECHO) "   make init - sets up requirements for first time" ;
-	$(QUIET)$(ECHO) " * install/remove" ;
-	$(QUIET)$(ECHO) "   make install - installs the module properly" ;
-	$(QUIET)$(ECHO) "   make user-install - trys an unprivliged install (may not work for some users)" ;
-	$(QUIET)$(ECHO) "   make uninstall - uninstalls the module" ;
-	$(QUIET)$(ECHO) "   make purge - uninstalls the module, and resets most related things" ;
-	$(QUIET)$(ECHO) "     (the big exception is init)" ;
-	$(QUIET)$(ECHO) " * misc" ;
-	$(QUIET)$(ECHO) "   make build-docs - generate documentation (using sphinx)" ;
-	$(QUIET)$(ECHO) "   make test - run minimal acceptance testing" ;
-	$(QUIET)$(ECHO) "   make test-style - run some code-style testing" ;
-	$(QUIET)$(ECHO) "   make test-pytest - run extensive testing (with pytest)" ;
-	$(QUIET)$(ECHO) "" ;
+	$(QUIET)printf "HELP\nHouse-keeping:\n\tmake help - this help text\n\tmake build - packages the module\n\tmake clean - cleans up a bit\n\tmake init - sets up requirements for first time\nInstall/Remove:\n\tmake install - installs the module properly\n\tmake user-install - tries an unprivileged install (may not work for some users)\n\tmake uninstall - uninstalls the module\n\tmake purge - uninstalls the module, and resets most related things\n\t\t(the big exception is init)\nMisc:\n\tmake build-docs - generate documentation (using sphinx)\n\tmake test - run minimal acceptance testing\n\tmake test-style - run some code-style testing\n\tmake test-pytest - run extensive testing (with pytest)\n\n";
 
 MANIFEST.in: init
 	$(QUIET)$(ECHO) "include requirements.txt" >"$@" ;
@@ -202,19 +185,24 @@ uninstall:
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-purge: clean uninstall
+legacy-purge: clean uninstall
 	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./build/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || :
-	$(QUIET)$(RM) ./test-reports/junit.xml 2>$(ERROR_LOG_PATH) || :
+
+purge: legacy-purge
+	$(QUIET)$(RM) ./test-reports/*.xml 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-test: cleanup MANIFEST.in
+just-test: cleanup MANIFEST.in
 	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test: just-test
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
@@ -260,51 +248,65 @@ must_have_pytest: init
 	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
 
-cleanup:
-	$(QUIET)$(RM) tests/*.pyc 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) tests/*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) tests/__pycache__/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) __pycache__/* 2>$(ERROR_LOG_PATH) || true
+cleanup-dev-backups::
+	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./.*/*~ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./**/*~ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*~ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./.*~ 2>$(ERROR_LOG_PATH) || :
+
+cleanup-mac-dir-store::
+	$(QUIET)$(RM) ./.DS_Store 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/.DS_Store 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/.DS_Store 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/**/.DS_Store 2>$(ERROR_LOG_PATH) || :
+
+cleanup-py-caches: cleanup-dev-backups cleanup-mac-dir-store
+	$(QUIET)$(RM) ./*.pyc 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/*.pyc 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/__pycache__/* 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./*/*/*.pyc 2>$(ERROR_LOG_PATH) || :
+
+cleanup-py-cache-dirs: cleanup-py-caches
+	$(QUIET)$(RMDIR) ./tests/__pycache__ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./*/__pycache__ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./*/*/__pycache__ 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./__pycache__ 2>$(ERROR_LOG_PATH) || :
+
+cleanup-hypothesis::
+	$(QUIET)$(RM) ./.hypothesis/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.hypothesis/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.hypothesis/ 2>$(ERROR_LOG_PATH) || true
+
+cleanup-tests: cleanup-hypothesis cleanup-py-cache-dirs cleanup-py-caches
+	$(QUIET)$(RM) ./test_env/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./test_env/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./test_env/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) .pytest_cache/ 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
+
+cleanup-multicast: cleanup-py-cache-dirs cleanup-py-caches
 	$(QUIET)$(RM) multicast/*.pyc 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) multicast/*~ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) multicast/__pycache__/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) multicast/*/*.pyc 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) multicast/*/*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) multicast/*.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) multicast/*/*.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) multicast/.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) multicast/*/.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) tests/.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) tests/*/.DS_Store 2>$(ERROR_LOG_PATH) || true
+
+cleanup-multicast-eggs: cleanup-dev-backups cleanup-mac-dir-store
 	$(QUIET)$(RM) multicast.egg-info/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./*.pyc 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast.egg-info 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) .eggs 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || true
+
+cleanup-src-dir: cleanup-dev-backups cleanup-mac-dir-store
+	$(QUIET)$(RM) ./src/**/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./src/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) ./src/ 2>$(ERROR_LOG_PATH) || true
+
+cleanup: cleanup-tests cleanup-multicast cleanup-multicast-eggs cleanup-src-dir
 	$(QUIET)$(RM) ./.coverage 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./coverage*.xml 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./sitecustomize.py 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./*/.DS_Store 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./.*/*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./.*~ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./src/**/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./src/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./test_env/**/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./test_env/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./.hypothesis/**/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RM) ./.hypothesis/* 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./src/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) tests/__pycache__ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) multicast/__pycache__ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) multicast/*/__pycache__ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./__pycache__ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) multicast.egg-info 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) .pytest_cache/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) .eggs 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./test_env/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./.tox/ 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(RMDIR) ./.hypothesis/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;
 
 build-docs: ./docs/ ./docs/Makefile docs-reqs

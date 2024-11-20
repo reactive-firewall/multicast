@@ -132,7 +132,7 @@ process_checkmake_output() {
 			grep -F "${file}" | \
 			sed -E -e 's/^[[:space:]]+//g' | \
 			while IFS= read -r line; do
-				printf "%s\n" "::warning file=${file},title=LINT::${line}: ${emsg}" >&2
+				printf "%s\n" "::warning file=${file},title=LINT::${line} ${emsg}" >&2
 			done
 		return 1
 	else
