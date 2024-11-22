@@ -37,21 +37,42 @@ except Exception as _cause:  # pragma: no branch
 
 
 class ExceptionsTestSuite(BasicUsageTestSuite):
+	"""
+	Test suite for validating the behavior of exception classes in the multicast package.
+
+	This suite focuses on testing the CommandExecutionError class, verifying its
+	initialization with different arguments and proper error propagation.
+	"""
 
 	__module__ = """tests.test_exceptions"""
 
 	__name__ = """tests.test_exceptions.ExceptionsTestSuite"""
 
 	def test_command_execution_error_with_args(self):
+		"""
+		Test CommandExecutionError initialization with custom message and exit code.
+
+		Verifies that both the message and exit code are correctly assigned when
+		explicitly provided during initialization.
+		"""
 		error = multicast.exceptions.CommandExecutionError("Test error", 42)
 		self.assertEqual(error.message, "Test error")
 		self.assertEqual(error.exit_code, 42)
 
 	def test_command_execution_error_default_exit_code(self):
+		"""Test CommandExecutionError initialization with default exit code.
+
+		Verifies that the exit code defaults to 1 when only a message is provided.
+		"""
 		error = multicast.exceptions.CommandExecutionError("Test error")
 		self.assertEqual(error.exit_code, 1)
 
 	def test_command_execution_error_with_cause(self):
+		"""Test CommandExecutionError initialization with a cause.
+
+		Verifies that the error properly chains exceptions when initialized with a
+		cause, maintaining both the cause reference and custom attributes.
+		"""
 		test_cause = RuntimeError("test")
 		self.assertIsNotNone(test_cause)
 		error = multicast.exceptions.CommandExecutionError(test_cause, "Test with cause", 77)

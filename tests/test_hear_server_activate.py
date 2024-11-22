@@ -38,6 +38,11 @@ except Exception as err:
 
 
 class McastServerActivateTestSuite(context.BasicUsageTestSuite):
+	"""Test suite for verifying multicast server activation functionality.
+
+	This test suite focuses on the proper initialization and activation
+	of the multicast server, including socket setup and cleanup procedures.
+	"""
 
 	__module__ = """tests.test_hear_server_activate"""
 

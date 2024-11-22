@@ -43,7 +43,17 @@ class TestPEP517Build(BasicUsageTestSuite):
 	__module__ = """tests.test_build"""
 
 	def test_build_with_pep517(self):
-		"""Test building the package using PEP 517 standards."""
+		"""
+		Test building the package using PEP 517 standards.
+
+		This test verifies:
+		1. Clean build environment setup
+		2. Successful package build (both sdist and wheel)
+		3. Presence of expected distribution files
+
+		References:
+		- PEP 517: https://peps.python.org/pep-0517/
+		"""
 		# Arguments need to clean
 		build_arguments = [
 			str("{} -m coverage run").format(sys.executable),

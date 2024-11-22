@@ -51,8 +51,28 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 
 	__name__ = """tests.test_hear_cleanup.HearCleanupTestSuite"""
 
+	# Class-level constants
+	QUICK_JOIN_TIMEOUT = 1  # Quick check for process termination
+	ERROR_JOIN_TIMEOUT = 3  # Timeout when handling errors
+	FINAL_JOIN_TIMEOUT = 15  # Final wait for process cleanup
+
 	def test_cleanup_on_exit(self):
-		"""Tests the special hear and stop test"""
+		"""Test proper cleanup of McastHEAR when receiving STOP message.
+
+		Prerequisites:
+			- Available test port (self._the_test_port)
+			- Multicast group 224.0.0.1 accessible
+
+		Expected behavior:
+			1. Start McastHEAR process in daemon mode
+			2. Send "STOP Test" message
+			3. Verify process terminates cleanly
+			4. Ensure all resources are released
+
+		Success criteria:
+			- Process exits with code 0
+			- No lingering processes or sockets
+		"""
 		theResult = False
 		fail_fixture = str("""STOP --> HEAR == error""")
 		_fixture_port_num = self._the_test_port
@@ -77,15 +97,15 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(sender)
 				while p.is_alive():
 					sender(group="224.0.0.1", port=_fixture_port_num, ttl=1, data="STOP Test")
-					p.join(1)
+					p.join(self.QUICK_JOIN_TIMEOUT)
 				self.assertFalse(p.is_alive())
 			except Exception as _cause:
-				p.join(3)
+				p.join(self.ERROR_JOIN_TIMEOUT)
 				if p.is_alive():
 					p.terminate()
 					p.close()
 				raise unittest.SkipTest(fail_fixture) from _cause
-			p.join(15)
+			p.join(self.FINAL_JOIN_TIMEOUT)
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))

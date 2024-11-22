@@ -12,6 +12,7 @@ from multiprocessing import Process
 
 # set up some stuff
 _fixture_PORT_arg = int(59595)
+# Valid multicast addresses range from 224.0.0.0 to 239.255.255.255
 _fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_BIND_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
 _fixture_host_IFACE_arg = None # Initial value representing no specific interface
@@ -100,7 +101,13 @@ I begin with it.
 CLI should work like so:
 
 ```plain
-multicast [-h|--help] [--use-std] [--daemon] (SAY|RECV|HEAR) [-h|--help] [--port PORT] [--iface IFACE] [--pipe|-m MESSAGE|--message MESSAGE] [--group BIND_GROUP] [--groups [JOIN_MCAST_GROUPS ...]]
+multicast [-h|--help] [--use-std] [--daemon] (SAY|RECV|HEAR)
+    [-h|--help]
+    [--port PORT]
+    [--iface IFACE]
+    [-m MESSAGE|--message MESSAGE]
+    [--group BIND_GROUP]
+    [--groups [JOIN_MCAST_GROUPS ...]]
 ```
 
 The commands are `SAY`, `RECV`, and `HEAR` for the CLI and are analogous to `send` listen/accept
@@ -110,7 +117,8 @@ and echo functions of a 1-to-1 connection.
 
 The `SAY` command is used to send data messages via multicast datagrams.
 
-* Note: the `--message` flag is expected with the `SAY` command, otherwise it behaves like `NOOP`.
+* Note: the `--message` flag is expected with the `SAY` command;
+  if not provided, it behaves like `NOOP`.
 * Note: the `--daemon` flag has no effect on the `SAY` command.
 
 ### `RECV`

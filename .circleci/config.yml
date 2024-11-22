@@ -1,11 +1,24 @@
 ---
 version: 2.1
+commands:
+  cleanup:
+    steps:
+      - run:
+          shell: /bin/bash
+          name: "Cleanup"
+          command: |
+            make clean
+          when: always
+
+parameters:
+  python-version:
+    type: string
+    default: "3.12"
+
 jobs:
   build:
     docker:
-      - image: cimg/python:3.10
-      - image: cimg/python:3.11
-      - image: cimg/python:3.12
+      - image: cimg/python:<< pipeline.parameters.python-version >>
     resource_class: medium
     environment:
       CI: cicleci
@@ -39,9 +52,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/python:3.10
-      - image: cimg/python:3.11
-      - image: cimg/python:3.12
+      - image: cimg/python:<< pipeline.parameters.python-version >>
     parallelism: 2
     resource_class: medium
     environment:
@@ -60,36 +71,18 @@ jobs:
           command: |
             python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
           when: on_success
-      - run:
-          shell: /bin/bash
-          name: "clean up for test"
-          command: |
-            make clean
-          when: always
+      - cleanup
       - run:
           shell: /bin/bash
           name: "Unit Tests"
           command: |
             make test
           when: on_success
-      - run:
-          shell: /bin/bash
-          name: "clean up from test"
-          command: |
-            make clean
-          when: always
-      - run:
-          shell: /bin/bash
-          name: "clean up from FAIL"
-          command: |
-            make clean
-          when: on_fail
+      - cleanup
 
   pytest:
     docker:
-      - image: cimg/python:3.10
-      - image: cimg/python:3.11
-      - image: cimg/python:3.12
+      - image: cimg/python:<< pipeline.parameters.python-version >>
     parallelism: 2
     resource_class: medium
     environment:
@@ -116,12 +109,7 @@ jobs:
           command: |
             python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
           when: on_success
-      - run:
-          shell: /bin/bash
-          name: "clean up for pytest"
-          command: |
-            make clean
-          when: always
+      - cleanup
       - run:
           shell: /bin/bash
           name: "pytest Unit Tests"
@@ -134,22 +122,11 @@ jobs:
       - store_artifacts:
           path: test-reports
           when: on_success
-      - run:
-          shell: /bin/bash
-          name: "clean up from pytest"
-          command: |
-            make clean
-          when: always
-      - run:
-          shell: /bin/bash
-          name: "clean up from FAIL"
-          command: |
-            make clean
-          when: on_fail
+      - cleanup
 
   lint:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:<< pipeline.parameters.python-version >>
     resource_class: medium
     environment:
       CI: cicleci
@@ -169,25 +146,17 @@ jobs:
           name: "install test-reqs attempt"
           command: |
             python3 -m pip install --user -r ./tests/requirements.txt || : ;
-      - run:
-          shell: /bin/bash
-          name: "clean up for test"
-          command: |
-            make clean
+      - cleanup
       - run:
           shell: /bin/bash
           name: "check code style and spelling"
           command: |
             make test-style || python3 -m flake8 --verbose --count --config=.flake8.ini
-      - run:
-          shell: /bin/bash
-          name: "clean up when done"
-          command: |
-            make clean
+      - cleanup
 
 workflows:
   version: 2
-  workflow:
+  test-matrix:
     jobs:
       - build
       - test:

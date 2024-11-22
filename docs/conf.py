@@ -15,6 +15,7 @@
 
 import sys
 import os
+from urllib.parse import quote
 
 # Define the branch reference for linkcode_resolve
 DOCS_BUILD_REF: str = os.environ.get("DOCS_BUILD_REF", "stable")
@@ -385,7 +386,11 @@ intersphinx_mapping = {
 
 
 def linkcode_resolve(domain, info):
-	if domain != "py" or not info["module"]:
+	if not isinstance(domain, str) or domain != "py":
+		return None
+	if not isinstance(info, dict) or "module" not in info or not info["module"]:
+		return None
+	if not isinstance(info["module"], str):
 		return None
 	filename = info["module"].replace(".", "/")
 	theResult = f"{linkcode_url_prefix}/blob/{DOCS_BUILD_REF}/{filename}.py"
@@ -393,4 +398,4 @@ def linkcode_resolve(domain, info):
 		theResult = theResult.replace("/multicast.py", "/multicast/__init__.py")
 	if "/tests.py" in theResult:
 		theResult = theResult.replace("/tests.py", "/tests/__init__.py")
-	return theResult
+	return quote(theResult, safe=":/-._")

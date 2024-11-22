@@ -5,8 +5,8 @@
 ```{toctree}
 :maxdepth: 3
 
-[Code of Conduct](https://github.com/reactive-firewall/multicast/.github/CODE_OF_CONDUCT.md)
-[Contributing](https://github.com/reactive-firewall/multicast/.github/CONTRIBUTING.md)
+[Code of Conduct](https://github.com/reactive-firewall/multicast/blob/master/.github/CODE_OF_CONDUCT.md)
+[Contributing](https://github.com/reactive-firewall/multicast/blob/master/.github/CONTRIBUTING.md)
 ```
 
 ### How do I get this running?

@@ -940,10 +940,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 		This helper method imports the package and extracts the __version__ attribute.
 
 		Returns:
-			version -- The version string of the package.
-
+			packaging.version.Version -- A validated version object from the __version__ attrbute.
 		Raises:
-			AssertionError -- If the version string cannot be retrieved.
+			AssertionError -- If the version string is invalid or cannot be retrieved.
+			ImportError -- If the multicast package cannot be imported.
 
 		"""
 		try:
@@ -957,6 +957,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			parsed_version = version.parse(_raw_version_fixture)
 			self.assertIsNotNone(parsed_version, """Version is not valid.""")
 			self.assertIsInstance(parsed_version, version.Version, """Version is not valid.""")
+			self.assertTrue(
+				len(parsed_version.release) >= 2,
+				"""Version must have at least major.minor components."""
+			)
 			return parsed_version
 		except ImportError:
 			self.fail("""Failed to import the multicast package to retrieve version.""")

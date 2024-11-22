@@ -23,7 +23,7 @@ __module__ = """tests"""
 try:
 	try:
 		import context
-	except Exception as _:  # pragma: no branch
+	except ImportError as _:  # pragma: no branch
 		del _  # skipcq - cleanup any error vars early
 		from . import context
 	if context.__name__ is None:

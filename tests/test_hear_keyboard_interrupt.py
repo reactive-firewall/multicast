@@ -20,6 +20,17 @@
 __module__ = """tests"""
 
 try:
+	"""Handle imports with CWE-758 mitigation.
+
+	This implementation uses a nested try-except pattern to:
+	1. Attempt direct context import
+	2. Fallback to relative import
+	3. Validate context module integrity
+	4. Import required dependencies
+
+	References:
+	- CWE-758: Reliance on Undefined, Unspecified, or Implementation-Defined Behavior
+	"""
 	try:
 		import context
 	except Exception as ImportErr:  # pragma: no branch
@@ -40,7 +51,13 @@ except Exception as _cause:  # pragma: no branch
 
 
 class TestHearKeyboardInterrupt(BasicUsageTestSuite):
+	"""
+	Test suite for verifying keyboard interrupt (SIGINT) handling.
 
+	This suite ensures that the multicast service properly handles
+	SIGINT signals by cleaning up resources and exiting gracefully
+	with the expected status code (130).
+	"""
 	__module__ = """tests.test_hear_keyboard_interrupt"""
 
 	def test_hear_keyboard_interrupt(self):
