@@ -9,7 +9,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -284,7 +284,7 @@ class ShutdownCommandReceived(RuntimeError):
 
 	__name__ = """multicast.exceptions.ShutdownCommandReceived"""
 
-	def __init__(self, message="SHUTDOWN", *args, **kwargs):
+	def __init__(self, *args, **kwargs):
 		"""
 		Initialize the ShutdownCommandReceived exception.
 
@@ -345,10 +345,37 @@ class ShutdownCommandReceived(RuntimeError):
 				... except ShutdownCommandReceived as e:
 				...     str(e) == "Custom message"
 				True
+
+			Testcase 7: Initialization with different call to init:
+				A. - Initializes a ShutdownCommandReceived with a specific exit code.
+				B. - Checks the message is still set, as normally would.
+				C. - Checks the cause is set, as super class would.
+				D. - Checks the specific exit code is NOT sixty-five (65) but rather still 143.
+
+				>>> pre_made_args = [ValueError("inner Cause"), "A Pre-made SHUTDOWN", int(65)]
+				>>> error = ShutdownCommandReceived(*pre_made_args)
+				>>> error.message
+				'A Pre-made SHUTDOWN'
+				>>> error.__cause__  #doctest: +ELLIPSIS
+				ValueError...inner Cause...
+				>>> error.exit_code
+				143
 		"""
+		if len(args) > 0 and isinstance(args[0], BaseException):
+			cause = args[0]
+			args = args[1:]
+		else:
+			cause = kwargs.pop("__cause__", None)
+		if len(args) > 0 and isinstance(args[0], str):
+			message = args[0]
+			args = args[1:]
+		else:
+			message = kwargs.pop("message", "SHUTDOWN")
 		if not isinstance(message, str):
 			raise TypeError("[CWE-573] message must be a string")
 		super().__init__(message, *args, **kwargs)
+		if cause is not None:
+			self.__cause__ = cause
 		self.message = message
 		self.exit_code = 143  # Use SIGTERM exit code for graceful shutdown
 
