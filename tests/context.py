@@ -940,7 +940,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		This helper method imports the package and extracts the __version__ attribute.
 
 		Returns:
-			packaging.version.Version -- A validated version object from the __version__ attrbute.
+			packaging.version.Version -- A validated version object from the __version__ attribute.
 		Raises:
 			AssertionError -- If the version string is invalid or cannot be retrieved.
 			ImportError -- If the multicast package cannot be imported.

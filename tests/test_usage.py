@@ -859,7 +859,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err  # skipcq - cleanup any error leaks early
 				theResult = False
-		self.assertTrue(theResult, str("""Could Not handle negitive inputs"""))
+		self.assertTrue(theResult, str("""Could Not handle negative inputs"""))
 
 
 if __name__ == '__main__':
