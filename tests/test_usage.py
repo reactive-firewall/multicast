@@ -443,10 +443,12 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			test_input = "Test message from stdin"
 			self.assertIsNotNone(test_input)
 			with patch('sys.stdin', io.StringIO(test_input)):
-				self.assertIsNotNone(say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num))
-			# Assert that the result is as expected
-			# You might need to modify this based on what _sayStep returns
-			theResult = True  # or whatever the expected output is
+				result = say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
+				self.assertIsNotNone(result)
+				# Verify the message was actually sent
+				theResult = result.success
+				self.assertTrue(theResult)  # Assuming there's a success indicator
+				self.assertEqual(result.sent_message, test_input)  # Verify message content
 		except Exception as err:
 			context.debugtestError(err)
 			self.skipTest(fail_fixture)

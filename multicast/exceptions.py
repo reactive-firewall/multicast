@@ -319,7 +319,7 @@ class ShutdownCommandReceived(RuntimeError):
 
 			Testcase 3: Invalid message type.
 
-				>>> exc = ShutdownCommandReceived(123)  # doctest: +IGNORE_EXCEPTION_DETAIL
+				>>> exc = ShutdownCommandReceived(message=123)  # doctest: +IGNORE_EXCEPTION_DETAIL
 				Traceback (most recent call last):
 				TypeError: message must be a string
 

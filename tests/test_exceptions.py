@@ -101,7 +101,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		"""
 		error = multicast.exceptions.ShutdownCommandReceived("Test Shutdown", 42)
 		self.assertEqual(error.message, "Test Shutdown")
-		self.assertIsNotEqual(error.exit_code, 42, "Unexpectedly was able to overide exit code!")
+		self.assertNotEqual(error.exit_code, 42, "Unexpectedly was able to override exit code!")
 		self.assertEqual(error.exit_code, 143)
 
 	def test_shutdown_received_error_default_exit_code(self):
@@ -135,7 +135,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertIsNotNone(error.__cause__)
 		self.assertEqual(error.__cause__, test_cause)
 		self.assertEqual(error.message, "Shutdown with cause")
-		self.assertIsNotEqual(error.exit_code, 77, "Unexpectedly was able to overide exit code!")
+		self.assertNotEqual(error.exit_code, 77, "Unexpectedly was able to override exit code!")
 		self.assertEqual(error.exit_code, 143)
 
 
