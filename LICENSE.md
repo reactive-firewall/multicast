@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2017-2024, Mr. Walls
+Copyright (c) 2017-2025, Mr. Walls
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@ You may obtain a copy of the License at
 ### Files: `.github/workflows/markdown-lint.yml`, and `.github/workflows/yaml-lint.yml`
 
 ***
-Copyright (c) 2017-2024, Your Mileage May Vary
+Copyright (c) 2017-2025, Your Mileage May Vary
 ALSO Licensed under MIT
 You may obtain a copy of the License at
 [MIT License](http://www.github.com/reactive-firewall/ymmv/LICENSE.md)

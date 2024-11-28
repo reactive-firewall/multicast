@@ -152,7 +152,7 @@ Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-fi
 
 ## License
 
-### Copyright (c) 2021-2024, Mr. Walls
+### Copyright (c) 2021-2025, Mr. Walls
 
 This project is licensed under the MIT License. See the
 [LICENSE.md](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md) file for
