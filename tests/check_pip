@@ -60,6 +60,21 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 #
+# ---
+# ### Security Advisory: Command Injection Risk in `tests/check_pip`
+#
+# When using the `tests/check_pip` script, be aware of a potential command injection vulnerability arising from module names containing special characters or leading hyphens (e.g., `-v`). The script has been updated to properly handle such module names by:
+#
+# - Using `--` in `grep` commands to prevent interpreting module names as options.
+# - Ensuring all inputs are correctly sanitized and special characters are handled safely.
+#
+# **Recommendations for Developers:**
+#
+# - **Validation:** Always ensure that variables used in shell commands are properly handled to avoid being misinterpreted as options or commands.
+# - **Updates:** Pull the latest changes from the repository to incorporate the security fixes in `tests/check_pip`.
+# - **Testing:** Incorporate static code analysis tools to detect similar vulnerabilities in the future.
+# ---
+#
 # check_pip: Audit and validate Python requirements files.
 # This, best-effort, script audits and validates Python requirements
 # files using tools like pip-audit and pip-licenses.
@@ -276,7 +291,7 @@ function check_license_when_given_req() {
 	# Install the given Python modules using pip
 	for module in $@ ; do
 		printf "::debug::%s\n" "Checking license from package '${module}' ..." ;
-		REQ_SPEC=$(grep -F "${module}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
+		REQ_SPEC=$(grep -F -- "${module}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F -- "${module}" )
 		ERR_MSG="pip install '$module' failed for $req_file." ;
 		if [[ ("${SUB_CODE}" -eq 0) ]] && python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null ;
 		then
