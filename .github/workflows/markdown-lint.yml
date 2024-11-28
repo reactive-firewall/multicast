@@ -31,8 +31,14 @@ jobs:
           yamllint --version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
 
       - name: Lint Workflow YAML
+        if: ${{ success() }}
         run: |
-          yamllint ${{ vars.YAML_ARGS }} .github/workflows/markdown-lint.yml
+          if [[ "${{ vars.YAML_ARGS }}" =~ ^[a-zA-Z0-9\ \-\.]*$ ]]; then
+            yamllint ${{ vars.YAML_ARGS }} .github/workflows/makefile-lint.yml
+          else
+            printf "%s\n" "Invalid YAML_ARGS provided"
+            exit 1
+          fi
 
       - name: Install NPM Dependencies
         run: |

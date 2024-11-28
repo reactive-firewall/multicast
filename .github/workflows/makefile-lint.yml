@@ -31,7 +31,12 @@ jobs:
       - name: Lint Workflow YAML
         if: ${{ success() }}
         run: |
-          yamllint ${{ vars.YAML_ARGS }} .github/workflows/makefile-lint.yml
+          if [[ "${{ vars.YAML_ARGS }}" =~ ^[a-zA-Z0-9\ \-\.]*$ ]]; then
+            yamllint ${{ vars.YAML_ARGS }} .github/workflows/makefile-lint.yml
+          else
+            echo "Invalid YAML_ARGS provided"
+            exit 1
+          fi
       - name: Install checkmake
         if: ${{ success() }}
         env:
