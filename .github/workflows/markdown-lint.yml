@@ -33,7 +33,8 @@ jobs:
       - name: Lint Workflow YAML
         if: ${{ success() }}
         run: |
-          case "${{ vars.YAML_ARGS }}" in
+          YAML_ARGS="${{ vars.YAML_ARGS }}"
+          case "${YAML_ARGS}" in
             *[!a-zA-Z0-9\ \-\.]*)
               ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters"
               ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=37,endLine=43,"
