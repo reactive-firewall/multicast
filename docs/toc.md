@@ -57,7 +57,7 @@ enabling developers to implement efficient and robust multicast functionality wi
   messages.
 * **Command-Line Interface**: Convenient CLI commands (`SAY`, `RECV`, `HEAR`) for quick testing
   and debugging.
-* **Cross-Platform Support**: Compatible with Linux, and macOS.
+* **Cross-Platform Support**: Compatible with Linux, UNIX, and macOS.
 
 ### Getting Started
 
@@ -80,9 +80,10 @@ enabling developers to implement efficient and robust multicast functionality wi
 :Name: Documentation
 apidocs/index
 /README
+/USAGE
 /FAQ
 /CI
-/USAGE
+/Exception_Guide
 /LICENSE
 ```
 

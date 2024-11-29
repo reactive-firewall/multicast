@@ -22,7 +22,45 @@
 Use for handling exit codes and exceptions from multicast. Contains classes and functions to
 handle exceptions and errors for/from the multicast module.
 
-Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
+> [!CAUTION]
+> See details regarding dynamic imports [documented](../__init__.py) in this module.
+
+Error Handling Mechanisms:
+
+	Exception Raising:
+
+		- **Module Specific Exceptions**: Defined in `multicast/exceptions.py`, providing clear
+			semantics for error conditions specific to the `multicast` module.
+		- **Standard Exceptions**: Used where appropriate to leverage built-in exception types for
+			common error scenarios.
+
+	Exception Mapping:
+
+		- The `exit_on_exception` decorator handles exceptions by mapping them to exit codes
+			defined in `EXIT_CODES`.
+		- Ensures that exceptions are caught and the program exits gracefully with standardized
+			exit codes.
+
+	Usage of `sys.exit()`:
+
+		- Direct calls to `sys.exit()` are discouraged outside of centralized exception handling.
+		- Prefer raising exceptions that are then handled by the exception management system.
+
+Guidelines for Developers:
+
+	- **Consistency**: Always raise exceptions using the predefined classes to maintain
+		consistency in error handling.
+	- **Clarity**: Provide informative error messages to aid in debugging and user feedback.
+	- **Mapping**: Ensure any new exceptions are added to the `EXIT_CODES` dictionary with
+		appropriate exit codes.
+	- **Standards Compliance**: Adhere to CEP-8 guidelines for exit codes and exception handling
+		protocols.
+
+Conclusion:
+
+	By following the error handling practices outlined in this guide, developers can create
+	robust, maintainable code that handles error conditions gracefully and consistently. This
+	contributes to a stable application and improves the overall developer experience.
 
 Minimal Acceptance Testing:
 
