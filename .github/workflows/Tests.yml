@@ -25,6 +25,8 @@ on:  # yamllint disable-line rule:truthy
       - master
       - stable
       - HOTFIX-*
+      - develop
+      - feature/*
     tags:
       - v*
   pull_request:
@@ -38,6 +40,14 @@ on:  # yamllint disable-line rule:truthy
 # Declare default permissions as none.
 permissions: {}
 
+env:
+  ENVIRONMENT: ${{
+    github.event_name == 'push' && (github.ref == 'refs/heads/master'
+      || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v'))
+    && 'Deployment' || 'Testing'
+  }}
+
+
 jobs:
   BUILD:
     permissions:
@@ -47,6 +57,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: github.repository == 'reactive-firewall/multicast'
     runs-on: ubuntu-latest
     defaults:
@@ -80,6 +91,7 @@ jobs:
       security-events: none
     if: ${{ !cancelled() }}
     needs: BUILD
+    environment: ${{ env.ENVIRONMENT }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -166,6 +178,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
@@ -216,6 +229,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
@@ -307,6 +321,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ubuntu-latest
@@ -352,6 +367,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
     needs: [MATS, COVERAGE]
     runs-on: ${{ matrix.os }}
@@ -468,6 +484,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
     needs: [BOOTSTRAP, MATS]
     runs-on: ${{ matrix.os }}
@@ -548,6 +565,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ !cancelled() }}
     needs: [BOOTSTRAP, MATS]
     runs-on: ubuntu-latest
@@ -603,7 +621,8 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    if: ${{ !cancelled() }}
+    environment: Deployment
+    if: ${{ !cancelled() && (env.ENVIRONMENT == 'Deployment') }}
     needs: [MATS, COVERAGE, EXTRAS-FOR-SETUP, EXTRAS-FOR-PIP]
     runs-on: ${{ matrix.os }}
     defaults:
@@ -672,6 +691,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
     needs: [MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
     runs-on: ubuntu-latest
