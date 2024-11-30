@@ -41,12 +41,7 @@ on:  # yamllint disable-line rule:truthy
 permissions: {}
 
 env:
-  ENVIRONMENT: ${{
-    github.event_name == 'push' && (github.ref == 'refs/heads/master'
-      || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v'))
-    && 'Deployment' || 'Testing'
-  }}
-
+  ENVIRONMENT: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || 'Testing' }}
 
 jobs:
   BUILD:
@@ -565,8 +560,8 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    environment: ${{ env.ENVIRONMENT }}
-    if: ${{ !cancelled() }}
+    environment: Testing
+    if: ${{ !cancelled() && env.ENVIRONMENT == 'Testing' }}
     needs: [BOOTSTRAP, MATS]
     runs-on: ubuntu-latest
     defaults:
@@ -693,7 +688,7 @@ jobs:
       security-events: none
     environment: ${{ env.ENVIRONMENT }}
     if: ${{ success() }}
-    needs: [MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
+    needs: [MATS, STYLE, COVERAGE, INTEGRATION]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
