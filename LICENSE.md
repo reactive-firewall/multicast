@@ -47,7 +47,7 @@ You may obtain a copy of the License at
 ### Files: `Logo.svg`
 
 ***
-The logo SVG file referances, and when possible renders with, the font 
+The logo SVG file references, and when possible renders with, the font 
 [CommicNeue](https://github.com/crozynski/comicneue/). 
 Copyright 2014 The Comic Neue Project Authors (https://github.com/crozynski/comicneue)
 which was under an OFL-type license.

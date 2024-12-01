@@ -72,7 +72,7 @@ enabling developers to implement efficient and robust multicast functionality wi
 * [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
 * [Release Notes](https://github.com/reactive-firewall/multicast/releases): Release information.
 * [CI Processes](./CI): Information on continuous integration and testing strategies.
-* [Exceptions in `multicast`](./Exception_Guide): Information on exceptions and thier handling in
+* [Exceptions in `multicast`](./Exception_Guide): Information on exceptions and their handling in
   the `multicast` module.
 * [License](./LICENSE): Licensing information and acknowledgments.
 
