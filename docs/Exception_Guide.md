@@ -170,9 +170,6 @@ For clarity, here's the standard mapping:
 | `BrokenPipeError`              | 141       | Broken Pipe (SIGPIPE)            |
 | `SystemExit`                   | 143       | Terminated (SIGTERM)             |
 
-> [!NOTE]
-> The actual implementation of the mapping is a bit PLACEHOLDER.
-
 <!-- Implementation Details -->
 <details>
 <summary>Implementation</summary>

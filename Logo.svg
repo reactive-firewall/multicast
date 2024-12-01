@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="Shadow" filterUnits="userSpaceOnUse" x="-25.6" y="-25.6">
+      <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="1.308"/>
+      <feFlood flood-color="gray" flood-opacity=".5" result="flood"/>
+      <feComposite in="flood" in2="blur" operator="in"/>
+    </filter>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="Ball_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -2 4 4" markerWidth="4" markerHeight="4" color="#e60">
+      <g>
+        <circle cx=".7999996" cy="0" r="0.799999292982219" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="Ball_Marker_2" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-3 -2 4 4" markerWidth="4" markerHeight="4" color="#e60">
+      <g>
+        <circle cx="-.7999996" cy="0" r="0.799999292982219" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.24.1\n2024-12-01 04:08:34 +0000</metadata>
+  <g id="Background" fill-opacity="1" stroke="none" stroke-opacity="1" fill="none" stroke-dasharray="none">
+    <title>Background</title>
+    <g id="Background_Badge_Ring">
+      <title>Badge Ring</title>
+      <g id="Graphic_34_shadow" filter="url(#Shadow)">
+        <ellipse cx="128" cy="128" rx="122.100195015905" ry="124.300198564071"/>
+        <ellipse cx="128" cy="128" rx="122.100195015905" ry="124.300198564071" stroke="#e60" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+      <g id="Graphic_34">
+        <ellipse cx="128" cy="128" rx="122.100195015905" ry="124.300198564071" stroke="#e60" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+      </g>
+    </g>
+    <g id="Background_Title_Text">
+      <title>Title Text</title>
+      <g id="Graphic_6">
+        <text transform="translate(163.62528 62.16213)" fill="#e60">
+          <tspan font-family="Comic Neue" font-style="italic" font-size="54" fill="#e60" x="0" y="49" xml:space="preserve">ulti</tspan>
+        </text>
+      </g>
+      <g id="Graphic_21">
+        <text transform="translate(51 101.68208)" fill="#e60">
+          <tspan font-family="Comic Neue" font-style="italic" font-size="96" fill="#e60" x="0" y="86" xml:space="preserve">Cast</tspan>
+        </text>
+      </g>
+    </g>
+    <g id="Background_M_Text_Logo">
+      <title>M Text Logo</title>
+      <g id="Line_8">
+        <desc>Simple Core of Main Multicast Logo</desc>
+        <path d="M 46 185.4013 L 46 44.6359 L 86.55646 80.04468 L 86.55646 18.059234 L 150.6246 82.12738 L 150.6246 109.44256" marker-end="url(#Ball_Marker)" marker-start="url(#Ball_Marker_2)" stroke="#e60" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"/>
+      </g>
+    </g>
+  </g>
+</svg>

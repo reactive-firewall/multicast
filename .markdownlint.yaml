@@ -6,15 +6,16 @@ MD001: true   # Enforce proper heading increments
 MD026:  # Disallow trailing punctuation in headings
   punctuation: ",;:!"  # - ('1.', '2.', etc. are ok though)
 
-# Disable or customize rules
+# Disable rules
+MD034: false  # Allow bare URLs
+
+# Customizations
 MD013:  # Disable line length rule for flexibility
   line_length: 100
   code_blocks: false
   tables: false
-MD033: false  # Allow inline HTML if needed
-MD034: false  # Allow bare URLs
-
-# Customizations
+MD033:  # Allow inline HTML if needed
+  allowed_elements: ["details", "summary"]
 MD007:
   indent: 2  # Set unordered list indentation to 2 spaces
 MD029:

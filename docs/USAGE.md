@@ -4,7 +4,7 @@
 
 The API is in late alpha testing, and has not yet reached a beta (pre-release) stage.
 
-Here is an example of usage (circa v1.4)
+Here is an example of usage (circa v2.0)
 
 ```python3
 import multicast

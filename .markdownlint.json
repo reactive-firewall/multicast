@@ -8,7 +8,9 @@
     "code_blocks": false,
     "tables": false
   },
-  "MD033": false,
+  "MD033": {
+    "allowed_elements": ["details", "summary"]
+  },
   "MD034": false,
   "MD007": {
     "indent": 2

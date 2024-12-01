@@ -329,7 +329,9 @@ clean-docs: ./docs/ ./docs/Makefile
 	$(QUIET)$(WAIT) ;
 
 ./docs/:
-	$(QUIET) : ;
+	$(QUIET)test -d "$@" || DO_FAIL="exit 77" ;  # set fail if can't verify directory
+	$(QUIET)test -e "$@" || DO_FAIL="exit 69" ;  # overwrite exitcode if does not exsist.
+	$(QUIET)$(DO_FAIL) ;
 
 ./docs/Makefile: ./docs/
 	$(QUIET)$(WAIT) ;
