@@ -308,7 +308,6 @@ context.
   [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161) and the
   project's conventions for error handling and exit codes.
 
-
 ## Adding New Exceptions
 
 When introducing new exceptions:
