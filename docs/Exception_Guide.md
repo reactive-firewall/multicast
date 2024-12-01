@@ -4,7 +4,7 @@ This document provides an in-depth overview of the error handling mechanisms wit
 It details the exceptions used, their meanings, associated exit codes, and examples of when and
 how they are raised in the codebase. The guide aims to standardize error handling practices and
 ensure consistency across the project, aligning with
-[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161) standards.
+[CEP-8](cep8) standards.
 
 ## Exceptions Overview
 
@@ -149,7 +149,7 @@ project's `EXIT_CODES` mapping.
 
 The `EXIT_CODES` dictionary in `multicast/exceptions.py` provides a centralized mapping between
 exit codes, exceptions, and messages, adhering to
-[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161).
+[CEP-8](cep8).
 
 For clarity, here's the standard mapping:
 
@@ -212,7 +212,7 @@ EXIT_CODES = {
 
 The following mappings are specific to multicast exceptions and may differ from the standard
 mappings above (while still remaining
-[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)
+[CEP-8](cep8)
 compliant):
 
 | Exception                 | Exit Code | Reason for Customization |
@@ -305,7 +305,7 @@ context.
 - **Clear Error Messages**: Provide informative and clear error messages to aid in debugging and
   user understanding.
 - **Adherence to Standards**: Follow the guidelines set out in
-  [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161) and the
+  [CEP-8](cep8) and the
   project's conventions for error handling and exit codes.
 
 ## Adding New Exceptions
@@ -331,4 +331,7 @@ provide a better experience for users interacting with the software.
 
 ### Copyright (c) 2024-2025, Mr. Walls
 
-[![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](license)
+
+[cep8]: https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161
+[license]: https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md
