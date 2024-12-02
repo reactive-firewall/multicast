@@ -191,17 +191,20 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)
+		_fixture_client_addr = ("224.0.0.1", _fixture_port_num)
 		data = b'\xff\xfe\xfd\xfc'  # Invalid UTF-8 bytes
 		sock = multicast.genSocket()
 		handler = multicast.hear.HearUDPHandler(
 			request=(data, sock),
-			client_address=("224.0.0.1", _fixture_port_num),
+			client_address=_fixture_client_addr,
 			server=None
 		)
 		try:
 			# Should silently ignore invalid UTF-8 data
-			handler.handle()
-			# If no exception is raised, the test passes
+			handler.handle()  # If no exception is raised, the test passes
+			# Verify handler state after processing invalid data
+			self.assertIsNone(handler.server)  # Server should remain None
+			self.assertEqual(handler.client_address, _fixture_client_addr)
 		except Exception as e:
 			self.fail(f"Handler raised an unexpected exception: {e}")
 		finally:
