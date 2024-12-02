@@ -37,8 +37,8 @@ build:
     pre_build:
       # Build the project module that is to be documented ; continue even if build fails
       - make build || true
-      # build the documentation ; avoid crashing even if docs fail
-      - make -j1 build-docs || true
+      # Build docs and verify output exists
+      - make -j1 build-docs && test -d docs/www/_build/html
     post_build:
       # Move built documentation into place ; ignore if fails
       - cp -vfRp docs/www/_build/html/ "$READTHEDOCS_OUTPUT" || true
@@ -57,6 +57,7 @@ sphinx:
 #
 # Note:
 # - Enabling PDF output requires LaTeX installed in the build environment
+#   - PDF output requires texlive-latex-recommended and texlive-fonts-recommended packages
+#   - PDF builds may significantly increase build time and output size
 # - Ensure all documentation content is compatible with these formats
 # - Assess user demand for offline documentation before enabling
-
