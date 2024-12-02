@@ -4,8 +4,8 @@
 		"markdownlint-cli": "^0.37.0"
 	},
 	"scripts": {
-		"markdownlint-cmd": "command -v markdownlint >/dev/null && markdownlint \"$@\" || npx markdownlint \"$@\"",
-		"lint:md": "npm run markdownlint-cmd --",
+		"markdownlint-cmd": "command -v markdownlint >/dev/null && markdownlint ${@} || npx markdownlint ${@}",
+		"lint:md": "npm run markdownlint-cmd",
 		"fix:md": "npm run markdownlint-cmd -- --fix"
 	}
 }
