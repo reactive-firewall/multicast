@@ -44,7 +44,7 @@ jobs:
               ;;
             *)
               printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
-              yamllint ${YAML_ARGS} .github/workflows/markdown-lint.yml
+              yamllint "${YAML_ARGS}" .github/workflows/markdown-lint.yml
               ;;
           esac
 
@@ -63,10 +63,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           git ls-files --exclude-standard -z -- *.md **/*.md |\
-          xargs -0 -I{} "npm lint:md -- {} --config .markdownlint.yaml" ;
+          xargs -0 -I{} npm lint:md -- "{}" --config .markdownlint.yaml ;
 
       - name: Lint Markdown Files with JSON config
         if: ${{ !cancelled() }}
         run: |
           git ls-files --exclude-standard -z -- *.md **/*.md |\
-          xargs -0 -I{} "npm lint:md -- {} --config .markdownlint.json" ;
+          xargs -0 -I{} npm lint:md -- "{}" --config .markdownlint.json ;
