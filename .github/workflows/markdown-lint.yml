@@ -50,8 +50,10 @@ jobs:
 
       - name: Install NPM Dependencies
         run: |
-          sudo npm install -g markdownlint
-          sudo npm install -g markdownlint-cli
+          ER_S="Invalid YAML_ARGS: contains unauthorized characters"
+          ER_T="title=INSTALL_ERROR"
+          ER_D="file=.github/workflows/markdown-lint.yml,line=53,endLine=56,"
+          npm install || { printf "::error %s::ERROR %s\n" "${ER_D}${ER_T}" "${ER_S}" && exit 1 ;}
 
       - name: Lint YAML config for markdown
         run: |
