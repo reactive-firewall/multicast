@@ -377,10 +377,12 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		Overrides the base class method to define how incoming data is handled.
 
 		By default:
-		Processes the incoming data from the client, logs the messages,
-		and sends a response back. If the data contains the
-		keyword "STOP", it raises a `RuntimeError` to
-		initiate server shutdown.
+			Processes the incoming data from the client, logs the messages,
+			and sends a response back. If the data contains the
+			keyword "STOP", it raises a `RuntimeError` to
+			initiate server shutdown.
+			Silently ignores any UnicodeDecodeError when decoding data.
+			Returns early if data or socket is None.
 
 		Minimal Acceptance Testing:
 
@@ -429,7 +431,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			try:
 				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			except UnicodeDecodeError:  # pragma: no cover
-				return  # nothing to do -- fail quickly.
+				return  # silently ignore invalid UTF-8 data -- fail quickly.
 		if (_sys.stdout.isatty()):  # pragma: no cover
 			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
