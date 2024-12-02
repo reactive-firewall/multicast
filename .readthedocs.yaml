@@ -5,6 +5,9 @@
 # Required
 version: 2
 
+# Optional but recommended, declare the Python requirements required
+# to build your documentation
+# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
 python:
   install:
     - requirements: requirements.txt
@@ -18,17 +21,26 @@ build:
     python: "3.12"
   jobs:
     post_checkout:
+      # Fetch the complete git history; ignore errors if already fully fetched
       - git fetch --unshallow || true
+      # Set fetch configuration to include all branches; ignore errors if already set
       - git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' || true
+      # Fetch all branches and tags; ignore network errors
       - git fetch --all --tags || true
+      # Clean build artifacts; ignore if already clean
       - make clean || true
+      # Purge caches and temporary files; continue even if purge fails
       - make purge || true
     post_install:
+      # Clean build artifacts; ignore if already clean
       - make clean || true
     pre_build:
+      # Build the project module that is to be documented ; continue even if build fails
       - make build || true
+      # build the documentation ; avoid crashing even if docs fail
       - make -j1 build-docs || true
     post_build:
+      # Move built documentation into place ; ignore if fails
       - cp -vfRp docs/www/_build/html/ "$READTHEDOCS_OUTPUT" || true
 
 # Build documentation in the "docs/" directory with Sphinx
@@ -38,13 +50,13 @@ sphinx:
   fail_on_warning: false
 
 # Optionally build your docs in additional formats such as PDF and ePub
+# To enable, uncomment the following lines and ensure dependencies are met
 # formats:
-#    - pdf
-#    - epub
+#   - pdf
+#   - epub
+#
+# Note:
+# - Enabling PDF output requires LaTeX installed in the build environment
+# - Ensure all documentation content is compatible with these formats
+# - Assess user demand for offline documentation before enabling
 
-# Optional but recommended, declare the Python requirements required
-# to build your documentation
-# See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
-# python:
-#    install:
-#    - requirements: docs/requirements.txt
