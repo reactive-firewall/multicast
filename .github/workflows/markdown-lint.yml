@@ -36,24 +36,29 @@ jobs:
           YAML_ARGS="${{ vars.YAML_ARGS }}"
           case "${YAML_ARGS}" in
             *[!a-zA-Z0-9\ \-\.]*)
-              ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters"
+              ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters!"
               ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=37,endLine=43,"
               ERR_TITLE="title=VALIDATION_ERROR"
               printf "::error %s::ERROR %s\n" "${ERR_DETAILS}${ERR_TITLE}" "${ERR_MSG_STUB}"
               exit 1
               ;;
             *)
-              printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
-              yamllint "${YAML_ARGS}" .github/workflows/markdown-lint.yml
+              printf "::notice file=.github/workflows/markdown-lint.yml,line=45,endLine=49,%s\n" \
+              "title=Validation::Validating workflow with args: %s\n" "${YAML_ARGS}"
+              yamllint ${YAML_ARGS} .github/workflows/markdown-lint.yml  # unquoted to split args.
               ;;
           esac
 
       - name: Install NPM Dependencies
         run: |
-          ER_S="Invalid YAML_ARGS: contains unauthorized characters"
-          ER_T="title=INSTALL_ERROR"
-          ER_D="file=.github/workflows/markdown-lint.yml,line=53,endLine=56,"
-          npm install || { printf "::error %s::ERROR %s\n" "${ER_D}${ER_T}" "${ER_S}" && exit 1 ;}
+          ERR_MSG="NPM package installation failed"
+          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=53,endLine=57"
+          ERR_LOC_2="file=packages.json,line=2,endLine=4"
+          npm install || {
+            printf "::error %s,title=INSTALL_ERROR::ERROR %s\n" "${ERR_LOC_1}" "${ERR_MSG}"
+            printf "::error %s,title=INSTALL_ERROR::ERROR %s\n" "${ERR_LOC_2}" "${ERR_MSG}"
+            exit 1
+          }
 
       - name: Lint YAML config for markdown
         run: |
