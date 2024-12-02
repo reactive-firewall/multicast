@@ -426,7 +426,10 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		if data is None or not sock:
 			return  # nothing to do -- fail fast.
 		else:
-			data = data.decode('utf8') if isinstance(data, bytes) else str(data)
+			try:
+				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
+			except UnicodeDecodeError:  # pragma: no cover
+				return  # nothing to do -- fail quickly.
 		if (_sys.stdout.isatty()):  # pragma: no cover
 			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:

@@ -180,6 +180,34 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 			"Socket should not be used when data is None"
 		)
 
+	def test_handle_with_invalid_utf8_data(self):
+		"""Test that HearUDPHandler silently ignores invalid UTF-8 data.
+
+		This test verifies that:
+			1. The handler continues processing when receiving invalid UTF-8 data
+			2. No exception is raised
+			3. The handler silently ignores the decoding error
+		"""
+		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		self.assertIsNotNone(_fixture_port_num)
+		self.assertIsInstance(_fixture_port_num, int)
+		data = b'\xff\xfe\xfd\xfc'  # Invalid UTF-8 bytes
+		sock = multicast.genSocket()
+		handler = multicast.hear.HearUDPHandler(
+			request=(data, sock),
+			client_address=("224.0.0.1", _fixture_port_num),
+			server=None
+		)
+		try:
+			# Should silently ignore invalid UTF-8 data
+			handler.handle()
+			# If no exception is raised, the test passes
+		except Exception as e:
+			self.fail(f"Handler raised an unexpected exception: {e}")
+		finally:
+			# Clean up socket
+			multicast.endSocket(sock)
+
 
 if __name__ == '__main__':
 	unittest.main()
