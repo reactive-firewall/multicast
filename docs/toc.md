@@ -8,6 +8,8 @@
 
 * Ensure Python 3 is installed on your system.
 
+  ![Python version](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_1_tty.gif)
+
 ### Step 2: Clone the Repository
 
 * Open your terminal and run:
@@ -17,6 +19,8 @@
   cd multicast
   ```
 
+  ![Git clone](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_2_tty.gif)
+
 ### Step 3: Install the Package
 
 * Run:
@@ -24,6 +28,8 @@
   ```shell
   make install
   ```
+
+  ![Make install](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_3_tty.gif)
 
 ### Step 4: Sending Messages
 
