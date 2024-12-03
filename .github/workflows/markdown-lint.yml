@@ -40,8 +40,8 @@ jobs:
               printf "::error %s%s\n" "${ERR_LOC}" "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
               exit 1
           else
-              printf "::notice file=.github/workflows/markdown-lint.yml,"\
-                "line=45,endLine=49,title=Validation::Validating workflow with args: %s\n" \
+              printf "::notice file=.github/workflows/markdown-lint.yml,%s %s\n" \
+                "line=36,endLine=47,title=Validation::Validating workflow with args:" \
                 "${YAML_ARGS}"
               read -ra ARGS <<< "${YAML_ARGS}"
               yamllint "${ARGS[@]}" .github/workflows/markdown-lint.yml
@@ -49,8 +49,9 @@ jobs:
 
       - name: Install NPM Dependencies
         run: |
+          # npm install
           ERR_MSG="NPM package installation failed"
-          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=57,endLine=57"
+          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=56,endLine=56"
           ERR_LOC_2="file=package.json,line=2,endLine=4"
           if ! NPM_ERROR=$(npm install 2>&1); then
           for LOC in "${ERR_LOC_1}" "${ERR_LOC_2}"; do
