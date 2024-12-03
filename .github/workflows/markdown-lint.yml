@@ -65,7 +65,6 @@ jobs:
 
       - name: Lint Markdown Files with YAML config
         if: ${{ !cancelled() }}
-        shell: bash
         run: |
           git ls-files --exclude-standard -z -- *.md **/*.md |\
           xargs -0 -I{} npm run lint:md -- "{}";
