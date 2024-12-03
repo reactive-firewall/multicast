@@ -34,11 +34,10 @@ jobs:
         if: ${{ success() }}
         run: |
           YAML_ARGS="${{ vars.YAML_ARGS }}"
-          if [[ ! "${YAML_ARGS}" =~ ^[a-zA-Z0-9[:space:]\-\.]*$ ]]; then
+          if [[ "${YAML_ARGS}" =~ ^*[!a-zA-Z0-9\ \-\.]*$ ]]; then
               ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters!"
-              ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=57,endLine=57"
-              printf "::error file=.github/workflows/markdown-lint.yml,line=37,endLine=43%s\n" \
-                "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
+              ERR_LOC="file=.github/workflows/markdown-lint.yml,line=37,endLine=42,"
+              printf "::error %s%s\n" "${ERR_LOC}" "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
               exit 1
           else
               printf "::notice file=.github/workflows/markdown-lint.yml,"\
