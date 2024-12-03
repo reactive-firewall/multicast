@@ -44,7 +44,7 @@ jobs:
               ;;
             *)
               printf "::notice file=.github/workflows/markdown-lint.yml,line=45,endLine=49,%s\n" \
-              "title=Validation::Validating workflow with args: %s\n" "${YAML_ARGS}"
+              "title=Validation::Validating workflow with args: ${YAML_ARGS}"
               yamllint ${YAML_ARGS} .github/workflows/markdown-lint.yml  # unquoted to split args.
               ;;
           esac
