@@ -34,31 +34,31 @@ jobs:
         if: ${{ success() }}
         run: |
           YAML_ARGS="${{ vars.YAML_ARGS }}"
-          case "${YAML_ARGS}" in
-            *[!a-zA-Z0-9\ \-\.]*)
+          if [[ ! "${YAML_ARGS}" =~ ^[a-zA-Z0-9[:space:]\-\.]*$ ]]; then
               ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters!"
-              ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=37,endLine=43,"
-              ERR_TITLE="title=VALIDATION_ERROR"
-              printf "::error %s::ERROR %s\n" "${ERR_DETAILS}${ERR_TITLE}" "${ERR_MSG_STUB}"
+              ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=57,endLine=57"
+              printf "::error file=.github/workflows/markdown-lint.yml,line=37,endLine=43%s\n" \
+                "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
               exit 1
-              ;;
-            *)
-              printf "::notice file=.github/workflows/markdown-lint.yml,line=45,endLine=49,%s\n" \
-              "title=Validation::Validating workflow with args: ${YAML_ARGS}"
-              yamllint ${YAML_ARGS} .github/workflows/markdown-lint.yml  # unquoted to split args.
-              ;;
-          esac
+          else
+              printf "::notice file=.github/workflows/markdown-lint.yml,"\
+                "line=45,endLine=49,title=Validation::Validating workflow with args: %s\n" \
+                "${YAML_ARGS}"
+              read -ra ARGS <<< "${YAML_ARGS}"
+              yamllint "${ARGS[@]}" .github/workflows/markdown-lint.yml
+          fi
 
       - name: Install NPM Dependencies
         run: |
           ERR_MSG="NPM package installation failed"
-          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=53,endLine=57"
+          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=57,endLine=57"
           ERR_LOC_2="file=package.json,line=2,endLine=4"
-          npm install || {
-            printf "::error %s,title=INSTALL_ERROR::ERROR %s\n" "${ERR_LOC_1}" "${ERR_MSG}"
-            printf "::error %s,title=INSTALL_ERROR::ERROR %s\n" "${ERR_LOC_2}" "${ERR_MSG}"
-            exit 1
-          }
+          if ! NPM_ERROR=$(npm install 2>&1); then
+          for LOC in "${ERR_LOC_1}" "${ERR_LOC_2}"; do
+            printf "::error %s,title=INSTALL_ERROR::ERROR %s: %s\n" \
+              "${LOC}" "${ERR_MSG}" "${NPM_ERROR}"
+          done
+          fi
 
       - name: Lint YAML config for markdown
         run: |
