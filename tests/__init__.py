@@ -21,6 +21,15 @@
 
 	Package containing test suites and utilities for the multicast module.
 
+	This package provides comprehensive testing coverage for various multicast functionalities
+	including server operations, data processing, cleanup routines, and exception handling.
+
+	For specific test cases, see:
+		- Server operations: test_hear_server.McastServerTestSuite
+		- Data processing: test_hear_data_processing.RecvDataProcessingTestSuite
+		- Cleanup routines: test_hear_cleanup.HearCleanupTestSuite
+		- Exception handling: test_exceptions.ExceptionsTestSuite
+
 	Robust imports: These statements import the entire "multicast" module,
 		allowing access to all its functionalities within the test environment.
 		This may be flagged as an intentional cyclic import by pylint.

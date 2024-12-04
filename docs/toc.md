@@ -8,6 +8,8 @@
 
 * Ensure Python 3 is installed on your system.
 
+  ![Python version](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_1_tty.gif)
+
 ### Step 2: Clone the Repository
 
 * Open your terminal and run:
@@ -17,6 +19,8 @@
   cd multicast
   ```
 
+  ![Git clone](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_2_tty.gif)
+
 ### Step 3: Install the Package
 
 * Run:
@@ -24,6 +28,8 @@
   ```shell
   make install
   ```
+
+  ![Make install](https://gist.github.com/reactive-firewall/33d74d2233ecb4ffe5a3891134fa0328/raw/cb3eff82d38d9213b4f0a678285e62ec87ff2dea/quickstart_step_3_tty.gif)
 
 ### Step 4: Sending Messages
 
@@ -57,7 +63,7 @@ enabling developers to implement efficient and robust multicast functionality wi
   messages.
 * **Command-Line Interface**: Convenient CLI commands (`SAY`, `RECV`, `HEAR`) for quick testing
   and debugging.
-* **Cross-Platform Support**: Compatible with Linux, and macOS.
+* **Cross-Platform Support**: Compatible with Linux, UNIX, and macOS.
 
 ### Getting Started
 
@@ -70,7 +76,10 @@ enabling developers to implement efficient and robust multicast functionality wi
 * [README](./README): Introduction and installation instructions.
 * [Usage Guide](./USAGE): Detailed usage examples and API documentation.
 * [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
+* [Release Notes](https://github.com/reactive-firewall/multicast/releases): Release information.
 * [CI Processes](./CI): Information on continuous integration and testing strategies.
+* [Exceptions in `multicast`](./Exception_Guide): Information on exceptions and their handling in
+  the `multicast` module.
 * [License](./LICENSE): Licensing information and acknowledgments.
 
 ## Contents
@@ -80,9 +89,10 @@ enabling developers to implement efficient and robust multicast functionality wi
 :Name: Documentation
 apidocs/index
 /README
+/USAGE
 /FAQ
 /CI
-/USAGE
+/Exception_Guide
 /LICENSE
 ```
 

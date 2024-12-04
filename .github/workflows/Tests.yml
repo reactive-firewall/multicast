@@ -1,5 +1,24 @@
 ---
 name: CI
+# Continuous Integration workflow for building, testing, and validating the project
+#
+# Jobs included:
+# - BUILD: Ensures the project compiles correctly
+# - BOOTSTRAP: Tests installation across Python versions and locales
+# - MATS: Runs Machine Acceptance Tests
+# - COVERAGE: Generates coverage reports on multiple OS and Python versions
+# - STYLE: Checks code style and linting compliance
+# - INTEGRATION: Performs integration tests on different platforms
+# - EXTRAS-FOR-SETUP: Tests legacy setup scripts
+# - EXTRAS-FOR-PIP: Validates package dependencies and pip installations
+# - DOCS: Builds and lints documentation
+# - TOX: Executes tests across Python environments using Tox
+#
+# Required Secrets:
+# - CODECOV_TOKEN: For uploading coverage reports to Codecov
+# - CODECLIMATE_TOKEN: For integration with Code Climate
+# - CC_TEST_REPORTER_ID: For Code Climate test reporting
+
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
@@ -600,7 +619,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       LC_CTYPE: "en_US.utf-8"
-      DOCS_BUILD_REF: ${{ github.sha }}
+      DOCS_BUILD_REF: ${{ github.sha }}  # Reference the specific commit in documentation builds
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}

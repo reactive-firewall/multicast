@@ -69,8 +69,9 @@ init: ../docs/
 
 clean:
 	@-rm -r -f $(SRCDIR)/$(BUILDDIR)/* 2>/dev/null || true
+	@-rm -r -f $(SRCDIR)/apidocs/* 2>/dev/null || true
 	@-rm -f -d $(SRCDIR)/$(BUILDDIR) 2>/dev/null || true
-	@-rm -r -f -d $(SRCDIR)/apidocs/* 2>/dev/null || true
+	@-rm -f -d $(SRCDIR)/apidocs 2>/dev/null || true
 	@-unlink $(SRCDIR)/README.md 2>/dev/null || true
 	@-unlink $(SRCDIR)/tests 2>/dev/null || true
 	@-unlink $(SRCDIR)/LICENSE.md 2>/dev/null || true

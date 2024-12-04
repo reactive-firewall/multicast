@@ -16,9 +16,53 @@
 import sys
 import os
 from urllib.parse import quote
+import re
+
+def _validate_git_ref(ref: str) -> str:
+	"""
+	Validate if the provided string is a valid Git reference.
+
+	Args:
+		ref (str) -- The Git reference to validate.
+
+	Returns:
+		str -- The validated Git reference.
+
+	Raises:
+		ValueError -- If the reference contains invalid characters.
+
+	Meta-Testing:
+
+		Testcase 1: Valid reference.
+
+			>>> _validate_git_ref('main')
+			'main'
+
+		Testcase 2: Valid reference with special characters.
+
+			>>> _validate_git_ref('feature/new-feature')
+			'feature/new-feature'
+
+		Testcase 3: Invalid reference with disallowed characters.
+
+			>>> _validate_git_ref('invalid$ref')  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
+			Traceback (most recent call last):
+			...
+			ValueError: Invalid Git reference: invalid$ref
+
+		Testcase 4: Empty reference.
+
+			>>> _validate_git_ref('')  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
+			Traceback (most recent call last):
+			...
+			ValueError: Invalid Git reference: 
+	"""
+	if not re.match(r'^[a-zA-Z0-9_\-./]+$', ref):
+		raise ValueError(f"Invalid Git reference: {ref}")
+	return ref
 
 # Define the branch reference for linkcode_resolve
-DOCS_BUILD_REF: str = os.environ.get("DOCS_BUILD_REF", "stable")
+DOCS_BUILD_REF: str = _validate_git_ref(os.environ.get("DOCS_BUILD_REF", "stable"))
 """
 The Git reference used in the GitHub links.
 Used by linkcode_resolve() to generate GitHub links. Accepts most git references
