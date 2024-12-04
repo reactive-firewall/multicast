@@ -23,12 +23,18 @@ jobs:
           persist-credentials: false
       - name: Install Apt-Get Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y yamllint npm
-          ERR_MSG_STUB="yamllint installation failed."
-          ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=26,endLine=31,title=FAILURE"
-          ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
-          yamllint --version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
+          sudo apt-get update || exit 1
+          sudo apt-get install -y yamllint npm || :  # handle error with detail below
+          print_error() {
+            local msg="$1"
+            local file_stub=".github/workflows/markdown-lint.yml"
+            local line_start="$2"
+            local line_end="$3"
+            printf "::error file=%s,line=%s,endLine=%s,title=VALIDATION_ERROR::ERROR %s\n" \
+              "${file_stub}" "${line_start}" "${line_end}" "${msg}"
+          }
+          command -v npm >/dev/null || { print_error "npm installation failed." 26 27 ; exit 126; }
+          yamllint --version || { print_error "Yamllint installation failed." 26 27 ; exit 126; }
 
       - name: Lint Workflow YAML
         if: ${{ success() }}
@@ -41,7 +47,7 @@ jobs:
               exit 1
           else
               printf "::notice file=.github/workflows/markdown-lint.yml,%s %s\n" \
-                "line=36,endLine=47,title=Validation::Validating workflow with args:" \
+                "line=42,endLine=43,title=Validation::Validating workflow with args:" \
                 "${YAML_ARGS}"
               read -ra ARGS <<< "${YAML_ARGS}"
               yamllint "${ARGS[@]}" .github/workflows/markdown-lint.yml
@@ -51,7 +57,7 @@ jobs:
         run: |
           # npm install
           ERR_MSG="NPM package installation failed"
-          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=56,endLine=56"
+          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=62,endLine=62"
           ERR_LOC_2="file=package.json,line=2,endLine=4"
           if ! NPM_ERROR=$(npm install 2>&1); then
           for LOC in "${ERR_LOC_1}" "${ERR_LOC_2}"; do
@@ -62,7 +68,9 @@ jobs:
 
       - name: Lint YAML config for markdown
         run: |
-          yamllint -f github --no-warnings .markdownlint.yaml
+          YAML_ARGS="${{ vars.YAML_ARGS }}"
+          read -ra ARGS <<< "${YAML_ARGS}"
+          yamllint ${{ vars.YAML_ARGS }} .markdownlint.yaml
 
       - name: Lint Markdown Files with YAML config
         if: ${{ !cancelled() }}

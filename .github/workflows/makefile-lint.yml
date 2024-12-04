@@ -38,28 +38,34 @@ jobs:
       - name: Install Apt-Get Dependencies
         run: |
           sudo apt-get update || exit 1
-          sudo apt-get install -y yamllint golang-go pandoc || exit 1
-          ERR_MSG_STUB="Go installation failed."
-          ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=25,endLine=30,title=FAILURE"
-          ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
-          go version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
+          sudo apt-get install -y yamllint golang-go pandoc || :  # handle error with detail below
+          print_error() {
+            local msg="$1"
+            local file_stub=".github/workflows/makefile-lint.yml"
+            local line_start="$2"
+            local line_end="$3"
+            printf "::error file=%s,line=%s,endLine=%s,title=VALIDATION_ERROR::ERROR %s\n" \
+              "${file_stub}" "${line_start}" "${line_end}" "${msg}"
+          }
+          go version || { print_error "Go installation failed." 40 41 ; exit 126; }
+          yamllint --version || { print_error "Yamllint installation failed." 40 41 ; exit 126; }
+          pandoc --version || { print_error "Pandoc installation failed." 40 41 ; exit 126; }
       - name: Lint Workflow YAML
         if: ${{ success() }}
         run: |
           YAML_ARGS="${{ vars.YAML_ARGS }}"
-          case "${YAML_ARGS}" in
-            *[!a-zA-Z0-9\ \-\.]*)
-              ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters"
-              ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=35,endLine=41,"
-              ERR_TITLE="title=VALIDATION_ERROR"
-              printf "::error %s::ERROR %s\n" "${ERR_DETAILS}${ERR_TITLE}" "${ERR_MSG_STUB}"
+          if [[ "${YAML_ARGS}" =~ ^*[!a-zA-Z0-9\ \-\.]*$ ]]; then
+              ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters!"
+              ERR_LOC="file=.github/workflows/markdown-lint.yml,line=37,endLine=42,"
+              printf "::error %s%s\n" "${ERR_LOC}" "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
               exit 1
-              ;;
-            *)
-              printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
-              yamllint ${YAML_ARGS} .github/workflows/makefile-lint.yml
-              ;;
-          esac
+          else
+              printf "::notice file=.github/workflows/markdown-lint.yml,%s %s\n" \
+                "line=36,endLine=47,title=Validation::Validating workflow with args:" \
+                "${YAML_ARGS}"
+              read -ra ARGS <<< "${YAML_ARGS}"
+              yamllint "${ARGS[@]}" .github/workflows/markdown-lint.yml
+          fi
       - name: Install checkmake
         if: ${{ success() }}
         env:
