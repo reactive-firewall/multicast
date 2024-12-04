@@ -37,7 +37,7 @@ acceptable for production use.
 
 ```mermaid
 %%{init: { 'gitGraph': {'mainBranchName': 'master'}} }%%
-gitGraph;
+gitGraph:
   commit id: "start"
   branch master
   checkout master
@@ -102,6 +102,6 @@ make clean ; # cleans up for next test
 
 ***
 
-#### Copyright (c) 2021-2024, Mr. Walls
+#### Copyright (c) 2021-2025, Mr. Walls
 
 [MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

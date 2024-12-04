@@ -252,6 +252,6 @@ work so far as this Multicast module is concerned.
 
 ***
 
-#### Copyright (c) 2021-2024, Mr. Walls
+#### Copyright (c) 2021-2025, Mr. Walls
 
 [MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

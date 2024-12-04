@@ -2,7 +2,7 @@
 
 # Python Test Template
 # ..................................
-# Copyright (c) 2017-2024, Mr. Walls
+# Copyright (c) 2017-2025, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 
 """Multicast Testing Module.
+
+	Package containing test suites and utilities for the multicast module.
 
 	Robust imports: These statements import the entire "multicast" module,
 		allowing access to all its functionalities within the test environment.
@@ -40,10 +42,8 @@
 """
 
 __package__ = """tests"""  # skipcq: PYL-W0622
-"""This is multicast testing package."""
 
 __module__ = """tests"""
-"""This is multicast testing module."""
 
 try:
 	import sys

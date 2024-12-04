@@ -115,3 +115,26 @@ updates:
     schedule:
       interval: "weekly"
       day: "tuesday"
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "master"
+    versioning-strategy: increase-if-necessary
+    labels:
+      - "Configs"
+      - "Testing"
+      - "JavaScript"
+      - "CI"
+    rebase-strategy: "disabled"
+    groups:
+      development-dependencies:
+        dependency-type: "development"
+    allow:
+      - dependency-type: "development"
+    assignees:
+      - "reactive-firewall"
+    commit-message:
+      prefix: "[HOTFIX] "
+      include: "scope"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
