@@ -52,20 +52,11 @@ jobs:
           pandoc --version || { print_error "Pandoc installation failed." 40 41 ; exit 126; }
       - name: Lint Workflow YAML
         if: ${{ success() }}
+        env:
+          YAML_ARGS: "${{ vars.YAML_ARGS }}"
         run: |
-          YAML_ARGS="${{ vars.YAML_ARGS }}"
-          if [[ "${YAML_ARGS}" =~ ^*[!a-zA-Z0-9\ \-\.]*$ ]]; then
-              ERR_MSG_STUB="Invalid YAML_ARGS: contains unauthorized characters!"
-              ERR_LOC="file=.github/workflows/makefile-lint.yml,line=56,endLine=57,"
-              printf "::error %s%s\n" "${ERR_LOC}" "title=VALIDATION_ERROR::ERROR ${ERR_MSG_STUB}"
-              exit 1
-          else
-              printf "::notice file=.github/workflows/makefile-lint.yml,%s %s\n" \
-                "line=67,endLine=67,title=Validation::Validating workflow with args:" \
-                "${YAML_ARGS}"
-              read -ra ARGS <<< "${YAML_ARGS}"
-              yamllint "${ARGS[@]}" .github/workflows/makefile-lint.yml
-          fi
+          printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
+          yamllint ${YAML_ARGS} .github/workflows/makefile-lint.yml
       - name: Install checkmake
         if: ${{ success() }}
         env:
@@ -85,7 +76,7 @@ jobs:
           fi
           make && make install || { \
             ERR_MSG_STUB="Checkmake build failed." \
-            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=86,endLine=92,title=FAILURE" \
+            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=77,endLine=83,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
             exit 1 \
@@ -120,10 +111,10 @@ jobs:
               "${file_stub}" "${line_start}" "${line_end}" "${msg}"
           }
           if [ ! -x "$TOOL_PATH" ]; then
-            { print_error "$TOOL_PATH not found or not executable." 122 124; exit 1; } ;
+            { print_error "$TOOL_PATH not found or not executable." 114 114; exit 1; } ;
           fi
           FILE="${{ steps.makefiles.outputs.files }}" ;
           printf "::group::%s\n" "${FILE}" ;
-          "$TOOL_PATH" "${FILE}" || { print_error "Linting failed." 127 127; exit 1; } ;
+          "$TOOL_PATH" "${FILE}" || { print_error "Linting failed." 118 118; exit 1; } ;
           printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
         if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
