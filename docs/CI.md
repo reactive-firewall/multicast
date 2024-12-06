@@ -39,7 +39,6 @@ acceptable for production use.
 %%{init: { 'gitGraph': {'mainBranchName': 'master'}} }%%
 gitGraph:
   commit id: "start"
-  branch master
   checkout master
   commit id: "history"
   commit id: "release candidate" tag: "v1.4-rc"
