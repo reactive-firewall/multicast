@@ -363,9 +363,10 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		"""
 		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))
 		received = str(sock.recv(1024), "utf-8")
+		sp = " " * 4
 		if (sys.stdout.isatty()):  # pragma: no cover
-			print(f"Sent:     {msg}")
-			print(f"Received: {received}")
+			print(f"Sent: {sp}{msg}")  # skipcq: PYL-C0209  -  must remain compatible
+			print(f"Received: {received}")  # skipcq: PYL-C0209  -  must remain compatible
 
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
@@ -443,7 +444,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 		"""
 		data = self.request[0].strip()
 		sock = self.request[1]
-		print(f"{self.client_address[0]} wrote:")
+		print(f"{self.client_address[0]} wrote: ")
 		print(data)
 		sock.sendto(data.upper(), self.client_address)
 

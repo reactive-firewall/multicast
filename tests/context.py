@@ -21,17 +21,33 @@ __module__ = """tests"""
 
 __name__ = """tests.context"""  # skipcq: PYL-W0622
 
-__doc__ = """
+__doc__ = """Test context and environment setup module.
 
-	Robust imports: These statements import the entire "multicast" module,
-		allowing access to all its functionalities within the test environment.
-		This can be flagged as an intentional
-		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
-		warning.
+This module provides the testing environment setup and utilities for the multicast
+package tests. It handles imports, path configurations, and provides helper functions
+for test execution.
+
+Functions:
+	getCoverageCommand: Get appropriate coverage command for test execution.
+	getPythonCommand: Get appropriate Python command, with coverage wrapping, for test execution.
+	checkPythonCommand: Execute Python commands with proper error handling.
+	timePythonCommand: Time profile wraps checkPythonCommand transparently.
+	checkStrOrByte: Validate Python console results with proper error handling.
+	debugBlob: Debug helper for unexpected outputs.
+	managed_process(process): Context manager for safely handling multiprocessing processes.
+
+Classes:
+	BasicUsageTestSuite: Base test suite with common test functionality.
+
+Robust imports: These statements import the entire "multicast" module,
+	allowing access to all its functionalities within the test environment.
+	This can be flagged as an intentional
+	[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+	warning.
+
+Meta Tests - Fixtures:
 
 	Context for Testing.
-
-	Meta Tests - Fixtures:
 
 		Test fixtures by importing test context.
 
@@ -48,6 +64,14 @@ __doc__ = """
 		>>>
 
 		>>> from context import profiling as _profiling
+		>>>
+
+	Testcase 1: Subclassing BasicUsageTestSuite should be simple.
+
+		>>> from tests.context import BasicUsageTestSuite
+		>>> class MyTests(BasicUsageTestSuite):
+		...     def test_example(self):
+		...         self.assertTrue(True)
 		>>>
 
 """
