@@ -111,7 +111,7 @@ Minimal Acceptance Testing:
 		>>> type(multicast.exceptions.__doc__) == type(multicast.exceptions.__module__)
 		True
 		>>>
-	
+
 	Testcase 3: Custom exceptions should have exit-code details.
 
 		>>> from multicast.exceptions import CommandExecutionError
