@@ -117,33 +117,41 @@ __prologue__ = str("""Python Multicast library version {version}.""").format(ver
 
 __doc__ = __prologue__ + """
 
-	The `multicast` package simplifies multicast communication in Python applications.
+The `multicast` package simplifies multicast communication in Python applications.
 
-	It provides tools for sending, receiving, and listening to multicast messages over UDP.
-	The package includes command-line utilities and is designed to work with multiple Python
-	versions. It supports IPv4 multicast addresses and is compliant with dynamic/private port
-	ranges as per RFC-6335.
+A comprehensive package for multicast communication in Python applications.
+Provides tools for sending, receiving, and listening to multicast messages over UDP.
+The package includes command-line utilities and is designed to work with multiple Python
+versions. It supports IPv4 multicast addresses and is compliant with dynamic/private port
+ranges as per RFC-6335.
 
-	Key Features:
+Key Features:
 	- Easy-to-use interfaces for multicast communication.
 	- Command-line tools for quick multicast operations.
 	- Support for UDP multicast via IPv4.
+	- Compliance with RFC-6335 for dynamic/private port ranges
 
-	Security Considerations:
+Security Considerations:
 	- Ensure proper data sanitization and validation to prevent injection attacks.
 	- Be mindful of TTL settings to limit message propagation to the intended network segment.
 
-	Dynamic Imports:
-		The sub-modules within "multicast" are interdependent, requiring access to each other's
-		functionalities. These statements import sub-modules of "multicast" and assign them to
-		aliases that match their sub-module names, facilitating organized access to these
-		components.
-		While the multicast alias is the same as the multicast module name, this pattern should
-		serve to reinforce the Multicast module's namespace, especially when dealing with dynamic
-		imports and to maintain consistency across different parts of the code.
+Attributes:
+	__version__ (str): The version of this package.
+	_MCAST_DEFAULT_PORT (int): Default port for multicast communication (59259).
+	_MCAST_DEFAULT_GROUP (str): Default multicast group address ('224.0.0.1').
+	_MCAST_DEFAULT_TTL (int): Default TTL for multicast packets (1).
+
+Dynamic Imports:
+	The sub-modules within "multicast" are interdependent, requiring access to each other's
+	functionalities. These statements import sub-modules of "multicast" and assign them to
+	aliases that match their sub-module names, facilitating organized access to these
+	components.
+	While the multicast alias is the same as the multicast module name, this pattern should
+	serve to reinforce the Multicast module's namespace, especially when dealing with dynamic
+	imports and to maintain consistency across different parts of the code.
 
 
-	Minimal Acceptance Testing:
+Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
 
