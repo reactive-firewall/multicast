@@ -1,4 +1,4 @@
-# Multicast Python Repo
+# Multicast Python Module
 
 ![Mcast Logo](Logo.svg)
 

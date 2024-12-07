@@ -1,6 +1,6 @@
 #!/usr/bin/env make -f
 
-# Python Multicast Repo
+# Multicast Python Module
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
