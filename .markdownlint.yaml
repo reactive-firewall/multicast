@@ -10,7 +10,7 @@ MD026:  # Disallow trailing punctuation in headings
 MD034: false  # Allow bare URLs
 
 # Customizations
-MD013:  # Disable line length rule for flexibility
+MD013:  # Customize line length rule for flexibility
   line_length: 100
   code_blocks: false
   tables: false

@@ -121,7 +121,7 @@ updates:
     versioning-strategy: increase-if-necessary
     labels:
       - "Configs"
-      - "Testing"
+      - "Linter"
       - "JavaScript"
       - "CI"
     rebase-strategy: "disabled"
