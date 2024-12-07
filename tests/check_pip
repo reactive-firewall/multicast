@@ -60,6 +60,21 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 #
+# ---
+# ### Security Advisory: Command Injection Risk in `tests/check_pip`
+#
+# When using the `tests/check_pip` script, be aware of a potential command injection vulnerability arising from module names containing special characters or leading hyphens (e.g., `-v`). The script has been updated to properly handle such module names by:
+#
+# - Using `--` in `grep` commands to prevent interpreting module names as options.
+# - Ensuring all inputs are correctly sanitized and special characters are handled safely.
+#
+# **Recommendations for Developers:**
+#
+# - **Validation:** Always ensure that variables used in shell commands are properly handled to avoid being misinterpreted as options or commands.
+# - **Updates:** Pull the latest changes from the repository to incorporate the security fixes in `tests/check_pip`.
+# - **Testing:** Incorporate static code analysis tools to detect similar vulnerabilities in the future.
+# ---
+#
 # check_pip: Audit and validate Python requirements files.
 # This, best-effort, script audits and validates Python requirements
 # files using tools like pip-audit and pip-licenses.
@@ -102,6 +117,11 @@ umask 137
 export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
 # set remaining variables
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
+# Global variable to track temporary directories
+TEMP_DIRS=""
+# Global variable to track initial directories
+readonly PRE_OLDPWD="${OLDPWD:-${PWD:-$(pwd)}}"
+readonly PRE_PWD="${PWD:-$(pwd)}"
 
 # Function to check if a command exists.
 
@@ -153,8 +173,19 @@ EXIT_CODE=1
 # Results:
 #	returns -- once cleanup has been done on a best-effort case.
 function cleanup() {
+	for dir in ${TEMP_DIRS}; do
+		if [[ ( -n "${dir}" ) ]] && [[ ( -d "${dir}" ) ]]; then
+			rm -rfd "${dir}" 2>/dev/null || : ;
+		fi
+	done
 	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
+	# best effort to restore starting location
+	cd "${PRE_PWD}" && cd "${PRE_OLDPWD}" 2>/dev/null || : ;
+	cd "${PRE_PWD}" 2>/dev/null || : ;
 	# unset when done
+	unset TEMP_DIRS 2>/dev/null || : ;
+	unset PRE_OLDPWD 2>/dev/null || : ;
+	unset PRE_PWD 2>/dev/null || : ;
 	unset LOCK_FILE 2>/dev/null || : ;
 	hash -d shlock 2>/dev/null || : ;
 }
@@ -172,7 +203,7 @@ function handle_signals() {
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 	else
 		# shellcheck disable=SC2046
-		printf "\t%s\n" "Check Setup Scripts Tests Coverage already in progress by "$(head "${LOCK_FILE}") >&2 ;
+		printf "\t%s\n" "Check PIP Configuration Tests already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 	fi
 }
@@ -226,11 +257,17 @@ function navigate_dirs_by_git() {
 	if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
 		if [ -z "${_TEST_ROOT_DIR}" ]; then
 			_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+			if [ -z "${_TEST_ROOT_DIR}" ]; then
+				printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: Could not determine repository root" >&2
+				EXIT_CODE=40
+				return ${EXIT_CODE}
+			fi
 		fi
 		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 	else
 		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
 		EXIT_CODE=40
+		return ${EXIT_CODE}
 	fi
 }
 
@@ -241,8 +278,8 @@ function check_license_when_given_req() {
 	umask 007
 	printf "::debug::%s\n" "need venv ..." ;
 	# Create a temporary directory for the virtual environment
-	temp_dir=$(mktemp -d)
-
+	local temp_dir=$(mktemp -d)
+	TEMP_DIRS="${TEMP_DIRS} ${temp_dir}" ;
 	# Enter the temporary directory
 	cd "${temp_dir}"
 
@@ -260,7 +297,7 @@ function check_license_when_given_req() {
 	# Install the given Python modules using pip
 	for module in $@ ; do
 		printf "::debug::%s\n" "Checking license from package '${module}' ..." ;
-		REQ_SPEC=$(grep -F "${module}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F "$module" )
+		REQ_SPEC=$(grep -F -- "${module}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F -- "${module}" )
 		ERR_MSG="pip install '$module' failed for $req_file." ;
 		if [[ ("${SUB_CODE}" -eq 0) ]] && python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${REQ_SPEC};" 2>/dev/null ;
 		then

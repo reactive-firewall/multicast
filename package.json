@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"markdownlint": "^0.36.1",
+		"markdownlint-cli": "^0.43.0"
+	},
+	"scripts": {
+		"lint:md": "command -v markdownlint >/dev/null && markdownlint --config .markdownlint.yaml --"
+	}
+}

@@ -23,34 +23,51 @@ jobs:
           persist-credentials: false
       - name: Install Apt-Get Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y yamllint npm
-          ERR_MSG_STUB="yamllint installation failed."
-          ERR_DETAILS="file=.github/workflows/markdown-lint.yml,line=26,endLine=31,title=FAILURE"
-          ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
-          yamllint --version || { printf "%s\n" "${ERR_MSG_LINE}"; exit 1; }
+          sudo apt-get update || exit 1
+          sudo apt-get install -y yamllint npm || :  # handle error with detail below
+          print_error() {
+            local msg="$1"
+            local file_stub=".github/workflows/markdown-lint.yml"
+            local line_start="$2"
+            local line_end="$3"
+            printf "::error file=%s,line=%s,endLine=%s,title=VALIDATION_ERROR::ERROR %s\n" \
+              "${file_stub}" "${line_start}" "${line_end}" "${msg}"
+          }
+          command -v npm >/dev/null || { print_error "npm installation failed." 26 27 ; exit 126; }
+          yamllint --version || { print_error "Yamllint installation failed." 26 27 ; exit 126; }
 
       - name: Lint Workflow YAML
+        if: ${{ success() }}
+        env:
+          YAML_ARGS: "${{ vars.YAML_ARGS }}"
         run: |
-          yamllint ${{ vars.YAML_ARGS }} .github/workflows/markdown-lint.yml
-
-      - name: Install NPM Dependencies
-        run: |
-          sudo npm install -g markdownlint
-          sudo npm install -g markdownlint-cli
+          printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
+          yamllint ${YAML_ARGS} .github/workflows/markdown-lint.yml
 
       - name: Lint YAML config for markdown
+        if: ${{ success() }}
+        env:
+          YAML_ARGS: "${{ vars.YAML_ARGS }}"
         run: |
-          yamllint -f github --no-warnings .markdownlint.yaml
+          printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
+          yamllint ${YAML_ARGS} .markdownlint.yaml
+
+      - name: Install NPM Dependencies
+        if: ${{ success() }}
+        run: |
+          # npm install
+          ERR_MSG="NPM package installation failed"
+          ERR_LOC_1="file=.github/workflows/markdown-lint.yml,line=63,endLine=63"
+          ERR_LOC_2="file=package.json,line=2,endLine=4"
+          if ! NPM_ERROR=$(npm install 2>&1); then
+          for LOC in "${ERR_LOC_1}" "${ERR_LOC_2}"; do
+            printf "::error %s,title=INSTALL_ERROR::ERROR %s: %s\n" \
+              "${LOC}" "${ERR_MSG}" "${NPM_ERROR}"
+          done
+          fi
 
       - name: Lint Markdown Files with YAML config
-        if: ${{ !cancelled() }}
+        if: ${{ success() }}
         run: |
           git ls-files --exclude-standard -z -- *.md **/*.md |\
-          xargs -0 -I{} markdownlint "{}" --config .markdownlint.yaml ;
-
-      - name: Lint Markdown Files with JSON config
-        if: ${{ !cancelled() }}
-        run: |
-          git ls-files --exclude-standard -z -- *.md **/*.md |\
-          xargs -0 -I{} markdownlint "{}" --config .markdownlint.json ;
+          xargs -0 -I{} npm run lint:md -- "{}";

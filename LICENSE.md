@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2017-2024, Mr. Walls
+Copyright (c) 2017-2025, Mr. Walls
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,13 +36,24 @@ You may obtain a copy of the License at
 ### Files: `.github/workflows/markdown-lint.yml`, and `.github/workflows/yaml-lint.yml`
 
 ***
-Copyright (c) 2017-2024, Your Mileage May Vary
+Copyright (c) 2017-2025, Your Mileage May Vary
 ALSO Licensed under MIT
 You may obtain a copy of the License at
 [MIT License](http://www.github.com/reactive-firewall/ymmv/LICENSE.md)
 ***
 
 ## Third-party Acknowledgments :bow:
+
+### Files: `Logo.svg`
+
+***
+The logo SVG file references, and when possible renders with, the font
+[CommicNeue](https://github.com/crozynski/comicneue/).
+Copyright 2014 The Comic Neue Project Authors (https://github.com/crozynski/comicneue)
+which was under an OFL-type license.
+See [OFL](https://raw.githubusercontent.com/crozynski/comicneue/d248cfb9/OFL.txt) for details.
+_NO ASSOCIATION._
+***
 
 ### Files: `multicast/send.py` and `multicast/recv.py`
 
@@ -52,9 +63,8 @@ Some code (namely: run, and parseArgs) was modified/derived from
 Copyright (c) 2019, ["pterodragon"](https://stackoverflow.com/users/5256940/pterodragon)
 which was under CC-by-sa-4 license.
 See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
-The code in `parseArgs`, `run`, and `main` are thus also under
-CC-by-sa-4
-See [CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) for details.
+The code in `parseArgs`, `run`, and `main` are thus **also** under
+[CC-by-sa-4](https://creativecommons.org/licenses/by-sa/4.0/) when regarded as source-code.
 _NO ASSOCIATION._
 ***
 

@@ -228,7 +228,7 @@ work so far as this Multicast module is concerned.
 
 ### How do I build the documentation?
 
-* Typicly the documentation will be automatically build by CI/CD and posted to the official
+* Typically, the documentation will be automatically built by CI/CD and posted to the official
   documentation site.
 
 * However if one still wishes to manually build the documentation, there is a make target for this:
@@ -252,6 +252,6 @@ work so far as this Multicast module is concerned.
 
 ***
 
-#### Copyright (c) 2021-2024, Mr. Walls
+#### Copyright (c) 2021-2025, Mr. Walls
 
 [MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
