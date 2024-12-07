@@ -157,6 +157,7 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "exclude .*.ini" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.yml" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.yaml" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude package.json" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .DS_Store" >>"$@" ;
