@@ -17,14 +17,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The main entry point for the multicast package.
+"""Main entry point for the multicast package.
 
 This module provides the command-line interface and core functionalities for multicast
-communication.
+communication. It handles command dispatching and execution of multicast operations.
+
+Classes:
+	McastNope: No-operation implementation for testing and validation.
+	McastRecvHearDispatch: Handler for receiving multicast messages.
+	McastDispatch: Main dispatcher for multicast operations.
+
+Functions:
+	main(*argv): Main entry point for CLI operations.
+
+Example:
+	>>> import multicast.__main__ as main
+	>>> exit_code, _ = main.main(['NOOP'])
+	>>> isinstance(exit_code, int)
+	True
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
-	Minimal Acceptance Testing:
+Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
 

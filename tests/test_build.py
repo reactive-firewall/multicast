@@ -17,6 +17,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Build and packaging tests for the multicast package.
+
+This module contains test cases that verify the build process, package structure,
+and installation requirements of the multicast package.
+
+Classes:
+	TestBuild: Test cases for build verification.
+	TestInstallation: Test cases for installation verification.
+
+Meta Testing:
+
+	>>> import tests.test_build
+	>>> tests.test_build.__name__
+	'tests.test_build'
+	>>>
+
+"""
+
 __module__ = """tests"""
 
 try:

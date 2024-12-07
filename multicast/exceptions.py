@@ -25,6 +25,14 @@ handle exceptions and errors for/from the multicast module.
 > [!CAUTION]
 > See details regarding dynamic imports [documented](../__init__.py) in this module.
 
+Classes:
+	CommandExecutionError: Exception for command execution failures.
+	ShutdownCommandReceived: Exception for graceful server shutdown.
+
+Attributes:
+	EXIT_CODES (dict): Mapping of exit codes to exceptions and messages.
+	EXCEPTION_EXIT_CODES (dict): Reverse mapping of exceptions to exit codes.
+
 Error Handling Mechanisms:
 
 	Exception Raising:
@@ -102,6 +110,16 @@ Minimal Acceptance Testing:
 		True
 		>>> type(multicast.exceptions.__doc__) == type(multicast.exceptions.__module__)
 		True
+		>>>
+
+	Testcase 3: Custom exceptions should have exit-code details.
+
+		>>> from multicast.exceptions import CommandExecutionError
+		>>> try:
+		...     raise CommandExecutionError("Failed", 1)
+		... except CommandExecutionError as e:
+		...     e.exit_code
+		1
 		>>>
 
 """

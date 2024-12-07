@@ -19,11 +19,17 @@
 
 """Provides multicast HEAR Features.
 
-Provides functionality to listen to and process multicast messages.
+Provides server-side functionality for listening to multicast messages. It implements a
+UDP server that can receive and process multicast messages continuously.
+
+Classes:
+	McastServer: UDP server implementation for multicast communication.
+	HearUDPHandler: Request handler for processing multicast messages.
+	McastHEAR: Main tool class for HEAR operations.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
-	Minimal Acceptance Testing:
+Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
 
@@ -91,6 +97,16 @@ Caution: See details regarding dynamic imports [documented](../__init__.py) in t
 		True
 		>>>
 
+	Testcase 3: Class McastHEAR should be stable.
+		A: Test that the hear component is initialized.
+		B: Tests that McastHEAR instantiates without error, as in trivial use-case.
+
+		>>> multicast.hear is not None
+		True
+		>>> hear = multicast.hear.McastHEAR()
+		>>> isinstance(hear, multicast.hear.McastHEAR)
+		True
+		>>>
 
 """
 

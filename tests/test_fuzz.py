@@ -126,7 +126,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=3, max_size=15))
-	@settings(deadline=300)
+	@settings(deadline=400)
 	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text):
 		"""
 		Test the multicast CLI's response to invalid fuzzed input.

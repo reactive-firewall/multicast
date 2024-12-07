@@ -81,7 +81,27 @@
 ################################################################################
 
 __module__ = """tests"""
-"""This is a testing related stand-alone utilities module."""
+"""This is a testing related stand-alone utilities module.
+
+This module provides test fixtures and utilities for testing multicast communication.
+It includes a basic UDP client implementation and handler for testing multicast
+functionality.
+
+Classes:
+	MCastClient: Test fixture for multicast client operations.
+	MyUDPHandler: UDP request handler for echo functionality.
+
+Functions:
+	main: Entry point for test operations.
+
+Example:
+	>>> from tests.MulticastUDPClient import MCastClient
+	>>> client = MCastClient(grp_addr='224.0.0.1', src_port=59259)
+	>>> isinstance(client._source_port, int)
+	True
+	>>>
+
+"""
 
 
 __name__ = """tests.MulticastUDPClient"""  # skipcq: PYL-W0622
@@ -343,8 +363,10 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		"""
 		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))
 		received = str(sock.recv(1024), "utf-8")
-		print(str("Sent:     {}").format(msg))  # skipcq: PYL-C0209  -  must remain compatible
-		print(str("Received: {}").format(received))  # skipcq: PYL-C0209  -  must remain compatible
+		sp = " " * 4
+		if (sys.stdout.isatty()):  # pragma: no cover
+			print(f"Sent: {sp}{msg}")  # skipcq: PYL-C0209  -  must remain compatible
+			print(f"Received: {received}")  # skipcq: PYL-C0209  -  must remain compatible
 
 
 class MyUDPHandler(socketserver.BaseRequestHandler):
@@ -422,7 +444,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 		"""
 		data = self.request[0].strip()
 		sock = self.request[1]
-		print(str("{} wrote:").format(self.client_address[0]))
+		print(f"{self.client_address[0]} wrote: ")
 		print(data)
 		sock.sendto(data.upper(), self.client_address)
 
