@@ -124,7 +124,7 @@ hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed
 # Check required commands
 check_command grep ;
 check_command python3 ;
-check_command codespell ;
+test -x "$(command -v codespell)" || exit 0 ;  # skip quietly if user has not installed GPL2 stuff.
 check_command git ;
 check_command shlock ;
 
