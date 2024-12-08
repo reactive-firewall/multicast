@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Python Multicast Repo
+# Multicast Python Module
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -71,7 +71,7 @@ def readFile(filename):
 	"""
 	theResult = None
 	try:
-		expected_files = ["""E.md""", """requirements.txt"""]
+		expected_files = {"""E.md""", """requirements.txt"""}
 		if not any(aexpected_file in filename for aexpected_file in expected_files):
 			raise ValueError(f"[CWE-706] Access to the file {filename} was not expected.") from None
 		with open(f"./{filename}") as f:
