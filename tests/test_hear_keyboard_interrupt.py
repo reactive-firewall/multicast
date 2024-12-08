@@ -60,6 +60,12 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	"""
 	__module__ = """tests.test_hear_keyboard_interrupt"""
 
+	# Constants for test configuration
+	STARTUP_DELAY_SECONDS = 1  # Allow server to start
+	PROCESS_TIMEOUT_SECONDS = 5
+	EXPECTED_SIGINT_EXIT_CODE = 130
+	INVALID_ARGS_EXIT_CODE = 2
+
 	def test_hear_keyboard_interrupt(self):
 		"""Tests the special hear and stop test"""
 		theResult = False
@@ -84,14 +90,20 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				text=True
 			)
 			try:
-				time.sleep(1)  # Allow server to start
+				time.sleep(STARTUP_DELAY_SECONDS)  # Allow server to start
 				process.send_signal(signal.SIGINT)
-				stdout, stderr = process.communicate(timeout=5)
+				stdout, stderr = process.communicate(timeout=PROCESS_TIMEOUT_SECONDS)
 				self.assertIsNotNone(stdout, "Incomplete Test.")
 				self.assertIsNotNone(stderr, "Incomplete Test.")
 				self.assertIsNotNone(process.returncode, "Incomplete Test.")
-				self.assertNotEqual(int(process.returncode), int(2), "Invalid Test Arguments.")
-				self.assertEqual(int(process.returncode), int(130), "CEP-8 VIOLATION.")
+				self.assertNotEqual(
+					int(process.returncode),
+					int(INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
+				)
+				self.assertEqual(
+					int(process.returncode),
+					int(EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
+				)
 				theResult = (int(process.returncode) >= int(1))
 			finally:
 				process.kill()
