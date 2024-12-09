@@ -75,75 +75,22 @@
 # - **Testing:** Incorporate static code analysis tools to detect similar vulnerabilities in the future.
 # ---
 #
-# check_pip: Audit and validate Python requirements files.
-# This, best-effort, script audits and validates Python requirements
-# files using tools like pip-audit and pip-licenses.
-# It accomplishes the following tasks:
-# 1. Sets up a safe execution environment with resource limits and UTF-8 encoding.
-# 2. Checks for the existence and executability of required commands.
-# 3. Implements a lock mechanism to prevent concurrent executions.
-# 4. Gathers all requirements.txt files from the project using git.
-# 5. Audits requirements files for security vulnerabilities using pip-audit.
-# 6. Checks licenses of dependencies using pip-licenses.
-# 7. Reports any findings and cleans up before exiting.
-#
-# Usage Summary:
-#   ./tests/check_pip [--fix]
-# Use the '--fix' option to enable auto-correction of vulnerabilities.
-#
-# Exit Code Summary:
-# The script uses the EXIT_CODE variable to track exit conditions:
-# -   0: Successful execution.
-# -   1: General failure.
-# -   3: git ls-tree command failed.
-# -   4: pip-audit failed.
-# -   5: pip-licenses failed.
-# -   6: pip install/unistall failed.
-# -  40: Missing valid repository or source structure.
-# - 126: Script already in progress or command not executable.
-# - 129: Received SIGHUP signal.
-# - 130: Received SIGINT signal (Ctrl+C).
-# - 131: Received SIGQUIT signal.
-# - 137: Received SIGABRT signal.
-# - 143: Received SIGTERM signal.
+# tests/shlib/tool_pip_venv - Virtual environment management
 
-test -d ./tests/shlib/ || exit 126 ;
-source ./tests/shlib/tool_pip_core
-source ./tests/shlib/tool_pip_lock
-source ./tests/shlib/tool_pip_venv
-source ./tests/shlib/tool_pip_license
-source ./tests/shlib/tool_pip_audit
-
-main() {
-	local exit_code=0
+setup_venv() {
+	local temp_dir
+	temp_dir=$(mktemp -d)
+	TEMP_DIRS+=("${temp_dir}")
 	
-	setup_environment
-	check_required_commands || return $?
-	acquire_lock || return $?
-	setup_signal_handlers
+	cd "${temp_dir}" || return 1
+	python3 -m venv venv
+	# shellcheck disable=SC1091
+	source venv/bin/activate
 	
-	# Get requirements files
-	local files_to_check
-	files_to_check=$(git ls-tree -r --full-tree --name-only HEAD -- \
-		"${PWD}"/test/requirements.txt \
-		"${PWD}"/*-requirements.txt \
-		"${PWD}/requirements.txt") || return 3
-	
-	# Process each requirements file
-	local req_file
-	for req_file in ${files_to_check}; do
-		printf "::group::Checking %s\n" "${req_file}"
-		
-		setup_venv || { exit_code=1; continue; }
-		
-		check_package_security "${req_file}" || exit_code=$?
-		[[ ${exit_code} -eq 0 ]] && check_package_licenses "${req_file}" || exit_code=$?
-		
-		cleanup_venv
-		printf "::endgroup::\n"
-	done
-	
-	return ${exit_code}
+	return 0
 }
 
-main "$@"
+cleanup_venv() {
+	deactivate 2>/dev/null || true
+	cd "${PRE_PWD}" || true
+}
