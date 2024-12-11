@@ -40,52 +40,13 @@ Example:
 import sys
 import os
 from urllib.parse import quote
-import re
 
-
-def _validate_git_ref(ref: str) -> str:
-	"""
-	Validate if the provided string is a valid Git reference.
-
-	Args:
-		ref (str) -- The Git reference to validate.
-
-	Returns:
-		str -- The validated Git reference.
-
-	Raises:
-		ValueError -- If the reference contains invalid characters.
-
-	Meta-Testing:
-
-		Testcase 1: Valid reference.
-
-			>>> _validate_git_ref('main')
-			'main'
-
-		Testcase 2: Valid reference with special characters.
-
-			>>> _validate_git_ref('feature/new-feature')
-			'feature/new-feature'
-
-		Testcase 3: Invalid reference with disallowed characters.
-
-			>>> _validate_git_ref('invalid$ref')  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
-			Traceback (most recent call last):
-			...
-			ValueError: Invalid Git reference: invalid$ref
-
-		Testcase 4: Empty reference.
-
-			>>> _validate_git_ref('')  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
-			Traceback (most recent call last):
-			...
-			ValueError: Invalid Git reference:...
-	"""
-	if not re.match(r'^[a-zA-Z0-9_\-./]+$', ref):
-		raise ValueError(f"Invalid Git reference: {ref}")
-	return ref
-
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+sys.path.insert(0, os.path.abspath(""".."""))
+from docs.utils import _validate_git_ref
+from docs.utils import slugify_header
 
 # Define the branch reference for linkcode_resolve
 DOCS_BUILD_REF: str = _validate_git_ref(os.environ.get("DOCS_BUILD_REF", "stable"))
@@ -98,10 +59,6 @@ Value:
 		variable is not set.
 """
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath(""".."""))
 sys.path.insert(1, os.path.abspath("""multicast"""))
 sys.path.insert(1, os.path.abspath("""tests"""))
 
@@ -116,7 +73,7 @@ needs_sphinx = "7.3"
 # for rst use 'sphinx.ext.autodoc'
 extensions = [
 	"""sphinx.ext.napoleon""", """autodoc2""", """sphinx.ext.autosectionlabel""",
-	"""sphinx.ext.githubpages""", """myst_parser""",
+	"""sphinx.ext.githubpages""", """myst_parser""", """sphinx_design""",
 	"""sphinx.ext.autosummary""", """sphinx.ext.doctest""", """sphinx.ext.todo""",
 	"""sphinx.ext.linkcode""", """sphinx.ext.viewcode""", """sphinx.ext.intersphinx""",
 ]
@@ -321,18 +278,45 @@ htmlhelp_basename = "multicast_doc"
 # see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html
 
 # be more like GFM with style
-myst_enable_extensions = ("tasklist", "strikethrough", "fieldlist")
+myst_enable_extensions = ("tasklist", "strikethrough", "fieldlist", "linkify")
 
 # for GFM diagrams and interoperability with other Markdown renderers
 myst_fence_as_directive = ("mermaid", "suggestion", "note")
 
+# Add linkify configuration
+myst_linkify_fuzzy_links = False
+
 # Focus only on github markdown
-# myst_gfm_only = True
+myst_gfm_only = True
+
+myst_html_meta = {
+	"github_url": f"https://github.com/reactive-firewall/{project}"
+}
+
+# For GH-style admonitions to MyST conversion
+myst_admonition_aliases = {
+	"note": "note",
+	"warning": "warning",
+	"important": "important",
+	"tip": "tip",
+	"caution": "caution"
+}
 
 # how deep should markdown headers have anchors be generated
 heading_anchors = 3
 
+# Enable header anchors as requested
+myst_heading_anchors = 3
+
+# For better slug generation in header references
+myst_heading_slug_func = slugify_header
+
 # -- Options for napoleon ext --------------------------------------------------
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = False
 
 # include __init__ when it has docstrings
 napoleon_include_init_with_doc = True
@@ -432,9 +416,7 @@ texinfo_documents = [
 
 # -- Link resolver -------------------------------------------------------------
 
-linkcode_url_prefix: str = str(
-	"""https://github.com/reactive-firewall/{proj}"""
-).format(proj=project)
+linkcode_url_prefix: str = f"https://github.com/reactive-firewall/{project}"
 
 extlinks = {
 	"""issue""": (
