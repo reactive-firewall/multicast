@@ -694,7 +694,7 @@ jobs:
     - name: Prep Testing Tox
       id: prep-tox
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { sudo apt-get update || true ;} ; wait ; { sudo apt-get install --assume-yes python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=677,endLine=677,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
+        if [ "$OS" == "ubuntu-latest" ] ; then { sudo apt-get update || true ;} ; wait ; { sudo apt-get install --assume-yes python3.10 python3.11 python3.11-venv || echo "::warning file=.github/workflows/Tests.yml,line=677,endLine=677,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
     - name: Install dependencies for Tox
       run: |
         pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
