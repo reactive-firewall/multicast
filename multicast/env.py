@@ -18,14 +18,6 @@
 # limitations under the License.
 
 
-__all__ = [
-	"""validate_port""",
-	"""validate_multicast_address""",
-	"""validate_ttl""",
-	"""load_config""",
-]
-
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """
 The package of this component.
@@ -114,9 +106,9 @@ except Exception as err:
 def validate_port(port: int) -> bool:
 	"""
 	Validate if the port number is within the dynamic/private port range.
-	
+
 	Rational for requiring within the dynamic/private port range: This is only setting the default,
-	and can be overridden by the client code on a case-by-case basis. By requiring **default** 
+	and can be overridden by the client code on a case-by-case basis. By requiring **default**
 	port values to be within the dynamic/private port range, the design is following the principle
 	of "secure by default" and the open/closed principle.
 
@@ -744,3 +736,11 @@ def load_config() -> dict:
 		"bind_addr": bind_addr,
 		"buffer_size": buffer_size
 	}
+
+
+# skipcq
+__all__ = [
+	"""__package__""", """__module__""", """__name__""", """__doc__""",  # skipcq: PYL-E0603
+	"""validate_port""", """validate_multicast_address""", """validate_ttl""",
+	"""load_config""",
+]
