@@ -83,10 +83,11 @@ setup_venv() {
 	TEMP_DIRS+=("${temp_dir}")
 	
 	chmod 751 "${temp_dir}" || return 77
-	cd "${temp_dir}" || return 1
-	python3 -m venv venv
+	cd "${temp_dir}" || return 2
+	python3 -m venv venv || return 69
+	chmod +x venv/bin/* || return 77
 	# shellcheck disable=SC1091
-	source venv/bin/activate
+	source venv/bin/activate || return 69
 	
 	return 0
 }
