@@ -8,6 +8,8 @@ Continuous integration testing is handled by GitHub Actions and the generous Cir
 
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/workflow/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/workflow/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
 [![DeepSource](https://app.deepsource.com/gh/reactive-firewall/multicast.svg/?label=active+issues&show_trend=true&token=SZUDMH7AtX399xLmONFAkiD6)](https://app.deepsource.com/gh/reactive-firewall/multicast/)
+[![CodeCov](https://codecov.io/gh/reactive-firewall/multicast/graphs/sunburst.svg?token=UDKPGQLA11)](https://codecov.io/gh/reactive-firewall/multicast)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9458/badge)](https://app.deepsource.com/report/3f7c11ca-c203-44ec-9e01-126078f11660)
 
 ## Testing
 
