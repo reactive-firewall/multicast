@@ -198,6 +198,7 @@ def load_tests(loader, tests, pattern):
 		suite.addTests(tests)
 	suite.addTests(doctest.DocTestSuite(module=multicast, test_finder=finder))
 	suite.addTests(doctest.DocTestSuite(module=multicast.exceptions, test_finder=finder))
+	suite.addTests(doctest.DocTestSuite(module=multicast.env, test_finder=finder))
 	suite.addTests(doctest.DocTestSuite(module=multicast.skt, test_finder=finder))
 	suite.addTests(doctest.DocTestSuite(module=multicast.recv, test_finder=finder))
 	suite.addTests(doctest.DocTestSuite(module=multicast.send, test_finder=finder))

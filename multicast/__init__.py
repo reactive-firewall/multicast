@@ -29,7 +29,7 @@ __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """exceptions""", """exceptions.CommandExecutionError""",
 	"""exceptions.get_exit_code_from_exception""", """exceptions.exit_on_exception""",
-	"""get_exit_code_from_exception""", """exit_on_exception""",
+	"""get_exit_code_from_exception""", """exit_on_exception""", """env""",
 	"""skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
 	"""skt.__file__""", """skt.genSocket""", """skt.genSocket.__func__""", """genSocket""",
 	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
@@ -379,6 +379,28 @@ CommandExecutionError = exceptions.CommandExecutionError
 get_exit_code_from_exception = exceptions.get_exit_code_from_exception
 
 exit_on_exception = exceptions.exit_on_exception
+
+
+if 'multicast.env' not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+	from . import env  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+else:  # pragma: no branch
+	env = sys.modules["""multicast.env"""]
+
+_config = env.load_config()
+
+if _config is None:
+	raise ImportError("FAIL: we could not import environment. ABORT.") from None
+else:
+	_MCAST_DEFAULT_PORT = _config["port"]
+	_MCAST_DEFAULT_GROUP = _config["group"]
+	_MCAST_DEFAULT_TTL = _config["ttl"]
+	global _MCAST_DEFAULT_BIND_IP
+	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
+	global _MCAST_DEFAULT_GROUPS
+	_MCAST_DEFAULT_GROUPS = _config["groups"]
+	global _MCAST_DEFAULT_BUFFER
+	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
 
 
 class mtool(abc.ABC):
