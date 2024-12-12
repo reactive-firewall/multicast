@@ -88,10 +88,10 @@ check_package_licenses() {
 	
 	# Filter and get package list
 	packages=$(sed -E -e '/^[[:space:]]*$/d' -e '/^[#]+.*$/d' "${req_file}" | \
-			   cut -d= -f1 | \
-			   grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
-			   sort -u)
-			   
+				cut -d= -f1 | \
+				grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
+				sort -u)
+
 	# Install pip-licenses
 	python3 -m pip install ${PIP_COMMON_FLAGS} "pip-licenses>=5.0" || return 6
 	

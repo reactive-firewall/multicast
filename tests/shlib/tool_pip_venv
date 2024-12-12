@@ -82,6 +82,7 @@ setup_venv() {
 	temp_dir=$(mktemp -d)
 	TEMP_DIRS+=("${temp_dir}")
 	
+	chmod 751 "${temp_dir}" || return 77
 	cd "${temp_dir}" || return 1
 	python3 -m venv venv
 	# shellcheck disable=SC1091
@@ -91,6 +92,6 @@ setup_venv() {
 }
 
 cleanup_venv() {
-	deactivate 2>/dev/null || true
-	cd "${PRE_PWD}" || true
+	deactivate 2>/dev/null || :
+	cd "${PRE_PWD}" || :
 }

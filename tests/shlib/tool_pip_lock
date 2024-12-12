@@ -82,14 +82,6 @@ hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
 
-acquire_lock() {
-	if ! shlock -f "${LOCK_FILE}" -p $$ ; then
-		printf "\t%s\n" "Check PIP Configuration Tests already in progress by $(head "${LOCK_FILE}")" >&2
-		return 126
-	fi
-	return 0
-}
-
 setup_signal_handlers() {
 	trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ; exit 129 ;' SIGHUP
 	trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ; exit 143 ;' SIGTERM
@@ -97,4 +89,14 @@ setup_signal_handlers() {
 	trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ; exit 130 ;' SIGINT
 	trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ; exit 137 ;' SIGABRT
 	trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT
+}
+
+acquire_lock() {
+	if ! shlock -f "${LOCK_FILE}" -p $$ ; then
+		printf "\t%s\n" "Check PIP Configuration Tests already in progress by $(head "${LOCK_FILE}")" >&2
+		return 126
+	else
+		setup_signal_handlers
+	fi
+	return 0
 }

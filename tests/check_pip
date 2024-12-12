@@ -119,8 +119,8 @@ main() {
 	
 	setup_environment
 	check_required_commands || return $?
-	acquire_lock || return $?
-	setup_signal_handlers
+	acquire_lock
+	exit_code=$?
 	
 	# Get requirements files
 	local files_to_check
@@ -142,7 +142,7 @@ main() {
 		cleanup_venv
 		printf "::endgroup::\n"
 	done
-	
+	cleanup 2>/dev/null || :
 	return ${exit_code}
 }
 
