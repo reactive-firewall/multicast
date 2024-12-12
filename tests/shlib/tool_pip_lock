@@ -77,6 +77,9 @@
 #
 # tests/shlib/tool_pip_lock - Locking mechanism
 
+# Set up CEP-5 shlock helper
+hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed to register shlock helper. CEP-5 locking will not work." >&2 ; exit 78 ; } ;
+
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
 
 acquire_lock() {
