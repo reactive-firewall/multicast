@@ -395,11 +395,11 @@ else:
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
 	_MCAST_DEFAULT_TTL = _config["ttl"]
-	global _MCAST_DEFAULT_BIND_IP
+	global _MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
-	global _MCAST_DEFAULT_GROUPS
+	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
-	global _MCAST_DEFAULT_BUFFER
+	global _MCAST_DEFAULT_BUFFER  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
 
 
