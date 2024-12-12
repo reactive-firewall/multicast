@@ -114,6 +114,11 @@ except Exception as err:
 def validate_port(port: int) -> bool:
 	"""
 	Validate if the port number is within the dynamic/private port range.
+	
+	Rational for requiring within the dynamic/private port range: This is only setting the default,
+	and can be overridden by the client code on a case-by-case basis. By requiring **default** 
+	port values to be within the dynamic/private port range, the design is following the principle
+	of "secure by default" and the open/closed principle.
 
 	Arguments:
 		port (int) -- The port number to validate.
@@ -142,8 +147,8 @@ def validate_port(port: int) -> bool:
 	try:
 		port_num = int(port)
 		return 49152 <= port_num <= 65535
-	except (ValueError, TypeError):
-		raise ValueError(f"Invalid port value: {port}. Must be an integer.")
+	except (ValueError, TypeError) as err:
+		raise ValueError(f"Invalid port value: {port}. Must be an integer.") from err
 
 
 def validate_multicast_address(addr: str) -> bool:
@@ -204,8 +209,8 @@ def validate_ttl(ttl: int) -> bool:
 	try:
 		ttl_num = int(ttl)
 		return 1 <= ttl_num <= 126
-	except (ValueError, TypeError):
-		raise ValueError(f"Invalid TTL value: {ttl}. Must be a positive integer below 127.")
+	except (ValueError, TypeError) as err:
+		raise ValueError(f"Invalid TTL value: {ttl}. Must be a positive integer below 127.") from err
 
 
 def load_port() -> int:
@@ -289,14 +294,18 @@ def load_port() -> int:
 	try:
 		port = int(os.getenv("MULTICAST_PORT", _MCAST_DEFAULT_PORT))
 	except ValueError:
-		warnings.warn(f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}")
+		warnings.warn(
+			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}",
+			stacklevel=2
+		)
 		port = _MCAST_DEFAULT_PORT
 	# Validate and potentially update port
 	if validate_port(port):
 		globals()["""_MCAST_DEFAULT_PORT"""] = port
 	else:
 		warnings.warn(
-			f"Port {port} is outside valid range (49152-65535), using default {_MCAST_DEFAULT_PORT}"
+			f"Port {port} is outside valid range (49152-65535), using default {_MCAST_DEFAULT_PORT}",
+			stacklevel=2
 		)
 		port = _MCAST_DEFAULT_PORT
 	return port
@@ -348,7 +357,7 @@ def load_group() -> ipaddress.IPv4Address:
 		A. Start with empty MULTICAST_GROUP
 		B. Set an invalid MULTICAST_GROUP ip value.
 		C. Use `load_group()` to load the builtin default.
-		D. Verify builtin default was loaded and a warrning was issued.
+		D. Verify builtin default was loaded and a warning was issued.
 		E. Verify MULTICAST_GROUP is still the same IP.
 
 		>>> os.environ.pop('MULTICAST_GROUP', None)
@@ -369,7 +378,7 @@ def load_group() -> ipaddress.IPv4Address:
 		A. Start with empty MULTICAST_GROUP
 		B. Set an invalid MULTICAST_GROUP value.
 		C. Use `load_group()` to load the builtin default.
-		D. Verify builtin default was loaded and a warrning was issued.
+		D. Verify builtin default was loaded and a warning was issued.
 		E. Verify MULTICAST_GROUP is still invalid.
 
 		>>> os.environ.pop('MULTICAST_GROUP', None)
@@ -409,7 +418,8 @@ def load_group() -> ipaddress.IPv4Address:
 		globals()["""_MCAST_DEFAULT_GROUP"""] = group
 	else:
 		warnings.warn(
-			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}"
+			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}",
+			stacklevel=2
 		)
 		group = _MCAST_DEFAULT_GROUP
 	return ipaddress.IPv4Address(group)
@@ -487,14 +497,18 @@ def load_TTL() -> int:
 	try:
 		ttl = int(os.getenv("MULTICAST_TTL", _MCAST_DEFAULT_TTL))
 	except ValueError:
-		warnings.warn(f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}")
+		warnings.warn(
+			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}",
+			stacklevel=2
+		)
 		ttl = _MCAST_DEFAULT_TTL
 	# Validate and potentially update TTL
 	if validate_ttl(ttl):
 		globals()["""_MCAST_DEFAULT_TTL"""] = ttl
 	else:
 		warnings.warn(
-			f"TTL {ttl} is outside valid range (1-126), using default {_MCAST_DEFAULT_TTL}"
+			f"TTL {ttl} is outside valid range (1-126), using default {_MCAST_DEFAULT_TTL}",
+			stacklevel=2
 		)
 		ttl = _MCAST_DEFAULT_TTL
 	# Update socket default timeout
@@ -568,7 +582,7 @@ def load_config() -> dict:
 		True
 		>>> '224.0.0.2' in config['groups']  # Valid multicast group address is included in groups
 		True
-		>>> '192.168.1.1' in config['groups']  # Invalid value ommited
+		>>> '192.168.1.1' in config['groups']  # Invalid value omitted
 		False
 		>>> os.environ.pop('MULTICAST_GROUP', None)
 		'224.0.0.2'
@@ -713,7 +727,10 @@ def load_config() -> dict:
 			if validate_multicast_address(addr):
 				groups.add(str(addr))
 			else:
-				warnings.warn(f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping")
+				warnings.warn(
+					f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping",
+					stacklevel=2
+				)
 	# Always include the primary group
 	groups.add(str(group))
 	# Include bind_addr if it's a valid multicast address

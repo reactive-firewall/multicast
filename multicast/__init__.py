@@ -382,6 +382,11 @@ exit_on_exception = exceptions.exit_on_exception
 
 
 if 'multicast.env' not in sys.modules:
+	"""Import the environment configuration module.
+
+	This module provides functionality for loading and validating
+	multicast configuration from environment variables.
+	"""
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import env  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
