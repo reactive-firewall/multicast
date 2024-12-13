@@ -11,7 +11,7 @@ name: CI-BUILD
 
 on:  # yamllint disable-line rule:truthy
   push:
-    tags: ["v*"]
+    branches: *
   pull_request:
     types: [opened, edited, reopened, ready_for_review]
     branches: ["feature-*", "patch-*"]
