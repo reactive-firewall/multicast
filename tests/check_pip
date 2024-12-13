@@ -337,13 +337,14 @@ function check_package_licenses() {
 	local req_file="$1"
 	local SUB_CODE=${EXIT_CODE-0}
 	local packages
+	# Get and validate packages before moving into venv
+	packages=$(get_package_list "${req_file}")
+	# move into a venv
 	setup_venv ; SUB_CODE=$? ;
 	# Install pip-licenses
 	install_package "pip-licenses>=5.0" || SUB_CODE=6 ;
 	wait ;
 	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
-	# Get and validate packages
-	packages=$(get_package_list "${req_file}")
 	local pkg
 	# Install the given Python modules using pip
 	for pkg in ${packages} ; do
