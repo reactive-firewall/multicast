@@ -151,9 +151,12 @@ jobs:
         shell: bash
 
   BUILD_STATUS:
+    permissions:
+      actions: read
+      pull-requests: read
     needs: [BUILD, BOOTSTRAP]
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
     steps:

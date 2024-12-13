@@ -19,6 +19,9 @@ permissions: {}
 
 jobs:
   check_build:
+    permissions:
+      actions: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
@@ -41,8 +44,12 @@ jobs:
           fi
 
   MATS:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
     needs: check_build
-    if: ${{ needs.check_build.outputs.should_run == 'true' }}
+    if: ${{ !cancelled() && (needs.check_build.outputs.should_run == 'true') }}
     runs-on: ubuntu-latest
     environment: ${{ needs.check_build.outputs.build_environment }}
     defaults:
@@ -89,7 +96,9 @@ jobs:
         if: ${{ always() }}
 
   MATS_STATUS:
-    needs: [MATS, check_build]
+    permissions:
+      actions: read
+    needs: [check_build, MATS]
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     outputs:

@@ -28,6 +28,9 @@ permissions: {}
 
 jobs:
   check_mats:
+    permissions:
+      actions: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
@@ -37,8 +40,8 @@ jobs:
         run: |
           if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
             ARTIFACTS_URL="${{ github.event.workflow_run.artifacts_url }}"
-            PASSED_MATS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$ARTIFACTS_URL" | \
-              jq -r '.artifacts[] | select(.name=="mats-status") | .passedMATs')
+            PASSED_MATS=$(gh api "${{ github.event.workflow_run.artifacts_url }}" \
+            --jq '.artifacts[] | select(.name=="MATS_STATUS") | .passedMATs')
             if [[ "$PASSED_MATS" == "true" ]]; then
               echo "should_run=true" >> $GITHUB_OUTPUT
             else
@@ -66,7 +69,7 @@ jobs:
       pull-requests: read
       security-events: none
     environment: ${{ needs.check_mats.outputs.mats_environment }}
-    if: ${{ success() && (needs.check_mats.outputs.should_run == 'true') }}
+    if: ${{ !cancelled() && (needs.check_mats.outputs.should_run == 'true') }}
     needs: [check_mats]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
