@@ -73,7 +73,7 @@ jobs:
       - name: Upload Docs Artifact with Python ${{ matrix.python-version }} on ${{ matrix.os }}
         uses: actions/upload-artifact@v4
         with:
-          name: Multicast-Documentation-${{ env.GITHUB_SHA }}-${{ matrix.os }}-${{ matrix.python-version }}
+          name: Multicast-Documentation-${{ github.sha }}-${{ matrix.os }}-${{ matrix.python-version }}
           path: ./docs/www/
           if-no-files-found: ignore
       - name: Post-purge

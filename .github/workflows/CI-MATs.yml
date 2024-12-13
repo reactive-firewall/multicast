@@ -90,7 +90,7 @@ jobs:
         if: ${{ always() }}
 
   MATS_STATUS:
-    needs: MATS
+    needs: [MATS, check_build]
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     outputs:
