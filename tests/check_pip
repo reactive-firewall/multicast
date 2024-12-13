@@ -392,7 +392,7 @@ if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 			if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 				printf "::debug::%s\n" "Checking licenses in $req_file ..." ;
 				# filter for only pkg from requirements file
-				check_license_when_given_req "$req_file" ; EXIT_CODE=$?
+				check_package_licenses "$req_file" ; EXIT_CODE=$?
 			else
 				printf "::error file=${req_file},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
 			fi
