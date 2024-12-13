@@ -11,14 +11,14 @@ name: CI-BUILD
 
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: *
+    branches: ["**"]  # matches any branch
+    tags: ["v*"]
   pull_request:
     types: [opened, edited, reopened, ready_for_review]
     branches: ["feature-*", "patch-*"]
   pull_request_target:
     types: [opened, edited, reopened, synchronize, ready_for_review]
     branches: ["main", "master", "stable", "HOTFIX-*"]
-    tags: ["v*"]
 
 # Declare default permissions as none.
 permissions: {}
