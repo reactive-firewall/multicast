@@ -6,14 +6,13 @@ name: CI-MATs
 # - MATS: Runs Machine Acceptance Tests
 #
 # Required Secrets:
-# - CODECOV_TOKEN: For uploading coverage reports to Codecov
-# - CODECLIMATE_TOKEN: For integration with Code Climate
-# - CC_TEST_REPORTER_ID: For Code Climate test reporting
+# NONE
 
 on:  # yamllint disable-line rule:truthy
   workflow_run:
     workflows: ["CI-BUILD"]
-    types: [completed]
+    types:
+      - completed
 
 # Declare default permissions as none.
 permissions: {}
