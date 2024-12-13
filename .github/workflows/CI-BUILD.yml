@@ -68,7 +68,7 @@ jobs:
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
-	environment: ${{ needs.BUILD.environment }}
+    environment: ${{ needs.BUILD.environment }}
     defaults:
       run:
         shell: bash
