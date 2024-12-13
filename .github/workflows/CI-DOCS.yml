@@ -12,14 +12,14 @@ permissions: {}
 
 on:  # yamllint disable-line rule:truthy
   push:
+    branches: ["main", "master", "stable"]
     tags: ["v*"]
   pull_request:
     types: [opened, reopened, ready_for_review]
-    branches: ["feature-*", "patch-*"]
+    branches: ["feature-*", "patch-*", "HOTFIX-*"]
   pull_request_target:
     types: [opened, edited, reopened, ready_for_review]
-    branches: ["main", "master", "stable", "HOTFIX-*"]
-    tags: ["v*"]
+    branches: ["main", "master", "stable"]
 
 jobs:
   DOCS:
