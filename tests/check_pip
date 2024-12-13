@@ -107,43 +107,313 @@
 # - 137: Received SIGABRT signal.
 # - 143: Received SIGTERM signal.
 
-test -d ./tests/shlib/ || exit 126 ;
-source ./tests/shlib/tool_pip_core
-source ./tests/shlib/tool_pip_lock
-source ./tests/shlib/tool_pip_venv
-source ./tests/shlib/tool_pip_license
-source ./tests/shlib/tool_pip_audit
+# Try to safely setup and fail fast if unable.
+ulimit -t 600
+# setting the path may break brain-dead CI that uses crazy paths
+# PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+umask 137
 
-main() {
-	local exit_code=0
-	
-	setup_environment
-	check_required_commands || return $?
-	acquire_lock
-	exit_code=$?
-	
-	# Get requirements files
-	local files_to_check
-	files_to_check=$(git ls-tree -r --full-tree --name-only HEAD -- \
-		"${PWD}"/test/requirements.txt \
-		"${PWD}"/*-requirements.txt \
-		"${PWD}/requirements.txt") || return 3
-	
-	# Process each requirements file
-	local req_file
-	for req_file in ${files_to_check}; do
-		printf "::group::Checking %s\n" "${req_file}"
-		
-		setup_venv || { exit_code=1; continue; }
-		
-		check_package_security "${req_file}" || exit_code=$?
-		[[ ${exit_code} -eq 0 ]] && check_package_licenses "${req_file}" || exit_code=$?
-		
-		cleanup_venv
-		printf "::endgroup::\n"
+# force utf-8 for checking in script
+export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
+# set remaining variables
+LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.pip-check-shell"
+# Global variable to track temporary directories
+TEMP_DIRS=""
+# Global variable to track initial directories
+readonly PRE_OLDPWD="${OLDPWD:-${PWD:-$(pwd)}}"
+readonly PRE_PWD="${PWD:-$(pwd)}"
+
+# Function to check if a command exists.
+
+# USAGE:
+#	~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#	exits 64 -- missing required argument
+#	exits 126 -- check complete and has failed, can not find given command.
+#	returns successful -- check complete and command found to be executable.
+function check_command() {
+	test -z "$1" && { printf "::error file=%s,line=%s,title=COMMAND::%s\n" \
+				"${SCRIPT_FILE}" "${BASH_LINENO:-0}" \
+				"Error: command name is required to check for existence." >&2 ; exit 64 ;} ;
+	local cmd="$1" ;
+	test -x "$(command -v ${cmd})" || { printf "::error file=%s,line=%s,title=COMMAND::%s\n" \
+				"${SCRIPT_FILE}" "${BASH_LINENO:-0}" \
+				"Error: Required command '$cmd' is not found." >&2 ; exit 126 ;} ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+
+# Set up CEP-5 shlock helper
+hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed to register shlock helper. CEP-5 locking will not work." >&2 ; exit 78 ; } ;
+
+# Check required commands
+check_required_commands() {
+	local -ra REQUIRED_COMMANDS=("grep" "python3" "git" "sed" "tee" "pip")
+	local cmd
+	for cmd in "${REQUIRED_COMMANDS[@]}"; do
+		check_command "${cmd}"
 	done
-	cleanup 2>/dev/null || :
-	return ${exit_code}
+}
+if command -v pip-audit >/dev/null 2>&1; then
+	check_command pip-audit  # optional
+else
+	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP::pip-audit not found, skipping security checks" ;
+fi
+check_command pip-licenses ;
+check_command shlock ;
+
+# Set default exitcode to failure until sure we won't need to abort
+EXIT_CODE=1
+
+# end of bootstraping, use functions below this point
+
+# Function to check if a command exists.
+
+# USAGE:
+#	~$ cleanup
+# Arguments:
+#	N/A
+# Results:
+#	returns -- once cleanup has been done on a best-effort case.
+function cleanup() {
+	for dir in ${TEMP_DIRS}; do
+		if [[ ( -n "${dir}" ) ]] && [[ ( -d "${dir}" ) ]]; then
+			rm -rfd "${dir}" 2>/dev/null || : ;
+		fi
+	done
+	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
+	# best effort to restore starting location
+	# shellcheck disable=SC2015
+	cd "${PRE_PWD}" && cd "${PRE_OLDPWD}" 2>/dev/null || : ;
+	cd "${PRE_PWD}" 2>/dev/null || : ;
+	# unset when done
+	unset TEMP_DIRS 2>/dev/null || : ;
+	unset PRE_OLDPWD 2>/dev/null || : ;
+	unset PRE_PWD 2>/dev/null || : ;
+	unset LOCK_FILE 2>/dev/null || : ;
+	hash -d shlock 2>/dev/null || : ;
 }
 
-main "$@"
+function handle_signals() {
+	if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
+		EXIT_CODE=0
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		# shellcheck disable=SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+	else
+		# shellcheck disable=SC2046
+		printf "\t%s\n" "Check PIP Configuration Tests already in progress by "$(head "${LOCK_FILE}") >&2 ;
+		exit 126 ;
+	fi
+}
+
+handle_signals
+
+# lazy defined variables should be defined now that this is the only script instance.
+
+# set the script-file to check_pip
+SCRIPT_FILE="tests/check_pip"
+# Set pip-audit options
+AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
+# List of Allowed Licenses delimited by semicolon ;
+ALLOW_LICENSES="Public Domain;Apache Software License;MIT License;BSD License;Python Software Foundation License;The Unlicense (Unlicense);Mozilla Public License 2.0 (MPL 2.0);"
+# Set pip-licenses options
+LICENSE_OPTIONS="--from=mixed"
+# Set pip options
+PIP_COMMON_FLAGS="--require-virtualenv --use-pep517 --exists-action s --upgrade --upgrade-strategy only-if-needed --quiet"
+# Set Env and OS specific pip options
+if [[ $( \uname -s ) == "*arwin" ]] ; then
+	PIP_ENV_FLAGS="--break-system-packages"
+	LICENSE_OPTIONS="--python python3 ${LICENSE_OPTIONS} --ignore-packages certifi"
+else
+	PIP_ENV_FLAGS=""
+fi ;
+# Enable auto-fix if '--fix' argument is provided
+if [[ "$1" == "--fix" ]]; then
+	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"
+	printf "%s\n" "Auto-fix enabled."
+fi
+
+# lazy defined functions should be defined now that this is the only script instance.
+
+# === Virtual Environment Management ===
+function setup_venv() {
+	local SUB_CODE="${EXIT_CODE-0}"
+	local temp_dir
+	# relax umask to allow mktemp and venv
+	umask 007
+	printf "::debug::%s\n" "need venv ..." ;
+	# Create a temporary directory for the virtual environment
+	temp_dir=$(mktemp -d)
+	TEMP_DIRS="${TEMP_DIRS} ${temp_dir}" ;
+	# Enter the temporary directory
+	cd "${temp_dir}" || SUB_CODE=69
+	# Create a virtual environment using venv
+	python3 -m venv venv
+	# shellcheck disable=SC1091
+	source venv/bin/activate
+	# tighten up umask for checks
+	umask 037
+	return "${SUB_CODE}"
+}
+
+function cleanup_venv() {
+	local temp_dir="${PWD}"
+	# Deactivate the virtual environment
+	deactivate
+	# return to starting dir
+	cd "${OLDPWD}" || return $? ;
+	# Remove the temporary directory and all of its contents
+	rm -rf "${temp_dir}" || : ;
+	# tighten up umask for cleanup
+	umask 137 ;
+	wait ;
+	return $? ;
+}
+
+# === Package Management ===
+function get_package_list() {
+	local req_file="$1"
+	sed -E -e '/^[[:space:]]*$/d' -e '/^[#]+.*$/d' "${req_file}" | \
+		cut -d= -f1 | \
+		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
+		sort -u
+}
+
+function install_package() {
+	local pkg="$1"
+	local INSTALL_ERROR=6
+	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${pkg}"; then
+		printf "::warning file=%s,title=PIP::Failed to install %s\n" "${req_file}" "${pkg}" >&2 ;
+		return "${INSTALL_ERROR}"
+	fi
+	return "${INSTALL_ERROR}"
+}
+
+# === Utilities ===
+function report_summary() {
+	printf "::group::%s\n" "Results" ;
+	# Improved reporting based on EXIT_CODE
+	case "${EXIT_CODE}" in
+		0) printf "::notice title=OK::%s\n" "OK: Found no detected requirements errors." ;;
+		1) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CHECK-PIP::%s\n" "FAIL: General failure during script execution." >&2 ;;
+		3) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
+		4) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SECURITY::%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
+		5) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=LICENSE::%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
+		6) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=INSTALL::%s\n" "FAIL: pip install failed." >&2 ;;
+		126) printf "::warning file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
+		*) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=FAILED::%s\n" "FAIL: Detected requirements errors." >&2 ;;
+	esac
+	printf "::endgroup::\n" ;
+}
+
+function navigate_dirs_by_git() {
+	if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+		if [ -z "${_TEST_ROOT_DIR}" ]; then
+			_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+			if [ -z "${_TEST_ROOT_DIR}" ]; then
+				printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: Could not determine repository root" >&2
+				EXIT_CODE=40
+				return ${EXIT_CODE}
+			fi
+		fi
+		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
+	else
+		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
+		EXIT_CODE=40
+		return ${EXIT_CODE}
+	fi
+}
+
+# === License Validation ===
+function check_package_licenses() {
+	local req_file="$1"
+	local SUB_CODE=${EXIT_CODE-0}
+	local packages
+	setup_venv ; SUB_CODE=$? ;
+	# Install pip-licenses
+	install_package "pip-licenses>=5.0" || SUB_CODE=6 ;
+	wait ;
+	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
+	# Get and validate packages
+	packages=$(get_package_list "${req_file}")
+	local pkg
+	# Install the given Python modules using pip
+	for pkg in ${packages} ; do
+		printf "::debug::%s\n" "Checking license from package '${pkg}' ..." ;
+		REQ_SPEC=$(grep -F -- "${pkg}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F -- "${pkg}" )
+		ERR_MSG="pip install '${pkg}' failed for $req_file." ;
+		if [[ ("${SUB_CODE}" -eq 0) ]] && install_package "${REQ_SPEC};" 2>/dev/null ;
+		then
+			printf "::debug::%s\n" "Fetched license from package '${pkg}' ..." ;
+		else
+			[[ ("${SUB_CODE}" -eq 0) ]] && SUB_CODE=6 && \
+			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "${ERR_MSG}" >&2
+		fi
+		unset ERR_MSG 2>/dev/null || : ;
+	done
+	# Use pip-licenses to list the licenses of the installed packages
+	# shellcheck disable=SC2086
+	{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || SUB_CODE=5 ;} ; wait ;
+	# Deactivate the virtual environment
+	cleanup_venv || SUB_CODE=89 ;
+	return "${SUB_CODE}"
+}
+
+# THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+navigate_dirs_by_git
+
+if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+
+	printf "::debug::%s\n" "Reading from repository ${_TEST_ROOT_DIR} ..." ;
+	# Get a list of files to check using git ls-tree with filtering (and careful shell globing)
+	FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/test/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null || EXIT_CODE=3)
+	[[ ( $EXIT_CODE -eq 0 ) ]] || { printf "%s\n" "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=GIT::Failed to list requirements files using git ls-tree" >&2 ;}
+
+	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+		# THIS IS THE ACTUAL TEST
+		printf "::debug::%s\n" "Starting checks ..." ;
+		# Iterate over files and run checks
+		for req_file in ${FILES_TO_CHECK} ; do
+			printf "::group::Checking %s\n" "${req_file}" ;
+			if [[ ( -x $(command -v pip-audit) ) ]] && [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+				printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities ..."
+				# shellcheck disable=SC2086
+				{ pip-audit $AUDIT_OPTIONS "${req_file}" || EXIT_CODE=4 ;} ; wait ;
+			fi ;
+			if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
+				printf "::debug::%s\n" "Checking licenses in $req_file ..." ;
+				# filter for only pkg from requirements file
+				check_license_when_given_req "$req_file" ; EXIT_CODE=$?
+			else
+				printf "::error file=${req_file},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
+			fi
+			printf "::endgroup::\n" ;
+		done
+	fi
+
+	printf "::debug::%s\n" "Summary reporting ..." ;
+	report_summary
+fi
+
+printf "::debug::%s\n" "Cleaning up ..." ;
+cleanup || rm -f "${LOCK_FILE}" 2>/dev/null || : ;
+
+# unset when done
+unset _TEST_ROOT_DIR 2>/dev/null || : ;
+unset AUDIT_OPTIONS 2>/dev/null || : ;
+unset ALLOW_LICENSES 2>/dev/null || : ;
+unset LICENSE_OPTIONS 2>/dev/null || : ;
+
+wait ;
+printf "::debug::%s\n" "Check-pip done." ;
+# Exit with the appropriate code
+exit ${EXIT_CODE:-255} ;
