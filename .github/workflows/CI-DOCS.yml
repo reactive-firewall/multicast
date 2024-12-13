@@ -1,0 +1,86 @@
+---
+name: CI-DOCS
+# Continuous Integration workflow for Testing Documentation Building.
+#
+# Jobs included:
+# - DOCS: Builds and lints documentation
+#
+# Required Secrets:
+# - DOCS_BUILD_REF: Automatic
+
+permissions: {}
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    tags: ["v*"]
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    branches: ["feature-*", "patch-*"]
+  pull_request_target:
+    types: [opened, edited, reopened, ready_for_review]
+    branches: ["main", "master", "stable", "HOTFIX-*"]
+    tags: ["v*"]
+
+jobs:
+  DOCS:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
+    environment: Deployment
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      LC_CTYPE: "en_US.utf-8"
+      DOCS_BUILD_REF: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
+        if: ${{ !cancelled() && runner.os == 'Windows' }}
+        run: python -m pip install --upgrade pip
+      - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+        run: |
+          pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
+          pip install -r ./requirements.txt ;
+          pip install -r ./tests/requirements.txt || true ;
+      - name: Pre-Clean
+        id: clean-prep
+        run: make -j1 -f Makefile clean ;
+      - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+        run: make -j1 -f Makefile build ;
+        if: ${{ success() }}
+      - name: Generate documentation with py${{ matrix.python-version }} on ${{ matrix.os }}
+        run: make -j1 -f Makefile build-docs 2>&1 >> $GITHUB_STEP_SUMMARY ;
+        if: ${{ !cancelled() }}
+      - name: Lint documentation
+        run: |
+          pip install --upgrade sphinx-lint
+          sphinx-lint docs/ 2>&1 >> $GITHUB_STEP_SUMMARY || true ;
+        if: ${{ !cancelled() }}
+      - name: Upload Docs Artifact with Python ${{ matrix.python-version }} on ${{ matrix.os }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Multicast-Documentation-${{ env.GITHUB_SHA }}-${{ matrix.os }}-${{ matrix.python-version }}
+          path: ./docs/www/
+          if-no-files-found: ignore
+      - name: Post-purge
+        id: post-uninstall
+        run: make -j1 -f Makefile purge || true ;
+        if: ${{ !cancelled() }}
+      - name: Post-Clean
+        id: post-end
+        run: make -j1 -f Makefile clean || true ;
+        if: ${{ !cancelled() }}
