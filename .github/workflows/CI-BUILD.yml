@@ -31,7 +31,7 @@ jobs:
       security-events: none
     if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
     runs-on: ubuntu-latest
-    environment: ${{ env.ENVIRONMENT }}
+    environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
     defaults:
       run:
         shell: bash
@@ -68,7 +68,7 @@ jobs:
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
-    environment: ${{ env.ENVIRONMENT }}
+	environment: ${{ needs.BUILD.environment }}
     defaults:
       run:
         shell: bash
