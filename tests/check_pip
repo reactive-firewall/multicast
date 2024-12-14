@@ -150,7 +150,7 @@ hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed
 
 # Check required commands
 check_required_commands() {
-	local -ra REQUIRED_COMMANDS=("grep" "python3" "git" "sed" "tee" "pip")
+	local -ra REQUIRED_COMMANDS=("grep" "python3" "git" "mktemp" "sed" "tee" "tr" "cut" "pip")
 	local cmd
 	for cmd in "${REQUIRED_COMMANDS[@]}"; do
 		check_command "${cmd}"
@@ -245,7 +245,7 @@ fi
 
 # === Virtual Environment Management ===
 function setup_venv() {
-	local SUB_CODE="${EXIT_CODE-0}"
+	local RES_CODE="${EXIT_CODE-0}"
 	local temp_dir
 	# relax umask to allow mktemp and venv
 	umask 007
@@ -254,14 +254,14 @@ function setup_venv() {
 	temp_dir=$(mktemp -d)
 	TEMP_DIRS="${TEMP_DIRS} ${temp_dir}" ;
 	# Enter the temporary directory
-	cd "${temp_dir}" || SUB_CODE=69
+	cd "${temp_dir}" || RES_CODE=69 ;
 	# Create a virtual environment using venv
 	python3 -m venv venv
 	# shellcheck disable=SC1091
 	source venv/bin/activate
 	# tighten up umask for checks
 	umask 037
-	return "${SUB_CODE}"
+	return "${RES_CODE:-0}"
 }
 
 function cleanup_venv() {
@@ -282,19 +282,18 @@ function cleanup_venv() {
 function get_package_list() {
 	local req_file="$1"
 	sed -E -e '/^[[:space:]]*$/d' -e '/^[#]+.*$/d' "${req_file}" | \
-		cut -d= -f1 | \
+		cut -d= -f1 | tr -d '<!>' | \
 		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
 		sort -u
 }
 
 function install_package() {
 	local pkg="$1"
-	local INSTALL_ERROR=6
 	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${pkg}"; then
 		printf "::warning file=%s,title=PIP::Failed to install %s\n" "${req_file}" "${pkg}" >&2 ;
-		return "${INSTALL_ERROR}"
+		return 6
 	fi
-	return "${INSTALL_ERROR}"
+	return 0
 }
 
 # === Utilities ===
@@ -341,10 +340,11 @@ function check_package_licenses() {
 	packages=$(get_package_list "${req_file}")
 	# move into a venv
 	setup_venv ; SUB_CODE=$? ;
+	wait ;
+	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
 	# Install pip-licenses
 	install_package "pip-licenses>=5.0" || SUB_CODE=6 ;
 	wait ;
-	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
 	local pkg
 	# Install the given Python modules using pip
 	for pkg in ${packages} ; do
