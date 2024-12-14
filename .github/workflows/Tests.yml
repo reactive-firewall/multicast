@@ -39,15 +39,11 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
       mats_environment: ${{ steps.get_env.outputs.environment }}
     steps:
+    steps:
       - id: check
         run: |
           if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
-            PASSED_MATS=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.artifacts[] | select(.name=="MATS_STATUS") | .passedMATs')
-            if [[ "$PASSED_MATS" == "true" ]]; then
-              echo "should_run=true" >> $GITHUB_OUTPUT
-            else
-              echo "should_run=false" >> $GITHUB_OUTPUT
-            fi
+            echo "should_run=true" >> $GITHUB_OUTPUT
           else
             echo "should_run=false" >> $GITHUB_OUTPUT
           fi
