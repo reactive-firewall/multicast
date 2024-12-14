@@ -39,7 +39,6 @@ jobs:
       should_run: ${{ steps.check.outputs.should_run }}
       mats_environment: ${{ steps.get_env.outputs.environment }}
     steps:
-    steps:
       - id: check
         run: |
           if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
