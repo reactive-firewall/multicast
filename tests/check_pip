@@ -283,7 +283,7 @@ function get_package_list() {
 	local req_file="$1"
 	sed -E -e '/^[[:space:]]*$/d' -e '/^[#]+.*$/d' "${req_file}" | \
 		cut -d= -f1 | tr -d '<!>' | \
-		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
+		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi|chardet)$" | \
 		sort -u
 }
 
