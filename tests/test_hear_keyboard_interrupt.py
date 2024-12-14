@@ -90,19 +90,19 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				text=True
 			)
 			try:
-				time.sleep(STARTUP_DELAY_SECONDS)  # Allow server to start
+				time.sleep(self.STARTUP_DELAY_SECONDS)
 				process.send_signal(signal.SIGINT)
-				stdout, stderr = process.communicate(timeout=PROCESS_TIMEOUT_SECONDS)
+				stdout, stderr = process.communicate(timeout=self.PROCESS_TIMEOUT_SECONDS)
 				self.assertIsNotNone(stdout, "Incomplete Test.")
 				self.assertIsNotNone(stderr, "Incomplete Test.")
 				self.assertIsNotNone(process.returncode, "Incomplete Test.")
 				self.assertNotEqual(
 					int(process.returncode),
-					int(INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
+					int(self.INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
 				)
 				self.assertEqual(
 					int(process.returncode),
-					int(EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
+					int(self.EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
 				)
 				theResult = (int(process.returncode) >= int(1))
 			finally:
