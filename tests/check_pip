@@ -298,8 +298,6 @@ function install_package() {
 }
 
 function install_CI_tool() {
-	local pkg="$1"
-	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${pkg}"; then
 	# Install pip-licenses without dependencies
 	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS --no-deps "pip-licenses>=5.0"; then
 		return 6
