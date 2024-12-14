@@ -1,0 +1,169 @@
+---
+name: CI-BUILD
+# Continuous Integration workflow for building, the project
+#
+# Jobs included:
+# - BUILD: Ensures the project compiles correctly
+# - BOOTSTRAP: Tests installation across Python versions and locales
+#
+# Required Secrets:
+# NONE
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["**"]  # matches any branch
+    tags: ["v*"]
+
+# Declare default permissions as none.
+permissions: {}
+
+env:
+  ENVIRONMENT: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
+
+jobs:
+  BUILD:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
+    if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+    runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      LANG: "en_US.UTF-8"
+    outputs:
+      build_status: ${{ steps.build.outcome }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pre-Clean
+        id: clean
+        run: make -j1 -f Makefile purge 2>/dev/null || true
+      - name: Test Build
+        id: build
+        run: make -j1 -f Makefile build
+      - name: Post-Clean
+        id: post
+        run: make -j1 -f Makefile purge || true
+
+  BOOTSTRAP:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
+    if: ${{ !cancelled() }}
+    needs: BUILD
+    runs-on: ubuntu-latest
+    environment: ${{ needs.BUILD.environment }}
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: 5
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        lang-var: ["de.utf-8", "jp.utf-8"]
+        experimental: [true]
+        include:
+          - python-version: "3.10"
+            lang-var: "de.utf-8"
+            experimental: false
+          - python-version: "3.10"
+            lang-var: "jp.utf-8"
+            experimental: false
+          - python-version: "3.10"
+            lang-var: "en_US.utf-8"
+            experimental: false
+          - python-version: "3.11"
+            lang-var: "en_US.utf-8"
+            experimental: false
+          - python-version: "3.11"
+            lang-var: "en_US.utf-8"
+            experimental: false
+          - python-version: "3.12"
+            lang-var: "en_US.utf-8"
+            experimental: false
+    outputs:
+      bootstrap_status: ${{ steps.bootstrap.outcome }}
+    env:
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: ${{ matrix.lang-var }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up dependencies
+        run: |
+          pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
+          pip install -r ./requirements.txt ;
+      - name: Pre-build
+        id: bootstrap
+        run: |
+          make -j1 -f Makefile clean || true ;
+          make -j1 -f Makefile build ;
+        shell: bash
+      - name: Summerize Building
+        id: sumerize-py-build
+        run: |
+          echo "- Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+        if: ${{ success() }}
+        shell: bash
+      - name: Run Tests
+        id: test-user-install
+        run: make -j1 -f Makefile user-install ;
+        shell: bash
+      - name: Summerize Install
+        id: sumerize-user-install
+        run: |
+          echo "- User Installing works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+        if: ${{ success() }}
+        shell: bash
+      - name: Test Info
+        id: test-info
+        run: python -m setup --name --version --license || true ;
+      - name: Post-Clean
+        id: post-bootstrap
+        run: |
+          make -j1 -f Makefile purge || true ;
+          make -j1 -f Makefile clean || true ;
+        if: ${{ always() }}
+        shell: bash
+
+  BUILD_STATUS:
+    permissions:
+      actions: read
+      pull-requests: read
+    needs: [BUILD, BOOTSTRAP]
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    outputs:
+      didBUILD: ${{ steps.check_status.outputs.build_success }}
+    steps:
+      - id: check_status
+        run: |
+          if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
+            echo "build_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "build_success=false" >> $GITHUB_OUTPUT
+          fi

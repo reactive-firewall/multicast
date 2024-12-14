@@ -24,7 +24,7 @@ copies or substantial portions of the Software.
 
 ## Included Licenses and additional Acknowledgments included with package
 
-### Files: `tests/context.py`, `tests/test_basic.py`, and `tests/test_usage.py`
+### Files in `tests/`: `profiling.py`, `test_basic.py`, `test_usage.py` and parts of `context.py`
 
 ***
 Copyright (c) 2017-2022, Python Test Repo Template

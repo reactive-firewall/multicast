@@ -1,11 +1,8 @@
 ---
-name: CI
-# Continuous Integration workflow for building, testing, and validating the project
+name: CI-TESTS
+# Continuous Integration workflow for post-MATs additional testing, and validating of the project.
 #
 # Jobs included:
-# - BUILD: Ensures the project compiles correctly
-# - BOOTSTRAP: Tests installation across Python versions and locales
-# - MATS: Runs Machine Acceptance Tests
 # - COVERAGE: Generates coverage reports on multiple OS and Python versions
 # - STYLE: Checks code style and linting compliance
 # - INTEGRATION: Performs integration tests on different platforms
@@ -19,193 +16,48 @@ name: CI
 # - CODECLIMATE_TOKEN: For integration with Code Climate
 # - CC_TEST_REPORTER_ID: For Code Climate test reporting
 
-on:  # yamllint disable-line rule:truthy
-  push:
-    branches:
-      - master
-      - stable
-      - HOTFIX-*
-    tags:
-      - v*
-  pull_request:
+on:
+  workflow_run:
+    workflows: ["CI-MATs"]
     types:
-      - opened
-      - edited
-      - reopened
-      - synchronize
-      - ready_for_review
+      - completed
 
 # Declare default permissions as none.
 permissions: {}
 
+
 jobs:
-  BUILD:
+  check_mats:
     permissions:
       actions: read
-      contents: read
-      statuses: write
-      packages: none
       pull-requests: read
-      security-events: none
-    if: github.repository == 'reactive-firewall/multicast'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    env:
-      LANG: "en_US.UTF-8"
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      mats_environment: ${{ steps.get_env.outputs.environment }}
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - name: Pre-Clean
-      id: clean
-      run: make -j1 -f Makefile purge 2>/dev/null || true ;
-    - name: Test Build
-      id: build
-      run: make -j1 -f Makefile build ;
-    - name: Post-Clean
-      id: post
-      run: make -j1 -f Makefile purge || true ;
-
-
-  BOOTSTRAP:
-    permissions:
-      actions: read
-      contents: read
-      statuses: write
-      packages: none
-      pull-requests: read
-      security-events: none
-    if: ${{ !cancelled() }}
-    needs: BUILD
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    timeout-minutes: 5
-    continue-on-error: ${{ matrix.experimental }}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-        lang-var: ["de.utf-8", "jp.utf-8"]
-        experimental: [true]
-        include:
-          - python-version: "3.10"
-            lang-var: "de.utf-8"
-            experimental: false
-          - python-version: "3.10"
-            lang-var: "jp.utf-8"
-            experimental: false
-          - python-version: "3.10"
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: "3.11"
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: "3.11"
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: "3.12"
-            lang-var: "en_US.utf-8"
-            experimental: false
-    env:
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: ${{ matrix.lang-var }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Set up dependencies
-      run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
-        pip install -r ./requirements.txt ;
-    - name: Pre-build
-      id: bootstrap
-      run: |
-        make -j1 -f Makefile clean || true ;
-        make -j1 -f Makefile build ;
-      shell: bash
-    - name: Summerize Building
-      id: sumerize-py-build
-      run: |
-        echo "- Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ success() }}
-      shell: bash
-    - name: Run Tests
-      id: test-install
-      run: make -j1 -f Makefile user-install ;
-      shell: bash
-    - name: Summerize Install
-      id: sumerize-user-install
-      run: |
-        echo "- User Installing works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ success() }}
-      shell: bash
-    - name: Test Info
-      id: test-info
-      run: python -m setup --name --version --license || true ;
-    - name: Post-Clean
-      id: post
-      run: |
-        make -j1 -f Makefile purge || true ;
-        make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
-      shell: bash
-
-
-  MATS:
-    permissions:
-      actions: read
-      contents: read
-      statuses: write
-      packages: none
-      pull-requests: read
-      security-events: none
-    if: ${{ !cancelled() }}
-    needs: BUILD
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    timeout-minutes: 8
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-    env:
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.utf-8"
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for ${{ matrix.python-version }}
-      run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
-        pip install -r ./requirements.txt ;
-        pip install -r ./tests/requirements.txt || true ;
-        pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Pre-Clean
-      id: clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Run Tests for python ${{ matrix.python-version }}
-      id: tests
-      run: make -j1 -f Makefile test ;
-    - name: Summerize MATs for python ${{ matrix.python-version }}
-      id: sumerize-mats
-      run: |
-        echo "- MATS works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
-      if: ${{ success() }}
-    - name: Post-Clean
-      id: post
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      - id: check
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            ARTIFACTS_URL="${{ github.event.workflow_run.artifacts_url }}"
+            PASSED_MATS=$(gh api "${{ github.event.workflow_run.artifacts_url }}" \
+            --jq '.artifacts[] | select(.name=="MATS_STATUS") | .passedMATs')
+            if [[ "$PASSED_MATS" == "true" ]]; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_run=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+      - id: get_env
+        run: |
+          ENV_VALUE=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.environment')
+          if [[ -n "$ENV_VALUE" ]]; then
+            echo "environment=$ENV_VALUE" >> $GITHUB_OUTPUT
+          else
+            echo "environment=Experimenting" >> $GITHUB_OUTPUT  # Default fallback
+          fi
 
 
   COVERAGE:
@@ -216,8 +68,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    if: ${{ success() }}
-    needs: [BUILD, MATS]
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
+    if: ${{ !cancelled() && (needs.check_mats.outputs.should_run == 'true') }}
+    needs: [check_mats]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -307,8 +160,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    if: ${{ success() }}
-    needs: [BUILD, MATS]
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
+    if: ${{ success() && (needs.check_mats.outputs.should_run == 'true') }}
+    needs: [check_mats]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -352,8 +206,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
     if: ${{ success() }}
-    needs: [MATS, COVERAGE]
+    needs: [check_mats, COVERAGE]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -468,8 +323,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
     if: ${{ success() }}
-    needs: [BOOTSTRAP, MATS]
+    needs: [COVERAGE, STYLE]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -548,8 +404,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    if: ${{ !cancelled() }}
-    needs: [BOOTSTRAP, MATS]
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
+    if: ${{ !cancelled() && (needs.check_mats.outputs.mats_environment == 'Testing' || needs.check_mats.outputs.mats_environment == 'Deployment') }}
+    needs: [COVERAGE, STYLE]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -595,75 +452,6 @@ jobs:
       if: ${{ !cancelled() }}
 
 
-  DOCS:
-    permissions:
-      actions: read
-      contents: read
-      statuses: write
-      packages: none
-      pull-requests: read
-      security-events: none
-    if: ${{ !cancelled() }}
-    needs: [MATS, COVERAGE, EXTRAS-FOR-SETUP, EXTRAS-FOR-PIP]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
-    env:
-      OS: ${{ matrix.os }}
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.utf-8"
-      LC_CTYPE: "en_US.utf-8"
-      DOCS_BUILD_REF: ${{ github.sha }}  # Reference the specific commit in documentation builds
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Windows' }}
-      run: python -m pip install --upgrade pip
-    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
-        pip install -r ./requirements.txt ;
-        pip install -r ./tests/requirements.txt || true ;
-    - name: Pre-Clean
-      id: clean-prep
-      run: make -j1 -f Makefile clean ;
-    - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build ;
-      if: ${{ success() }}
-    - name: Generate documentation with py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -j1 -f Makefile build-docs 2>&1 >> $GITHUB_STEP_SUMMARY ;
-      if: ${{ !cancelled() }}
-    - name: Lint documentation
-      run: |
-        pip install --upgrade sphinx-lint
-        sphinx-lint docs/ 2>&1 >> $GITHUB_STEP_SUMMARY || true ;
-      if: ${{ !cancelled() }}
-    - name: Upload Docs Artifact with Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: Multicast-Documentation-${{ env.GITHUB_SHA }}-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./docs/www/
-        if-no-files-found: ignore
-    - name: Post-purge
-      id: post-uninstall
-      run: make -j1 -f Makefile purge || true ;
-      if: ${{ !cancelled() }}
-    - name: Post-Clean
-      id: post-end
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ !cancelled() }}
-
-
   TOX:
     permissions:
       actions: read
@@ -672,8 +460,9 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    if: ${{ success() }}
-    needs: [MATS, STYLE, COVERAGE, INTEGRATION, DOCS]
+    if: ${{ success() && needs.check_mats.outputs.should_run == 'true' }}
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
+    needs: [STYLE, COVERAGE, INTEGRATION]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
