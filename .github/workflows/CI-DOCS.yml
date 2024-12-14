@@ -30,7 +30,7 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    environment: Deployment
+    environment: ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master') && 'Testing' || 'Experimenting' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

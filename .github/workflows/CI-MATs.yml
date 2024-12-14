@@ -24,6 +24,8 @@ jobs:
       pull-requests: read
       checks: write
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
       build_environment: ${{ steps.get_env.outputs.environment }}
