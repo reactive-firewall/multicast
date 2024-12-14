@@ -232,6 +232,7 @@ PIP_COMMON_FLAGS="--require-virtualenv --use-pep517 --exists-action s --upgrade 
 if [[ $( \uname -s ) == "*arwin" ]] ; then
 	PIP_ENV_FLAGS="--break-system-packages"
 	LICENSE_OPTIONS="--python python3 ${LICENSE_OPTIONS} --ignore-packages certifi"
+	LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages chardet"
 else
 	PIP_ENV_FLAGS=""
 	LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages chardet"
@@ -284,7 +285,7 @@ function get_package_list() {
 	local req_file="$1"
 	sed -E -e '/^[[:space:]]*$/d' -e '/^[#]+.*$/d' "${req_file}" | \
 		cut -d= -f1 | tr -d '<!>' | \
-		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi)$" | \
+		grep -vE "^(pip|setuptools|wheel|build|hypothesis|certifi|chardet)$" | \
 		sort -u
 }
 
@@ -295,32 +296,6 @@ function install_package() {
 		return 6
 	fi
 	return 0
-}
-
-function install_CI_tool() {
-	# Install pip-licenses without dependencies
-	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS --no-deps "pip-licenses>=5.0"; then
-		return 6
-	fi
-	# Install only required dependencies for pip-licenses
-	# prettytable - BSD license
-	# PTable - BSD license
-	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "prettytable>=3.0" "PTable>=0.9.2";
-	then
-		return 6
-	fi
-	return 0
-}
-
-function cleanup_unwanted_packages() {
-	local -ra UNWANTED_PACKAGES=("chardet", "see")
-	local pkg
-	for pkg in "${UNWANTED_PACKAGES[@]}"; do
-		if pip show "${pkg}" >/dev/null 2>&1; then
-			printf "::warning title=LICENSE::Removing unwanted package: %s\n" "${pkg}"
-			pip uninstall --quiet -y $PIP_ENV_FLAGS "${pkg}" >/dev/null 2>&1 || true
-		fi
-	done
 }
 
 # === Utilities ===
@@ -370,7 +345,7 @@ function check_package_licenses() {
 	wait ;
 	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
 	# Install pip-licenses
-	install_CI_tool || SUB_CODE=6 ;
+	install_package "pip-licenses>=5.0" || SUB_CODE=6 ;
 	wait ;
 	local pkg
 	# Install the given Python modules using pip
@@ -388,8 +363,6 @@ function check_package_licenses() {
 		unset ERR_MSG 2>/dev/null || : ;
 	done
 
-	# Clean up unwanted packages before license check
-	cleanup_unwanted_packages || : ;
 	# Use pip-licenses to list the licenses of the installed packages
 	# shellcheck disable=SC2086
 	{ pip-licenses $LICENSE_OPTIONS --allow-only="${ALLOW_LICENSES}" || SUB_CODE=5 ;} ; wait ;
