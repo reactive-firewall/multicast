@@ -10,6 +10,7 @@ Continuous integration testing is handled by GitHub Actions and the generous Cir
 [![DeepSource](https://app.deepsource.com/gh/reactive-firewall/multicast.svg/?label=active+issues&show_trend=true&token=SZUDMH7AtX399xLmONFAkiD6)](https://app.deepsource.com/gh/reactive-firewall/multicast/)
 [![CodeCov](https://codecov.io/gh/reactive-firewall/multicast/graphs/sunburst.svg?token=UDKPGQLA11)](https://codecov.io/gh/reactive-firewall/multicast)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9458/badge)](https://app.deepsource.com/report/3f7c11ca-c203-44ec-9e01-126078f11660)
+[GHA Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS)
 
 ## Testing
 
@@ -82,14 +83,14 @@ gitGraph:
 
 ### Linting
 
-The Multicast project uses CI/CD to ensure many files, including code, configurations, and even
-documentation, etc. are all linted before publishing releases. This is automaticly triggred by
-the pull-requests durring the project's release workflow, Namely before merging anything to the
-branch `mater`.
+The Multicast project uses CI/CD to ensure all files, including code, configurations, and
+documentation, are linted before publishing releases. This is automatically triggered by
+pull requests during the project's release workflow, namely before merging anything to the
+branch `master`.
 
 #### Linting Badges
 
-
+[![CodeQL](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml)
 [![Markdown Lint](https://github.com/reactive-firewall/multicast/actions/workflows/markdown-lint.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/markdown-lint.yml)
 [![YAML Lint](https://github.com/reactive-firewall/multicast/actions/workflows/yaml-lint.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/yaml-lint.yml)
 [![Makefile Lint](https://github.com/reactive-firewall/multicast/actions/workflows/makefile-lint.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/makefile-lint.yml)
