@@ -932,6 +932,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 	__name__ = """tests.context.BasicUsageTestSuite"""
 
 	NO_PYTHON_ERROR = """No python cmd to test with!"""  # skipcq: TCV-002
+	"""Error message used when Python command is not available for testing.
+
+	This constant is used across multiple test methods to maintain consistency
+	in error reporting when Python command execution is not possible.
+	"""
 
 	@classmethod
 	def setUpClass(cls):
