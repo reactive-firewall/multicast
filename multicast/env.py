@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Python Multicast Repo
+# Multicast Python Module
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -710,8 +710,8 @@ def load_config() -> dict:
 	group = load_group()
 	ttl = load_TTL()
 	groups_str = os.getenv("MULTICAST_GROUPS", "")
-	bind_addr = os.getenv("MULTICAST_BIND_ADDR", group)
-	buffer_size = int(os.getenv("MULTICAST_BUFFER_SIZE", 1316))
+	bind_addr = os.getenv("MULTICAST_BIND_ADDR", group)  # skipcq: PYL-W1508
+	buffer_size = int(os.getenv("MULTICAST_BUFFER_SIZE", 1316))  # skipcq: PYL-W1508
 	# Process and validate groups
 	groups = set()
 	if groups_str:
