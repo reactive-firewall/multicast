@@ -454,6 +454,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 		print(data)
 		sock.sendto(data.upper(), self.client_address)
 
+
 # skipcq: TCV-002
 def main():
 	"""

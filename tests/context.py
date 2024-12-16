@@ -931,6 +931,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	__name__ = """tests.context.BasicUsageTestSuite"""
 
+	NO_PYTHON_ERROR = """No python cmd to test with!"""  # skipcq: TCV-002
+
 	@classmethod
 	def setUpClass(cls):
 		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
@@ -955,7 +957,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if not self._thepython:
-			self.skipTest(str("""No python cmd to test with!"""))  # skipcq: TCV-002
+			self.skipTest(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self._the_test_port = self._always_generate_random_port_WHEN_called()
 
 	def _should_get_package_version_WHEN_valid(self):
@@ -999,7 +1001,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_finds_python_WHEN_testing(self):
 		"""Test case 1: Class Test-Fixture Meta Test."""
 		if (self._thepython is not None) and (len(self._thepython) <= 0):
-			self.fail(str("""No python cmd to test with!"""))  # skipcq: TCV-002
+			self.fail(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self.test_absolute_truth_and_meaning()
 
 	def tearDown(self):
