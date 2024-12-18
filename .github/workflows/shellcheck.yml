@@ -24,6 +24,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Shellcheck Scan
-        uses: reactive-firewall/shellcheck-scan@7f80c033f1f423cea9b6d8e5e3c12b72aad424ad # v0
+        uses: reactive-firewall/shellcheck-scan@f349a86fcf7374b9aea6ed813328bd9d747ffadd # v0
         with:  # optional arguments
           publish-artifacts: true
