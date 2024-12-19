@@ -202,6 +202,11 @@ EXIT_CODES = {
 }
 ```
 
+> [!TIP]
+> Plan Ahead: Custom exceptions like CommandExecutionError can use exit codes in the range
+`1-255`, but should avoid conflicting with the standard mappings defined above by
+[CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161).
+
 </details>
 
 > [!NOTE]

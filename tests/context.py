@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Python Test Repo Template
+# Multicast Python Module (Testing)
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -8,7 +8,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,17 +21,33 @@ __module__ = """tests"""
 
 __name__ = """tests.context"""  # skipcq: PYL-W0622
 
-__doc__ = """
+__doc__ = """Test context and environment setup module.
 
-	Robust imports: These statements import the entire "multicast" module,
-		allowing access to all its functionalities within the test environment.
-		This can be flagged as an intentional
-		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
-		warning.
+This module provides the testing environment setup and utilities for the multicast
+package tests. It handles imports, path configurations, and provides helper functions
+for test execution.
+
+Functions:
+	getCoverageCommand: Get appropriate coverage command for test execution.
+	getPythonCommand: Get appropriate Python command, with coverage wrapping, for test execution.
+	checkPythonCommand: Execute Python commands with proper error handling.
+	timePythonCommand: Time profile wraps checkPythonCommand transparently.
+	checkStrOrByte: Validate Python console results with proper error handling.
+	debugBlob: Debug helper for unexpected outputs.
+	managed_process(process): Context manager for safely handling multiprocessing processes.
+
+Classes:
+	BasicUsageTestSuite: Base test suite with common test functionality.
+
+Robust imports: These statements import the entire "multicast" module,
+	allowing access to all its functionalities within the test environment.
+	This can be flagged as an intentional
+	[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+	warning.
+
+Meta Tests - Fixtures:
 
 	Context for Testing.
-
-	Meta Tests - Fixtures:
 
 		Test fixtures by importing test context.
 
@@ -48,6 +64,14 @@ __doc__ = """
 		>>>
 
 		>>> from context import profiling as _profiling
+		>>>
+
+	Testcase 1: Subclassing BasicUsageTestSuite should be simple.
+
+		>>> from tests.context import BasicUsageTestSuite
+		>>> class MyTests(BasicUsageTestSuite):
+		...     def test_example(self):
+		...         self.assertTrue(True)
 		>>>
 
 """
@@ -144,7 +168,7 @@ try:
 	else:  # pragma: no branch
 		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
 except Exception as err:  # pragma: no branch
-	raise ImportError("[CWE-440] Python Multicast Repo Failed to import.") from err
+	raise ImportError("[CWE-440] Multicast Python Module Failed to import.") from err
 
 
 try:
@@ -218,9 +242,9 @@ def getCoverageCommand():
 	try:
 		thecov = checkPythonCommand(["command", "-v", "coverage"])
 		if (str("/coverage") in str(thecov)):
-			thecov = str("coverage")
+			thecov = str("coverage")  # skipcq: TCV-002
 		elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
-			thecov = str("coverage3")
+			thecov = str("coverage3")  # skipcq: TCV-002
 		else:  # pragma: no branch
 			thecov = "exit 1 ; #"
 	except Exception:  # pragma: no branch
@@ -261,7 +285,7 @@ def __check_cov_before_py():
 	thepython = str(sys.executable)
 	thecov = getCoverageCommand()
 	if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 7)):
-		thepython = str("{} run -p").format(str(thecov))
+		thepython = str("{} run -p").format(str(thecov))  # skipcq: TCV-002
 	else:  # pragma: no branch
 		try:
 			import coverage as coverage
@@ -360,6 +384,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system.") from None
 	if not args or args[0] is None:
+		# skipcq: TCV-002
 		raise ValueError("[CWE-1286] args must be an array of positional arguments") from None
 	else:
 		args = [*args]  # convert to an array
@@ -906,6 +931,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	__name__ = """tests.context.BasicUsageTestSuite"""
 
+	NO_PYTHON_ERROR = """No python cmd to test with!"""  # skipcq: TCV-002
+	"""Error message used when Python command is not available for testing.
+
+	This constant is used across multiple test methods to maintain consistency
+	in error reporting when Python command execution is not possible.
+	"""
+
 	@classmethod
 	def setUpClass(cls):
 		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
@@ -930,7 +962,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
 		if not self._thepython:
-			self.skipTest(str("""No python cmd to test with!"""))
+			self.skipTest(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self._the_test_port = self._always_generate_random_port_WHEN_called()
 
 	def _should_get_package_version_WHEN_valid(self):
@@ -974,7 +1006,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_finds_python_WHEN_testing(self):
 		"""Test case 1: Class Test-Fixture Meta Test."""
 		if (self._thepython is not None) and (len(self._thepython) <= 0):
-			self.fail(str("""No python cmd to test with!"""))
+			self.fail(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self.test_absolute_truth_and_meaning()
 
 	def tearDown(self):

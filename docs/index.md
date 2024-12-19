@@ -9,7 +9,11 @@ Jump directly to the [Quickstart](./toc)
 - [README](./README): Introduction and installation instructions.
 - [Usage Guide](./USAGE): Detailed usage examples and API documentation.
 - [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
+- [Release Notes](https://github.com/reactive-firewall/multicast/releases): Release information.
+- [Environment Configuration](./Environment_Configuration): Environment Configuration Guide.
 - [CI Processes](./CI): Information on continuous integration and testing strategies.
+- [Exceptions in `multicast`](./Exception_Guide): Information on exceptions and their handling in
+  the `multicast` module.
 - [License](./LICENSE): Licensing information and acknowledgments.
 
 ---

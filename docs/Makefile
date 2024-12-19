@@ -65,6 +65,7 @@ init: ../docs/
 	@ln -s -f ../"$(PROJECT_DOC_SRC_DIR)" $(SRCDIR)/"$(PROJECT_DOC_SRC_DIR)"
 	@ln -s -f ../tests $(SRCDIR)/tests 2>/dev/null || true
 	@ln -s -f ../README.md $(SRCDIR)/README.md
+	@ln -s -f ../Logo.svg $(SRCDIR)/Logo.svg
 	@ln -s -f ../LICENSE.md $(SRCDIR)/LICENSE.md
 
 clean:
@@ -73,6 +74,7 @@ clean:
 	@-rm -f -d $(SRCDIR)/$(BUILDDIR) 2>/dev/null || true
 	@-rm -f -d $(SRCDIR)/apidocs 2>/dev/null || true
 	@-unlink $(SRCDIR)/README.md 2>/dev/null || true
+	@-unlink $(SRCDIR)/Logo.svg 2>/dev/null || true
 	@-unlink $(SRCDIR)/tests 2>/dev/null || true
 	@-unlink $(SRCDIR)/LICENSE.md 2>/dev/null || true
 	@-unlink $(SRCDIR)/"$(PROJECT_DOC_SRC_DIR)" 2>/dev/null || true

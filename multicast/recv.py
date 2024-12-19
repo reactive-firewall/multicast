@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Python Multicast Repo
+# Multicast Python Module
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -9,7 +9,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,27 +17,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Multicast RECV functionality implementation.
 
-# Third-party Acknowledgement:
-# ..........................................
-# Some code (namely: run, and parseArgs) was modified/derived from:
-# https://stackoverflow.com/a/52791404
-# Copyright (c) 2019, "pterodragon" (https://stackoverflow.com/users/5256940/pterodragon)
-# which was under CC-by-sa-4 license.
-# see https://creativecommons.org/licenses/by-sa/4.0/ for details
-# The components in parseArgs, run, and main are thus also under
-# CC-by-sa-4 https://creativecommons.org/licenses/by-sa/4.0/
-# ..........................................
-# NO ASSOCIATION
+This module provides functionality for receiving multicast messages. It contains classes
+and functions to handle receiving messages from multicast groups, with support for
+single-message reception modes.
 
-"""Provides multicast RECV Features.
+Functions:
+	joinstep: Configure socket for joining multicast groups.
+	tryrecv: Attempt to receive data on a socket.
+	recvstep: Receive messages continuously until interrupted.
 
-Use for receiving multicast messages. Contains classes and functions to handle receiving messages
-from multicast groups.
+Classes:
+	McastRECV: Main tool class for RECV operations.
 
 Caution: See details regarding dynamic imports [documented](../__init__.py) in this module.
 
-	Minimal Acceptance Testing:
+Minimal Acceptance Testing:
 
 	First set up test fixtures by importing multicast.
 
