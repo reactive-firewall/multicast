@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Python Test Repo Template
+# Multicast Python Module (Testing)
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -9,7 +9,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -90,19 +90,19 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				text=True
 			)
 			try:
-				time.sleep(STARTUP_DELAY_SECONDS)  # Allow server to start
+				time.sleep(self.STARTUP_DELAY_SECONDS)
 				process.send_signal(signal.SIGINT)
-				stdout, stderr = process.communicate(timeout=PROCESS_TIMEOUT_SECONDS)
+				stdout, stderr = process.communicate(timeout=self.PROCESS_TIMEOUT_SECONDS)
 				self.assertIsNotNone(stdout, "Incomplete Test.")
 				self.assertIsNotNone(stderr, "Incomplete Test.")
 				self.assertIsNotNone(process.returncode, "Incomplete Test.")
 				self.assertNotEqual(
 					int(process.returncode),
-					int(INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
+					int(self.INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
 				)
 				self.assertEqual(
 					int(process.returncode),
-					int(EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
+					int(self.EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
 				)
 				theResult = (int(process.returncode) >= int(1))
 			finally:

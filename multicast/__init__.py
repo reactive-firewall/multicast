@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Python Multicast Repo
+# Multicast Python Module
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -29,7 +29,7 @@ __all__ = [
 	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
 	"""__doc__""", """exceptions""", """exceptions.CommandExecutionError""",
 	"""exceptions.get_exit_code_from_exception""", """exceptions.exit_on_exception""",
-	"""get_exit_code_from_exception""", """exit_on_exception""",
+	"""get_exit_code_from_exception""", """exit_on_exception""", """env""",
 	"""skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
 	"""skt.__file__""", """skt.genSocket""", """skt.genSocket.__func__""", """genSocket""",
 	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
@@ -93,7 +93,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """2.0.3-rc-1"""
+__version__ = """2.0.3-rc-3"""
 """The version of this program.
 
 	Minimal Acceptance Testing:
@@ -368,17 +368,48 @@ if 'multicast.exceptions' not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import exceptions  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
+	global exceptions  # skipcq: PYL-W0604
 	exceptions = sys.modules["""multicast.exceptions"""]
 
 EXIT_CODES = exceptions.EXIT_CODES
+"""See multicast.exceptions.EXIT_CODES."""
 
 EXCEPTION_EXIT_CODES = exceptions.EXCEPTION_EXIT_CODES
+"""See multicast.exceptions.EXCEPTION_EXIT_CODES."""
 
 CommandExecutionError = exceptions.CommandExecutionError
+"""See multicast.exceptions.CommandExecutionError Class."""
 
 get_exit_code_from_exception = exceptions.get_exit_code_from_exception
+"""See multicast.exceptions.get_exit_code_from_exception function."""
 
 exit_on_exception = exceptions.exit_on_exception
+"""See multicast.exceptions.exit_on_exception function."""
+
+
+if 'multicast.env' not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+	from . import env  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+else:  # pragma: no branch
+	global env  # skipcq: PYL-W0604
+	env = sys.modules["""multicast.env"""]
+
+_config = env.load_config()
+
+if _config is None:
+	raise ImportError("FAIL: we could not import environment. ABORT.") from None
+else:
+	_MCAST_DEFAULT_PORT = _config["port"]
+	_MCAST_DEFAULT_GROUP = _config["group"]
+	_MCAST_DEFAULT_TTL = _config["ttl"]
+	global _MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0604
+	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
+	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
+	_MCAST_DEFAULT_GROUPS = _config["groups"]
+	global _MCAST_DEFAULT_BUFFER  # skipcq: PYL-W0604
+	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
+
+del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
 
 class mtool(abc.ABC):
@@ -627,6 +658,7 @@ class mtool(abc.ABC):
 if 'multicast.skt' not in sys.modules:
 	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
+	global skt  # skipcq: PYL-W0604
 	skt = sys.modules["""multicast.skt"""]
 
 
@@ -641,23 +673,27 @@ endSocket = skt.endSocket
 if 'multicast.recv' not in sys.modules:
 	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
+	global recv  # skipcq: PYL-W0604
 	recv = sys.modules["""multicast.recv"""]
 
 
 if 'multicast.send' not in sys.modules:
 	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
+	global send  # skipcq: PYL-W0604
 	send = sys.modules["""multicast.send"""]
 
 
 if 'multicast.hear' not in sys.modules:
 	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
+	global hear  # skipcq: PYL-W0604
 	hear = sys.modules["""multicast.hear"""]
 
 
 try:
 	if """multicast.__main__""" in sys.modules:  # pragma: no cover
+		global __main__  # skipcq: PYL-W0604
 		__main__ = sys.modules["""multicast.__main__"""]
 except Exception:
 	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
