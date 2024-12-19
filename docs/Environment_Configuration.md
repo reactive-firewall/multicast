@@ -1,7 +1,9 @@
 # Environment Configuration Module
 
 ## Overview
-The `multicast.env` module provides environment-based configuration for the multicast package, allowing runtime customization of network settings through environment variables.
+
+The `multicast.env` module provides environment-based configuration for the multicast package,
+allowing runtime customization of network settings through environment variables.
 
 ## Environment Variables
 
@@ -17,6 +19,7 @@ The `multicast.env` module provides environment-based configuration for the mult
 ## Usage
 
 ### Basic Configuration
+
 ```python
 import os  # used to set environment
 
@@ -36,6 +39,7 @@ import multicast
 ```
 
 ### Multiple Group Configuration
+
 ```python
 # Join multiple multicast groups
 os.environ['MULTICAST_GROUPS'] = '224.0.0.1 224.0.0.2 224.0.0.3'
@@ -57,42 +61,52 @@ and does not actually update Multicast after import)_
 ## Configuration Details
 
 ### Port Configuration
+
 - Valid range: 49152-65535 (dynamic/private ports)
 - Invalid values trigger warning and fall back to default
 - Example:
+
   ```python
   os.environ['MULTICAST_PORT'] = '50000'
   ```
 
 ### Group Configuration
+
 - Must be valid multicast addresses (224.0.0.0/4)
 - Invalid addresses trigger warning and fall back to default
 - Example:
+
   ```python
   os.environ['MULTICAST_GROUP'] = '224.0.0.2'
   ```
 
 ### TTL Configuration
+
 - Valid range: 1-126 (as per RFC-1112)
 - Also sets socket default timeout
 - Example:
+
   ```python
   os.environ['MULTICAST_TTL'] = '2'
   ```
 
 ### Buffer Size Configuration
+
 - Must be positive integer
 - Invalid values trigger warning and fall back to default
 - Example:
+
   ```python
   os.environ['MULTICAST_BUFFER_SIZE'] = '2048'
   ```
 
 ## Caveat
+
 - Environment variables must be set before importing the module
 - Invalid values trigger warnings but won't cause failures
 - Changes to configuration affect all subsequent operations
 
 ## References
+
 - [RFC-1112: Host Extensions for IP Multicasting](https://datatracker.ietf.org/doc/html/rfc1112)
 - [RFC-6335: IANA Port Number Registry](https://datatracker.ietf.org/doc/html/rfc6335)
