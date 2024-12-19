@@ -77,6 +77,7 @@ enabling developers to implement efficient and robust multicast functionality wi
 * [Usage Guide](./USAGE): Detailed usage examples and API documentation.
 * [FAQ](./FAQ): Frequently asked questions and troubleshooting tips.
 * [Release Notes](https://github.com/reactive-firewall/multicast/releases): Release information.
+* [Environment Configuration](./Environment_Configuration): Environment Configuration Guide.
 * [CI Processes](./CI): Information on continuous integration and testing strategies.
 * [Exceptions in `multicast`](./Exception_Guide): Information on exceptions and their handling in
   the `multicast` module.
@@ -91,6 +92,7 @@ apidocs/index
 /README
 /USAGE
 /FAQ
+/Environment_Configuration
 /CI
 /Exception_Guide
 /LICENSE
