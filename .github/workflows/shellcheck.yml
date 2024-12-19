@@ -26,4 +26,5 @@ jobs:
       - name: Shellcheck Scan
         uses: reactive-firewall/shellcheck-scan@f349a86fcf7374b9aea6ed813328bd9d747ffadd # v0
         with:  # optional arguments
+          match: 'tests/check_* **/*.bash'
           publish-artifacts: true
