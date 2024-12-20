@@ -3,7 +3,7 @@
 name: shellcheck
 on:  # yamllint disable-line rule:truthy
   push:
-    branches: ["main", "master", "stable", "feature-exploring-sarif-output-165"]
+    branches: ["main", "master", "stable"]
   pull_request:
     branches: ["main", "master", "stable", "feature-*", "patch-*", "HOTFIX-*"]
 
