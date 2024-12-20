@@ -14,6 +14,7 @@ jobs:
     permissions:
       contents: read  # for actions/checkout to fetch code
       actions: read
+      pull-requests: read
       statuses: write
       security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
 
@@ -24,7 +25,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Shellcheck Scan
-        uses: reactive-firewall/shellcheck-scan@f349a86fcf7374b9aea6ed813328bd9d747ffadd # v0
+        uses: reactive-firewall/shellcheck-scan@2bcd2ecde3da2d77867ba3f96fbe9584eebe292d # v0
         with:  # optional arguments
           match: 'tests/check_* **/*.bash'
           publish-artifacts: true
