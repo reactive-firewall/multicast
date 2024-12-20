@@ -14,7 +14,7 @@ allowing runtime customization of network settings through environment variables
 | `MULTICAST_GROUPS` | - | Space-separated list of additional multicast addresses |
 | `MULTICAST_TTL` | 1 | Time-to-live value (1-126) |
 | `MULTICAST_BIND_ADDR` | "0.0.0.0" | Address to bind to |
-| `MULTICAST_BUFFER_SIZE` | 1024 | Receive buffer size in bytes |
+| `MULTICAST_BUFFER_SIZE` | 1316 | Receive buffer size in bytes |
 
 ## Usage
 
@@ -34,7 +34,7 @@ os.environ['MULTICAST_GROUP'] = '224.0.0.2'
 # os.environ['MULTICAST_TTL'] = '2'  # May harm your own bandwidth when increasing
 # os.environ['MULTICAST_BUFFER_SIZE'] = '2048'  # Expect increased data loss when increasing
 
-# Load configuration Loads on Import
+# Configuration loads on import
 import multicast
 ```
 
@@ -43,19 +43,19 @@ import multicast
 ```python
 # Join multiple multicast groups
 os.environ['MULTICAST_GROUPS'] = '224.0.0.1 224.0.0.2 224.0.0.3'
-# Load configuration Loads on Import
+# Configuration loads on import
 import multicast
 
 # load config
 from multicast.env import load_config
 config = load_config()
 
-# you can now access configuration
+# you can now access the configuration
 # e.g.
 print(config['groups'])  # ['224.0.0.1', '224.0.0.2', '224.0.0.3']
 ```
 
-_(changing the resulting config values only causes the setting to loose its special value,
+_(changing the resulting config values only causes the setting to lose its special value,
 and does not actually update Multicast after import)_
 
 ## Configuration Details
@@ -63,7 +63,7 @@ and does not actually update Multicast after import)_
 ### Port Configuration
 
 - Valid range: 49152-65535 (dynamic/private ports)
-- Invalid values trigger warning and fall back to default
+- Invalid values trigger a warning and fall back to default
 - Example:
 
   ```python
@@ -73,7 +73,7 @@ and does not actually update Multicast after import)_
 ### Group Configuration
 
 - Must be valid multicast addresses (224.0.0.0/4)
-- Invalid addresses trigger warning and fall back to default
+- Invalid addresses trigger a warning and fall back to default
 - Example:
 
   ```python
@@ -93,7 +93,7 @@ and does not actually update Multicast after import)_
 ### Buffer Size Configuration
 
 - Must be positive integer
-- Invalid values trigger warning and fall back to default
+- Invalid values trigger a warning and fall back to default
 - Example:
 
   ```python
@@ -103,7 +103,7 @@ and does not actually update Multicast after import)_
 ## Caveat
 
 - Environment variables must be set before importing the module
-- Invalid values trigger warnings but won't cause failures
+- Invalid values trigger a warnings but won't cause failures
 - Changes to configuration affect all subsequent operations
 
 ## References
