@@ -19,7 +19,6 @@ extend-ignore = ["E117", "D203", "D208", "D212"]
 # OPTIONAL - BCP Ignore long lines as specified in CEP-8
 max-line-length = 100
 docstring-convention = "google"
-docstring_style = "google"
 
 [pytest.enabler.flake8]
 addopts = "--flake8"
