@@ -1,12 +1,22 @@
 ---
 name: CI-MATs
-# Continuous Integration workflow for Minimal Acceptance Tests.
+# Continuous Integration workflow for Minimal Acceptance Tests (MATs).
 #
-# Jobs included:
-# - MATS: Runs Machine Acceptance Tests
+# This workflow runs after successful completion of CI-BUILD to ensure
+# that the codebase meets minimal acceptance criteria.
 #
-# Required Secrets:
-# NONE
+# Jobs:
+# - check_build: Verifies CI-BUILD success and sets up environment
+# - MATS: Runs Machine Acceptance Tests across Python versions
+# - MATS_STATUS: Reports final test status
+#
+# Triggers:
+# - Automatically on CI-BUILD workflow completion
+#
+# Required Secrets: None
+#
+# Dependencies:
+# - Requires successful completion of CI-BUILD workflow
 
 on:  # yamllint disable-line rule:truthy
   workflow_run:
