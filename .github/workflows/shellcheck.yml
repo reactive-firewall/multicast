@@ -13,9 +13,7 @@ jobs:
   shellcheck:
     permissions:
       contents: read  # for actions/checkout to fetch code
-      actions: read
-      pull-requests: read
-      statuses: write
+      pull-requests: read  # to get PR metadata
       security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
 
     runs-on: ubuntu-latest
@@ -27,5 +25,6 @@ jobs:
       - name: Shellcheck Scan
         uses: reactive-firewall/shellcheck-scan@2bcd2ecde3da2d77867ba3f96fbe9584eebe292d # v0
         with:  # optional arguments
-          match: 'tests/check_* **/*.bash'
+          match: 'tests/check_* **/*.sh'
           publish-artifacts: true
+        if: ${{ success() }}
