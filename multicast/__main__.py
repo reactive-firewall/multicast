@@ -77,10 +77,6 @@ Minimal Acceptance Testing:
 
 # skipcq
 __all__ = [
-	"""__package__""",
-	"""__module__""",
-	"""__name__""",
-	"""__doc__""",
 	"""McastNope""",
 	"""McastRecvHearDispatch""",
 	"""McastDispatch""",
