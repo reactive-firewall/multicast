@@ -19,7 +19,6 @@
 
 __module__ = """tests"""
 
-
 try:
 	try:
 		import context
@@ -59,13 +58,18 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_HEAR_args = [
-				"""--port""", str(_fixture_port_num),
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				str(_fixture_port_num),
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
-				target=multicast.__main__.main,
-				name="RECV", args=("RECV", _fixture_HEAR_args,)
+				target=multicast.__main__.main, name="RECV", args=(
+					"RECV",
+					_fixture_HEAR_args,
+				)
 			)
 			p.start()
 			self.assertIsNotNone(p)
@@ -104,13 +108,21 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_HEAR_args = [
-				"""--port""", str(_fixture_port_num),
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				str(_fixture_port_num),
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.main,
-				name="HEAR", args=("--daemon", "HEAR", _fixture_HEAR_args,)
+				name="HEAR",
+				args=(
+					"--daemon",
+					"HEAR",
+					_fixture_HEAR_args,
+				)
 			)
 			p.start()
 			self.assertIsNotNone(p)
@@ -166,9 +178,7 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)
 		handler = multicast.hear.HearUDPHandler(
-			request=(None, None),
-			client_address=('224.0.0.1', _fixture_port_num),
-			server=None
+			request=(None, None), client_address=('224.0.0.1', _fixture_port_num), server=None
 		)
 		# Mock the socket to prevent actual network calls
 		handler.request = (None, MagicMock())
@@ -176,8 +186,7 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 		handler.handle()
 		# Verify that the handler processed the None data case correctly
 		self.assertEqual(
-			mock_socket.method_calls, [],
-			"Socket should not be used when data is None"
+			mock_socket.method_calls, [], "Socket should not be used when data is None"
 		)
 
 	def test_handle_with_invalid_utf8_data(self):
@@ -195,9 +204,7 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 		data = b'\xff\xfe\xfd\xfc'  # Invalid UTF-8 bytes
 		sock = multicast.genSocket()
 		handler = multicast.hear.HearUDPHandler(
-			request=(data, sock),
-			client_address=_fixture_client_addr,
-			server=None
+			request=(data, sock), client_address=_fixture_client_addr, server=None
 		)
 		try:
 			# Should silently ignore invalid UTF-8 data

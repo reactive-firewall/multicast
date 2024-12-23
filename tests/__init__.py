@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """Multicast Testing Module.
 
 	Package containing test suites and utilities for the multicast module.
@@ -57,10 +56,11 @@ __module__ = """tests"""
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! we could not import sys. ABORT. ABORT.") from None
+		raise ModuleNotFoundError(
+			"[CWE-440] OMG! we could not import sys. ABORT. ABORT."
+		) from None
 except Exception as err:  # pragma: no branch
 	raise ImportError(err) from err
-
 
 try:
 	if 'os' not in sys.modules:
@@ -70,7 +70,6 @@ try:
 except Exception as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
 
-
 try:
 	if 'unittest' not in sys.modules:
 		import unittest
@@ -78,7 +77,6 @@ try:
 		unittest = sys.modules["""unittest"""]
 except Exception as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
-
 
 try:
 	if 'functools' not in sys.modules:
@@ -88,7 +86,6 @@ try:
 except Exception as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] functools Failed to import.") from err
 
-
 try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
@@ -96,7 +93,6 @@ try:
 		multicast = sys.modules["""multicast"""]
 except Exception as err:  # pragma: no branch
 	raise ImportError("[CWE-440] multicast Failed to import.") from err
-
 
 try:
 	_DIR_NAME = str(".")
@@ -122,16 +118,26 @@ try:
 	from tests import test_fuzz
 
 	depends = [
-		profiling, test_basic, test_deps, test_install_requires, test_build, test_manifest,
-		test_usage, test_hear_server_activate, test_hear_cleanup, test_fuzz,
-		test_hear_data_processing, test_exceptions, test_hear_keyboard_interrupt,
+		profiling,
+		test_basic,
+		test_deps,
+		test_install_requires,
+		test_build,
+		test_manifest,
+		test_usage,
+		test_hear_server_activate,
+		test_hear_cleanup,
+		test_fuzz,
+		test_hear_data_processing,
+		test_exceptions,
+		test_hear_keyboard_interrupt,
 		test_hear_server
 	]
 	for unit_test in depends:
 		try:
 			if unit_test.__name__ is None:  # pragma: no branch
 				raise ImportError(
-					str("Test module failed to import even the {} tests.").format(str(unit_test))
+					f"Test module failed to import even the {str(unit_test)} tests."
 				) from None
 		except Exception as impErr:  # pragma: no branch
 			raise ImportError(str("[CWE-758] Test module failed completely.")) from impErr
@@ -145,7 +151,6 @@ except Exception as badErr:  # pragma: no branch
 	del badErr  # skipcq - cleanup any error leaks early
 	exit(0)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
 
-
 try:
 	if 'tests.context' not in sys.modules:
 		from tests import context
@@ -154,15 +159,21 @@ try:
 except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
-
 test_cases = (
-	test_basic.BasicTestSuite, test_exceptions.ExceptionsTestSuite, test_deps.TestRequirementsTxt,
-	test_build.TestPEP517Build, test_manifest.TestManifestInclusion,
-	test_install_requires.TestParseRequirements, test_usage.MulticastTestSuite,
-	test_usage.BasicIntegrationTestSuite, test_hear_server_activate.McastServerActivateTestSuite,
-	test_hear_cleanup.HearCleanupTestSuite, test_hear_data_processing.RecvDataProcessingTestSuite,
-	test_hear_server.McastServerTestSuite, test_hear_server.HearUDPHandlerTestSuite,
+	test_basic.BasicTestSuite,
+	test_exceptions.ExceptionsTestSuite,
+	test_deps.BuildRequirementsTxtTestSuite,
+	test_build.BuildPEP517TestSuite,
+	test_manifest.TestManifestInclusion,
+	test_install_requires.TestParseRequirements,
+	test_usage.MulticastTestSuite,
+	test_usage.BasicIntegrationTestSuite,
+	test_hear_server.McastServerTestSuite,
+	test_hear_server.HearUDPHandlerTestSuite,
+	test_hear_server_activate.McastServerActivateTestSuite,
+	test_hear_data_processing.RecvDataProcessingTestSuite,
 	test_hear_data_processing.HearHandleNoneDataTestSuite,
+	test_hear_cleanup.HearCleanupTestSuite,
 	test_hear_keyboard_interrupt.TestHearKeyboardInterrupt
 )
 
@@ -204,5 +215,3 @@ def load_tests(loader, tests, pattern):
 	suite.addTests(doctest.DocTestSuite(module=multicast.send, test_finder=finder))
 	suite.addTests(doctest.DocTestSuite(module=multicast.hear, test_finder=finder))
 	return suite
-
-

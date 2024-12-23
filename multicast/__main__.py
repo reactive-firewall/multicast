@@ -75,23 +75,66 @@ Minimal Acceptance Testing:
 
 """
 
-
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__doc__""",
-	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""__package__""",
+	"""__module__""",
+	"""__name__""",
+	"""__doc__""",
+	"""McastNope""",
+	"""McastRecvHearDispatch""",
+	"""McastDispatch""",
+	"""main""",
 	"""TASK_OPTIONS""",
 ]
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
+"""
+The package of this component.
 
+Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: __main__ should be automatically imported.
+
+		>>> multicast.__main__.__package__ is not None
+		True
+		>>>
+		>>> multicast.__main__.__package__ == multicast.__package__
+		True
+		>>>
+
+"""
 
 __module__ = """multicast.__main__"""  # skipcq: PYL-W0622
+"""
+The module of this component.
 
+Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: __main__ should be automatically imported.
+
+		>>> multicast.__main__.__module__ is not None
+		True
+		>>>
+
+"""
 
 __file__ = """multicast/__main__.py"""
-
+"""The file of this component."""
 
 try:
 	from . import sys
@@ -99,24 +142,20 @@ except ImportError as impErr:
 	# Throw more relevant Error
 	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
 
-
 if 'multicast.__version__' not in sys.modules:
 	from . import __version__ as __version__  # skipcq: PYL-C0414
 else:  # pragma: no branch
 	__version__ = sys.modules["""multicast.__version__"""]
-
 
 if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
 	from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
 else:  # pragma: no branch
 	_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
 
-
 if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
 	from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
 else:  # pragma: no branch
 	_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
-
 
 if 'multicast.exceptions' not in sys.modules:
 	# pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
@@ -124,24 +163,20 @@ if 'multicast.exceptions' not in sys.modules:
 else:  # pragma: no branch
 	exceptions = sys.modules["""multicast.exceptions"""]
 
-
 if 'multicast.mtool' not in sys.modules:
 	from . import mtool as mtool  # skipcq: PYL-C0414
 else:  # pragma: no branch
 	mtool = sys.modules["""multicast.mtool"""]
-
 
 if 'multicast.recv' not in sys.modules:
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
 	recv = sys.modules["""multicast.recv"""]
 
-
 if 'multicast.send' not in sys.modules:
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
 	send = sys.modules["""multicast.send"""]
-
 
 if 'multicast.hear' not in sys.modules:
 	from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
@@ -446,14 +481,12 @@ class McastRecvHearDispatch(mtool):
 		if parser is not None:  # pragma: no branch
 			parser.add_argument(
 				"""--port""",
-				type=int, default=_MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+				type=int,
+				default=_MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
 			)
 			__tmp_help = """local interface to use for listening to multicast data; """
 			__tmp_help += """if unspecified, any one interface may be chosen."""
-			parser.add_argument(
-				"""--iface""", default=None,
-				help=str(__tmp_help)
-			)
+			parser.add_argument("""--iface""", default=None, help=str(__tmp_help))
 			__tmp_help = """multicast group (ip address) to bind-to for the udp socket; """
 			__tmp_help += """should be one of the multicast groups joined globally """
 			__tmp_help += """(not necessarily joined in this python program) """
@@ -474,10 +507,7 @@ class McastRecvHearDispatch(mtool):
 			__tmp_help += """of that interface) instead of not joining. NOTE: If you really need """
 			__tmp_help += """to NOT join the multicast group you should instead use the sockets """
 			__tmp_help += """module directly, as this module does not support such a use-case."""
-			parser.add_argument(
-				"""--groups""", default=[], nargs='*',
-				help=str(__tmp_help)
-			)
+			parser.add_argument("""--groups""", default=[], nargs="*", help=str(__tmp_help))
 
 	@staticmethod
 	def _help_daemon_dispatch(*args, **kwargs):
@@ -529,7 +559,6 @@ class McastRecvHearDispatch(mtool):
 
 # More boiler-plate-code
 
-
 TASK_OPTIONS = {
 	"""NOOP""": McastNope(),
 	"""RECV""": McastRecvHearDispatch(),
@@ -574,11 +603,7 @@ class McastDispatch(mtool):
 			try:
 				(_is_done, theResult) = TASK_OPTIONS[tool].__call__([], **kwargs)
 			except Exception as e:  # pragma: no branch
-				theResult = str(
-					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {errs}"""
-				).format(
-					t=tool, args=kwargs, errs=e
-				)
+				theResult = f"CRITICAL - Attempted '[{tool}]: {kwargs}' just failed! :: {e}"  # noqa
 				_is_done = False
 		return (_is_done, theResult)  # noqa
 
@@ -610,21 +635,15 @@ class McastDispatch(mtool):
 		except Exception as err:  # pragma: no branch
 			exit_code = exceptions.get_exit_code_from_exception(err)
 			__EXIT_MSG = (
-				False, str(
-					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {code} {errs}"""
-				).format(
-					t=__name__, args=args, code=exit_code, errs=err
-				)
+				False,
+				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {err}" # noqa
 			)
 			if (sys.stderr.isatty()):
 				print(
 					"WARNING - An error occurred while handling the arguments. Refused.",
 					file=sys.stderr
 				)
-				print(
-					f"{exceptions.EXIT_CODES[exit_code][1]}: {err}\n{err.args}",
-					file=sys.stderr
-				)
+				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {err}\n{err.args}", file=sys.stderr)
 		return __EXIT_MSG  # noqa
 
 

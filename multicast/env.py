@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """
 The package of this component.
@@ -31,17 +30,16 @@ Minimal Acceptance Testing:
 		>>> import multicast
 		>>>
 
-	Testcase 1: exceptions should be automatically imported.
+	Testcase 1: Env should be automatically imported.
 
-		>>> multicast.exceptions.__package__ is not None
+		>>> multicast.env.__package__ is not None
 		True
 		>>>
-		>>> multicast.exceptions.__package__ == multicast.__package__
+		>>> multicast.env.__package__ == multicast.__package__
 		True
 		>>>
 
 """
-
 
 __module__ = """multicast.env"""
 """
@@ -56,7 +54,7 @@ Minimal Acceptance Testing:
 		>>> import multicast
 		>>>
 
-	Testcase 1: Exceptions should be automatically imported.
+	Testcase 1: Env should be automatically imported.
 
 		>>> multicast.env.__module__ is not None
 		True
@@ -64,10 +62,8 @@ Minimal Acceptance Testing:
 
 """
 
-
 __file__ = """multicast/env.py"""
 """The file of this component."""
-
 
 __name__ = """multicast.env"""  # skipcq: PYL-W0622
 """The name of this component.
@@ -81,14 +77,13 @@ __name__ = """multicast.env"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automatically imported.
+	Testcase 1: Env should be automatically imported.
 
 		>>> multicast.env.__name__ is not None
 		True
 		>>>
 
 """
-
 
 try:
 	import os
@@ -202,7 +197,9 @@ def validate_ttl(ttl: int) -> bool:
 		ttl_num = int(ttl)
 		return 1 <= ttl_num <= 126
 	except (ValueError, TypeError) as err:
-		raise ValueError(f"Invalid TTL value: {ttl}. Must be a positive integer below 127.") from err
+		raise ValueError(
+			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
+		) from err
 
 
 def load_port() -> int:
@@ -287,8 +284,7 @@ def load_port() -> int:
 		port = int(os.getenv("MULTICAST_PORT", _MCAST_DEFAULT_PORT))
 	except ValueError:
 		warnings.warn(
-			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}",
-			stacklevel=2
+			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}", stacklevel=2
 		)
 		port = _MCAST_DEFAULT_PORT
 	# Validate and potentially update port
@@ -410,8 +406,7 @@ def load_group() -> ipaddress.IPv4Address:
 		globals()["""_MCAST_DEFAULT_GROUP"""] = group
 	else:
 		warnings.warn(
-			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}",
-			stacklevel=2
+			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2
 		)
 		group = _MCAST_DEFAULT_GROUP
 	return ipaddress.IPv4Address(group)
@@ -490,8 +485,7 @@ def load_TTL() -> int:
 		ttl = int(os.getenv("MULTICAST_TTL", _MCAST_DEFAULT_TTL))
 	except ValueError:
 		warnings.warn(
-			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}",
-			stacklevel=2
+			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}", stacklevel=2
 		)
 		ttl = _MCAST_DEFAULT_TTL
 	# Validate and potentially update TTL
@@ -720,8 +714,7 @@ def load_config() -> dict:
 				groups.add(str(addr))
 			else:
 				warnings.warn(
-					f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping",
-					stacklevel=2
+					f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping", stacklevel=2
 				)
 	# Always include the primary group
 	groups.add(str(group))
@@ -740,7 +733,12 @@ def load_config() -> dict:
 
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__doc__""",  # skipcq: PYL-E0603
-	"""validate_port""", """validate_multicast_address""", """validate_ttl""",
+	"""__package__""",
+	"""__module__""",
+	"""__name__""",
+	"""__doc__""",  # skipcq: PYL-E0603
+	"""validate_port""",
+	"""validate_multicast_address""",
+	"""validate_ttl""",
 	"""load_config""",
 ]

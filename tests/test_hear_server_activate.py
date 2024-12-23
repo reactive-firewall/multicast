@@ -19,7 +19,6 @@
 
 __module__ = """tests"""
 
-
 try:
 	try:
 		import context
@@ -65,11 +64,14 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 		# Define a simple request handler
 		class SimpleHandler:
+
 			def handle(self):
 				pass  # Handler logic is not the focus here
+
 		# Create an instance of McastServer
 		server_address = (MCAST_GROUP, 0)  # Bind to any available port
 		server = multicast.hear.McastServer(server_address, SimpleHandler)
+
 		# Start the server in a separate thread
 
 		def run_server():
@@ -96,4 +98,3 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 if __name__ == '__main__':
 	unittest.main()
-

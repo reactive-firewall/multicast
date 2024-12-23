@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 """
 Tests of integration by usage.
 
@@ -45,7 +44,6 @@ Tests of integration by usage.
 """
 
 __module__ = """tests"""
-
 
 try:
 	try:
@@ -163,9 +161,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		)
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_a:
-				_ = multicast.__main__.McastDispatch().doStep(
-					["SAY", "--message"]
-				)
+				_ = multicast.__main__.McastDispatch().doStep(["SAY", "--message"])
 			(tst_err_rslt_b, rtn_val_b) = multicast.__main__.McastDispatch().doStep(
 				["SAY", "--message", "test"]
 			)
@@ -199,9 +195,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(1)""")
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_c:
-				_ = multicast.__main__.McastDispatch().doStep(
-					["RECV", "--port", "test"]
-				)
+				_ = multicast.__main__.McastDispatch().doStep(["RECV", "--port", "test"])
 			with self.assertRaises(SystemExit) as rtn_val_d:
 				_ = multicast.__main__.McastDispatch().doStep(
 					["RECV", "--port=test", "group=None"]
@@ -234,13 +228,9 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HEAR, junk) != exit(2)""")
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_e:
-				_ = __main__.main(
-					["HEAR", "--port", "test"]
-				)
+				_ = __main__.main(["HEAR", "--port", "test"])
 			with self.assertRaises(SystemExit) as rtn_val_f:
-				_ = __main__.main(
-					["RECV", "--port", "test"]
-				)
+				_ = __main__.main(["RECV", "--port", "test"])
 			self.assertIsNotNone(rtn_val_e)
 			self.assertIsNotNone(rtn_val_f)
 			tst_err_rslt_e = rtn_val_e.exception.code
@@ -342,18 +332,25 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		sub_fail_fixture = str("""SAY X-> HEAR == Error X-> HEAR :: (Error in SAY)""")
 		try:
 			_fixture_SAY_args = [
-				"""--port""", """59991""",
-				"""--group""", """'224.0.0.1'""",
-				"""--message""", """'test message'"""
+				"""--port""",
+				"""59991""",
+				"""--group""",
+				"""'224.0.0.1'""",
+				"""--message""",
+				"""'test message'"""
 			]
 			_fixture_HEAR_args = [
-				"""--port""", """59991""",
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				"""59991""",
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=(["""HEAR""", _fixture_HEAR_args])
+				name="HEAR",
+				args=(["""HEAR""", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
@@ -391,19 +388,26 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_SAY_args = [
-				"""--port""", str(_fixture_port_num),
-				"""--group""", """'224.0.0.1'""",
-				"""--message""", """'test message'"""
+				"""--port""",
+				str(_fixture_port_num),
+				"""--group""",
+				"""'224.0.0.1'""",
+				"""--message""",
+				"""'test message'"""
 			]
 			_fixture_HEAR_args = [
 				"""HEAR""",
-				"""--port""", str(_fixture_port_num),
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				str(_fixture_port_num),
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=(["""HEAR""", _fixture_HEAR_args])
+				name="HEAR",
+				args=(["""HEAR""", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
@@ -462,13 +466,17 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		sub_fail_fixture = str("""NOOP X-> RECV == Error X-> RECV :: (Error in NOOP)""")
 		try:
 			_fixture_RECV_args = [
-				"""--port""", """59992""",
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				"""59992""",
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="NOHEAR", args=(["RECV", _fixture_RECV_args])
+				name="NOHEAR",
+				args=(["RECV", _fixture_RECV_args])
 			)
 			p.start()
 			try:
@@ -552,18 +560,18 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
 		try:
 			if (self._thepython is not None):
-				theOutputtxt = context.checkPythonCommand([
-					str(self._thepython),
-					str("-m"),
-					str("multicast"),
-					str("--help")
-				], stderr=subprocess.STDOUT)
+				theOutputtxt = context.checkPythonCommand(
+					[str(self._thepython), str("-m"), str("multicast"), str("--help")],
+					stderr=subprocess.STDOUT
+				)
 				self.assertIn(str("usage:"), str(theOutputtxt))
 				if (str("usage:") in str(theOutputtxt)):
 					theResult = True
 				else:
 					theResult = False
-					context.debugUnexpectedOutput(str("usage:"), str(theOutputtxt), self._thepython)
+					context.debugUnexpectedOutput(
+						str("usage:"), str(theOutputtxt), self._thepython
+					)
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
@@ -582,16 +590,10 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					args = [
 						str(self._thepython),
 						str("-m"),
-						str("multicast{}").format(
-							str(
-								test_case
-							)
-						),
+						str("multicast{}").format(str(test_case)),
 						str("--help")
 					]
-					theOutputtxt = context.checkPythonCommand(
-						args, stderr=subprocess.STDOUT
-					)
+					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					self.assertIn(str("usage:"), str(theOutputtxt))
 					if (str("usage:") in str(theOutputtxt)):
 						theResult = ((theResult is None) or (theResult is True))
@@ -612,23 +614,22 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		"""Test case for multicast vs multicast.__main__"""
 		theResult = False
 		try:
-			theExpectedText = context.checkPythonCommand([
-				str(self._thepython),
-				str("-m"),
-				str("multicast.__main__")
-			], stderr=subprocess.STDOUT)
+			theExpectedText = context.checkPythonCommand(
+				[str(self._thepython), str("-m"), str("multicast.__main__")],
+				stderr=subprocess.STDOUT
+			)
 			self.assertIsNotNone(theExpectedText)
-			theOutputtxt = context.checkPythonCommand([
-				str(self._thepython),
-				str("-m"),
-				str("multicast")
-			], stderr=subprocess.STDOUT)
+			theOutputtxt = context.checkPythonCommand(
+				[str(self._thepython), str("-m"), str("multicast")], stderr=subprocess.STDOUT
+			)
 			self.assertIn(str(theExpectedText), str(theOutputtxt))
 			if (str(theExpectedText) in str(theOutputtxt)):
 				theResult = True
 			else:
 				theResult = False
-				context.debugUnexpectedOutput(str(theExpectedText), str(theOutputtxt), self._thepython)
+				context.debugUnexpectedOutput(
+					str(theExpectedText), str(theOutputtxt), self._thepython
+				)
 		except BaseException as err:
 			context.debugtestError(err)
 			err = None
@@ -645,11 +646,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					args = [
 						str(self._thepython),
 						str("-m"),
-						str("multicast{}").format(
-							str(
-								test_case
-							)
-						),
+						str("multicast{}").format(str(test_case)),
 						str("--version")
 					]
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
@@ -672,11 +669,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					args = [
 						str(self._thepython),
 						str("-m"),
-						str("multicast{}").format(
-							str(
-								test_case
-							)
-						),
+						str("multicast{}").format(str(test_case)),
 						str("--help")
 					]
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
@@ -737,16 +730,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						args = [
 							str(self._thepython),
 							str("-m"),
-							str("multicast{}").format(
-								str(
-									test_case_o
-								)
-							),
-							str(test_case_i.mode).format(
-								str(
-									test_case_i.command
-								)
-							),
+							str("multicast{}").format(str(test_case_o)),
+							str(test_case_i.mode).format(str(test_case_i.command)),
 							str("--help")
 						]
 						theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
@@ -785,11 +770,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						str(self._thepython),
 						str("-m"),
 						str("multicast"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					theOutputtxt = context.timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
@@ -818,11 +799,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						str(self._thepython),
 						str("-m"),
 						str("multicast"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					context.checkPythonFuzzing(args, stderr=None)
 					# now test it
@@ -844,11 +821,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						str(self._thepython),
 						str("-m"),
 						str("multicast"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# or simply:
@@ -866,4 +839,3 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 
 if __name__ == '__main__':
 	unittest.main()
-

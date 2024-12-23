@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests"""
 
 __name__ = """tests.context"""  # skipcq: PYL-W0622
@@ -83,7 +82,6 @@ try:
 except ImportError as err:
 	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
-
 try:
 	if 'os' not in sys.modules:
 		import os
@@ -93,13 +91,12 @@ except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
 
 try:
-	if 'random' not in sys.modules:
-		import random
+	if 'secrets' not in sys.modules:
+		import secrets
 	else:  # pragma: no branch
-		random = sys.modules["""random"""]
+		secrets = sys.modules["""secrets"""]
 except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Random Failed to import.") from err
-
+	raise ModuleNotFoundError("[CWE-440] Secrets Failed to import.") from err
 
 try:
 	if 'string' not in sys.modules:
@@ -108,7 +105,6 @@ try:
 		string = sys.modules["""string"""]
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] String Failed to import.") from err
-
 
 try:
 	if 'unittest' not in sys.modules:
@@ -126,12 +122,10 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] contextlib Failed to import.") from err
 
-
 try:
 	from contextlib import contextmanager
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] contextlib.contextmanager Failed to import.") from err
-
 
 try:
 	if 'Process' not in sys.modules:
@@ -141,7 +135,6 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
-
 try:
 	if 'subprocess' not in sys.modules:
 		import subprocess
@@ -149,7 +142,6 @@ try:
 		subprocess = sys.modules["""subprocess"""]
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
-
 
 try:
 	if 'packaging' not in sys.modules:
@@ -161,7 +153,6 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from err
 
-
 try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
@@ -169,7 +160,6 @@ try:
 		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
 except Exception as err:  # pragma: no branch
 	raise ImportError("[CWE-440] Multicast Python Module Failed to import.") from err
-
 
 try:
 	if 'tests.profiling' not in sys.modules:
@@ -179,7 +169,6 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
-
 try:
 	if 'multicast.exceptions' not in sys.modules:
 		import multicast.exceptions
@@ -188,7 +177,6 @@ try:
 	from multicast.exceptions import CommandExecutionError
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
-
 
 __BLANK = str("""""")
 """
@@ -216,7 +204,7 @@ __BLANK = str("""""")
 """
 
 
-def getCoverageCommand():
+def getCoverageCommand() -> str:
 	"""
 		Function for backend coverage command.
 		Rather than just return the sys.executable which will usually be a python implementation,
@@ -241,12 +229,13 @@ def getCoverageCommand():
 	thecov = "exit 1 ; #"
 	try:
 		thecov = checkPythonCommand(["command", "-v", "coverage"])
-		if (str("/coverage") in str(thecov)):
+		_unsafe_cov = checkPythonCommand(["which", "coverage"])
+		if (str("/coverage") in str(thecov) or str("/coverage") in str(_unsafe_cov)):
 			thecov = str("coverage")  # skipcq: TCV-002
 		elif str("/coverage3") in str(checkPythonCommand(["command", "-v", "coverage3"])):
 			thecov = str("coverage3")  # skipcq: TCV-002
 		else:  # pragma: no branch
-			thecov = "exit 1 ; #"
+			thecov = "exit 1 ; #"  # skipcq: TCV-002
 	except Exception:  # pragma: no branch
 		thecov = "exit 1 ; #"  # handled error by suppressing it and indicating caller should abort.
 	return str(thecov)
@@ -285,7 +274,7 @@ def __check_cov_before_py():
 	thepython = str(sys.executable)
 	thecov = getCoverageCommand()
 	if (str("coverage") in str(thecov)) and (sys.version_info >= (3, 7)):
-		thepython = str("{} run -p").format(str(thecov))  # skipcq: TCV-002
+		thepython = str(f"{str(thecov)} run -p")  # skipcq: TCV-002
 	else:  # pragma: no branch
 		try:
 			import coverage as coverage
@@ -293,10 +282,10 @@ def __check_cov_before_py():
 				thepython = str("{} -m coverage run -p").format(str(sys.executable))
 		except Exception:
 			thepython = str(sys.executable)  # handled error by falling back on faile-safe value.
-	return str(thepython)
+	return thepython
 
 
-def getPythonCommand():
+def getPythonCommand() -> str:
 	"""
 		Function for backend python command.
 		Rather than just return the sys.executable which will usually be a python implementation,
@@ -390,17 +379,14 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 		args = [*args]  # convert to an array
 	if str("coverage") in args[0]:
 		i = 1
-		if str("{} -m coverage").format(str(sys.executable)) in str(args[0]):  # pragma: no branch
+		if str(f"{str(sys.executable)} -m coverage") in str(args[0]):  # pragma: no branch
 			args[0] = str(sys.executable)
 			args.insert(1, str("-m"))
 			args.insert(2, str("coverage"))
 			i += 2
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
-		extra_args = [
-			"""run""", """-p""",
-			"""--context=Integration""", """--source=multicast"""
-		]
+		extra_args = ["""run""", """-p""", """--context=Integration""", """--source=multicast"""]
 		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
 		for k, ktem in enumerate(extra_args):
 			offset = i + k
@@ -788,8 +774,7 @@ def check_exec_command_has_output(test_case, someArgs):
 			try:
 				theArgs = [test_case._thepython] + someArgs
 				test_case.assertIsNotNone(
-					checkPythonCommand(theArgs, stderr=subprocess.STDOUT),
-					fail_msg_fixture
+					checkPythonCommand(theArgs, stderr=subprocess.STDOUT), fail_msg_fixture
 				)
 				theResult = True
 			except BaseException as othererr:
@@ -856,18 +841,18 @@ def debugUnexpectedOutput(expectedOutput, actualOutput, thepython):
 	"""
 	print(__BLANK)
 	if (thepython is not None):
-		print(str("python cmd used: {}").format(str(thepython)))
+		print(f"python cmd used: {str(thepython)}")
 	else:
 		print("Warning: Unexpected output!")
 	print(__BLANK)
 	if (expectedOutput is not None):
 		print(str("The expected output is..."))
 		print(__BLANK)
-		print(str("{}").format(str(expectedOutput)))
+		print(f"{str(expectedOutput)}")
 		print(__BLANK)
 	print(str("The actual output was..."))
 	print(__BLANK)
-	print(str("{}").format(str(actualOutput)))
+	print(str(f"{str(actualOutput)}"))
 	print(__BLANK)
 
 
@@ -955,7 +940,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		Returns:
 			int: A random port number between 49152 and 65535.
 		"""
-		return random.SystemRandom().randint(49152, 65535)
+		return secrets.randbelow(65535 - 49152 + 1) + 49152
 
 	def setUp(self):
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
@@ -1020,4 +1005,3 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def tearDownClass(cls):
 		"""Overrides unittest.TestCase.tearDownClass(cls) to clean up thepython test fixture."""
 		cls._thepython = None
-

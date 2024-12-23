@@ -56,7 +56,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-class TestPEP517Build(BasicUsageTestSuite):
+class BuildPEP517TestSuite(BasicUsageTestSuite):
 
 	__module__ = """tests.test_build"""
 
@@ -74,16 +74,14 @@ class TestPEP517Build(BasicUsageTestSuite):
 		"""
 		# Arguments need to clean
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'clean', '--all'
+			f"{str(sys.executable)} -m coverage run", "setup.py", "clean", "--all"
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running clean"), str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'-m', 'build', '--sdist', '--wheel'
+			f"{str(sys.executable)} -m coverage run", "-m", "build", "--sdist", "--wheel"
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
@@ -99,7 +97,8 @@ class TestPEP517Build(BasicUsageTestSuite):
 		]
 		for expected_file in expected_files:
 			self.assertIn(
-				expected_file, dist_files,
+				expected_file,
+				dist_files,
 				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}"
 			)
 

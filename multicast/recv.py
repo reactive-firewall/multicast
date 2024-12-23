@@ -103,7 +103,6 @@ Minimal Acceptance Testing:
 
 """
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
@@ -127,7 +126,6 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
 __module__ = """multicast"""
 """The module of this program.
 
@@ -148,10 +146,8 @@ __module__ = """multicast"""
 
 """
 
-
 __file__ = """multicast/recv.py"""
 """The file of this component."""
-
 
 __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 """The name of this component.
@@ -186,19 +182,16 @@ except Exception as importErr:
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
-
 try:
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
 	from multicast import struct as _struct
-	depends = [
-		_unicodedata, _socket, _struct, _argparse
-	]
+	depends = [_unicodedata, _socket, _struct, _argparse]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
 			baton = ModuleNotFoundError(
-				str("[CWE-440] module failed to import {}.").format(str(unit))
+				f"[CWE-440] module failed to import {str(unit)}."
 			)  # pragma: no cover
 			baton.module = unit  # pragma: no cover
 			raise baton from None  # pragma: no cover
@@ -544,7 +537,10 @@ class McastRECV(multicast.mtool):
 			tuple: A tuple containing received data and a status indicator.
 		"""
 		response = self._hearstep(
-			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
+			kwargs.get(
+				"groups",
+				[multicast._MCAST_DEFAULT_GROUP]  # skipcq: PYL-W0212 - module ok
+			),
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("iface", None),  # skipcq: PTC-W0039 - ensure None by default
 			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),  # skipcq: PYL-W0212 - module ok
@@ -556,4 +552,3 @@ class McastRECV(multicast.mtool):
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		_result = (len(response) > 0) is True
 		return (_result, None if not _result else response)  # skipcq: PTC-W0020  - intended
-

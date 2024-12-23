@@ -36,7 +36,6 @@ Example:
 	'v2.0'
 """
 
-
 import sys
 import os
 from urllib.parse import quote
@@ -72,17 +71,25 @@ needs_sphinx = "7.3"
 # for md us 'autodoc2' (pip install sphinx-autodoc2)
 # for rst use 'sphinx.ext.autodoc'
 extensions = [
-	"""sphinx.ext.napoleon""", """autodoc2""", """sphinx.ext.autosectionlabel""",
-	"""sphinx.ext.githubpages""", """myst_parser""", """sphinx_design""",
-	"""sphinx.ext.autosummary""", """sphinx.ext.doctest""", """sphinx.ext.todo""",
-	"""sphinx.ext.linkcode""", """sphinx.ext.viewcode""", """sphinx.ext.intersphinx""",
+	"""sphinx.ext.napoleon""",
+	"""autodoc2""",
+	"""sphinx.ext.autosectionlabel""",
+	"""sphinx.ext.githubpages""",
+	"""myst_parser""",
+	"""sphinx_design""",
+	"""sphinx.ext.autosummary""",
+	"""sphinx.ext.doctest""",
+	"""sphinx.ext.todo""",
+	"""sphinx.ext.linkcode""",
+	"""sphinx.ext.viewcode""",
+	"""sphinx.ext.intersphinx""",
 ]
 
 # for md auto-docs
 autodoc2_packages = [
+	"tests",
 	"multicast",
 	"tests.context",
-	"tests",
 ]
 
 autodoc2_render_plugin = "myst"
@@ -92,11 +99,11 @@ templates_path = ["_templates"]
 
 # The suffix of source filenames.
 source_suffix = {
+	".yml": "yaml",
 	".md": "markdown",
 	".txt": "markdown",
-	".rst": "restructuredtext",
-	".yml": "yaml",
 	"Makefile": "makefile",
+	".rst": "restructuredtext",
 }
 
 # The encoding of source files. Official sphinx docs recommend utf-8-sig.
@@ -132,8 +139,18 @@ today_fmt = "%Y.%B.%d"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-	"_build", ".github", ".circleci", "codecov_env", ".DS_Store", "**/.git", "dist",
-	"../tests/tests/**", "www", "**/docs", "../multicast/multicast/**", "*~"
+	"*~",
+	"www",
+	"dist",
+	"_build",
+	".github",
+	"**/docs",
+	"**/.git",
+	".DS_Store",
+	".circleci",
+	"codecov_env",
+	"../tests/tests/**",
+	"../multicast/multicast/**",
 ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
@@ -160,7 +177,6 @@ pygments_style = "xcode"
 # and for dark-mode
 # pygments_style_dark ="monokai"
 pygments_style_dark = "github-dark"
-
 
 pygments_options = {
 	"""tabsize""": 4,
@@ -268,11 +284,10 @@ html_show_copyright = True
 # html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
-# html_file_suffix = "html"
+html_file_suffix = ".html"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "multicast_doc"
-
 
 # -- Options for MyST markdown parser -------------------------------------------
 # see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html
@@ -340,13 +355,7 @@ latex_elements = {}
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-	(
-		"index",
-		"Documentation.tex",
-		"Multicast Documentation",
-		"reactive-firewall",
-		"manual"
-	),
+	("index", "Documentation.tex", "Multicast Documentation", "reactive-firewall", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -369,24 +378,14 @@ latex_documents = [
 # If false, no module index is generated.
 # latex_domain_indices = True
 
-
 # -- Options for manual page output --------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-	(
-		"index",
-		"multicast",
-		"Multicast Documentation",
-		["reactive-firewall"],
-		1
-	)
-]
+man_pages = [("index", "multicast", "Multicast Documentation", ["reactive-firewall"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
-
 
 # -- Options for Texinfo output ------------------------------------------------
 
@@ -395,13 +394,13 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
 	(
-		"index",
-		"Multicast",
-		"Multicast Documentation",
-		"reactive-firewall",
-		"Multicast",
-		"Multicast Python Module.",
-		"Miscellaneous"
+	"index",
+	"Multicast",
+	"Multicast Documentation",
+	"reactive-firewall",
+	"Multicast",
+	"Multicast Python Module.",
+	"Miscellaneous"
 	),
 ]
 
@@ -418,22 +417,19 @@ texinfo_documents = [
 
 linkcode_url_prefix: str = f"https://github.com/reactive-firewall/{project}"
 
+suffix = """/issues/%s"""
+
 extlinks = {
 	"""issue""": (
-		str("""{prefix}/{suffix}""").format(
-			prefix=linkcode_url_prefix, suffix="""/issues/%s"""
-		),
-		"""issue #%s"""
+	f"{linkcode_url_prefix}/{suffix}",
+	"""issue #%s"""
 	)
 }
 
 # try to link with official python3 documentation.
 # see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
 intersphinx_mapping = {
-	"""python""": (
-		"""https://docs.python.org/3""",
-		(None, """python-inv.txt""")
-	)
+	"""python""": ("""https://docs.python.org/3""", (None, """python-inv.txt"""))
 }
 
 
