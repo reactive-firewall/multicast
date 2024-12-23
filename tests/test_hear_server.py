@@ -19,7 +19,6 @@
 
 __module__ = """tests"""
 
-
 try:
 	try:
 		import context

@@ -243,7 +243,7 @@ work so far as this Multicast module is concerned.
   to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
 
   ```bash
-  export DOCS_BUILD_REF=$(${GIT:-git} rev-parse --verify HEAD)
+  export DOCS_BUILD_REF=$("${GIT:-git}" rev-parse --verify HEAD)
   make build-docs  # or your own documentation build command
   ```
 

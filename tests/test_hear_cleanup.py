@@ -19,7 +19,6 @@
 
 __module__ = """tests"""
 
-
 try:
 	try:
 		import context
@@ -85,8 +84,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			}
 			self.assertIsNotNone(_fixture_HEAR_kwargs)
 			p = Process(
-				target=multicast.hear.McastHEAR().doStep,
-				name="HEAR", kwargs=_fixture_HEAR_kwargs
+				target=multicast.hear.McastHEAR().doStep, name="HEAR", kwargs=_fixture_HEAR_kwargs
 			)
 			p.daemon = True
 			p.start()

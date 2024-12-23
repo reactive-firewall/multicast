@@ -9,26 +9,13 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-# Third-party Acknowledgement:
-# ..........................................
-# Some code (namely: run, and parseArgs) was modified/derived from:
-# https://stackoverflow.com/a/52791404
-# Copyright (c) 2019, "pterodragon" (https://stackoverflow.com/users/5256940/pterodragon)
-# which was under CC-by-sa-4 license.
-# see https://creativecommons.org/licenses/by-sa/4.0/ for details
-# The components in parseArgs, run, and main are thus also under
-# CC-by-sa-4 https://creativecommons.org/licenses/by-sa/4.0/
-# ..........................................
-# NO ASSOCIATION
 
 """Socket utility functions for multicast communication.
 
@@ -83,7 +70,6 @@ Testcase 2: SKT utils should be detailed with some metadata.
 
 """
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
@@ -107,7 +93,6 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
 __module__ = """multicast.skt"""
 """The module of this program.
 
@@ -128,10 +113,8 @@ __module__ = """multicast.skt"""
 
 """
 
-
 __file__ = """multicast/skt.py"""
 """The file of this component."""
-
 
 __name__ = """multicast.skt"""  # skipcq: PYL-W0622
 """The name of this component.
@@ -153,7 +136,6 @@ __name__ = """multicast.skt"""  # skipcq: PYL-W0622
 
 """
 
-
 try:
 	from . import socket as _socket  # skipcq: PYL-C0414
 	from . import struct as _struct  # noqa
@@ -166,7 +148,7 @@ except Exception as err:
 	raise baton from err
 
 
-def genSocket():
+def genSocket() -> _socket.socket:
 	"""
 	Create and configure a multicast socket.
 

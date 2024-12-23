@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Third-party Acknowledgement:
 # ..........................................
 # Some code (less than 10%) was modified/derived from:
@@ -67,7 +66,6 @@ Minimal Acceptance Testing:
 
 """
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """The package of this program.
 
@@ -91,7 +89,6 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
 __module__ = """multicast"""
 """The module of this program.
 
@@ -112,10 +109,8 @@ __module__ = """multicast"""
 
 """
 
-
 __file__ = """multicast/send.py"""
 """The file of this component."""
-
 
 __name__ = """multicast.send"""  # skipcq: PYL-W0622 - Ensures the correct name value.
 """The name of this component.
@@ -150,20 +145,17 @@ except Exception as importErr:
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
-
 try:
 	from multicast import argparse as _argparse  # skipcq: PYL-C0414
 	from multicast import unicodedata as _unicodedata  # skipcq: PYL-C0414
 	from multicast import socket as _socket  # skipcq: PYL-C0414
 	from multicast import struct as _struct  # skipcq: PYL-C0414
-	depends = [
-		_unicodedata, _socket, _struct, _argparse
-	]
+	depends = [_unicodedata, _socket, _struct, _argparse]
 	for unit in depends:
 		try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ImportError(
-					str("[CWE-440] module failed to import {}.").format(str(unit))
+					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
 		except Exception as _cause:  # pragma: no branch
 			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
@@ -285,7 +277,8 @@ class McastSAY(multicast.mtool):
 		"""
 		if parser is not None:  # pragma: no branch
 			parser.add_argument(
-				"""--port""", type=int,
+				"""--port""",
+				type=int,
 				default=multicast._MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
@@ -293,12 +286,17 @@ class McastSAY(multicast.mtool):
 				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
-				"""--groups""", required=False, nargs='*',
+				"""--groups""",
+				required=False,
+				nargs="*",
 				dest="""groups""",
 				help="""multicast groups (ip addrs) to listen to join."""
 			)
 			parser.add_argument(
-				"""-m""", """--message""", nargs='+', dest="""data""",
+				"""-m""",
+				"""--message""",
+				nargs="+",
+				dest="""data""",
 				default=str("""PING from {name}: group: {group}, port: {port}""")
 			)
 
@@ -345,12 +343,13 @@ class McastSAY(multicast.mtool):
 			tuple: A tuple containing a status indicator and optional error message.
 		"""
 		group = kwargs.get(
-			"group", multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
+			"group",
+			multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 		)
 		port = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		data = kwargs.get("data")
 		_result = False
-		if data == ['-']:
+		if data == ["-"]:
 			_result = True
 			# Read from stdin in chunks
 			while True:

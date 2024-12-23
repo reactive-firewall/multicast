@@ -135,13 +135,13 @@ SCRIPT_FILE="tests/check_spelling"
 CODESPELL_OPTIONS="--quiet-level=4 --builtin clear,rare,code -L assertIn"
 
 function cleanup() {
-	rm -f ${LOCK_FILE} 2>/dev/null || : ; wait ;
+	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
 	# unset when done
 	unset LOCK_FILE 2>/dev/null || : ;
 	hash -d shlock 2>/dev/null || : ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		EXIT_CODE=0
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
@@ -195,6 +195,7 @@ fi
 
 # THIS IS THE ACTUAL TEST
 # Iterate over files and run codespell
+# shellcheck disable=SC2086
 for FILE in $FILES_TO_CHECK; do
 	printf "::group::%s\n" "Checking ${FILE}" ;
 	{ codespell $CODESPELL_OPTIONS "${FILE}" || EXIT_CODE=$? ;} 2>/dev/null ; wait ;
@@ -204,11 +205,12 @@ done
 # cleaning up and reporting
 report_summary
 
-cleanup || rm -f ${LOCK_FILE} 2>/dev/null || : ;
+cleanup || rm -f "${LOCK_FILE}" 2>/dev/null || : ;
 
 # unset when done
 unset _TEST_ROOT_DIR 2>/dev/null || : ;
 unset CODESPELL_OPTIONS 2>/dev/null || : ;
 
 wait ;
+# shellcheck disable=SC2086
 exit ${EXIT_CODE:-255} ;

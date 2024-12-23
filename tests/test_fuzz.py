@@ -19,7 +19,6 @@
 
 __module__ = """tests"""
 
-
 try:
 	try:
 		import context
@@ -91,25 +90,30 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_SAY_args = [
 				"""SAY""",
-				"""--port""", str(_fixture_port_num),
-				"""--group""", """'224.0.0.1'""",
-				"""--message""", str("""'{d}'""").format(d=data)
+				"""--port""",
+				str(_fixture_port_num),
+				"""--group""",
+				"""'224.0.0.1'""",
+				"""--message""",
+				str("""'{d}'""").format(d=data)
 			]
 			_fixture_HEAR_args = [
 				"""HEAR""",
-				"""--port""", str(_fixture_port_num),
-				"""--groups""", """'224.0.0.1'""",
-				"""--group""", """'224.0.0.1'"""
+				"""--port""",
+				str(_fixture_port_num),
+				"""--groups""",
+				"""'224.0.0.1'""",
+				"""--group""",
+				"""'224.0.0.1'"""
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
-				name="HEAR", args=[_fixture_HEAR_args]
+				name="HEAR",
+				args=[_fixture_HEAR_args]
 			)
 			p.start()
 			try:
-				self.assertIsNotNone(
-					multicast.__main__.McastDispatch().doStep(_fixture_SAY_args)
-				)
+				self.assertIsNotNone(multicast.__main__.McastDispatch().doStep(_fixture_SAY_args))
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep(_fixture_SAY_args)
 				)  # preemptive extra retry
@@ -147,14 +151,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		fail_fixture = str("""XZY? --> Multicast != error""")
 		if (self._thepython is not None):
 			try:
-				args = [
-					str(self._thepython),
-					str("-m"),
-					str("multicast"),
-					str(
-						text
-					)
-				]
+				args = [str(self._thepython), str("-m"), str("multicast"), str(text)]
 				theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 				# or simply:
 				self.assertIsNotNone(theOutputtxt)
@@ -185,7 +182,9 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 		"""
 		theResult = False
 		fail_fixture = str(f"stdin({text.__sizeof__()}) --> SAY == error")
-		sub_fail_fixture = str("""stdin({text.__sizeof__()}) --> SAY ?-> HEAR? == Error X-> HEAR""")
+		sub_fail_fixture = str(
+			"""stdin({text.__sizeof__()}) --> SAY ?-> HEAR? == Error X-> HEAR"""
+		)
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -196,8 +195,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 			}
 			self.assertIsNotNone(_fixture_HEAR_kwargs)
 			p = Process(
-				target=multicast.hear.McastHEAR().doStep,
-				name="HEAR", kwargs=_fixture_HEAR_kwargs
+				target=multicast.hear.McastHEAR().doStep, name="HEAR", kwargs=_fixture_HEAR_kwargs
 			)
 			p.daemon = True
 			p.start()

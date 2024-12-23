@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests"""
 
 try:
@@ -48,8 +47,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		super(TestManifestInclusion, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'clean', '--all'
+			str("{} -m coverage run").format(sys.executable), 'setup.py', 'clean', '--all'
 		]
 		# Clean previous builds
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
@@ -71,7 +69,9 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		# Arguments need to build
 		build_arguments = [
 			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'sdist', '--formats=gztar'
+			'setup.py',
+			'sdist',
+			'--formats=gztar'
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
@@ -111,7 +111,8 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		]
 		for expected_file in expected_files:
 			self.assertIn(
-				expected_file, members,
+				expected_file,
+				members,
 				str("""Missing {expected} in sdist.""").format(expected=expected_file)
 			)
 
@@ -131,7 +132,8 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		]
 		for unwanted_file in unwanted_files:
 			self.assertNotIn(
-				unwanted_file, members,
+				unwanted_file,
+				members,
 				str("""Unwanted file {reject} found in sdist.""").format(reject=unwanted_file)
 			)
 

@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests"""
 
 try:
@@ -66,13 +65,17 @@ class TestParseRequirements(BasicUsageTestSuite):
 	def test_simple_version_constraint(self):
 		"""Test parsing a simple version constraint."""
 		self.write_requirements("""package>=1.0\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, ["""package>=1.0"""])
 
 	def test_multiple_version_constraints(self):
 		"""Test parsing multiple version constraints."""
 		self.write_requirements("""package>=1.0,!=1.5,<2.0\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, ["""package>=1.0"""])
 
 	def test_comments_and_empty_lines(self):
@@ -85,7 +88,9 @@ class TestParseRequirements(BasicUsageTestSuite):
 			"""
 		)
 		self.write_requirements(content)
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, ["""package>=1.0"""])
 
 	def test_options_and_urls_ignored(self):
@@ -98,13 +103,17 @@ class TestParseRequirements(BasicUsageTestSuite):
 			"""
 		)
 		self.write_requirements(content)
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, [])
 
 	def test_malformed_lines(self):
 		"""Test handling of malformed requirement lines."""
 		self.write_requirements("""bad_package==\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, [])
 
 	def test_nonexistent_requirements_file(self):

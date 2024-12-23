@@ -110,7 +110,6 @@ Minimal Acceptance Testing:
 
 """
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """Names the package of this program.
 
@@ -135,7 +134,6 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
 __module__ = """multicast"""
 """Names the module of this program.
 
@@ -157,10 +155,8 @@ __module__ = """multicast"""
 
 """
 
-
 __file__ = """multicast/hear.py"""
 """Names the file of this component."""
-
 
 __name__ = """multicast.hear"""  # skipcq: PYL-W0622
 """Names this component.
@@ -199,7 +195,6 @@ except Exception as importErr:
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
-
 try:
 	import threading
 	import socketserver
@@ -208,14 +203,12 @@ try:
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
 	from multicast import struct as _struct
-	depends = [
-		_unicodedata, _socket, _struct, _argparse
-	]
+	depends = [_unicodedata, _socket, _struct, _argparse]
 	for unit in depends:
 		try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ModuleNotFoundError(
-					str("[CWE-440] module failed to import {}.").format(str(unit))
+					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
 		except Exception:  # pragma: no branch
 			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
@@ -302,7 +295,7 @@ class McastServer(socketserver.UDPServer):
 		print(str("server_bind"))
 		super(McastServer, self).server_bind()
 		# enter critical section
-		print(str("bound on: {}").format(str(self.socket.getsockname())))
+		print(f"bound on: {str(self.socket.getsockname())}")
 		# exit critical section
 
 	def close_request(self, request):
@@ -451,20 +444,18 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		if (_sys.stdout.isatty()):  # pragma: no cover
 			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
-			myID = str(sock.getsockname()[0])
+			me = str(sock.getsockname()[0])
 			if (_sys.stdout.isatty()):  # pragma: no cover
-				_sim_data_str = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
-				print(str("{me} HEAR: [{you} SAID {what}]").format(
-					me=myID, you=self.client_address, what=str(_sim_data_str)
-				))
-				print(str("{me} SAYS [ HEAR [ {what} SAID {you} ] from {me} ]").format(
-					me=myID, you=self.client_address, what=str(_sim_data_str)
-				))
+				_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
+				print(
+					f"{me} HEAR: [{self.client_address} SAID {str(_what)}]"
+				)
+				print(
+					f"{me} SAYS [ HEAR [ {str(_what)} SAID {self.client_address} ] from {me} ]"  # noqa
+				)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
-				str("HEAR [ {what} SAID {you} ] from {me}").format(
-					me=myID, you=self.client_address, what=data.upper()
-				)
+				f"HEAR [ {data.upper()} SAID {self.client_address} ] from {me}"  # noqa
 			)
 			if """STOP""" in str(data):
 				raise multicast.exceptions.ShutdownCommandReceived("SHUTDOWN") from None

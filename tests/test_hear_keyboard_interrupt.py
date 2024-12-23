@@ -74,13 +74,20 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_cmd = str("{} -m coverage run -p --context=Integration").format(sys.executable)
+			_fixture_cmd = str("{} -m coverage run -p --context=Integration").format(
+				sys.executable
+			)
 			_fixture_HEAR_args = [
-				_fixture_cmd, """--source=multicast""",
-				"""-m""", """multicast""",
-				"""--daemon""", """HEAR""",
-				"""--port""", str(_fixture_port_num),
-				"""--group""", """224.0.0.1"""
+				_fixture_cmd,
+				"""--source=multicast""",
+				"""-m""",
+				"""multicast""",
+				"""--daemon""",
+				"""HEAR""",
+				"""--port""",
+				str(_fixture_port_num),
+				"""--group""",
+				"""224.0.0.1"""
 			]
 			self.assertIsNotNone(_fixture_HEAR_args)
 			process = subprocess.Popen(
@@ -98,11 +105,13 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				self.assertIsNotNone(process.returncode, "Incomplete Test.")
 				self.assertNotEqual(
 					int(process.returncode),
-					int(self.INVALID_ARGS_EXIT_CODE), "Invalid Test Arguments."
+					int(self.INVALID_ARGS_EXIT_CODE),
+					"Invalid Test Arguments."
 				)
 				self.assertEqual(
 					int(process.returncode),
-					int(self.EXPECTED_SIGINT_EXIT_CODE), "CEP-8 VIOLATION."
+					int(self.EXPECTED_SIGINT_EXIT_CODE),
+					"CEP-8 VIOLATION."
 				)
 				theResult = (int(process.returncode) >= int(1))
 			finally:

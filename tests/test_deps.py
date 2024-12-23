@@ -52,7 +52,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] venv Failed to import.") from _cause
 
 
-class TestRequirementsTxt(context.BasicUsageTestSuite):
+class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	"""Test cases for 'tests/requirements.txt'."""
 
 	__module__ = """tests.test_deps"""
@@ -82,15 +82,12 @@ class TestRequirementsTxt(context.BasicUsageTestSuite):
 				self.assertRegex(
 					line,
 					pattern,
-					str("""Invalid requirement format at line {line_number}: '{line}'""").format(
-						line_number=line_number, line=line
-					)
+					f"Invalid requirement format at line {line_number}: '{line}'"
 				)
 
 	@unittest.skipUnless(
-		(
-			sys.platform.startswith("linux") or sys.platform.startswith("darwin")
-		), "This test is not supported on this OS."
+		(sys.platform.startswith("linux") or sys.platform.startswith("darwin")),
+		"This test is not supported on this OS."
 	)
 	def test_requirements_installation(self):
 		"""Attempt to install dependencies from 'tests/requirements.txt' in a virtual env."""

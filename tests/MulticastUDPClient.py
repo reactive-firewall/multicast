@@ -103,17 +103,16 @@ Example:
 
 """
 
-
 __name__ = """tests.MulticastUDPClient"""  # skipcq: PYL-W0622
-
 
 try:
 	import sys
 	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
+		raise ModuleNotFoundError(
+			"[CWE-440] OMG! sys.modules is not available or empty."
+		) from None
 except ImportError as err:
 	raise ImportError("[CWE-440] Unable to import sys module.") from err
-
 
 try:
 	if 'os' not in sys.modules:
@@ -127,7 +126,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.__cause__ = badErr
 	raise baton from badErr
 
-
 try:
 	if 'functools' not in sys.modules:
 		import functools
@@ -139,7 +137,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton from badErr
-
 
 try:
 	if 'socket' not in sys.modules:
@@ -153,7 +150,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.__cause__ = badErr
 	raise baton from badErr
 
-
 try:
 	if 'socketserver' not in sys.modules:
 		import socketserver
@@ -165,7 +161,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton from badErr
-
 
 try:
 	if 'random' not in sys.modules:
@@ -301,12 +296,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		else:
 			self._source_port = int(
 				50000 + (
-					int(
-						random.SystemRandom().randbytes(
-							int(60000).__sizeof__()
-						).hex(),
-						16
-					) % 9999
+					int(random.SystemRandom().randbytes(int(60000).__sizeof__()).hex(), 16) % 9999
 				)
 			)
 

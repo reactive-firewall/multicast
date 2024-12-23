@@ -124,7 +124,6 @@ Minimal Acceptance Testing:
 
 """
 
-
 __package__ = """multicast"""  # skipcq: PYL-W0622
 """
 The package of this program.
@@ -149,7 +148,6 @@ Minimal Acceptance Testing:
 
 """
 
-
 __module__ = """multicast.exceptions"""
 """
 The module of this program.
@@ -171,10 +169,8 @@ Minimal Acceptance Testing:
 
 """
 
-
 __file__ = """multicast/exceptions.py"""
 """The file of this component."""
-
 
 __name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
 """The name of this component.
@@ -188,14 +184,13 @@ __name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automatically imported.
+	Testcase 1: Exceptions should be automatically imported.
 
 		>>> multicast.exceptions.__name__ is not None
 		True
 		>>>
 
 """
-
 
 try:
 	from . import sys  # skipcq: PYL-C0414
@@ -544,7 +539,7 @@ Minimal Acceptance Testing:
 """
 
 
-def get_exit_code_from_exception(exc):
+def get_exit_code_from_exception(exc: BaseException) -> int:
 	"""
 	Retrieve the exit code associated with a specific exception.
 
@@ -632,6 +627,7 @@ def exit_on_exception(func):
 			Traceback (most recent call last):
 			SystemExit...65...
 	"""
+
 	@functools.wraps(func)
 	def wrapper(*args, **kwargs):
 		try:
@@ -640,27 +636,29 @@ def exit_on_exception(func):
 			# Handle SystemExit exceptions, possibly from argparse
 			exit_code = exc.code if isinstance(exc.code, int) else 2
 			if (sys.stderr.isatty()):
-				print(
-					f"{EXIT_CODES[exit_code][1]}: {exc}",
-					file=sys.stderr
-				)
+				print(f"{EXIT_CODES[exit_code][1]}: {exc}", file=sys.stderr)
 			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 		except BaseException as err:
 			exit_code = get_exit_code_from_exception(err)
 			if (sys.stderr.isatty()):
-				print(
-					f"{EXIT_CODES[exit_code][1]}: {err}",
-					file=sys.stderr
-				)
+				print(f"{EXIT_CODES[exit_code][1]}: {err}", file=sys.stderr)
 			raise SystemExit(exit_code) from err
 			# otherwise sys.exit(exit_code)
+
 	return wrapper
 
 
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__doc__""",  # skipcq: PYL-E0603
-	"""CommandExecutionError""", """EXCEPTION_EXIT_CODES""", """EXIT_CODES""",
-	"""get_exit_code_from_exception""", """exit_on_exception""", """ShutdownCommandReceived"""
+	"""__package__""",
+	"""__module__""",
+	"""__name__""",
+	"""__doc__""",  # skipcq: PYL-E0603
+	"""CommandExecutionError""",
+	"""EXCEPTION_EXIT_CODES""",
+	"""EXIT_CODES""",
+	"""get_exit_code_from_exception""",
+	"""exit_on_exception""",
+	"""ShutdownCommandReceived"""
 ]

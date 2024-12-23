@@ -18,6 +18,7 @@
 
 import re
 
+
 def _validate_git_ref(ref: str) -> str:
 	"""
 	Validate if the provided string is a valid Git reference.
@@ -104,6 +105,6 @@ def slugify_header(s: str) -> str:
 			'cep-7-documentation-guide'
 	"""
 	# First, remove special characters and convert to lowercase
-	text = re.sub(r'[^\w\- ]', '', s).strip().lower()
+	text = re.sub(r'[^\w\- ]', "", s).strip().lower()
 	# Then replace consecutive spaces or dashes with a single dash
-	return re.sub(r'[-\s]+', '-', text)
+	return re.sub(r'[-\s]+', "-", text)

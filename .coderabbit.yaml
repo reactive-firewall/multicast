@@ -105,7 +105,7 @@ reviews:
         5. As a general rule, undocumented function definitions and class definitions in the project's Python code are assumed incomplete. Please consider suggesting a short summary of the code for any of these incomplete definitions as docstrings when reviewing.
 
         6. Verify Flake8's configuration file is located at ".flake8.ini"
-    - path: tests/*
+    - path: 'tests/*'
       instructions: >-
         When reviewing **test** code:
 
@@ -138,14 +138,14 @@ reviews:
         'tests/requirements.txt' for testing the project.
 
         Consider these the records of truth regarding project test code dependencies.
-    - path: .github/**
+    - path: '.github/**'
       instructions: >-
         * When the project is hosted on GitHub: All GitHub-specific configurations, templates, and tools should be found in the '.github' directory tree.
 
         * 'actionlint' erroneously generates false positives when dealing with GitHub's `${{ ... }}` syntax in conditionals.
 
         * 'actionlint' erroneously generates incorrect solutions when suggesting the removal of valid `${{ ... }}` syntax.
-    - path: docs/*
+    - path: 'docs/*'
       instructions: >-
         When a project contains a `docs/` directory:
 
