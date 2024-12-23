@@ -80,6 +80,7 @@ fi
 function check_command() {
 	test -z "$1" && { printf "%s\n" "::warning file=${SCRIPT_NAME},title=BUG::Command name is required to check for existence." >&2 ; exit 64 ; } ;
 	local cmd="$1" ;
+	# shellcheck disable=SC2086
 	test -x "$(command -v ${cmd})" || { printf "%s\n" "::error file=${SCRIPT_NAME},title=MISSING::Required command '${cmd}' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells

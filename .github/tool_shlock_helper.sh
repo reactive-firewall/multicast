@@ -94,6 +94,6 @@ if [[ ( $# -eq 0 ) ]] ; then
 	test -e "${LOCK_FILE}" || false  ;
 	EXIT_CODE=0 ;
 fi
-
+# shellcheck disable=SC2086
 exit ${EXIT_CODE:-126};
 

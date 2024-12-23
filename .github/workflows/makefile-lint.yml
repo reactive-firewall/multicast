@@ -56,6 +56,7 @@ jobs:
           YAML_ARGS: "${{ vars.YAML_ARGS }}"
         run: |
           printf "Validating workflow with args: %s\n" "${YAML_ARGS}"
+          # shellcheck disable=SC2086
           yamllint ${YAML_ARGS} .github/workflows/makefile-lint.yml
       - name: Install checkmake
         if: ${{ success() }}

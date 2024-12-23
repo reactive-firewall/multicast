@@ -104,24 +104,25 @@ LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.cov-integration-shell"
 EXIT_CODE=1
 
 function cleanup() {
-	rm -f ./${LOG_FILE} 2>/dev/null || true ; wait ;
-	rm -f ./${ERR_FILE} 2>/dev/null || true ; wait ;
-	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
+	rm -f ./"${LOG_FILE}" 2>/dev/null || true ; wait ;
+	rm -f ./"${ERR_FILE}" 2>/dev/null || true ; wait ;
+	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		EXIT_CODE=0
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		# shellcheck disable=SC2086
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		printf "%s\n" "Check Integration Tests Coverage already in progress by "`head ${LOCK_FILE}` ;
+		printf "%s\n" "Check Integration Tests Coverage already in progress by "`head "${LOCK_FILE}"` ;
 		exit 126 ;
 fi
 
@@ -144,30 +145,30 @@ export COVERAGE_CMD="$(command -v python3) -m coverage run --source=multicast -p
 # start test-suite
 
 make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
-printf "%s\n\n" "Start of Log:" > ./${LOG_FILE} ; wait ;
-printf "%s\n\n" "Will use host-port: [${TEST_MCAST_GROUP} : ${TEST_MCAST_PORT}]" >> ./${LOG_FILE} ; wait ;
-printf "%s\n\n" "Start of Integration Test one-shot:" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast --use-std RECV --port ${TEST_MCAST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
+printf "%s\n\n" "Start of Log:" > ./"${LOG_FILE}" ; wait ;
+printf "%s\n\n" "Will use host-port: [${TEST_MCAST_GROUP} : ${TEST_MCAST_PORT}]" >> ./"${LOG_FILE}" ; wait ;
+printf "%s\n\n" "Start of Integration Test one-shot:" >> ./"${LOG_FILE}" ; wait ;
+( sleep 1 ; "${COVERAGE_CMD} multicast --use-std RECV --port ${TEST_MCAST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP}" 2>./"${ERR_FILE}" & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./"${LOG_FILE}" & true ;
 
 for PCOUNT in $(seq 1 5) ; do
-	${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & sleep 1 ;
+	"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "TEST from ${PCOUNT}" 2>/dev/null & sleep 1 ;
 done ;
 
-${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
-${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
-printf "%s\n\n" "End of Integration Test one-shot" >> ./${LOG_FILE} ; wait ;
+"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
+"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "STOP" 2>/dev/null ;
+printf "%s\n\n" "End of Integration Test one-shot" >> ./"${LOG_FILE}" ; wait ;
 
-printf "%s\n\n" "Start of Integration Test daemon:" >> ./${LOG_FILE} ; wait ;
-( sleep 1 ; ${COVERAGE_CMD} multicast --daemon HEAR --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} 2>./${ERR_FILE} & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./${LOG_FILE} & true ;
+printf "%s\n\n" "Start of Integration Test daemon:" >> ./"${LOG_FILE}" ; wait ;
+( sleep 1 ; "${COVERAGE_CMD}" multicast --daemon HEAR --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" 2>./"${ERR_FILE}" & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./"${LOG_FILE}" & true ;
 
 for PCOUNT in $(seq 1 5) ; do
-	${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "TEST from $PCOUNT" 2>/dev/null & : ;
+	"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "TEST from $PCOUNT" 2>/dev/null & : ;
 done ;
 
-${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
-${COVERAGE_CMD} multicast SAY --port ${TEST_MCAST_PORT} --group ${TEST_MCAST_GROUP} --message "STOP" 2>/dev/null ;
+"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "STOP from $TEST_MCAST_GROUP" 2>/dev/null & sleep 1 ;
+"${COVERAGE_CMD}" multicast SAY --port "${TEST_MCAST_PORT}" --group "${TEST_MCAST_GROUP}" --message "STOP" 2>/dev/null ;
 wait ;
-printf "%s\n\n" "End of Integration Test daemon" >> ./${LOG_FILE} ; wait ;
+printf "%s\n\n" "End of Integration Test daemon" >> ./"${LOG_FILE}" ; wait ;
 
 # cleanup from test-suite
 
@@ -175,19 +176,19 @@ $(command -v python3) -m coverage combine 2>/dev/null || EXIT_CODE=2 ;
 $(command -v python3) -m coverage xml --include=multicast/* -o ./test-reports/coverage_supplement.xml || EXIT_CODE=2 ;
 
 wait ;
-cp -f ./${LOG_FILE} ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
+cp -f ./"${LOG_FILE}" ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
 printf "%s\n" "" | tee -a ./test-reports/integration_data_log.log ; wait ;
 
 if [[ ( -r ./${ERR_FILE} ) ]] ; then
 	printf "%s\n" "Errors: " | tee -a ./test-reports/integration_data_log.log ; wait ;
-	cat <./${ERR_FILE} | tee -a ./test-reports/integration_data_log.log ; wait ;
+	cat <./"${ERR_FILE}" | tee -a ./test-reports/integration_data_log.log ; wait ;
 fi
 
 unset COVERAGE_CMD 2>/dev/null || : ;
 unset TEST_MCAST_GROUP 2>/dev/null || : ;
 unset TEST_MCAST_PORT 2>/dev/null || : ;
 
-cleanup || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
+cleanup || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
 
-# goodbye
+# shellcheck disable=SC2086
 exit ${EXIT_CODE:-255} ;

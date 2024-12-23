@@ -178,6 +178,7 @@ EXIT_CODE=1
 # Results:
 #	returns -- once cleanup has been done on a best-effort case.
 function cleanup() {
+	# shellcheck disable=SC2086
 	for dir in ${TEMP_DIRS}; do
 		if [[ ( -n "${dir}" ) ]] && [[ ( -d "${dir}" ) ]]; then
 			rm -rfd "${dir}" 2>/dev/null || : ;
@@ -349,6 +350,7 @@ function check_package_licenses() {
 	wait ;
 	local pkg
 	# Install the given Python modules using pip
+	# shellcheck disable=SC2086
 	for pkg in ${packages} ; do
 		printf "::debug::%s\n" "Checking license from package '${pkg}' ..." ;
 		REQ_SPEC=$(grep -F -- "${pkg}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F -- "${pkg}" )
