@@ -27,7 +27,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Shellcheck Scan
-        uses: reactive-firewall/flake8-cq@47ce59267a5006e8e2b8d6992a472891b9afc204  # v0.5.0-beta
+        uses: reactive-firewall/flake8-cq@6d8f90d0ed991c505cdfdd3bb0dbd2575cc68cce  # v0.7.0-beta
         with:  # optional arguments
           config: '.flake8.ini'
           match: '**/*.py'
