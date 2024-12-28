@@ -302,7 +302,7 @@ myst_fence_as_directive = ("mermaid", "suggestion", "note")
 myst_linkify_fuzzy_links = False
 
 # Focus only on github markdown
-myst_gfm_only = True
+myst_gfm_only = False
 
 myst_html_meta = {
 	"github_url": f"https://github.com/reactive-firewall/{project}"
