@@ -27,7 +27,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Flake8 Scan
-        uses: reactive-firewall/flake8-cq@63115a7b6743f192db5ee87024db17b626337999  # v0.8.0-beta
+        uses: reactive-firewall/flake8-cq@0d8f3f8f3635cce2d3a42adbff5878d107df5fd0  # v0.9.0-beta
         with:  # optional arguments
           config: '.flake8.ini'
           match: '**/*.py'
