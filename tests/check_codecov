@@ -83,6 +83,7 @@ EXIT_CODE=0
 function check_command() {
     test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
     local cmd="$1" ;
+    # shellcheck disable=SC2086
     test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells
@@ -106,12 +107,19 @@ else
 fi
 
 function cleanup() {
-	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
-	rm -f ./codecov 2>/dev/null || true ; wait ;
+	# shellcheck disable=SC2317
+	rm -f "${LOCK_FILE}" 2>/dev/null || true ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
+	rm -f ./codecov 2>/dev/null || true ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
@@ -144,6 +152,7 @@ fi
 # This File  MUST BE GIT-IGNORED
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
+	# shellcheck disable=SC1091
 	source ./codecov_env 2>/dev/null || true ;
 fi
 

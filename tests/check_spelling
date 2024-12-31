@@ -95,8 +95,8 @@ ulimit -t 600
 umask 137
 
 # force utf-8 for spelling
-export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
-
+LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
+export LC_CTYPE
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.spell-check-shell"
 EXIT_CODE=1
 
@@ -113,6 +113,7 @@ EXIT_CODE=1
 function check_command() {
 	test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
 	local cmd="$1" ;
+	# shellcheck disable=SC2086
 	test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells

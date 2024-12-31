@@ -80,6 +80,7 @@ EXIT_CODE=1
 function check_command() {
     test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
     local cmd="$1" ;
+    # shellcheck disable=SC2086
     test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells
@@ -97,7 +98,11 @@ check_command shlock ;
 
 
 function cleanup() {
-	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
+	# shellcheck disable=SC2317
+	rm -f "${LOCK_FILE}" 2>/dev/null || true ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 

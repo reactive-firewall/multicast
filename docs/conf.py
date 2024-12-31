@@ -44,8 +44,8 @@ from urllib.parse import quote
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath(""".."""))
-from docs.utils import _validate_git_ref
-from docs.utils import slugify_header
+from docs.utils import _validate_git_ref  # noqa
+from docs.utils import slugify_header  # noqa
 
 # Define the branch reference for linkcode_resolve
 DOCS_BUILD_REF: str = _validate_git_ref(os.environ.get("DOCS_BUILD_REF", "stable"))
@@ -284,7 +284,7 @@ html_show_copyright = True
 # html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
-#html_file_suffix = ".html"
+# html_file_suffix = ".html"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "multicast_doc"
@@ -398,13 +398,13 @@ man_pages = [("index", "multicast", "Multicast Documentation", ["reactive-firewa
 #  dir menu entry, description, category)
 texinfo_documents = [
 	(
-	"index",
-	"Multicast",
-	"Multicast Documentation",
-	"reactive-firewall",
-	"Multicast",
-	"Multicast Python Module.",
-	"Miscellaneous"
+		"index",
+		"Multicast",
+		"Multicast Documentation",
+		"reactive-firewall",
+		"Multicast",
+		"Multicast Python Module.",
+		"Miscellaneous"
 	),
 ]
 
@@ -425,8 +425,8 @@ suffix = """/issues/%s"""
 
 extlinks = {
 	"""issue""": (
-	f"{linkcode_url_prefix}/{suffix}",
-	"""issue #%s"""
+		f"{linkcode_url_prefix}/{suffix}",
+		"""issue #%s"""
 	)
 }
 

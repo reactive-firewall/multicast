@@ -113,7 +113,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 			self.assertIn(
 				expected_file,
 				members,
-			f"Missing {str(expected_file)} in sdist."
+				f"Missing {str(expected_file)} in sdist."
 			)
 
 	def test_sdist_excludes_unwanted_files(self):
@@ -134,7 +134,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 			self.assertNotIn(
 				unwanted_file,
 				members,
-			f"Unwanted file {str(unwanted_file)} found in sdist."
+				f"Unwanted file {str(unwanted_file)} found in sdist."
 			)
 
 

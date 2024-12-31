@@ -97,8 +97,8 @@ ulimit -t 60
 # setting the path may break brain-dead CI that uses crazy paths
 # PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
-
-export LC_CTYPE="${LC_CTYPE:-'en_US.UTF-8'}"
+LC_CTYPE="${LC_CTYPE:-'en_US.UTF-8'}"
+export LC_CTYPE
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.cov-legacy-setup-shell"
 EXIT_CODE=1
@@ -143,7 +143,7 @@ function cleanup() {
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		EXIT_CODE=0
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
@@ -173,10 +173,11 @@ else
 fi
 
 if [[ ( -x $(command -v python3) ) ]] ; then
-	export COVERAGE_CMD="$(command -v python3) -m coverage run --include=setup.py -p"
+	COVERAGE_CMD="$(command -v python3) -m coverage run --include=setup.py -p"
 elif [[ ( -x $(command -v coverage) ) ]] ; then
-	export COVERAGE_CMD="$(command -v coverage) run --include=setup.py -p"
+	COVERAGE_CMD="$(command -v coverage) run --include=setup.py -p"
 fi
+export COVERAGE_CMD
 
 make -C "${_TEST_ROOT_DIR}" -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 printf "%s\n" "Start of Log:" > "${_TEST_ROOT_DIR}"/"${LOG_FILE}" ; wait ;
