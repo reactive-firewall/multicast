@@ -95,7 +95,7 @@ class HypothesisTestSuite(context.BasicUsageTestSuite):
 				"""--group""",
 				"""'224.0.0.1'""",
 				"""--message""",
-				str("""'{d}'""").format(d=data)
+				f"'{data}'"
 			]
 			_fixture_HEAR_args = [
 				"""HEAR""",

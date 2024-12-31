@@ -112,7 +112,8 @@ if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		printf "%s\n" "Check for Copyright lines already in progress by "`head "${LOCK_FILE}"` ;
+		# shellcheck disable=SC2046
+		printf "%s\n" "Check for Copyright lines already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		false ;
 		exit 126 ;
 fi
@@ -132,7 +133,7 @@ fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
-for _TEST_DOC in $(find "${_TEST_ROOT_DIR}" \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} "${_TEST_FILE_VALIDATOR} {}" ; wait ;) ; do
+for _TEST_DOC in $(git ls-files -z --exclude-standard -- '*.py' '*.md' '*.txt' 2>&1 | xargs -0 -I{} "${_TEST_FILE_VALIDATOR} {}" ; wait ;) ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
 		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126;

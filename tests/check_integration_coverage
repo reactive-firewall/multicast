@@ -122,7 +122,8 @@ if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		# shellcheck disable=SC2086
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		printf "%s\n" "Check Integration Tests Coverage already in progress by "`head "${LOCK_FILE}"` ;
+		# shellcheck disable=SC2046
+		printf "%s\n" "Check Integration Tests Coverage already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 fi
 

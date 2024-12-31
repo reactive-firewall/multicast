@@ -302,6 +302,10 @@ myst_fence_as_directive = ("mermaid", "suggestion", "note")
 myst_linkify_fuzzy_links = False
 
 # Focus only on github markdown
+# NOTE: We keep myst_gfm_only = False because setting it to True
+# (see PR #240) caused a regression where the 'toc.md' contents
+# fence broke. Re-enabling GitHub Flavored Markdown exclusively
+# should be approached with caution to avoid that issue.
 myst_gfm_only = False
 
 myst_html_meta = {

@@ -47,7 +47,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		super(TestManifestInclusion, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
-			str("{} -m coverage run").format(sys.executable), 'setup.py', 'clean', '--all'
+			f"{str(sys.executable)} -m coverage run", "setup.py", "clean", "--all"
 		]
 		# Clean previous builds
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
@@ -68,7 +68,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		"""
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
+			f"{str(sys.executable)} -m coverage run",
 			'setup.py',
 			'sdist',
 			'--formats=gztar'
@@ -113,7 +113,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 			self.assertIn(
 				expected_file,
 				members,
-				str("""Missing {expected} in sdist.""").format(expected=expected_file)
+			f"Missing {str(expected_file)} in sdist."
 			)
 
 	def test_sdist_excludes_unwanted_files(self):
@@ -134,7 +134,7 @@ class TestManifestInclusion(BasicUsageTestSuite):
 			self.assertNotIn(
 				unwanted_file,
 				members,
-				str("""Unwanted file {reject} found in sdist.""").format(reject=unwanted_file)
+			f"Unwanted file {str(unwanted_file)} found in sdist."
 			)
 
 

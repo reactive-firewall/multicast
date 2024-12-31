@@ -74,9 +74,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_cmd = str("{} -m coverage run -p --context=Integration").format(
-				sys.executable
-			)
+			_fixture_cmd = f"{str(sys.executable)} -m coverage run -p --context=Integration"
 			_fixture_HEAR_args = [
 				_fixture_cmd,
 				"""--source=multicast""",
