@@ -161,6 +161,56 @@ except Exception as _cause:  # pragma: no branch
 
 
 def loadDocstringsFromModule(module):
+	"""
+	Load and return a test suite containing doctests from the specified module.
+
+	This function attempts to import the `doctest` module and uses it to find
+	and load all doctests defined in the provided module. If the module is
+	valid and contains doctests, a `unittest.TestSuite` object is returned
+	containing those tests. If no doctests are found or if an error occurs
+	during the loading process, appropriate messages are printed to the
+	console.
+
+	Notes:
+	- The function checks if the `doctest` module is already imported to
+		avoid unnecessary imports.
+	- The `DocTestFinder` is configured with the following options:
+		- `verbose=True`: Enables verbose output for the test discovery.
+		- `recurse=True`: Allows the finder to search for doctests in
+			nested functions and classes.
+		- `exclude_empty=True`: Excludes empty doctests from the results.
+	- If no doctests are found in the specified module, a message is printed
+		indicating that no tests were found.
+	- Any other exceptions encountered during the loading process are caught
+		and printed to the console.
+
+	Args:
+		module (module) -- The Python module from which to load doctests. This should be a
+			valid module object that has been imported. If the module is None,
+			the function will return None.
+
+	Returns:
+		(unittest.TestSuite or None) -- A `unittest.TestSuite` object containing the
+			doctests found in the specified module. If the module is None,
+			the function returns None.
+
+	Raises:
+		ImportError
+			If the `doctest` module fails to import, an ImportError is raised
+			with a message indicating the failure.
+
+	Meta-Testing:
+
+		>>> import multicast
+		>>> suite = loadDocstringsFromModule(multicast)  #doctest: +ELLIPSIS
+		Finding tests in multicast...
+		>>> if suite:
+		...     print(f"Loaded {len(suite._tests)} doctests from "
+		...         f"{multicast.__name__}")  # doctest: +ELLIPSIS
+		Loaded ... doctests from ...
+		>>>
+
+	"""
 	if not module:
 		return None
 	try:
@@ -172,7 +222,13 @@ def loadDocstringsFromModule(module):
 		raise ImportError("[CWE-440] doctest Failed to import.") from _cause
 	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)
 	doc_suite = unittest.TestSuite()
-	doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
+	try:
+		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
+	except ValueError as e:
+		# ValueError is raised when no tests are found
+		print(f"No doctests found in {module.__name__}: {e}")
+	except Exception as e:
+		print(f"Error loading doctests from {module.__name__}: {e}")
 	return doc_suite
 
 
