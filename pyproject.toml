@@ -20,11 +20,32 @@ extend-ignore = ["E117", "D203", "D208", "D212"]
 max-line-length = 100
 docstring-convention = "google"
 
-[pytest.enabler.flake8]
+[tool.pytest]
+testpaths = "tests"
+python_files = "test_*.py"
+
+[tool.pytest.markers]
+mat = "minimum acceptance tests"
+mat_basic = "basic component tests"
+mat_doctests = "documentation tests"
+mat_say = "send.py focused tests"
+mat_hear = "recv.py and hear.py focused tests"
+mat_usage = "__main__.py and API tests"
+mat_build = "build and packaging tests"
+mat_bootstrap = "init/exceptions/env/skt tests"
+extra = "additional important tests"
+extra_coverage = "coverage-focused tests"
+extra_linting = "linting tests"
+extra_security = "security tests"
+fuzzing = "fuzzing tests"
+fuzzing_basic = "smaller sub-set of fuzzing tests"
+performance = "performance and scalability tests"
+
+[tool.pytest.enabler.flake8]
 addopts = "--flake8"
 
-[pytest.enabler.doctest]
+[tool.pytest.enabler.doctest]
 addopts = "--doctest-glob=**/*.py --doctest-modules"
 
-[pytest.enabler.cov]
+[tool.pytest.enabler.cov]
 addopts = "--cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml"

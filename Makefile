@@ -77,6 +77,9 @@ ifeq "$(PYTHON)" ""
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
+		COVERAGE_ARGS := --cov=. --cov-append --cov-report=xml
+	else
+		COVERAGE_ARGS :=
 	endif
 	ifeq "$(COVERAGE)" ""
 		COVERAGE!=$(COMMAND) coverage
@@ -87,7 +90,14 @@ else
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
+		COVERAGE_ARGS := --cov=. --cov-append --cov-report=xml
+	else
+		COVERAGE_ARGS :=
 	endif
+endif
+
+ifndef PYTEST
+	PYTEST=$(PYTHON) -m pytest --cache-clear --junitxml=test-reports/junit.xml -v --rootdir=.
 endif
 
 ifndef PIP_COMMON_FLAGS
@@ -198,11 +208,6 @@ purge: legacy-purge
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-just-test: cleanup MANIFEST.in
-	$(QUIET)$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
-	$(QUITE)$(WAIT) ;
-	$(QUIET)$(DO_FAIL) ;
-
 test: just-test
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
@@ -227,8 +232,63 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(WAIT) ;
 
+# === Test Group Targets ===
+just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) --doctest-glob=multicast/*.py,tests/*.py --doctest-modules $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|usage|build|bootstrap)
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) --junitxml=test-reports/junit.xml -v --rootdir=. -m "mat and $*"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $*; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test-extra: ## Run all extra tests
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test-extra-%: ## Run specific extra test category
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra and $*"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra --category $*; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test-fuzzing: ## Run all fuzzing tests
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "fuzzing"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group fuzzing; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
+test-perf: ## Run all performance tests
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "performance"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group performance; \
+	fi
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
 test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=multicast/*.py,tests/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTEST) --doctest-glob=multicast/*.py,tests/*.py --doctest-modules $(COVERAGE_ARGS) || DO_FAIL="exit 2" ;
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."

@@ -35,6 +35,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
+@context.markWithMetaTag("mat", "mat_hear")
 class HearCleanupTestSuite(context.BasicUsageTestSuite):
 	"""
 	Test suite for verifying the cleanup behavior of the multicast hearing mechanism.

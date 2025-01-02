@@ -35,6 +35,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
+@context.markWithMetaTag("mat", "mat_basic")
 class BasicTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite containing basic test cases for the multicast module.

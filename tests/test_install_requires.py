@@ -38,7 +38,8 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import setup or test context") from _cause
 
 
-class TestParseRequirements(BasicUsageTestSuite):
+@context.markWithMetaTag("mat", "mat_build")
+class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 	__module__ = """tests.test_install_requires"""
 
@@ -46,7 +47,7 @@ class TestParseRequirements(BasicUsageTestSuite):
 	"""stores the temporary requirements file path for testing"""
 
 	def setUp(self):
-		super(TestParseRequirements, self).setUp()
+		super(ParseRequirementsTestSuite, self).setUp()
 		# Create a temporary requirements file for testing
 		self.requirements_file = """test_requirements.txt"""
 
@@ -56,7 +57,7 @@ class TestParseRequirements(BasicUsageTestSuite):
 			if os.path.exists(self.requirements_file):
 				os.remove(self.requirements_file)
 		finally:
-			super(TestParseRequirements, self).tearDown()
+			super(ParseRequirementsTestSuite, self).tearDown()
 
 	def write_requirements(self, content):
 		with open(self.requirements_file, 'w') as f:
