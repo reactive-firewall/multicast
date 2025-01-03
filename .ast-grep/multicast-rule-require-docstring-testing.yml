@@ -2,7 +2,7 @@
 id: require-docstring-testing
 rule:
   kind: class_definition
-  inside: 
+  inside:
     kind: module
   has:
     kind: block
