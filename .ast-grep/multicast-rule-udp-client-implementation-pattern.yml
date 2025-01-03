@@ -1,0 +1,13 @@
+# .ast-grep/multicast-rule-udp-client-implementation-pattern.yml
+id: udp-client-implementation-pattern
+rule:
+  pattern: |
+    class MulticastUDPClient($$$):
+      $$$
+      def __init__(self, $$$):
+        $$$
+      def $METHOD(self, $$$):
+        $$$
+language: python
+message: "Verify UDP client implementation follows project standards"
+severity: error

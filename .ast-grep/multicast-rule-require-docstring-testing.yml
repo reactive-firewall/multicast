@@ -1,0 +1,22 @@
+# .ast-grep/multicast-rule-require-docstring-testing.yml
+id: require-docstring-testing
+rule:
+  kind: class_definition
+  inside: 
+    kind: module
+  has:
+    kind: block
+    has:
+      kind: expression_statement
+      has:
+        pattern: |
+          """$DOCSTRING"""
+        kind: string
+        has:
+          kind: string_content
+          not:
+            pattern: |
+              .*(Minimal Acceptance |Mets-)Testing:.*
+language: python
+message: "Class must include docstring with testing examples"
+severity: warning

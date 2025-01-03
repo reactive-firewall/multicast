@@ -1,0 +1,24 @@
+# .ast-grep/multicast-rule-enforce-testcase-format.yml
+id: enforce-testcase-format
+rule:
+  kind: class_definition
+  inside:
+    kind: module
+  has:
+    kind: block
+    has:
+      kind: expression_statement
+      has:
+        pattern: |
+          """$DOCSTRING"""
+        kind: string
+        has:
+          kind: string_content
+          not:
+            pattern: |
+              .*Testcase \d+:.+?
+              >>>.+?
+              .*
+language: python
+message: "Test cases must follow format: Testcase N: description followed by assertions"
+severity: warning
