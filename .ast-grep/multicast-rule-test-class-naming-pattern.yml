@@ -1,0 +1,11 @@
+# .ast-grep/multicast-rule-test-class-naming-pattern.yml
+id: test-class-naming-pattern
+rule:
+  pattern: |
+    class Test$NAME($$):
+      $$$
+      def test_$METHOD_WHEN_$CONDITION(self):
+        $$$
+language: python
+message: "Test classes should follow naming convention and include WHEN conditions"
+severity: warning
