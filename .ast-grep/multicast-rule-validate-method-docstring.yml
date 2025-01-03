@@ -45,7 +45,7 @@ rule:
       - matches: function_docstring
       - matches: method_docstring
     - not:
-       matches: cep7_docstring_tests
+        matches: cep7_docstring_tests
 language: python
 message: "Method must have docstring with testing examples"
 severity: warning
