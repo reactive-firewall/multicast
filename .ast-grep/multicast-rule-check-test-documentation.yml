@@ -73,7 +73,7 @@ utils:
         - matches: method_docstring
         - matches: class_docstring
       - has:
-          regex: (Verif|Check|Test).*
+          regex: \b(Verif|Check|Test)\b.*
           kind: string_content
           ends: string_end
   cep7_docstring_function_arguments:
