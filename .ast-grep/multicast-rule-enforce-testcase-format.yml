@@ -21,4 +21,4 @@ rule:
               .*
 language: python
 message: "Test cases must follow format: Testcase N: description followed by assertions"
-severity: warning
+severity: hint

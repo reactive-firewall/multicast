@@ -8,4 +8,7 @@ rule:
         $$$
 language: python
 message: "Test classes should follow naming convention and include WHEN conditions"
+files:
+  - tests/**/test_*.py
+  - tests/test_*.py
 severity: warning

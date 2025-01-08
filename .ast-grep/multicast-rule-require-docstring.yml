@@ -1,21 +1,85 @@
-# .ast-grep/multicast-rule-check-test-documentation.yml
+# .ast-grep/multicast-rule-require-docstring.yml
 utils:
+  py_string_literal:
+    all:
+      - kind: string_content
+      - any:
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:'{3})
+            - precedes:
+                kind: string_end
+                regex: (?:'{3})
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:"{3})
+            - precedes:
+                kind: string_end
+                regex: (?:"{3})
+        - inside:
+            kind: string
+  docstring_pattern:
+    any:
+        - pattern:
+            selector: string
+            context: |
+              """$DOC"""
+        - pattern:
+            selector: string
+            context: |
+              '''$DOC'''
+    has:
+        matches: py_string_literal
+        kind: string_content
+    inside:
+      kind: expression_statement
+  docstring_statement:
+    pattern:
+      selector: expression_statement
+      context: |
+        $$$
+      has:
+        pattern:
+          selector: string
+          context: |
+            $docstring_pattern
+    kind: expression_statement
+    has:
+      matches: docstring_pattern
+      inside:
+        kind: expression_statement
+      kind: string
   module_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_statement
         inside:
-          kind: expression_statement
-          inside:
-            kind: module
-      - kind: string
+          kind: module
+      - kind: expression_statement
+  block_docstring:
+    matches: docstring_statement
+    inside:
+      kind: block
+      has:
+        matches: docstring_statement
+    kind: expression_statement
+    nthChild: 1
+  block_with_docstring:
+    all:
+      - has:
+          matches: block_docstring
+          stopBy: neighbor
+      - kind: block
+        pattern: |
+            $$$
   class_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
+            matches: block_with_docstring
             kind: block
             inside:
               kind: class_definition
@@ -23,8 +87,6 @@ utils:
   data_class_docstring:
     all:
       - matches: class_docstring
-      - pattern: |
-          """$DOC"""
         inside:
           kind: expression_statement
           inside:
@@ -40,21 +102,29 @@ utils:
             inside:
               kind: class_definition
       - kind: string
+  function_block:
+    kind: block
+    inside:
+      kind: function_definition
   function_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
             kind: block
-            inside:
-              kind: function_definition
+            matches: function_block
       - kind: string
+  function_missing_docstring:
+    precedes:
+      kind: block
+      has:
+        kind: expression_statement
+        not:
+          matches: docstring_pattern
   method_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
@@ -73,8 +143,7 @@ utils:
         - matches: method_docstring
         - matches: class_docstring
       - has:
-          regex: |
-            \b(Verif|Check|Test|Yield|Submit|Ensure|Run|Make|Review|Create|Update|Delete|Configure|Install|Use|Follow|Access|Load|Save|Execute|Build|Initialize|Document|Validate|Optimize|Generate).*
+          regex: \b(Verif|Check|Test)\b.*
           kind: string_content
           ends: string_end
   cep7_docstring_function_arguments:
@@ -138,20 +207,28 @@ utils:
           kind: string_content
           ends: string_end
 
-id: check-test-documentation
+id: check-has-docstring-documentation
 rule:
-  all:
-    - any:
-      - matches: data_class_docstring
-      - matches: function_docstring
-      - matches: method_docstring
-    - not:
-        all:
-          - matches: cep7_docstring_purpose
-          - matches: cep7_docstring_arguments
-          - any:
-              - matches: data_class_docstring
-              - matches: cep7_docstring_returns
+  not:
+    has:
+      matches: block_with_docstring
+      kind: block
+  any:
+    - kind: class_definition
+      pattern:
+        selector: class_definition
+        context: |
+          class $NAME($$$):
+            $$$
+            $CLASS_BODY
+    - kind: function_definition
+      pattern: 
+        selector: function_definition
+        context: |
+          def $NAME($$$)$$$:
+            $$$
+            $FUNC_BODY
+selector: identifier
 language: python
-message: "Documentation must include purpose, args, and returns sections."
-severity: hint
+message: "$NAME must have documentation, add docstring."
+severity: warning

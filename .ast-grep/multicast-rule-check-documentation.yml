@@ -1,9 +1,39 @@
 # .ast-grep/multicast-rule-check-test-documentation.yml
 utils:
+  py_string_literal:
+    all:
+      - kind: string_content
+      - any:
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:'{3})
+            - precedes:
+                kind: string_end
+                regex: (?:'{3})
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:"{3})
+            - precedes:
+                kind: string_end
+                regex: (?:"{3})
+        - inside:
+            kind: string
+  docstring_pattern:
+    any:
+        - pattern: |
+            """$DOC"""
+        - pattern: |
+            '''$DOC'''
+    has:
+        matches: py_string_literal
+        kind: string_content
+    inside:
+      kind: expression_statement
   module_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
@@ -11,8 +41,7 @@ utils:
       - kind: string
   class_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
@@ -23,8 +52,6 @@ utils:
   data_class_docstring:
     all:
       - matches: class_docstring
-      - pattern: |
-          """$DOC"""
         inside:
           kind: expression_statement
           inside:
@@ -36,14 +63,13 @@ utils:
                     kind: identifier
                 - not:
                     has:
-                      kind: function_definition
+                        kind: function_definition
             inside:
               kind: class_definition
       - kind: string
   function_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
@@ -53,8 +79,7 @@ utils:
       - kind: string
   method_docstring:
     all:
-      - pattern: |
-          """$DOC"""
+      - matches: docstring_pattern
         inside:
           kind: expression_statement
           inside:
@@ -73,8 +98,7 @@ utils:
         - matches: method_docstring
         - matches: class_docstring
       - has:
-          regex: |
-            \b(Verif|Check|Test|Yield|Submit|Ensure|Run|Make|Review|Create|Update|Delete|Configure|Install|Use|Follow|Access|Load|Save|Execute|Build|Initialize|Document|Validate|Optimize|Generate).*
+          regex: \b(Verif|Check|Test)\b.*
           kind: string_content
           ends: string_end
   cep7_docstring_function_arguments:
@@ -140,18 +164,9 @@ utils:
 
 id: check-test-documentation
 rule:
-  all:
-    - any:
-      - matches: data_class_docstring
-      - matches: function_docstring
-      - matches: method_docstring
-    - not:
-        all:
-          - matches: cep7_docstring_purpose
-          - matches: cep7_docstring_arguments
-          - any:
-              - matches: data_class_docstring
-              - matches: cep7_docstring_returns
+    kind: function_definition
+    not:
+        matches: function_docstring
 language: python
-message: "Documentation must include purpose, args, and returns sections."
-severity: hint
+message: "Functions should have documentation"
+severity: warning

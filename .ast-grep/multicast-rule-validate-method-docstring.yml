@@ -48,4 +48,7 @@ rule:
         matches: cep7_docstring_tests
 language: python
 message: "Method must have docstring with testing examples"
+files:
+  - multicast/**/*.py
+  - multicast/*.py
 severity: warning

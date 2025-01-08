@@ -1,0 +1,79 @@
+# .ast-grep/multicast-rule-check-class-has-documentation.yml
+utils:
+  py_string_literal:
+    all:
+      - kind: string_content
+      - any:
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:'{3})
+            - precedes:
+                kind: string_end
+                regex: (?:'{3})
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:"{3})
+            - precedes:
+                kind: string_end
+                regex: (?:"{3})
+        - inside:
+            kind: string
+  docstring_pattern:
+    any:
+        - pattern: |
+            """$DOC"""
+        - pattern: |
+            '''$DOC'''
+    has:
+        matches: py_string_literal
+        kind: string_content
+    inside:
+      kind: expression_statement
+  docstring_statement:
+    kind: expression_statement
+    has:
+      matches: docstring_pattern
+      inside:
+        kind: expression_statement
+      kind: string
+  module_docstring:
+    all:
+      - matches: docstring_statement
+        inside:
+          kind: module
+      - kind: expression_statement
+  block_docstring:
+    matches: docstring_statement
+    inside:
+      kind: block
+    kind: expression_statement
+    nthChild: 1
+  block_with_docstring:
+    all:
+      - has:
+          matches: block_docstring
+      - kind: block
+  class_docstring:
+    all:
+      - matches: docstring_pattern
+        inside:
+          kind: expression_statement
+          inside:
+            kind: block
+            inside:
+              kind: class_definition
+      - kind: string
+
+id: check-has-class-documentation
+rule:
+  not:
+    has:
+      matches: block_with_docstring
+      kind: block
+  kind: class_definition
+selector: identifier
+language: python
+message: "Class definitions must have documentation."
+severity: warning

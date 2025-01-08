@@ -12,3 +12,6 @@ rule:
         regex: def setUp\(
 message: "Test classes must include setUp method for fixtures"
 severity: warning
+files:
+  - tests/**/test_*.py
+  - tests/test_*.py

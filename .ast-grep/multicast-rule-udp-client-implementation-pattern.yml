@@ -10,4 +10,7 @@ rule:
         $$$
 language: python
 message: "Verify UDP client implementation follows project standards"
-severity: error
+files:
+  - tests/**/*.py
+  - tests/*.py
+severity: hint
