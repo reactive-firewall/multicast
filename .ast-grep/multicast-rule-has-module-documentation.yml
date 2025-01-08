@@ -22,13 +22,13 @@ utils:
             kind: string
   docstring_pattern:
     any:
-        - pattern: |
-            """$DOC"""
-        - pattern: |
-            '''$DOC'''
+      - pattern: |
+          """$DOC"""
+      - pattern: |
+          '''$DOC'''
     has:
-        matches: py_string_literal
-        kind: string_content
+      matches: py_string_literal
+      kind: string_content
     inside:
       kind: expression_statement
   docstring_statement:

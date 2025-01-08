@@ -22,13 +22,13 @@ utils:
             kind: string
   docstring_pattern:
     any:
-        - pattern: |
-            """$DOC"""
-        - pattern: |
-            '''$DOC'''
+      - pattern: |
+          """$DOC"""
+      - pattern: |
+          '''$DOC'''
     has:
-        matches: py_string_literal
-        kind: string_content
+      matches: py_string_literal
+      kind: string_content
     inside:
       kind: expression_statement
   module_docstring:
@@ -63,7 +63,7 @@ utils:
                     kind: identifier
                 - not:
                     has:
-                        kind: function_definition
+                      kind: function_definition
             inside:
               kind: class_definition
       - kind: string
@@ -164,9 +164,9 @@ utils:
 
 id: check-test-documentation
 rule:
-    kind: function_definition
-    not:
-        matches: function_docstring
+  kind: function_definition
+  not:
+    matches: function_docstring
 language: python
 message: "Functions should have documentation"
 severity: warning

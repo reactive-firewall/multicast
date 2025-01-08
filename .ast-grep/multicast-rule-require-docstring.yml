@@ -22,17 +22,17 @@ utils:
             kind: string
   docstring_pattern:
     any:
-        - pattern:
-            selector: string
-            context: |
-              """$DOC"""
-        - pattern:
-            selector: string
-            context: |
-              '''$DOC'''
+      - pattern:
+          selector: string
+          context: |
+            """$DOC"""
+      - pattern:
+          selector: string
+          context: |
+            '''$DOC'''
     has:
-        matches: py_string_literal
-        kind: string_content
+      matches: py_string_literal
+      kind: string_content
     inside:
       kind: expression_statement
   docstring_statement:
@@ -222,7 +222,7 @@ rule:
             $$$
             $CLASS_BODY
     - kind: function_definition
-      pattern: 
+      pattern:
         selector: function_definition
         context: |
           def $NAME($$$)$$$:
