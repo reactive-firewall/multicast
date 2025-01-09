@@ -1,0 +1,34 @@
+# .ast-grep/utils/content.yml
+# CEP-7 content validation utilities
+utils:
+  cep7_docstring_function_arguments:
+    all:
+      - matches: function_docstring
+      - has:
+          regex: |
+            (Args|Arguments):.*
+          kind: string_content
+  cep7_docstring_method_arguments:
+    all:
+      - matches: method_docstring
+      - has:
+          regex: |
+            (Params|Parameters):.*
+          kind: string_content
+  cep7_docstring_class_arguments:
+    all:
+      - matches: data_class_docstring
+      - has:
+          regex: |
+            (Properties|Attributes):.*
+          kind: string_content
+
+id: cep7_docstring_arguments
+rule:
+  any:
+    - matches: cep7_docstring_class_arguments
+    - matches: cep7_docstring_method_arguments
+    - matches: cep7_docstring_function_arguments
+    - has:
+        matches: cep7_docstring_arguments
+language: python

@@ -1,0 +1,31 @@
+# .ast-grep/utils/content.yml
+# CEP-7 content validation utilities
+utils:
+  cep7_docstring_function_returns:
+    all:
+      - any:
+        - matches: function_docstring
+      - has:
+          regex: |
+            (Returns|Results):.*
+          kind: string_content
+  cep7_docstring_method_returns:
+    all:
+      - any:
+        - matches: method_docstring
+      - has:
+          regex: |
+            (Returns):.*
+          kind: string_content
+
+id: cep7_docstring_returns
+rule:
+  all:
+    - any:
+      - matches: cep7_docstring_function_returns
+      - matches: cep7_docstring_method_returns
+    - has:
+        regex: |
+          (Returns|Results):.*
+        kind: string_content
+language: python

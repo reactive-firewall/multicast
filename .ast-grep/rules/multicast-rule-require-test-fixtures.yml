@@ -3,8 +3,10 @@ id: require-test-fixtures
 language: python
 rule:
   all:
-    - pattern: |
-        class $TEST_CLASS(unittest.TestCase):
+    - pattern:
+        selector: class_definition
+        context: |
+          class $TEST_CLASS(unittest.TestCase):
             $SETUP
       inside:
         kind: module
@@ -13,5 +15,4 @@ rule:
 message: "Test classes must include setUp method for fixtures"
 severity: warning
 files:
-  - tests/**/test_*.py
-  - tests/test_*.py
+  - tests{/**/,/}test_*.py

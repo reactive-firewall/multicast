@@ -1,0 +1,13 @@
+# .ast-grep/utils/structure.yml
+# Documentation structure utilities
+id: block_docstring
+rule:
+  matches: docstring_statement
+  inside:
+    kind: block
+    has:
+      matches: docstring_statement
+  kind: expression_statement
+  nthChild: 1
+language: python
+

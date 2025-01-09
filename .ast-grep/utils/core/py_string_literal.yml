@@ -1,0 +1,23 @@
+# .ast-grep/utils/py_string_literal.yml
+id: py_string_literal
+rule:
+  all:
+    - kind: string_content
+      inside:
+        kind: string
+    - any:
+      - all:
+          - follows:
+              kind: string_start
+              regex: (?:'{3})
+          - precedes:
+              kind: string_end
+              regex: (?:'{3})
+      - all:
+          - follows:
+              kind: string_start
+              regex: (?:"{3})
+          - precedes:
+              kind: string_end
+              regex: (?:"{3})
+language: python
