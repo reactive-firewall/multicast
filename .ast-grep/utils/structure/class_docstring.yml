@@ -13,4 +13,3 @@ rule:
             kind: class_definition
     - kind: string
 language: python
-

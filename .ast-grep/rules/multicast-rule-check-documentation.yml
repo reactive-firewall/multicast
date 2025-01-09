@@ -2,10 +2,10 @@
 id: check-has-documentation
 rule:
   pattern:
-      selector: function_definition
-      context: |
-        def $FUNC_NAME($$$)$$$:$$$
-          $BODY
+    selector: function_definition
+    context: |
+      def $FUNC_NAME($$$)$$$:$$$
+        $BODY
   kind: function_definition
   not:
     matches: function_docstring

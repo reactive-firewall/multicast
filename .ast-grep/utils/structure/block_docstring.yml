@@ -10,4 +10,3 @@ rule:
   kind: expression_statement
   nthChild: 1
 language: python
-
