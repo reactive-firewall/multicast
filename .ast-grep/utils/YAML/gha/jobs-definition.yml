@@ -1,0 +1,13 @@
+# .ast-grep/utils/yaml/gha/jobs-definition.yml
+id: gha_jobs_definition
+rule:
+  pattern:
+    selector: block_mapping_pair
+    context: |
+      jobs:
+        $JOBS
+    has:
+      all:
+        - field: key
+        - field: value
+language: YAML

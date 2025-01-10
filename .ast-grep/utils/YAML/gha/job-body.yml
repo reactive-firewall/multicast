@@ -1,0 +1,12 @@
+# .ast-grep/utils/yaml/gha/job-body.yml
+id: gha_job_body
+rule:
+  pattern: 
+    context: |
+      $JOB_BODY
+    severity: hint
+  inside:
+    kind: block_mapping_pair
+    matches: gha_job_definition
+  kind: block_node
+language: YAML

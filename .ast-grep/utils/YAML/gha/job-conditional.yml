@@ -1,0 +1,14 @@
+# .ast-grep/utils/yaml/gha/job-conditional.yml
+id: gha_job_condition_map
+rule:
+  pattern: 
+    context: |
+      if: $JOB_CONDITION
+    severity: hint
+  inside:
+    kind: block_mapping
+    inside:
+      kind: block_node
+      matches: gha_job_body
+  kind: block_mapping_pair
+language: YAML

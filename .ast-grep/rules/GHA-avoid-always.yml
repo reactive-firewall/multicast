@@ -1,0 +1,21 @@
+# GHA-avoid-always.yml
+id: gha-jobs-should-avoid-always
+rule:
+  matches: gha_job_condition_map
+  kind: block_mapping_pair
+  has:
+    kind: flow_node
+    field: value
+    has:
+      pattern:
+        selector: plain_scalar
+        context: |
+          $$$
+      has:
+        kind: string_scalar
+        regex: \$\{\{.*always\(\).*\}\}
+fix: |
+  if: ${{ !cancelled() }}
+language: YAML
+message: Condition "always" is dangerous, try "not canceled" instead.
+severity: warning
