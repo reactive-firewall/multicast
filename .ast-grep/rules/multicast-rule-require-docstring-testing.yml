@@ -16,11 +16,11 @@ rule:
           kind: string_content
           not:
             pattern: |
-              .*(Minimal Acceptance |Mets-)Testing:.*
+              .*(Minimal Acceptance |Metas-)Testing:.*
 language: python
 message: "Class must include docstring with testing examples"
 files:
-  - tests{/**/,/}test_*.py
+  - tests{/**/,/}test_[a-z0-9_]*.py
 severity: hint
 description: |
   Ensures that Python classes include proper docstrings with testing examples.

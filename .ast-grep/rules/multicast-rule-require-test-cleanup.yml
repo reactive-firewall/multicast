@@ -15,4 +15,4 @@ rule:
 message: "Test classes must include tearDown method for cleanup."
 severity: "warning"
 files:
-  - tests{/**/,/}test_*.py
+  - tests{/**/,/}test_[a-z0-9_]*.py

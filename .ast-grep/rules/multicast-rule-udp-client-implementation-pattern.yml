@@ -11,8 +11,9 @@ rule:
 language: python
 message: "Verify UDP client implementation follows project standards"
 files:
-  - tests{/**/,/}test_*.py
+  - tests{/**/,/}test_[a-z0-9_]*.py
 severity: hint
 description: |
-  Mcast server must implement doStep method with proper error handling
-  and follow project multicast server guidelines.
+  Test utility class for Mcast server must implement doStep method
+  with proper error handling and follow project multicast server guidelines.
+  Note: This pattern applies only to test implementations.

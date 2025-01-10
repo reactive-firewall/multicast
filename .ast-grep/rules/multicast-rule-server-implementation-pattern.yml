@@ -9,6 +9,5 @@ rule:
 language: python
 message: "Verify Mcast server implementation follows standard pattern"
 files:
-  - multicast/**/*.py
-  - multicast/*.py
+  - multicast{/**/,/}*.py
 severity: error

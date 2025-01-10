@@ -8,10 +8,3 @@ rule:
 language: python
 message: "Module docstring must be present and well formatted."
 severity: warning
-fix: |
-  """
-  Module description.
-
-  This module provides...
-  """
-  $$$

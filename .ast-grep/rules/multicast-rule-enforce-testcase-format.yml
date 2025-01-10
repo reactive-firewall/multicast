@@ -4,7 +4,7 @@ rule:
   pattern:
     selector: class_definition
     context: |
-      class $CLASS_NAME($$$)$$$:$$$
+      class $CLASS_NAME($$$):$$$
         """$DOCSTRING"""
         $$$
   kind: class_definition

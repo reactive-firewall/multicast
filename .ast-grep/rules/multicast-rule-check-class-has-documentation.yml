@@ -28,5 +28,14 @@ examples:
         Attributes:
           attr1: Description of first attribute
           attr2: Description of second attribute
+        Methods:
+          method1: Description of first method
+          method2: Description of second method
+
+        Testing:
+          >>> obj = MyClass()
+          >>> obj.method1()
+          True
+
        """
        pass
