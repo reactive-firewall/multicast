@@ -1,7 +1,7 @@
 # .ast-grep/utils/yaml/gha/job-conditional.yml
 id: gha_job_condition_map
 rule:
-  pattern: 
+  pattern:
     context: |
       if: $JOB_CONDITION
     severity: hint
