@@ -7,8 +7,13 @@ rule:
       - matches: function_docstring
       - matches: method_docstring
     - has:
-        regex: |
-          .*Testing:.+\n\s+>>>\s+\S+.*?\n\s*(?:True|False|\d+|None|\[.*?\]|\{.*?\}|".*?"|'.*?'|\S+)
+        all:
+          - regex: |
+              .*Testing:.+
+          - regex: |
+              \s+>>>\s+\S+.*?
+          - regex: |
+              \s*(?:True|False|\d+|None|\[.*?\]|\{.*?\}|".*?"|'.*?'|\S+)
         kind: string_content
     - kind: string
 language: python
