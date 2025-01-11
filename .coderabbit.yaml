@@ -229,14 +229,25 @@ reviews:
         enabled_rules:
           - BEEN_PART_AGREEMENT
           - COMMA_COMPOUND_SENTENCE
+          - COMPOUNDING
+          - EN_COMPOUNDS
           - EN_COMPOUND_ADJECTIVE_INTERNAL
           - EN_CONTRACTION_SPELLING
           - EN_WORD_COHERENCY
+          - ENGLISH_WORD_REPEAT_RULE
+          - EN_A_VS_AN
           - IT_IS_OBVIOUS
+          - NONSTANDARD_PHRASES
           - OXFORD_SPELLING
           - PASSIVE_VOICE
+          - REDUNDANCY
+          - SEMANTICS
           - STYLE
+          - TYPOGRAPHY
           - TWELFTH_OF_NEVER
+          - WIKIPEDIA_12_AM
+          - WIKIPEDIA_12_PM
+          - WIKIPEDIA_CONTRACTIONS
     shellcheck:
       enabled: true
     ruff:
