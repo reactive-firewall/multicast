@@ -227,13 +227,16 @@ reviews:
           - EN_QUOTES
           - CONSECUTIVE_SPACES
         enabled_rules:
-          - STYLE
+          - BEEN_PART_AGREEMENT
+          - COMMA_COMPOUND_SENTENCE
+          - EN_COMPOUND_ADJECTIVE_INTERNAL
           - EN_CONTRACTION_SPELLING
           - EN_WORD_COHERENCY
           - IT_IS_OBVIOUS
-          - TWELFTH_OF_NEVER
           - OXFORD_SPELLING
           - PASSIVE_VOICE
+          - STYLE
+          - TWELFTH_OF_NEVER
     shellcheck:
       enabled: true
     ruff:
