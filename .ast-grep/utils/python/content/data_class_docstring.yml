@@ -4,8 +4,11 @@ id: data_class_docstring
 rule:
   all:
     - matches: class_docstring
-    - pattern: |
-        """$DOC"""
+    - any:
+        - pattern: |
+            """$DOC"""
+        - pattern: |
+            '''$DOC'''
       inside:
         kind: expression_statement
         inside:

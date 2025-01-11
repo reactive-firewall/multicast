@@ -17,5 +17,5 @@ rule:
 fix: |
   if: ${{ !cancelled() }}
 language: YAML
-message: Condition "always" is dangerous, try "not canceled" instead.
+message: 'Condition "always()" is dangerous as it runs even when the workflow is canceled. Use "if: ${{ !cancelled() }}" instead for safer execution control.'
 severity: warning
