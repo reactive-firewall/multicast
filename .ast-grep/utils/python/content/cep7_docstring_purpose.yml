@@ -9,6 +9,6 @@ rule:
       - matches: class_docstring
     - has:
         regex: |
-          \b(Verif|Check|Test|Yield|Submit|Ensure|Run|Make|Review|Create|Update|Delete|Configure|Install|Use|Follow|Access|Load|Save|Execute|Build|Initialize|Document|Validate|Optimize|Generate).*
+          \b((?:Verify|Verifies|Valid)|(?:Check|Test|Review)|(?:Create|Update|Delete)|(?:Configure|Install|Initialize)|(?:Run|Execute|Build)|(?:Load|Save|Access)|(?:Ensure|Make|Use|Follow|Document|Optimize|Generate|Submit|Yield)).*
         kind: string_content
 language: python
