@@ -24,6 +24,7 @@ import re
 # - Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
 GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
 
+
 def _validate_git_ref(ref: str) -> str:
 	"""
 	Validate if the provided string is a valid Git reference.
