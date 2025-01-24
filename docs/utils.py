@@ -18,6 +18,7 @@
 
 import re
 
+
 # Git reference validation pattern
 # Enforces:
 # - Must start with alphanumeric character
@@ -33,8 +34,6 @@ def _validate_git_ref(ref: str) -> str:
 		- Must start with an alphanumeric character
 		- Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
 		- Cannot contain consecutive dots (..)
-		...
-
 	Args:
 		ref (str) -- The Git reference to validate.
 
