@@ -227,15 +227,19 @@ reviews:
           - EN_QUOTES
           - CONSECUTIVE_SPACES
         enabled_rules:
+          # Grammar rules
           - BEEN_PART_AGREEMENT
           - COMMA_COMPOUND_SENTENCE
+          # Compound word rules
           - COMPOUNDING
           - EN_COMPOUNDS
           - EN_COMPOUND_ADJECTIVE_INTERNAL
+          # Word usage and consistency
           - EN_CONTRACTION_SPELLING
           - EN_WORD_COHERENCY
           - ENGLISH_WORD_REPEAT_RULE
           - EN_A_VS_AN
+          # Style and semantics
           - IT_IS_OBVIOUS
           - NONSTANDARD_PHRASES
           - OXFORD_SPELLING
@@ -244,6 +248,7 @@ reviews:
           - SEMANTICS
           - STYLE
           - TYPOGRAPHY
+          # Time and date conventions
           - TWELFTH_OF_NEVER
           - WIKIPEDIA_12_AM
           - WIKIPEDIA_12_PM
