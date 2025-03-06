@@ -184,6 +184,10 @@ def loadDocstringsFromModule(module):
 	- Any other exceptions encountered during the loading process are caught
 		and printed to the console.
 
+	See Also:
+		- get_test_suite: Function that uses `loadDocstringsFromModule` to build test suites
+		- load_tests: Function that loads both regular tests and doctests
+
 	Args:
 		module (module) -- The Python module from which to load doctests. This should be a
 			valid module object that has been imported. If the module is None,
