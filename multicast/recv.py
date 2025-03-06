@@ -243,27 +243,43 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		False
 		>>> type(multicast.recv.joinstep)
 		<class 'function'>
-		>>> multicast.recv.joinstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<socket.socket...>
+		>>> tst_sk = multicast.recv.joinstep(None, 59991)
+		>>> tst_sk #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...laddr=...>
+		>>> multicast.endSocket(tst_sk)
+		>>> tst_sk #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP
-		>>> multicast.recv.joinstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> tst_sk_2 = multicast.recv.joinstep([tst_fxtr], 59991)
+		>>> tst_sk_2 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
-		>>> multicast.recv.joinstep(
+		>>> multicast.endSocket(tst_sk_2)
+		>>> tst_sk_2 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
+		>>> tst_sk_3 = multicast.recv.joinstep(
 		... 		[tst_fxtr], 59991, None, tst_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> tst_sk_3 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
+		>>> multicast.endSocket(tst_sk_3)
+		>>> tst_sk_3 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> sk_fxtr = multicast.genSocket()
-		>>> multicast.recv.joinstep(
+		>>> tst_sk_4 = multicast.recv.joinstep(
 		... 		[tst_fxtr], 59991, None, tst_fxtr, sk_fxtr
-		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		... )
+		>>> tst_sk_4 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
+		>>> multicast.endSocket(tst_sk_4)
+		>>> tst_sk_4 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> sk_fxtr.close()
 		>>>
 
 
 	"""
 	if not groups:
-		groups = []
+		groups = [] if bind_group is None else [bind_group]
 	if isock is None:
 		sock = multicast.genSocket()
 	else:
