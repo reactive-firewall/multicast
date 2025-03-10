@@ -233,6 +233,12 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		>>>
 
 	Testcase 1: Stability testing.
+		A: Verify the multicast.recv module is properly initialized.
+		B: Verify the joinstep function exists and has the expected type.
+		C: Test socket creation with no groups (default behavior).
+		D: Test socket creation with a specified multicast group.
+		E: Test socket creation with a multicast group and binding to that group.
+		F: Test socket creation using an existing socket handle.
 
 		>>> import multicast
 		>>>
@@ -279,7 +285,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 	"""
 	if not groups:
-		groups = [] if bind_group is None else [bind_group]
+		groups = []
 	if isock is None:
 		sock = multicast.genSocket()
 	else:
