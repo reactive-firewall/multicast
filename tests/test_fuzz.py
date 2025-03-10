@@ -42,6 +42,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
+@context.markWithMetaTag("fuzzing", "fuzzing_basic")
 class HypothesisTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite that uses Hypothesis to perform fuzz testing on the multicast sender and receiver.

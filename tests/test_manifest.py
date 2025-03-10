@@ -39,12 +39,13 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-class TestManifestInclusion(BasicUsageTestSuite):
+@context.markWithMetaTag("mat", "mat_build")
+class ManifestInclusionTestSuite(BasicUsageTestSuite):
 
 	__module__ = """tests.test_manifest"""
 
 	def setUp(self):
-		super(TestManifestInclusion, self).setUp()
+		super(ManifestInclusionTestSuite, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
 			f"{str(sys.executable)} -m coverage run", "setup.py", "clean", "--all"

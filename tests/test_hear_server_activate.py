@@ -36,6 +36,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
+@context.markWithMetaTag("mat", "mat_hear")
 class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 	"""Test suite for verifying multicast server activation functionality.
 

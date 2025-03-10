@@ -427,10 +427,13 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 			Testcase 3: `handle` requires valid requests or ignores input.
 
-			>>> handler.request = ("The Test", multicast.genSocket())
+			>>> tst_fixture_sock = multicast.genSocket()
+			>>> handler.request = ("The Test", tst_fixture_sock)
 			>>> handler.client_address = ("224.0.1.2", 51234)
 			>>> handler.handle() is None
 			True
+			>>>
+			>>> multicast.endSocket(tst_fixture_sock)
 			>>>
 		"""
 		(data, sock) = self.request

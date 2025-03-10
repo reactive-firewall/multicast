@@ -204,6 +204,23 @@ __BLANK = str("""""")
 """
 
 
+def markWithMetaTag(*marks: str):
+	"""Decorator to apply pytest marks if pytest is available."""
+	try:
+		import pytest
+		pytest_available = True
+	except ImportError:
+		pytest_available = False
+
+	def decorator(cls):
+		if pytest_available:
+			for mark in marks:
+				cls = pytest.mark.__getattr__(mark)(cls)
+		return cls
+
+	return decorator
+
+
 def getCoverageCommand() -> str:
 	"""
 		Function for backend coverage command.

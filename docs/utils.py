@@ -19,10 +19,21 @@
 import re
 
 
+# Git reference validation pattern
+# Enforces:
+# - Must start with alphanumeric character
+# - Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
+GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
+
+
 def _validate_git_ref(ref: str) -> str:
 	"""
 	Validate if the provided string is a valid Git reference.
 
+	Git reference naming rules:
+		- Must start with an alphanumeric character
+		- Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
+		- Cannot contain consecutive dots (..)
 	Args:
 		ref (str) -- The Git reference to validate.
 
@@ -57,8 +68,15 @@ def _validate_git_ref(ref: str) -> str:
 			Traceback (most recent call last):
 			...
 			ValueError: Invalid Git reference:...
+
+		Testcase 5: Invalid reference with disallowed dot-dot characters.
+
+			>>> _validate_git_ref('invalid..ref')  #doctest: +IGNORE_EXCEPTION_DETAIL +ELLIPSIS
+			Traceback (most recent call last):
+			...
+			ValueError: Invalid Git reference: invalid..ref
 	"""
-	if not re.match(r'^[a-zA-Z0-9_\-./]+$', ref):
+	if not re.match(GIT_REF_PATTERN, ref) or ".." in ref:
 		raise ValueError(f"Invalid Git reference: {ref}")
 	return ref
 

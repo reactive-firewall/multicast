@@ -36,6 +36,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
+@context.markWithMetaTag("mat", "mat_hear")
 class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite that checks empty data with the multicast sender and receiver.

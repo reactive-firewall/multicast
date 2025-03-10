@@ -52,6 +52,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] venv Failed to import.") from _cause
 
 
+@context.markWithMetaTag("extra", "extra_coverage")
 class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	"""Test cases for 'tests/requirements.txt'."""
 
