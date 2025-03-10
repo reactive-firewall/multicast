@@ -175,6 +175,7 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "prune test-reports" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .github" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .circleci" >>"$@" ;
+	$(QUIET)$(ECHO) "prune venv" >>"$@" ;
 
 build: init ./setup.py MANIFEST.in
 	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
@@ -241,6 +242,13 @@ just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
 	fi
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
+
+test-mat: ## Run all minimum acceptance tests
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "mat"; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat ; \
+	fi
 
 test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|usage|build|bootstrap)
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
