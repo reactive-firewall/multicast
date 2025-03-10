@@ -12,3 +12,14 @@ message: "Test classes should follow [CEP-9](https://gist.github.com/reactive-fi
 files:
   - tests{/**/,/}test_[a-z0-9_]*.py
 severity: warning
+examples:
+  - name: Valid test names
+    code: |
+      class TestServer(unittest.TestCase):
+        def test_connect_WHEN_valid_credentials_GIVEN_correct_format(self) -> None:
+          pass
+  - name: Invalid test names
+    code: |
+      class TestServer(unittest.TestCase):
+        def test_something(self) -> None:  # Missing WHEN and GIVEN
+          pass

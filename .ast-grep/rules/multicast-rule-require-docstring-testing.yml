@@ -16,7 +16,7 @@ rule:
           kind: string_content
           not:
             pattern: |
-              .*(Minimal Acceptance |Metas-)Testing:.*
+              .*(Minimal Acceptance |Meta-)Testing:.*
 language: python
 message: "Class must include docstring with testing examples"
 files:

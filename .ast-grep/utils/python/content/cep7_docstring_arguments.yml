@@ -1,5 +1,5 @@
 # .ast-grep/utils/content.yml
-# CEP-7 content validation utilities
+# CEP-7 specific arguments/parameters/attributes/etc header validation utilities
 utils:
   cep7_docstring_function_arguments:
     all:
