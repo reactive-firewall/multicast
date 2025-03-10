@@ -558,5 +558,8 @@ class McastHEAR(multicast.mtool):
 				) from userInterrupt
 		finally:
 			if server:  # pragma: no cover
-				server.shutdown()
+				# deadlocks if not called by other thread
+				end_it = threading.Thread(name="Kill_Thread", target=server.shutdown, args=[])
+				end_it.start()
+				end_it.join(1)
 		return (server_initialized, None)
