@@ -16,6 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifeq "$(LANG)" ""
+	LANG="en_US.UTF-8"
+endif
+
 ifeq "$(LC_CTYPE)" ""
 	LC_CTYPE="en_US.UTF-8"
 endif
@@ -86,7 +90,7 @@ ifeq "$(PYTHON)" ""
 	endif
 else
 	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
+		COVERAGE=$(PYTHON) -m coverage
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
 		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
 		COV_CORE_DATAFILE = .coverage
@@ -94,10 +98,17 @@ else
 	else
 		COVERAGE_ARGS :=
 	endif
+	ifeq "$(COVERAGE)" ""
+		COVERAGE!=$(COMMAND) coverage
+	endif
 endif
 
 ifndef PYTEST
 	PYTEST=$(PYTHON) -m pytest --cache-clear --junitxml=test-reports/junit.xml -v --rootdir=.
+	ifndef DOC_TEST_ARGS
+		# Define common doctest flags
+		DOC_TEST_ARGS := --doctest-glob=multicast/*.py,tests/*.py --doctest-modules
+	endif
 endif
 
 ifndef PIP_COMMON_FLAGS
@@ -236,19 +247,16 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 # === Test Group Targets ===
 just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) --doctest-glob=multicast/*.py,tests/*.py --doctest-modules $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
+		$(PYTEST) $(DOC_TEST_ARGS) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ; \
 	fi
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
-test-mat: ## Run all minimum acceptance tests
-	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "mat"; \
-	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat ; \
-	fi
+test-mat: test-mat-build test-mat-bootstrap test-mat-basic test-mat-say test-mat-hear test-mat-usage test-mat-doctests ## Run all minimum acceptance tests
+	$(QUITE)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
 
 test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|usage|build|bootstrap)
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
@@ -296,7 +304,7 @@ test-perf: ## Run all performance tests
 	$(QUIET)$(DO_FAIL) ;
 
 test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
-	$(QUIET)$(PYTEST) --doctest-glob=multicast/*.py,tests/*.py --doctest-modules $(COVERAGE_ARGS) || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTEST) $(DOC_TEST_ARGS) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ;
 	$(QUITE)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."

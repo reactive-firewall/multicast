@@ -58,6 +58,13 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = """tests.test_deps"""
 
+	def test_requirements_path_exists(self):
+		"""Test that 'tests/requirements.txt' exists."""
+		self.assertTrue(
+			os.path.isdir('tests'),
+			"The 'tests/' directory does not exist."
+		)
+
 	def test_requirements_file_exists(self):
 		"""Test that 'tests/requirements.txt' exists."""
 		self.assertTrue(
@@ -89,6 +96,10 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	@unittest.skipUnless(
 		(sys.platform.startswith("linux") or sys.platform.startswith("darwin")),
 		"This test is not supported on this OS."
+	)
+	@unittest.skipIf(
+		sys.prefix != sys.base_prefix,
+		"Invalid test because a virtual environment is already active."
 	)
 	def test_requirements_installation(self):
 		"""Attempt to install dependencies from 'tests/requirements.txt' in a virtual env."""

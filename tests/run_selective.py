@@ -32,14 +32,18 @@ def main():
 	args = parser.parse_args()
 	try:
 		_bar = str("-" * 20)
-		print(f"{_bar}START{_bar}")
+		if (sys.stdout.isatty()):
+			print(f"{_bar}START{_bar}", file=sys.stdout)
 		suite = get_test_suite(args.group, args.category)
 		runner = unittest.TextTestRunner(verbosity=2)
 		result = runner.run(suite)
-		print(f"{_bar} END {_bar}")
+		if (sys.stdout.isatty()):
+			print(f"{_bar} END {_bar}", file=sys.stdout)
+		del _bar  # skipcq - cleanup any object leaks early
 		sys.exit(not result.wasSuccessful())
 	except ValueError as e:
-		print(f"Error: {e}", file=sys.stderr)
+		if (sys.stderr.isatty()):
+			print(f"Error: {e}", file=sys.stderr)
 		sys.exit(1)
 
 
