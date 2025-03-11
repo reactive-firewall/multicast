@@ -115,7 +115,6 @@ try:
 	from tests import test_hear_cleanup
 	from tests import test_hear_data_processing
 	from tests import test_hear_keyboard_interrupt
-	from tests import test_fuzz
 
 	depends = [
 		profiling,
@@ -127,12 +126,18 @@ try:
 		test_usage,
 		test_hear_server_activate,
 		test_hear_cleanup,
-		test_fuzz,
 		test_hear_data_processing,
 		test_exceptions,
 		test_hear_keyboard_interrupt,
 		test_hear_server
 	]
+
+	try:
+		from tests import test_fuzz
+		depends.insert(10, test_fuzz)
+	except ImportError as e:
+		print(f"Error loading optional Fuzzing tests: {e}")
+
 	for unit_test in depends:
 		try:
 			if unit_test.__name__ is None:  # pragma: no branch
@@ -156,7 +161,7 @@ try:
 		from tests import context
 	else:  # pragma: no branch
 		context = sys.modules["""tests.context"""]
-except Exception as _cause:  # pragma: no branch
+except ImportError as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
 

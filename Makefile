@@ -76,39 +76,23 @@ ifeq "$(PYTHON)" ""
 		PY_CMD=$(COMMAND) python
 	endif
 	PYTHON=$(PY_CMD) $(PY_ARGS)
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(PYTHON) -m coverage
-		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
-		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
-		COV_CORE_DATAFILE = .coverage
-		COVERAGE_ARGS := --cov=. --cov-append --cov-report=xml
-	else
-		COVERAGE_ARGS :=
-	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
-	endif
+endif
+
+ifeq "$(COVERAGE)" ""
+	COVERAGE=$(PYTHON) -m coverage
+	#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
+	COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
+	COV_CORE_DATAFILE = .coverage
+	COVERAGE_ARGS := --cov=. --cov-append --cov-report=xml
 else
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(PYTHON) -m coverage
-		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
-		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
-		COV_CORE_DATAFILE = .coverage
-		COVERAGE_ARGS := --cov=. --cov-append --cov-report=xml
-	else
-		COVERAGE_ARGS :=
-	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
-	endif
+	COVERAGE_ARGS :=
+endif
+ifeq "$(COVERAGE)" ""
+	COVERAGE!=$(COMMAND) coverage
 endif
 
 ifndef PYTEST
 	PYTEST=$(PYTHON) -m pytest --cache-clear --junitxml=test-reports/junit.xml -v --rootdir=.
-	ifndef DOC_TEST_ARGS
-		# Define common doctest flags
-		DOC_TEST_ARGS := --doctest-glob=multicast/*.py,tests/*.py --doctest-modules
-	endif
 endif
 
 ifndef PIP_COMMON_FLAGS
@@ -190,7 +174,7 @@ MANIFEST.in: init
 
 build: init ./setup.py MANIFEST.in
 	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
@@ -200,12 +184,12 @@ init:
 
 install: init build must_be_root
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
 	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 $(PIP_ENV_FLAGS) --no-input -y multicast 2>$(ERROR_LOG_PATH) || :
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 legacy-purge: clean uninstall
@@ -247,51 +231,51 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 # === Test Group Targets ===
 just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) $(DOC_TEST_ARGS) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
+		$(PYTEST) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-mat: test-mat-build test-mat-bootstrap test-mat-basic test-mat-say test-mat-hear test-mat-usage test-mat-doctests ## Run all minimum acceptance tests
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|usage|build|bootstrap)
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) --junitxml=test-reports/junit.xml -v --rootdir=. -m "mat and $*"; \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) --junitxml=test-reports/junit.xml -v --rootdir=. -m "mat and $*" || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $*; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-extra: ## Run all extra tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra"; \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra" || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-extra-%: ## Run specific extra test category
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra and $*"; \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra and $*" || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra --category $*; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-fuzzing: ## Run all fuzzing tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "fuzzing"; \
+		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "fuzzing" || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group fuzzing; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-perf: ## Run all performance tests
@@ -300,18 +284,20 @@ test-perf: ## Run all performance tests
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group performance; \
 	fi
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
 test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
-	$(QUIET)$(PYTEST) $(DOC_TEST_ARGS) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ;
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(ECHO) "WARNING: The target '$@' is deprecated;"
+	$(QUIET)$(ECHO) "Use 'TESTS_USE_PYTEST=1 make test' instead"
+	$(QUIET)$(PYTEST) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
 	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || DO_FAIL="exit 2" ;
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)tests/check_spelling || true
 	$(QUIET)tests/check_cc_lines || true
@@ -428,7 +414,7 @@ user-install: build
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 %:
