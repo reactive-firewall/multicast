@@ -127,6 +127,7 @@ check_command grep ;
 check_command python3 ;
 test -x "$(command -v codespell)" || exit 0 ;  # skip quietly if user has not installed GPL2 stuff.
 check_command git ;
+check_command sed ;
 check_command shlock ;
 
 
@@ -135,9 +136,15 @@ SCRIPT_FILE="tests/check_spelling"
 # Set codespell options
 CODESPELL_OPTIONS="--quiet-level=4 --builtin clear,rare,code -L assertIn"
 
+# Define specific typos to check for (regression tests)
+declare -a SPECIFIC_TYPOS=(
+	"RECCOMENDED:RECOMMENDED"
+)
+
 function cleanup() {
 	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
 	# unset when done
+	unset SPECIFIC_TYPOS 2>/dev/null || : ;
 	unset LOCK_FILE 2>/dev/null || : ;
 	hash -d shlock 2>/dev/null || : ;
 }
@@ -195,11 +202,34 @@ if [[ "$1" == "--fix" ]]; then
 fi
 
 # THIS IS THE ACTUAL TEST
-# Iterate over files and run codespell
+# Iterate over files
 # shellcheck disable=SC2086
 for FILE in $FILES_TO_CHECK; do
+	# Part 1: Run codespell
 	printf "::group::%s\n" "Checking ${FILE}" ;
+	printf "::debug::%s\n" "Running codespell tests for typos." ;
 	{ codespell $CODESPELL_OPTIONS "${FILE}" || EXIT_CODE=$? ;} 2>/dev/null ; wait ;
+	# Part 2: Run specific regression tests for known typos
+	printf "::debug::%s\n" "Running regression tests for specific typos." ;
+	for TYPO_PAIR in "${SPECIFIC_TYPOS[@]}"; do
+		# Split the pair into typo and correction
+		TYPO="${TYPO_PAIR%%:*}"
+		CORRECTION="${TYPO_PAIR##*:}"
+		
+		# Check for the specific typo
+		if grep -q "$TYPO" "$FILE" 2>/dev/null; then
+			printf "::error file=%s,title=Regression Test Failed::%s\n" "${FILE}" "Found typo '$TYPO' (should be '$CORRECTION')" >&2
+			EXIT_CODE=2
+			
+			# Auto-correct if --fix is provided
+			if [[ "$1" == "--fix" ]]; then
+				{ sed -i "s/$TYPO/$CORRECTION/g" "${FILE}" 2>/dev/null && \
+				printf "::notice file=%s,title=Auto-corrected::%s\n" "$FILE" "Fixed typo '$TYPO' to '$CORRECTION'" ;} || :
+			fi
+		fi
+		unset TYPO 2>/dev/null || : ;
+		unset CORRECTION 2>/dev/null || : ;
+	done
 	printf "::endgroup::\n" ;
 done
 
