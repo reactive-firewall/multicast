@@ -102,7 +102,15 @@ endif
 
 # Define environment-specific pip install flags
 ifeq ($(shell uname),Darwin)
-	PIP_ENV_FLAGS := --break-system-packages
+	# Check if pip supports --break-system-packages
+	PIP_VERSION := $(shell $(PYTHON) -m pip --version | awk '{print $2}')
+	PIP_MAJOR := $(word 2,$(subst ., ,$(PIP_VERSION)))
+	PIP_MINOR := $(word 3,$(subst ., ,$(PIP_VERSION)))
+	ifeq ($(shell [ $(PIP_MAJOR) -gt 24 ] || { [ $(PIP_MAJOR) -eq 24 ] && [ $(PIP_MINOR) -ge 3 ]; }), 0)
+		PIP_ENV_FLAGS := --break-system-packages
+	else
+		PIP_ENV_FLAGS :=
+	endif
 else
 	PIP_ENV_FLAGS :=
 endif
@@ -222,7 +230,9 @@ test-reports:
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: test-reports init
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || DO_FAIL="exit 69" ;
+	$(QUIET)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
 
 docs-reqs: ./docs/ ./docs/requirements.txt init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r docs/requirements.txt  2>$(ERROR_LOG_PATH) || : ;

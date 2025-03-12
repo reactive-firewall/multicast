@@ -102,6 +102,10 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)))
 	if 'tests' in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
+except ImportError as err:  # pragma: no branch
+	raise ImportError("[CWE-440] multicast tests Failed to import.") from err
+
+try:
 	from tests import profiling as profiling  # skipcq: PYL-C0414
 	from tests import test_basic
 	from tests import test_exceptions
@@ -135,7 +139,7 @@ try:
 	try:
 		from tests import test_fuzz
 		depends.insert(10, test_fuzz)
-	except ImportError as e:
+	except Exception as e:  # pragma: no branch
 		print(f"Error loading optional Fuzzing tests: {e}")
 
 	for unit_test in depends:
