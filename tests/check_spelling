@@ -223,8 +223,9 @@ for FILE in $FILES_TO_CHECK; do
 			
 			# Auto-correct if --fix is provided
 			if [[ "$1" == "--fix" ]]; then
-				{ sed -i "s/$TYPO/$CORRECTION/g" "${FILE}" 2>/dev/null && \
-				printf "::notice file=%s,title=Auto-corrected::%s\n" "$FILE" "Fixed typo '$TYPO' to '$CORRECTION'" ;} || :
+				if sed -i "s/$TYPO/$CORRECTION/g" "${FILE}" 2>/dev/null; then
+					printf "::notice file=%s,title=Auto-corrected::%s\n" "$FILE" "Fixed typo '$TYPO' to '$CORRECTION'"
+				fi
 			fi
 		fi
 		unset TYPO 2>/dev/null || : ;
