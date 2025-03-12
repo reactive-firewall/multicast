@@ -32,3 +32,19 @@ fix:
   import $MODULE
 description: Rule for sys.modules check pattern
 language: python
+examples:
+  - name: Complex import statement
+    code: |
+      try:
+        if 'os' not in sys.modules:
+          import os
+        else:  # pragma: no branch
+          os = sys.modules["""os"""]
+      except ImportError as err:  # pragma: no branch
+        raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
+  - name: Simplified import statement
+    code: |
+      try:
+        import os
+      except ImportError as err:  # pragma: no branch
+        raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
