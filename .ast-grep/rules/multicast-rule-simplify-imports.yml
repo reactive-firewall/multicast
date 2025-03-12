@@ -1,0 +1,34 @@
+# .ast-grep/multicast-rule-simplify-imports.yml
+---
+id: simplify-imports
+rule:
+  any:
+    - kind: if_statement
+      pattern: |
+        if $CONDITION:
+          import $MODULE
+        else: $$$
+      inside:
+        kind: block
+        inside:
+          kind: try_statement
+          inside:
+            kind: module
+      all:
+        - has:
+            any:
+              - kind: comparison_operator
+                pattern: |
+                  '$MODULE' not in sys.modules
+              - kind: comparison_operator
+                pattern: |
+                  "$MODULE" not in sys.modules
+        - has:
+            kind: block
+            has:
+              kind: import_statement
+message: "Consider simplifying import statement."
+fix:
+  import $MODULE
+description: Rule for sys.modules check pattern
+language: python
