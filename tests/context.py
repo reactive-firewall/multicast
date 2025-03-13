@@ -972,7 +972,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 	def test_absolute_truth_and_meaning(self):
 		"""Test case 0: Insanitty Test."""
 		assert True
-		self.assertTrue(True, "Insanitty Test Failed")
+		self.assertTrue(True, "Insanitty Test Failed")  # skipcq: PYL-W1503
 
 	def test_finds_python_WHEN_testing(self):
 		"""Test case 1: Class Test-Fixture Meta Test."""
