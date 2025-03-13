@@ -123,7 +123,7 @@ except ImportError as baton:
 try:
 	import random
 except ImportError as baton:  # pragma: no branch
-	raise ModuleNotFoundError(baton, str("[CWE-758] Test module failed to randomize.")) from baton
+	raise ModuleNotFoundError("[CWE-758] Test module failed to randomize.") from baton
 
 
 class MCastClient(object):  # skipcq: PYL-R0205
