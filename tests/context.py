@@ -86,8 +86,10 @@ try:
 	import os
 	if not hasattr(os, 'sep') or not os.sep:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-440] OS support is not available.") from None
-	import secrets
 	import string
+	if not hasattr(string, 'digits') or not string.digits:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] string support is not available.") from None
+	import secrets
 	import unittest
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Module Failed to import.") from err
