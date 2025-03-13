@@ -83,44 +83,14 @@ except ImportError as err:
 	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
 try:
-	if 'os' not in sys.modules:
-		import os
-	else:  # pragma: no branch
-		os = sys.modules["""os"""]
+	import os
+	if not hasattr(os, 'sep') or not os.sep:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] OS support is not available.") from None
+	import secrets
+	import string
+	import unittest
 except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
-
-try:
-	if 'secrets' not in sys.modules:
-		import secrets
-	else:  # pragma: no branch
-		secrets = sys.modules["""secrets"""]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Secrets Failed to import.") from err
-
-try:
-	if 'string' not in sys.modules:
-		import string
-	else:  # pragma: no branch
-		string = sys.modules["""string"""]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] String Failed to import.") from err
-
-try:
-	if 'unittest' not in sys.modules:
-		import unittest
-	else:  # pragma: no branch
-		unittest = sys.modules["""unittest"""]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
-
-try:
-	if 'contextlib' not in sys.modules:
-		import contextlib
-	else:  # pragma: no branch
-		contextlib = sys.modules["""contextlib"""]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] contextlib Failed to import.") from err
+	raise ModuleNotFoundError("[CWE-440] Module Failed to import.") from err
 
 try:
 	from contextlib import contextmanager
@@ -136,10 +106,7 @@ except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
 try:
-	if 'subprocess' not in sys.modules:
-		import subprocess
-	else:  # pragma: no branch
-		subprocess = sys.modules["""subprocess"""]
+	import subprocess
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
 

@@ -111,68 +111,19 @@ try:
 		raise ModuleNotFoundError(
 			"[CWE-440] OMG! sys.modules is not available or empty."
 		) from None
-except ImportError as err:
-	raise ImportError("[CWE-440] Unable to import sys module.") from err
+except ImportError as baton:
+	raise ImportError("[CWE-440] Unable to import sys module.") from baton
 
 try:
-	if 'os' not in sys.modules:
-		import os
-	else:  # pragma: no branch
-		os = sys.modules["""os"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
+	import socket
+	import socketserver
+except ImportError as baton:
+	raise ImportError("[CWE-758] Test module failed completely.") from baton
 
 try:
-	if 'functools' not in sys.modules:
-		import functools
-	else:  # pragma: no branch
-		functools = sys.modules["""functools"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
-try:
-	if 'socket' not in sys.modules:
-		import socket
-	else:  # pragma: no branch
-		socket = sys.modules["""socket"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
-try:
-	if 'socketserver' not in sys.modules:
-		import socketserver
-	else:  # pragma: no branch
-		socketserver = sys.modules["""socketserver"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
-try:
-	if 'random' not in sys.modules:
-		import random
-	else:  # pragma: no branch
-		random = sys.modules["""random"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
+	import random
+except ImportError as baton:  # pragma: no branch
+	raise ModuleNotFoundError(baton, str("[CWE-758] Test module failed to randomize.")) from baton
 
 
 class MCastClient(object):  # skipcq: PYL-R0205

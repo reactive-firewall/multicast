@@ -55,36 +55,10 @@ __module__ = """tests"""
 
 try:
 	import sys
-	if sys.__name__ is None:  # pragma: no branch
-		raise ModuleNotFoundError(
-			"[CWE-440] OMG! we could not import sys. ABORT. ABORT."
-		) from None
-except Exception as err:  # pragma: no branch
-	raise ImportError(err) from err
-
-try:
-	if 'os' not in sys.modules:
-		import os
-	else:  # pragma: no branch
-		os = sys.modules["""os"""]
-except Exception as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
-
-try:
-	if 'unittest' not in sys.modules:
-		import unittest
-	else:  # pragma: no branch
-		unittest = sys.modules["""unittest"""]
-except Exception as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] unittest Failed to import.") from err
-
-try:
-	if 'functools' not in sys.modules:
-		import functools
-	else:  # pragma: no branch
-		functools = sys.modules["""functools"""]
-except Exception as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] functools Failed to import.") from err
+	import os
+	import unittest
+except ImportError as baton:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Module failed to import.") from baton
 
 try:
 	if 'multicast' not in sys.modules:

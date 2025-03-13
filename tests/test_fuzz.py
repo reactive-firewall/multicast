@@ -72,8 +72,8 @@ if not _has_hypothesis:
 		from hypothesis import settings
 		from hypothesis import strategies as st
 		_has_hypothesis = True
-	except ImportError as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except ImportError as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		_has_hypothesis = False
 
 
