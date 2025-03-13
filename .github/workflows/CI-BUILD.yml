@@ -163,7 +163,7 @@ jobs:
       - id: check_status
         run: |
           if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
-            echo "build_success=true" >> $GITHUB_OUTPUT
+            echo "build_success=true" >> "$GITHUB_OUTPUT"
           else
-            echo "build_success=false" >> $GITHUB_OUTPUT
+            echo "build_success=false" >> "$GITHUB_OUTPUT"
           fi

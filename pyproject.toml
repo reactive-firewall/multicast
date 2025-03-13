@@ -12,7 +12,7 @@ extend-select = ["D", "E"]
 # Ignore specific warnings and errors according to CEP-7 style
 extend-ignore = ["E117", "D203", "D208", "D212"]
 # REQUIRED CEP-7 Custom Exceptions:
-#    E117,  # Over-indented - RECCOMENDED
+#    E117,  # Over-indented - RECOMMENDED
 #    D208,  # Docstring is over-indented - CEP-7
 #    D203,  # 1 blank line required before class docstring - CEP-7
 #    D212,  # Multi-line docstring summary should start at the first line - CEP-7
