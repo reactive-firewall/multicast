@@ -77,7 +77,20 @@ if not _has_hypothesis:
 
 
 def onlyIfHasHypothesis(has_hypothesis):
-	"""Decorator to handle optional loading."""
+	"""
+	Conditionally enable a class based on the availability of the hypothesis library.
+
+	If the provided flag is False, returns a dummy class with a placeholder method that does nothing,
+	allowing tests dependent on hypothesis to be safely bypassed. If True, the original
+	class is returned unchanged.
+
+	Arguments:
+		has_hypothesis (bool): Flag indicating whether the hypothesis library is available.
+
+	Returns:
+		callable: A decorator function that returns either the original class or a dummy class
+		with a placeholder method, depending on the has_hypothesis flag.
+	"""
 	def decorator(cls):
 		if not has_hypothesis:
 			# Create an empty class with a method that returns None
