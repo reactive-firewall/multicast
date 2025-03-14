@@ -51,7 +51,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
-          python-version: ${{ env.PYTHON_DEFAULT }}
+          python-version: "${{ vars.PYTHON_DEFAULT }}"
       - name: Pre-Clean
         id: clean
         run: make -j1 -f Makefile purge 2>/dev/null || true
@@ -86,24 +86,24 @@ jobs:
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "de.utf-8"
             experimental: false
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "jp.utf-8"
             experimental: false
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_OLD_MIN }}"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.11"
+          - python-version: "${{ vars.PYTHON_OLD_EXTRA }}"
             lang-var: "en_US.utf-8"
             experimental: false
           - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.12"
+          - python-version: "${{ vars.PYTHON_EXPERIMENTAL }}"
             lang-var: "en_US.utf-8"
-            experimental: false
+            experimental: ${{ (needs.BUILD.environment == 'Experimenting') }}
     outputs:
       bootstrap_status: ${{ steps.bootstrap.outcome }}
     env:
