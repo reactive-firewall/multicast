@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	"""Handle imports with CWE-758 mitigation.
@@ -121,9 +121,9 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 	without fragmentation.
 	"""
 
-	__module__ = """tests.test_fuzz"""
+	__module__ = "tests.test_fuzz"
 
-	__name__ = """tests.test_fuzz.HypothesisTestSuite"""
+	__name__ = "tests.test_fuzz.HypothesisTestSuite"
 
 	@given(st.binary(min_size=1, max_size=1472))
 	@settings(deadline=None)
@@ -144,28 +144,28 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 		- If the receiver process encounters an error, the test is skipped.
 		"""
 		theResult = False
-		fail_fixture = str("""SAY --> HEAR == error""")
+		fail_fixture = str("SAY --> HEAR == error")
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_SAY_args = [
-				"""SAY""",
-				"""--port""",
+				"SAY",
+				"--port",
 				str(_fixture_port_num),
-				"""--group""",
-				"""'224.0.0.1'""",
-				"""--message""",
+				"--group",
+				"'224.0.0.1'",
+				"--message",
 				f"'{data}'"
 			]
 			_fixture_HEAR_args = [
-				"""HEAR""",
-				"""--port""",
+				"HEAR",
+				"--port",
 				str(_fixture_port_num),
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--groups",
+				"'224.0.0.1'",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -209,7 +209,7 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 			- The CLI output includes the invalid input text
 		"""
 		theResult = False
-		fail_fixture = str("""XZY? --> Multicast != error""")
+		fail_fixture = str("XZY? --> Multicast != error")
 		if (self._thepython is not None):
 			try:
 				args = [str(self._thepython), str("-m"), str("multicast"), str(text)]
@@ -251,8 +251,8 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_HEAR_kwargs = {
-				"""port""": _fixture_port_num,
-				"""group""": """224.0.0.1"""
+				"port": _fixture_port_num,
+				"group": "224.0.0.1"
 			}
 			self.assertIsNotNone(_fixture_HEAR_kwargs)
 			p = Process(

@@ -27,7 +27,7 @@
 # ..........................................
 # NO ASSOCIATION
 
-__module__ = """tests.profiling"""
+__module__ = "tests.profiling"
 """This is pythonrepo testing module Template."""
 
 try:
@@ -43,7 +43,7 @@ try:
 	if 'os' not in sys.modules:
 		import os
 	else:  # pragma: no branch
-		os = sys.modules["""os"""]
+		os = sys.modules["os"]
 except Exception as badErr:  # pragma: no branch
 	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
@@ -55,7 +55,7 @@ try:
 	if 'functools' not in sys.modules:
 		import functools
 	else:  # pragma: no branch
-		functools = sys.modules["""functools"""]
+		functools = sys.modules["functools"]
 except Exception as badErr:  # pragma: no branch
 	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
@@ -78,7 +78,7 @@ try:
 	if 'cProfile' not in sys.modules:
 		import cProfile
 	else:  # pragma: no branch
-		cProfile = sys.modules["""cProfile"""]
+		cProfile = sys.modules["cProfile"]
 except Exception as badErr:  # pragma: no branch
 	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__

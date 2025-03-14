@@ -43,7 +43,7 @@ Tests of integration by usage.
 
 """
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -118,14 +118,14 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		or the testing environment rather than actual bugs in the code.
 	"""
 
-	__module__ = """tests.test_usage"""
+	__module__ = "tests.test_usage"
 
-	__name__ = """tests.test_usage.MulticastTestSuite"""
+	__name__ = "tests.test_usage.MulticastTestSuite"
 
 	def test_aborts_WHEN_calling_multicast_GIVEN_invalid_tools(self):
 		"""Tests the impossible state for CLI tools given bad tools"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(JUNK) == error""")
+		fail_fixture = str("multicast.__main__.McastDispatch().useTool(JUNK) == error")
 		tst_dispatch = multicast.__main__.McastDispatch()
 		test_junk_values = ["", "NoSuchTool", None]
 		try:
@@ -158,7 +158,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		"""
 		theResult = False
 		fail_fixture = str(
-			"""multicast.__main__.McastDispatch().useTool(SAY, message) != valid exit(0..3)"""
+			"multicast.__main__.McastDispatch().useTool(SAY, message) != valid exit(0..3)"
 		)
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_a:
@@ -193,7 +193,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_recv_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(1)""")
+		fail_fixture = str("multicast.__main__.McastDispatch().useTool(RECV, junk) != exit(1)")
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_c:
 				_ = multicast.__main__.McastDispatch().doStep(["RECV", "--port", "test"])
@@ -226,7 +226,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_aborts_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the message argument for failure given invalid input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HEAR, junk) != exit(2)""")
+		fail_fixture = str("multicast.__main__.McastDispatch().useTool(HEAR, junk) != exit(2)")
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_e:
 				_ = __main__.main(["HEAR", "--port", "test"])
@@ -258,7 +258,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_ignores_WHEN_calling_multicast_GIVEN_invalid_args(self):
 		"""Tests the group argument for new auto-default behavior given None."""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.main(HEAR, group=None) == ERROR""")
+		fail_fixture = str("multicast.__main__.main(HEAR, group=None) == ERROR")
 		try:
 			(rtn_val_f, tst_err_rslt_f) = __main__.main(
 				["HEAR", "--group", "None", "--iface=None"]
@@ -280,7 +280,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_is_stable_WHEN_calling_multicast_GIVEN_invalid_tool(self):
 		"""Tests the hexdump argument for failure given future tools"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HEAR, hex) == error""")
+		fail_fixture = str("multicast.__main__.McastDispatch().useTool(HEAR, hex) == error")
 		try:
 			self.assertTupleEqual(
 				multicast.__main__.main(["HEAR", "--hex"]),
@@ -296,7 +296,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_noop_stable_WHEN_calling_multicast_GIVEN_noop_args(self):
 		"""Tests the NOOP state for multicast given bad input"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.main(NOOP) == Error""")
+		fail_fixture = str("multicast.__main__.main(NOOP) == Error")
 		try:
 			self.assertIsNotNone(multicast.__main__.main(["NOOP"]), fail_fixture)
 			self.assertIsNotNone(multicast.__main__.main(["NOOP"])[0])  # skipcq: PTC-W0020
@@ -314,7 +314,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_help_works_WHEN_calling_multicast_GIVEN_help_tool(self):
 		"""Tests the HELP argument for help usage"""
 		theResult = False
-		fail_fixture = str("""multicast.__main__.McastDispatch().useTool(HELP, []) == Empty""")
+		fail_fixture = str("multicast.__main__.McastDispatch().useTool(HELP, []) == Empty")
 		try:
 			with self.assertRaises(SystemExit) as rtn_val_h:
 				multicast.__main__.McastDispatch().doStep(["HELP"])
@@ -329,41 +329,41 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_works_WHEN_say_works(self):
 		"""Tests the basic send and recv test"""
 		theResult = False
-		fail_fixture = str("""SAY --> HEAR == error""")
-		sub_fail_fixture = str("""SAY X-> HEAR == Error X-> HEAR :: (Error in SAY)""")
+		fail_fixture = str("SAY --> HEAR == error")
+		sub_fail_fixture = str("SAY X-> HEAR == Error X-> HEAR :: (Error in SAY)")
 		try:
 			_fixture_SAY_args = [
-				"""--port""",
-				"""59991""",
-				"""--group""",
-				"""'224.0.0.1'""",
-				"""--message""",
-				"""'test message'"""
+				"--port",
+				"59991",
+				"--group",
+				"'224.0.0.1'",
+				"--message",
+				"'test message'"
 			]
 			_fixture_HEAR_args = [
-				"""--port""",
-				"""59991""",
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--port",
+				"59991",
+				"--groups",
+				"'224.0.0.1'""",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
 				name="HEAR",
-				args=(["""HEAR""", _fixture_HEAR_args])
+				args=(["HEAR", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
 				tst_fixture_sendDispatch = multicast.__main__.McastDispatch()
 				self.assertIsNotNone(
-					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["SAY", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["SAY", _fixture_SAY_args])
 				)
 				self.assertIsNotNone(
-					tst_fixture_sendDispatch.doStep(["""SAY""", _fixture_SAY_args])
+					tst_fixture_sendDispatch.doStep(["SAY", _fixture_SAY_args])
 				)
 			except Exception as _cause:
 				p.join()
@@ -383,32 +383,32 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_hear_works_WHEN_fuzzed_and_say_works(self):
 		"""Tests the basic send and recv test. Skips if fuzzing broke SAY fixture."""
 		theResult = False
-		fail_fixture = str("""SAY --> HEAR == error""")
+		fail_fixture = str("SAY --> HEAR == error")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_SAY_args = [
-				"""--port""",
+				"--port",
 				str(_fixture_port_num),
-				"""--group""",
-				"""'224.0.0.1'""",
-				"""--message""",
-				"""'test message'"""
+				"--group",
+				"'224.0.0.1'",
+				"--message",
+				"'test message'"
 			]
 			_fixture_HEAR_args = [
-				"""HEAR""",
-				"""--port""",
+				"HEAR",
+				"--port",
 				str(_fixture_port_num),
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--groups",
+				"'224.0.0.1'",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
 				name="HEAR",
-				args=(["""HEAR""", _fixture_HEAR_args])
+				args=(["HEAR", _fixture_HEAR_args])
 			)
 			p.start()
 			try:
@@ -439,7 +439,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_say_works_WHEN_using_stdin(self):
 		"""Tests the basic send with streamed input test case."""
 		theResult = False
-		fail_fixture = str("""STDIN --> SAY == error""")
+		fail_fixture = str("STDIN --> SAY == error")
 		_fixture_port_num = self._the_test_port
 		try:
 			say = multicast.send.McastSAY()
@@ -463,16 +463,16 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 	def test_recv_Errors_WHEN_say_not_used(self):
 		"""Tests the basic noop recv test"""
 		theResult = False
-		fail_fixture = str("""NOOP --> RECV != error""")
-		sub_fail_fixture = str("""NOOP X-> RECV == Error X-> RECV :: (Error in NOOP)""")
+		fail_fixture = str("NOOP --> RECV != error")
+		sub_fail_fixture = str("NOOP X-> RECV == Error X-> RECV :: (Error in NOOP)")
 		try:
 			_fixture_RECV_args = [
-				"""--port""",
-				"""59992""",
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--port",
+				"59992",
+				"--groups",
+				"'224.0.0.1'",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.McastDispatch().doStep,
@@ -547,19 +547,19 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		```
 	"""
 
-	__module__ = """tests.test_usage"""
+	__module__ = "tests.test_usage"
 
-	__name__ = """tests.test_usage.BasicIntegrationTestSuite"""
+	__name__ = "tests.test_usage.BasicIntegrationTestSuite"
 
 	def setUp(self):
 		super(self.__class__, self).setUp()  # skipcq: PYL-E1003 - this is more polymorphic
 		if (self._thepython is None):
-			self.skipTest(str("""No python cmd to test with!"""))
+			self.skipTest(str("No python cmd to test with!"))
 
 	def test_prints_usage_WHEN_called_GIVEN_help_argument(self):
 		"""Test case for multicast.__main__ help."""
 		theResult = False
-		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
+		fail_fixture = str("multicast.__main__(--help) == not helpful")
 		try:
 			if (self._thepython is not None):
 				theOutputtxt = context.checkPythonCommand(
@@ -580,12 +580,12 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
-		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
+		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
 
 	def test_prints_usage_WHEN_called_GIVEN_cmd_and_help_argument(self):
 		"""Test case for multicast HEAR|RECV|SAY help."""
 		theResult = None
-		fail_fixture = str("""multicast.__main__(--help) == not helpful""")
+		fail_fixture = str("multicast.__main__(--help) == not helpful")
 		try:
 			if (self._thepython is not None):
 				for test_case in [".__main__", ""]:
@@ -610,7 +610,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
-		self.assertTrue(theResult, str("""Could Not find usage from multicast CMD --help"""))
+		self.assertTrue(theResult, str("Could Not find usage from multicast CMD --help"))
 
 	def test_equivilant_response_WHEN_absolute_vs_implicit(self):
 		"""Test case for multicast vs multicast.__main__"""
@@ -637,7 +637,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			err = None
 			del err  # skipcq - cleanup any error leaks early
 			theResult = False
-		self.assertTrue(theResult, str("""Could Not swap multicast for multicast.__main__"""))
+		self.assertTrue(theResult, str("Could Not swap multicast for multicast.__main__"))
 
 	def test_prints_version_WHEN_called_GIVEN_version_argument(self):
 		"""Test for result from --version argument: python -m multicast.* --version """
@@ -659,12 +659,12 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err  # skipcq - cleanup any error leaks early
 				theResult = False
-		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
+		self.assertTrue(theResult, str("Could Not find version from multicast --version"))
 
 	def test_Usage_Error_WHEN_the_help_command_is_called(self):
 		"""Test case for multicast* --help."""
 		theResult = False
-		fail_fixture = str("""multicast --help == not helpful""")
+		fail_fixture = str("multicast --help == not helpful")
 		try:
 			if (self._thepython is not None):
 				for test_case in [".__main__", ""]:
@@ -684,8 +684,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						theOutputtxt = str(repr(bytes(theOutputtxt)))
 					# or simply:
 					self.assertIsNotNone(theOutputtxt)
-					self.assertIn(str("""usage:"""), str(theOutputtxt))
-					if (str("""usage:""") in str(theOutputtxt)):
+					self.assertIn(str("usage:"), str(theOutputtxt))
+					if (str("usage:") in str(theOutputtxt)):
 						theResult = True or theResult
 					else:
 						theResult = False
@@ -698,7 +698,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
-		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
+		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
 
 	def test_Usage_Error_WHEN_the_help_sub_command_is_called(self):
 		"""
@@ -713,7 +713,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		- command: the sub-command being tested
 		"""
 		theResult = False
-		fail_fixture = str("""multicast [HEAR|RECV] --help == not helpful""")
+		fail_fixture = str("multicast [HEAR|RECV] --help == not helpful")
 		try:
 			TestCase = namedtuple("TestCase", ["mode", "command"])
 			inner_fixtures = [
@@ -746,8 +746,8 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 							theOutputtxt = str(repr(bytes(theOutputtxt)))
 						# or simply:
 						self.assertIsNotNone(theOutputtxt)
-						self.assertIn(str("""usage:"""), str(theOutputtxt))
-						if (str("""usage:""") in str(theOutputtxt)):
+						self.assertIn(str("usage:"), str(theOutputtxt))
+						if (str("usage:") in str(theOutputtxt)):
 							theResult = True and theResult
 						else:
 							theResult = False
@@ -760,7 +760,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 			del err  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
-		self.assertTrue(theResult, str("""Could Not find usage from multicast --help"""))
+		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
 
 	def test_profile_WHEN_the_noop_command_is_called(self):
 		"""Test case template for profiling"""
@@ -811,7 +811,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err  # skipcq - cleanup any error leaks early
 				theResult = False
-		self.assertTrue(theResult, str("""Could Not handle multicast NOOP"""))
+		self.assertTrue(theResult, str("Could Not handle multicast NOOP"))
 
 	def test_invalid_Error_WHEN_cli_called_GIVEN_bad_input(self):
 		"""Test case template for invalid input to multicast CLI."""
@@ -836,7 +836,7 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				err = None
 				del err  # skipcq - cleanup any error leaks early
 				theResult = False
-		self.assertTrue(theResult, str("""Could Not handle negative inputs"""))
+		self.assertTrue(theResult, str("Could Not handle negative inputs"))
 
 
 if __name__ == '__main__':

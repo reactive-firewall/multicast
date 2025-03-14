@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -43,9 +43,9 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 
 	"""
 
-	__module__ = """tests.test_hear_data_processing"""
+	__module__ = "tests.test_hear_data_processing"
 
-	__name__ = """tests.test_hear_data_processing.RecvDataProcessingTestSuite"""
+	__name__ = "tests.test_hear_data_processing.RecvDataProcessingTestSuite"
 
 	def test_multicast_sender_with_no_data(self):
 		"""
@@ -53,18 +53,18 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 
 		"""
 		theResult = False
-		fail_fixture = str("""SAY -X] RECV? != error""")
+		fail_fixture = str("SAY -X] RECV? != error")
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_HEAR_args = [
-				"""--port""",
+				"--port",
 				str(_fixture_port_num),
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--groups",
+				"'224.0.0.1'",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.main, name="RECV", args=(
@@ -87,7 +87,7 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 					p.close()
 				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join(5)
-			self.assertFalse(p.is_alive(), """RESOURCE LEAK.""")
+			self.assertFalse(p.is_alive(), "RESOURCE LEAK.")
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) == int(0))
@@ -103,18 +103,18 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 
 		"""
 		theResult = False
-		fail_fixture = str("""SAY -X] HEAR? != error""")
+		fail_fixture = str("SAY -X] HEAR? != error")
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			_fixture_HEAR_args = [
-				"""--port""",
+				"--port",
 				str(_fixture_port_num),
-				"""--groups""",
-				"""'224.0.0.1'""",
-				"""--group""",
-				"""'224.0.0.1'"""
+				"--groups",
+				"'224.0.0.1'",
+				"--group",
+				"'224.0.0.1'"
 			]
 			p = Process(
 				target=multicast.__main__.main,
@@ -136,7 +136,7 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 				while p.is_alive():
 					sender(group="224.0.0.1", port=_fixture_port_num, data=["STOP"])
 					p.join(1)
-				self.assertFalse(p.is_alive(), """HEAR ignored STOP""")
+				self.assertFalse(p.is_alive(), "HEAR ignored STOP")
 			except Exception as _cause:
 				p.join(3)
 				if p.is_alive():
@@ -144,7 +144,7 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 					p.close()
 				raise unittest.SkipTest(fail_fixture) from _cause
 			p.join(5)
-			self.assertFalse(p.is_alive(), """RESOURCE LEAK.""")
+			self.assertFalse(p.is_alive(), "RESOURCE LEAK.")
 			self.assertIsNotNone(p.exitcode, "Unexpected None == Exit-Code.")
 			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) >= int(0))
@@ -163,9 +163,9 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 
 	"""
 
-	__module__ = """tests.test_hear_data_processing"""
+	__module__ = "tests.test_hear_data_processing"
 
-	__name__ = """tests.test_hear_data_processing.HearHandleNoneDataTestSuite"""
+	__name__ = "tests.test_hear_data_processing.HearHandleNoneDataTestSuite"
 
 	def test_handle_none_data(self):
 		"""Test that HearUDPHandler properly handles None data without raising exceptions.

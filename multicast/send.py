@@ -66,7 +66,7 @@ Minimal Acceptance Testing:
 
 """
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -89,7 +89,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -109,10 +109,10 @@ __module__ = """multicast"""
 
 """
 
-__file__ = """multicast/send.py"""
+__file__ = "multicast/send.py"
 """The file of this component."""
 
-__name__ = """multicast.send"""  # skipcq: PYL-W0622 - Ensures the correct name value.
+__name__ = "multicast.send"  # skipcq: PYL-W0622 - Ensures the correct name value.
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -138,7 +138,7 @@ try:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
@@ -200,13 +200,13 @@ class McastSAY(multicast.mtool):
 
 	"""
 
-	__module__ = """multicast.send"""
+	__module__ = "multicast.send"
 
-	__name__ = """multicast.send.McastSAY"""
+	__name__ = "multicast.send.McastSAY"
 
-	__proc__ = """SAY"""
+	__proc__ = "SAY"
 
-	__prologue__ = """Python Multicast Broadcaster."""
+	__prologue__ = "Python Multicast Broadcaster."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -277,27 +277,27 @@ class McastSAY(multicast.mtool):
 		"""
 		if parser is not None:  # pragma: no branch
 			parser.add_argument(
-				"""--port""",
+				"--port",
 				type=int,
 				default=multicast._MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
-				"""--group""",
+				"--group",
 				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
-				"""--groups""",
+				"--groups",
 				required=False,
 				nargs="*",
-				dest="""groups""",
-				help="""multicast groups (ip addrs) to listen to join."""
+				dest="groups",
+				help="multicast groups (ip addrs) to listen to join."
 			)
 			parser.add_argument(
-				"""-m""",
-				"""--message""",
+				"-m",
+				"--message",
 				nargs="+",
-				dest="""data""",
-				default=str("""PING from {name}: group: {group}, port: {port}""")
+				dest="data",
+				default=str("PING from {name}: group: {group}, port: {port}")
 			)
 
 	@staticmethod
@@ -363,7 +363,7 @@ class McastSAY(multicast.mtool):
 				_result = _result and self._sayStep(group, port, chunk)
 		elif isinstance(data, list):
 			# Join multiple arguments into a single string
-			message = str(""" """).join(data)
+			message = str(" ").join(data)
 			_result = self._sayStep(group, port, message)
 		else:
 			message = data.decode('utf8') if isinstance(data, bytes) else str(data)

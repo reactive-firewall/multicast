@@ -43,7 +43,7 @@ from urllib.parse import quote
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath(""".."""))
+sys.path.insert(0, os.path.abspath(".."))
 from docs.utils import _validate_git_ref  # noqa
 from docs.utils import slugify_header  # noqa
 
@@ -58,8 +58,8 @@ Value:
 		variable is not set.
 """
 
-sys.path.insert(1, os.path.abspath("""multicast"""))
-sys.path.insert(1, os.path.abspath("""tests"""))
+sys.path.insert(1, os.path.abspath("multicast"))
+sys.path.insert(1, os.path.abspath("tests"))
 
 # -- General configuration -----------------------------------------------------
 
@@ -71,18 +71,18 @@ needs_sphinx = "7.3"
 # for md us 'autodoc2' (pip install sphinx-autodoc2)
 # for rst use 'sphinx.ext.autodoc'
 extensions = [
-	"""sphinx.ext.napoleon""",
-	"""autodoc2""",
-	"""sphinx.ext.autosectionlabel""",
-	"""sphinx.ext.githubpages""",
-	"""myst_parser""",
-	"""sphinx_design""",
-	"""sphinx.ext.autosummary""",
-	"""sphinx.ext.doctest""",
-	"""sphinx.ext.todo""",
-	"""sphinx.ext.linkcode""",
-	"""sphinx.ext.viewcode""",
-	"""sphinx.ext.intersphinx""",
+	"sphinx.ext.napoleon",
+	"autodoc2",
+	"sphinx.ext.autosectionlabel",
+	"sphinx.ext.githubpages",
+	"myst_parser",
+	"sphinx_design",
+	"sphinx.ext.autosummary",
+	"sphinx.ext.doctest",
+	"sphinx.ext.todo",
+	"sphinx.ext.linkcode",
+	"sphinx.ext.viewcode",
+	"sphinx.ext.intersphinx",
 ]
 
 # for md auto-docs
@@ -179,15 +179,15 @@ pygments_style = "xcode"
 pygments_style_dark = "github-dark"
 
 pygments_options = {
-	"""tabsize""": 4,
-	"""stripall""": False,
-	"""encoding""": "utf-8",
+	"tabsize": 4,
+	"stripall": False,
+	"encoding": "utf-8",
 }
 
 pygments_yaml_options = {
-	"""tabsize""": 2,
-	"""stripall""": True,
-	"""encoding""": "utf-8",
+	"tabsize": 2,
+	"stripall": True,
+	"encoding": "utf-8",
 }
 
 highlight_options = {
@@ -421,19 +421,19 @@ texinfo_documents = [
 
 linkcode_url_prefix: str = f"https://github.com/reactive-firewall/{project}"
 
-suffix = """/issues/%s"""
+suffix = "/issues/%s"
 
 extlinks = {
-	"""issue""": (
+	"issue": (
 		f"{linkcode_url_prefix}/{suffix}",
-		"""issue #%s"""
+		"issue #%s"
 	)
 }
 
 # try to link with official python3 documentation.
 # see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
 intersphinx_mapping = {
-	"""python""": ("""https://docs.python.org/3""", (None, """python-inv.txt"""))
+	"python": ("https://docs.python.org/3", (None, "python-inv.txt"))
 }
 
 

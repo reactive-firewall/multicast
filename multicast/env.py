@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """
 The package of this component.
 
@@ -41,7 +41,7 @@ Minimal Acceptance Testing:
 
 """
 
-__module__ = """multicast.env"""
+__module__ = "multicast.env"
 """
 The module of this component.
 
@@ -62,10 +62,10 @@ Minimal Acceptance Testing:
 
 """
 
-__file__ = """multicast/env.py"""
+__file__ = "multicast/env.py"
 """The file of this component."""
 
-__name__ = """multicast.env"""  # skipcq: PYL-W0622
+__name__ = "multicast.env"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -289,7 +289,7 @@ def load_port() -> int:
 		port = _MCAST_DEFAULT_PORT
 	# Validate and potentially update port
 	if validate_port(port):
-		globals()["""_MCAST_DEFAULT_PORT"""] = port
+		globals()["_MCAST_DEFAULT_PORT"] = port
 	else:
 		warnings.warn(
 			f"Port {port} is outside valid range (49152-65535), using default {_MCAST_DEFAULT_PORT}",
@@ -403,7 +403,7 @@ def load_group() -> ipaddress.IPv4Address:
 	group = os.getenv("MULTICAST_GROUP", _MCAST_DEFAULT_GROUP)
 	# Validate and potentially update group
 	if validate_multicast_address(group):
-		globals()["""_MCAST_DEFAULT_GROUP"""] = group
+		globals()["_MCAST_DEFAULT_GROUP"] = group
 	else:
 		warnings.warn(
 			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2
@@ -490,7 +490,7 @@ def load_TTL() -> int:
 		ttl = _MCAST_DEFAULT_TTL
 	# Validate and potentially update TTL
 	if validate_ttl(ttl):
-		globals()["""_MCAST_DEFAULT_TTL"""] = ttl
+		globals()["_MCAST_DEFAULT_TTL"] = ttl
 	else:
 		warnings.warn(
 			f"TTL {ttl} is outside valid range (1-126), using default {_MCAST_DEFAULT_TTL}",

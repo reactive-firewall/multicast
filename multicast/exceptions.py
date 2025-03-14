@@ -124,7 +124,7 @@ Minimal Acceptance Testing:
 
 """
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """
 The package of this program.
 
@@ -148,7 +148,7 @@ Minimal Acceptance Testing:
 
 """
 
-__module__ = """multicast.exceptions"""
+__module__ = "multicast.exceptions"
 """
 The module of this program.
 
@@ -169,10 +169,10 @@ Minimal Acceptance Testing:
 
 """
 
-__file__ = """multicast/exceptions.py"""
+__file__ = "multicast/exceptions.py"
 """The file of this component."""
 
-__name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
+__name__ = "multicast.exceptions"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -231,9 +231,9 @@ class CommandExecutionError(RuntimeError):
 			1
 	"""
 
-	__module__ = """multicast.exceptions"""
+	__module__ = "multicast.exceptions"
 
-	__name__ = """multicast.exceptions.CommandExecutionError"""
+	__name__ = "multicast.exceptions.CommandExecutionError"
 
 	def __init__(self, *args, **kwargs):
 		"""
@@ -331,9 +331,9 @@ class ShutdownCommandReceived(RuntimeError):
 			'Custom shutdown message.'
 	"""
 
-	__module__ = """multicast.exceptions"""
+	__module__ = "multicast.exceptions"
 
-	__name__ = """multicast.exceptions.ShutdownCommandReceived"""
+	__name__ = "multicast.exceptions.ShutdownCommandReceived"
 
 	def __init__(self, *args, **kwargs):
 		"""

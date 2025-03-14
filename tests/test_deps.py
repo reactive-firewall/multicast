@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -50,7 +50,7 @@ except Exception as _cause:  # pragma: no branch
 class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	"""Test cases for 'tests/requirements.txt'."""
 
-	__module__ = """tests.test_deps"""
+	__module__ = "tests.test_deps"
 
 	def test_requirements_path_exists(self):
 		"""Test that 'tests/requirements.txt' exists."""
@@ -103,7 +103,7 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 		result = context.checkPythonCommand(
 			[context.getPythonCommand(), '-m pip', 'install', '-r', 'tests/requirements.txt']
 		)
-		self.assertIsNotNone(result, str("""Failed to install requirements!"""))
+		self.assertIsNotNone(result, str("Failed to install requirements!"))
 
 
 # leave this part

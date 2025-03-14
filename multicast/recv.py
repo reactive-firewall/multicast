@@ -103,7 +103,7 @@ Minimal Acceptance Testing:
 
 """
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -126,7 +126,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -146,10 +146,10 @@ __module__ = """multicast"""
 
 """
 
-__file__ = """multicast/recv.py"""
+__file__ = "multicast/recv.py"
 """The file of this component."""
 
-__name__ = """multicast.recv"""  # skipcq: PYL-W0622
+__name__ = "multicast.recv"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -175,7 +175,7 @@ try:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 except Exception as importErr:
 	del importErr  # skipcq - cleanup any error leaks early
@@ -407,7 +407,7 @@ def recvstep(msgbuffer, chunk, sock):
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
-			print(str("""User Interrupted"""))
+			print(str("User Interrupted"))
 	except OSError:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
@@ -462,18 +462,18 @@ class McastRECV(multicast.mtool):
 
 	"""
 
-	__module__ = """multicast.recv"""
+	__module__ = "multicast.recv"
 
-	__name__ = """multicast.recv.McastRECV"""
+	__name__ = "multicast.recv.McastRECV"
 
-	__proc__ = """RECV"""
+	__proc__ = "RECV"
 
 	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
 		this module/instance, but it is also possible to bind to group which
 		is added by some other programs (like another python program instance of this)
 	"""
 
-	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
+	__prologue__ = "Python Multicast Receiver. Primitives for a listener for multicast data."
 
 	@classmethod
 	def setupArgs(cls, parser):

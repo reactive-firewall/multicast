@@ -70,7 +70,7 @@ Testcase 2: SKT utils should be detailed with some metadata.
 
 """
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -93,7 +93,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-__module__ = """multicast.skt"""
+__module__ = "multicast.skt"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -113,10 +113,10 @@ __module__ = """multicast.skt"""
 
 """
 
-__file__ = """multicast/skt.py"""
+__file__ = "multicast/skt.py"
 """The file of this component."""
 
-__name__ = """multicast.skt"""  # skipcq: PYL-W0622
+__name__ = "multicast.skt"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:

@@ -49,9 +49,9 @@
 
 """
 
-__package__ = """tests"""  # skipcq: PYL-W0622
+__package__ = "tests"  # skipcq: PYL-W0622
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	import sys
@@ -64,7 +64,7 @@ try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["multicast"]
 except Exception as err:  # pragma: no branch
 	raise ImportError("[CWE-440] multicast Failed to import.") from err
 
@@ -138,7 +138,7 @@ try:
 	if 'tests.context' not in sys.modules:
 		from tests import context
 	else:  # pragma: no branch
-		context = sys.modules["""tests.context"""]
+		context = sys.modules["tests.context"]
 except ImportError as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
@@ -204,7 +204,7 @@ def loadDocstringsFromModule(module):
 		if 'doctest' not in sys.modules:
 			import doctest
 		else:  # pragma: no branch
-			doctest = sys.modules["""doctest"""]
+			doctest = sys.modules["doctest"]
 	except Exception as _cause:  # pragma: no branch
 		raise ImportError("[CWE-440] doctest Failed to import.") from _cause
 	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)

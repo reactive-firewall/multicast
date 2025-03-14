@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -41,7 +41,7 @@ except Exception as _cause:  # pragma: no branch
 @context.markWithMetaTag("mat", "mat_build")
 class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_install_requires"""
+	__module__ = "tests.test_install_requires"
 
 	requirements_file = None
 	"""stores the temporary requirements file path for testing"""
@@ -49,7 +49,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 	def setUp(self):
 		super(ParseRequirementsTestSuite, self).setUp()
 		# Create a temporary requirements file for testing
-		self.requirements_file = """test_requirements.txt"""
+		self.requirements_file = "test_requirements.txt"
 
 	def tearDown(self):
 		"""Clean up the temporary requirements file"""
@@ -65,19 +65,19 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 	def test_simple_version_constraint(self):
 		"""Test parsing a simple version constraint."""
-		self.write_requirements("""package>=1.0\n""")
+		self.write_requirements("package>=1.0\n")
 		install_requires = parse_requirements_for_install_requires(
 			readFile(self.requirements_file)
 		)
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		self.assertEqual(install_requires, ["package>=1.0"])
 
 	def test_multiple_version_constraints(self):
 		"""Test parsing multiple version constraints."""
-		self.write_requirements("""package>=1.0,!=1.5,<2.0\n""")
+		self.write_requirements("package>=1.0,!=1.5,<2.0\n")
 		install_requires = parse_requirements_for_install_requires(
 			readFile(self.requirements_file)
 		)
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		self.assertEqual(install_requires, ["package>=1.0"])
 
 	def test_comments_and_empty_lines(self):
 		"""Test handling comments and empty lines."""
@@ -92,7 +92,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		install_requires = parse_requirements_for_install_requires(
 			readFile(self.requirements_file)
 		)
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		self.assertEqual(install_requires, ["package>=1.0"])
 
 	def test_options_and_urls_ignored(self):
 		"""Test that options and URLs are ignored."""
@@ -111,7 +111,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 	def test_malformed_lines(self):
 		"""Test handling of malformed requirement lines."""
-		self.write_requirements("""bad_package==\n""")
+		self.write_requirements("bad_package==\n")
 		install_requires = parse_requirements_for_install_requires(
 			readFile(self.requirements_file)
 		)
@@ -119,7 +119,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 	def test_nonexistent_requirements_file(self):
 		"""Test behavior when requirements file does not exist."""
-		_test_fixture = """nonexistent.txt"""
+		_test_fixture = "nonexistent.txt"
 		install_requires = parse_requirements_for_install_requires(readFile(_test_fixture))
 		self.assertEqual(install_requires, [])
 

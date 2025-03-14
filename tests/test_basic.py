@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -63,7 +63,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 	platforms.
 	"""
 
-	__module__ = """tests.test_basic"""
+	__module__ = "tests.test_basic"
 
 	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
@@ -122,7 +122,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 				(_ignored_code, test_fixture) = tst_dispatch.useTool(tst_in)
 				self.assertIsNone(
 					test_fixture,
-					str("""multicast.McastDispatch().useTool({}) == ERROR""").format(str(tst_in))
+					str("multicast.McastDispatch().useTool({}) == ERROR").format(str(tst_in))
 				)
 			theResult = True
 		except Exception:

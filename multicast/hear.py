@@ -110,7 +110,7 @@ Minimal Acceptance Testing:
 
 """
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """Names the package of this program.
 
 	Minimal Acceptance Testing:
@@ -134,7 +134,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-__module__ = """multicast"""
+__module__ = "multicast"
 """Names the module of this program.
 
 	Minimal Acceptance Testing:
@@ -155,10 +155,10 @@ __module__ = """multicast"""
 
 """
 
-__file__ = """multicast/hear.py"""
+__file__ = "multicast/hear.py"
 """Names the file of this component."""
 
-__name__ = """multicast.hear"""  # skipcq: PYL-W0622
+__name__ = "multicast.hear"  # skipcq: PYL-W0622
 """Names this component.
 
 	Minimal Acceptance Testing:
@@ -184,7 +184,7 @@ try:
 	if 'multicast' not in _sys.modules:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = _sys.modules["""multicast"""]
+		multicast = _sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 	# skipcq
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
@@ -332,7 +332,7 @@ class McastServer(socketserver.UDPServer):
 			None
 		"""
 		print(str("handle_error"))
-		if request is not None and request[0] is not None and """STOP""" in str(request[0]):
+		if request is not None and request[0] is not None and "STOP" in str(request[0]):
 			def kill_func(a_server):
 				"""
 				Terminate the server.
@@ -460,7 +460,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				self.client_address[0], self.client_address[1],
 				f"HEAR [ {data.upper()} SAID {self.client_address} ] from {me}"  # noqa
 			)
-			if """STOP""" in str(data):
+			if "STOP" in str(data):
 				raise multicast.exceptions.ShutdownCommandReceived("SHUTDOWN") from None
 
 
@@ -508,18 +508,18 @@ class McastHEAR(multicast.mtool):
 
 	"""
 
-	__module__ = """multicast.hear"""
+	__module__ = "multicast.hear"
 
-	__name__ = """multicast.hear.McastHEAR"""
+	__name__ = "multicast.hear.McastHEAR"
 
-	__proc__ = """HEAR"""
+	__proc__ = "HEAR"
 
 	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
 		this module/instance, but it is also possible to bind to group which
 		is added by some other programs (like another python program instance of this)
 	"""
 
-	__prologue__ = """Python Multicast Server for multicast input."""
+	__prologue__ = "Python Multicast Server for multicast input."
 
 	@classmethod
 	def setupArgs(cls, parser):

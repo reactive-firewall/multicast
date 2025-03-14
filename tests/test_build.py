@@ -35,7 +35,7 @@ Meta Testing:
 
 """
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -59,7 +59,7 @@ except Exception as _cause:  # pragma: no branch
 @context.markWithMetaTag("mat", "mat_build")
 class BuildPEP517TestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_build"""
+	__module__ = "tests.test_build"
 
 	def test_build_with_pep517(self):
 		"""
@@ -87,7 +87,7 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
 		self.assertIn(str("running build"), str(theBuildtxt))
-		self.assertIn(str("""Successfully built"""), str(theBuildtxt))
+		self.assertIn(str("Successfully built"), str(theBuildtxt))
 		# Verify that the dist directory contains the expected files
 		dist_dir = os.path.join(os.getcwd(), 'dist')
 		pkg_version = str(self._should_get_package_version_WHEN_valid())

@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	"""Handle imports with CWE-758 mitigation.
@@ -59,7 +59,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	SIGINT signals by cleaning up resources and exiting gracefully
 	with the expected status code (130).
 	"""
-	__module__ = """tests.test_hear_keyboard_interrupt"""
+	__module__ = "tests.test_hear_keyboard_interrupt"
 
 	# Constants for test configuration
 	STARTUP_DELAY_SECONDS = 1  # Allow server to start
@@ -70,7 +70,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	def test_hear_keyboard_interrupt(self):
 		"""Tests the special hear and stop test"""
 		theResult = False
-		fail_fixture = str("""C^INT --> HEAR == error""")
+		fail_fixture = str("C^INT --> HEAR == error")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -78,15 +78,15 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 			_fixture_cmd = f"{str(sys.executable)} -m coverage run -p --context=Integration"
 			_fixture_HEAR_args = [
 				_fixture_cmd,
-				"""--source=multicast""",
-				"""-m""",
-				"""multicast""",
-				"""--daemon""",
-				"""HEAR""",
-				"""--port""",
+				"--source=multicast",
+				"-m",
+				"multicast",
+				"--daemon",
+				"HEAR",
+				"--port",
 				str(_fixture_port_num),
-				"""--group""",
-				"""224.0.0.1"""
+				"--group",
+				"224.0.0.1"
 			]
 			self.assertIsNotNone(_fixture_HEAR_args)
 			process = subprocess.Popen(

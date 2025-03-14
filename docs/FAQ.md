@@ -79,8 +79,8 @@ import random  # for random port
 
 # set up some stuff
 _fixture_PORT_arg = int(random.SystemRandom().randint(49152, 65535))
-_fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_BIND_arg = """224.0.0.1"""
+_fixture_mcast_GRP_arg = "224.0.0.1"  # only use dotted notation for multicast group addresses
+_fixture_host_BIND_arg = "224.0.0.1"
 
 # spawn a listening proc
 
@@ -107,15 +107,15 @@ inputHandler()
 from multiprocessing import Process as Process
 
 _fixture_HEAR_kwargs = {
-        """is_daemon""": True,
-        """port""": _fixture_PORT_arg,
-        """group""": _fixture_host_BIND_arg
+        "is_daemon": True,
+        "port": _fixture_PORT_arg,
+        "group": _fixture_host_BIND_arg
     }
 p = Process(
     target=multicast.hear.McastHEAR().doStep,
     name="HEAR", kwargs=_fixture_HEAR_kwargs
 )
-p.daemon = _fixture_HEAR_kwargs["""is_daemon"""]
+p.daemon = _fixture_HEAR_kwargs["is_daemon"]
 p.start()
 
 # ... use CTL+C (or signal 2) to shutdown the server 'p'
@@ -128,9 +128,9 @@ _and elsewhere (like another function or even module) for the sender:_
 # assuming already did 'import multicast as multicast'
 
 _fixture_SAY_args = [
-    """--port""", _fixture_PORT_arg,
-    """--group""", _fixture_mcast_GRP_arg,
-    """--message""", """'test message'"""
+    "--port", _fixture_PORT_arg,
+    "--group", _fixture_mcast_GRP_arg,
+    "--message", "'test message'"
 ]
 try:
     multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])

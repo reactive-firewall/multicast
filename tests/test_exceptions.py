@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	"""Handle imports with CWE-758 mitigation.
@@ -55,9 +55,9 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 	initialization with different arguments and proper error propagation.
 	"""
 
-	__module__ = """tests.test_exceptions"""
+	__module__ = "tests.test_exceptions"
 
-	__name__ = """tests.test_exceptions.ExceptionsTestSuite"""
+	__name__ = "tests.test_exceptions.ExceptionsTestSuite"
 
 	def test_command_execution_error_with_args(self):
 		"""

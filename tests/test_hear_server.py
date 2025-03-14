@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -38,9 +38,9 @@ except Exception as err:
 @context.markWithMetaTag("mat", "mat_hear")
 class McastHearTestSuite(context.BasicUsageTestSuite):
 
-	__module__ = """tests.test_hear_server"""
+	__module__ = "tests.test_hear_server"
 
-	__name__ = """tests.test_hear_server.McastHearTestSuite"""
+	__name__ = "tests.test_hear_server.McastHearTestSuite"
 
 	@staticmethod
 	def get_default_ip():
@@ -71,9 +71,9 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 
 class McastServerTestSuite(McastHearTestSuite):
 
-	__module__ = """tests.test_hear_server"""
+	__module__ = "tests.test_hear_server"
 
-	__name__ = """tests.test_hear_server.McastServerTestSuite"""
+	__name__ = "tests.test_hear_server.McastServerTestSuite"
 
 	def test_handle_error_without_stop_in_request(self):
 		"""
@@ -83,7 +83,7 @@ class McastServerTestSuite(McastHearTestSuite):
 		the STOP command and cleans up resources.
 		"""
 		theResult = False
-		fail_fixture = str("""Mock(BLAH) --> Handler-HEAR == error""")
+		fail_fixture = str("Mock(BLAH) --> Handler-HEAR == error")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -108,7 +108,7 @@ class McastServerTestSuite(McastHearTestSuite):
 
 	def test_handle_error_with_none_request(self):
 		theResult = False
-		fail_fixture = str("""Mock(EMPTY) --X Handler-HEAR != Safe""")
+		fail_fixture = str("Mock(EMPTY) --X Handler-HEAR != Safe")
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -134,12 +134,12 @@ class McastServerTestSuite(McastHearTestSuite):
 
 class HearUDPHandlerTestSuite(McastHearTestSuite):
 
-	__module__ = """tests.test_hear_server"""
+	__module__ = "tests.test_hear_server"
 
-	__name__ = """tests.test_hear_server.HearUDPHandlerTestSuite"""
+	__name__ = "tests.test_hear_server.HearUDPHandlerTestSuite"
 
 	def test_handle_with_none_data_and_sock(self):
-		fail_fixture = str("""Handler(None, None) --> HEAR == error""")
+		fail_fixture = str("Handler(None, None) --> HEAR == error")
 		_fixture_port_num = self._the_test_port
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)

@@ -16,9 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
-__name__ = """tests.context"""  # skipcq: PYL-W0622
+__name__ = "tests.context"  # skipcq: PYL-W0622
 
 __doc__ = """Test context and environment setup module.
 
@@ -103,7 +103,7 @@ try:
 	if 'Process' not in sys.modules:
 		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
-		Process = sys.modules["""Process"""]
+		Process = sys.modules["Process"]
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
 
@@ -117,7 +117,7 @@ try:
 		import packaging
 		from packaging import version
 	else:  # pragma: no branch
-		packaging = sys.modules["""packaging"""]
+		packaging = sys.modules["packaging"]
 		from packaging import version
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from err
@@ -126,7 +126,7 @@ try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]  # pylint: disable=cyclic-import
+		multicast = sys.modules["multicast"]  # pylint: disable=cyclic-import
 except Exception as err:  # pragma: no branch
 	raise ImportError("[CWE-440] Multicast Python Module Failed to import.") from err
 
@@ -134,7 +134,7 @@ try:
 	if 'tests.profiling' not in sys.modules:
 		import tests.profiling as profiling
 	else:  # pragma: no branch
-		profiling = sys.modules["""tests.profiling"""]
+		profiling = sys.modules["tests.profiling"]
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
@@ -142,7 +142,7 @@ try:
 	if 'multicast.exceptions' not in sys.modules:
 		import multicast.exceptions
 	else:  # pragma: no branch
-		multicast.exceptions = sys.modules["""multicast.exceptions"""]
+		multicast.exceptions = sys.modules["multicast.exceptions"]
 	from multicast.exceptions import CommandExecutionError
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
@@ -372,7 +372,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 			i += 2
 		else:  # pragma: no branch
 			args[0] = str(getCoverageCommand())
-		extra_args = ["""run""", """-p""", """--context=Integration""", """--source=multicast"""]
+		extra_args = ["run", "-p", "--context=Integration", "--source=multicast"]
 		# PEP-279 - see https://www.python.org/dev/peps/pep-0279/
 		for k, ktem in enumerate(extra_args):
 			offset = i + k
@@ -447,7 +447,7 @@ def checkStrOrByte(theInput):
 		theOutput = theInput
 	try:
 		if isinstance(theInput, bytes):
-			theOutput = theInput.decode("""UTF-8""")
+			theOutput = theInput.decode("UTF-8")
 	except UnicodeDecodeError:  # pragma: no branch
 		theOutput = bytes(theInput)
 	return theOutput
@@ -754,7 +754,7 @@ def check_exec_command_has_output(test_case, someArgs):
 		returns True if has output and False otherwise.
 	"""
 	theResult = False
-	fail_msg_fixture = str("""Expecting output: CLI test had no output.""")
+	fail_msg_fixture = str("Expecting output: CLI test had no output.")
 	try:
 		if (test_case._thepython is not None):
 			try:
@@ -898,11 +898,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	"""
 
-	__module__ = """tests.context"""
+	__module__ = "tests.context"
 
-	__name__ = """tests.context.BasicUsageTestSuite"""
+	__name__ = "tests.context.BasicUsageTestSuite"
 
-	NO_PYTHON_ERROR = """No python cmd to test with!"""  # skipcq: TCV-002
+	NO_PYTHON_ERROR = "No python cmd to test with!"  # skipcq: TCV-002
 	"""Error message used when Python command is not available for testing.
 
 	This constant is used across multiple test methods to maintain consistency
@@ -911,7 +911,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls):
-		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
+		"Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."
 		cls._thepython = getPythonCommand()
 
 	@staticmethod
@@ -950,25 +950,25 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 		"""
 		try:
-			self.assertIsNotNone(multicast.__module__, """Version will be efectivly None.""")
-			self.assertIsNotNone(multicast.__version__, """Version is not valid.""")
+			self.assertIsNotNone(multicast.__module__, "Version will be efectivly None.")
+			self.assertIsNotNone(multicast.__version__, "Version is not valid.")
 			_raw_version_fixture = multicast.__version__
-			self.assertIsInstance(_raw_version_fixture, str, """Version is not a string.""")
+			self.assertIsInstance(_raw_version_fixture, str, "Version is not a string.")
 			# Strip custom tags
 			# stuff like: mcast_version = mcast_version.replace("-hotfix", "").replace("-hf", "")
 			# Refactor alpha/beta tags
 			parsed_version = version.parse(_raw_version_fixture)
-			self.assertIsNotNone(parsed_version, """Version is not valid.""")
-			self.assertIsInstance(parsed_version, version.Version, """Version is not valid.""")
+			self.assertIsNotNone(parsed_version, "Version is not valid.")
+			self.assertIsInstance(parsed_version, version.Version, "Version is not valid.")
 			self.assertTrue(
 				len(parsed_version.release) >= 2,
-				"""Version must have at least major.minor components."""
+				"Version must have at least major.minor components."
 			)
 			return parsed_version
 		except ImportError:
-			self.fail("""Failed to import the multicast package to retrieve version.""")
+			self.fail("Failed to import the multicast package to retrieve version.")
 
-	@unittest.skipUnless(True, """Insanitty Test. Good luck debugging.""")
+	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
 		"""Test case 0: Insanitty Test."""
 		assert True

@@ -80,7 +80,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-__module__ = """tests"""
+__module__ = "tests"
 """This is a testing related stand-alone utilities module.
 
 This module provides test fixtures and utilities for testing multicast communication.
@@ -103,7 +103,7 @@ Example:
 
 """
 
-__name__ = """tests.MulticastUDPClient"""  # skipcq: PYL-W0622
+__name__ = "tests.MulticastUDPClient"  # skipcq: PYL-W0622
 
 try:
 	import sys
@@ -170,7 +170,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 	"""
 
-	__module__ = """tests.MulticastUDPClient.MCastClient"""
+	__module__ = "tests.MulticastUDPClient.MCastClient"
 
 	_group_addr = None
 	"""The multicast group address."""
@@ -240,10 +240,10 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		# skipcq: TCV-002
-		if str("""grp_addr""") in kwargs:
-			self._group_addr = kwargs.get("""grp_addr""", None)  # skipcq: PTC-W0039 - ensure None
-		if str("""src_port""") in kwargs:
-			self._source_port = kwargs.get("""src_port""", 0)
+		if str("grp_addr") in kwargs:
+			self._group_addr = kwargs.get("grp_addr", None)  # skipcq: PTC-W0039 - ensure None
+		if str("src_port") in kwargs:
+			self._source_port = kwargs.get("src_port", 0)
 		else:
 			self._source_port = int(
 				50000 + (
@@ -337,7 +337,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 	"""
 
-	__module__ = """tests.MulticastUDPClient.MyUDPHandler"""
+	__module__ = "tests.MulticastUDPClient.MyUDPHandler"
 
 	# skipcq: TCV-002
 	def handle(self):
@@ -429,7 +429,7 @@ def main():
 	tsts_fxr = MCastClient()
 	print(str((HOST, PORT)))
 	tsts_fxr.say(HOST, PORT, sock, data)
-	tsts_fxr.say(HOST, PORT, sock, str("""STOP"""))
+	tsts_fxr.say(HOST, PORT, sock, str("STOP"))
 
 
 if __name__ == "__main__":

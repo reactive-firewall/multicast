@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -42,7 +42,7 @@ except Exception as _cause:  # pragma: no branch
 @context.markWithMetaTag("mat", "mat_build")
 class ManifestInclusionTestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_manifest"""
+	__module__ = "tests.test_manifest"
 
 	def setUp(self):
 		super(ManifestInclusionTestSuite, self).setUp()
@@ -94,20 +94,20 @@ class ManifestInclusionTestSuite(BasicUsageTestSuite):
 		the sdist and checking if the required files are present in the tar archive.
 		"""
 		members, pkg_version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(pkg_version)
+		package_prefix = str("multicast-{}").format(pkg_version)
 		expected_files = [
-			str("""{}/README.md""").format(package_prefix),
-			str("""{}/LICENSE.md""").format(package_prefix),
-			str("""{}/requirements.txt""").format(package_prefix),
-			str("""{}/setup.py""").format(package_prefix),
-			str("""{}/MANIFEST.in""").format(package_prefix),
-			str("""{}/setup.cfg""").format(package_prefix),
-			str("""{}/multicast/__init__.py""").format(package_prefix),
-			str("""{}/multicast/__main__.py""").format(package_prefix),
-			str("""{}/multicast/skt.py""").format(package_prefix),
-			str("""{}/multicast/recv.py""").format(package_prefix),
-			str("""{}/multicast/send.py""").format(package_prefix),
-			str("""{}/multicast/hear.py""").format(package_prefix),
+			str("{}/README.md").format(package_prefix),
+			str("{}/LICENSE.md").format(package_prefix),
+			str("{}/requirements.txt").format(package_prefix),
+			str("{}/setup.py").format(package_prefix),
+			str("{}/MANIFEST.in").format(package_prefix),
+			str("{}/setup.cfg").format(package_prefix),
+			str("{}/multicast/__init__.py").format(package_prefix),
+			str("{}/multicast/__main__.py").format(package_prefix),
+			str("{}/multicast/skt.py").format(package_prefix),
+			str("{}/multicast/recv.py").format(package_prefix),
+			str("{}/multicast/send.py").format(package_prefix),
+			str("{}/multicast/hear.py").format(package_prefix),
 			# Include other important files and directories
 		]
 		for expected_file in expected_files:
@@ -124,11 +124,11 @@ class ManifestInclusionTestSuite(BasicUsageTestSuite):
 		by building the sdist and verifying that these files are absent from the tar archive.
 		"""
 		members, pkg_version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(pkg_version)
+		package_prefix = str("multicast-{}").format(pkg_version)
 		unwanted_files = [
-			str("""{}/.gitignore""").format(package_prefix),
-			str("""{}/.github/""").format(package_prefix),
-			str("""{}/tests/""").format(package_prefix),
+			str("{}/.gitignore").format(package_prefix),
+			str("{}/.github/").format(package_prefix),
+			str("{}/tests/").format(package_prefix),
 			# Exclude other files or directories as specified in MANIFEST.in
 		]
 		for unwanted_file in unwanted_files:

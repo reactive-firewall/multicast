@@ -64,7 +64,7 @@ __all__ = [
 	"""hear.McastHEAR""",
 ]
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -80,7 +80,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -96,7 +96,7 @@ __module__ = """multicast"""
 
 """
 
-__name__ = """multicast"""  # skipcq: PYL-W0622
+__name__ = "multicast"  # skipcq: PYL-W0622
 """The name of this program.
 
 	Minimal Acceptance Testing:
@@ -114,7 +114,7 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """2.0.4"""
+__version__ = "2.0.4"
 """The version of this program.
 
 	Minimal Acceptance Testing:
@@ -265,7 +265,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 global _MCAST_DEFAULT_GROUP  # skipcq: PYL-W0604
 
-_MCAST_DEFAULT_GROUP = """224.0.0.1"""
+_MCAST_DEFAULT_GROUP = "224.0.0.1"
 """Arbitrary group to use by default, though any mcst grp would work.
 
 	The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
@@ -378,7 +378,7 @@ if 'multicast.exceptions' not in sys.modules:
 	from . import exceptions  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global exceptions  # skipcq: PYL-W0604
-	exceptions = sys.modules["""multicast.exceptions"""]
+	exceptions = sys.modules["multicast.exceptions"]
 
 EXIT_CODES = exceptions.EXIT_CODES
 """See multicast.exceptions.EXIT_CODES."""
@@ -395,12 +395,12 @@ get_exit_code_from_exception = exceptions.get_exit_code_from_exception
 exit_on_exception = exceptions.exit_on_exception
 """See multicast.exceptions.exit_on_exception function."""
 
-if 'multicast.env' not in sys.modules:
+if "multicast.env" not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import env  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global env  # skipcq: PYL-W0604
-	env = sys.modules["""multicast.env"""]
+	env = sys.modules["multicast.env"]
 
 _config = env.load_config()
 
@@ -439,13 +439,13 @@ class mtool(abc.ABC):
 
 	"""
 
-	__module__ = """multicast"""
+	__module__ = "multicast"
 
 	__proc__ = None
 
-	__prologue__ = """Add a prologue here."""
+	__prologue__ = "Add a prologue here."
 
-	__epilogue__ = """Add an epilogue here."""
+	__epilogue__ = "Add an epilogue here."
 
 	@classmethod
 	def buildArgs(cls, calling_parser_group):
@@ -498,7 +498,7 @@ class mtool(abc.ABC):
 				add_help=False
 			)
 			group = calling_parser_group.add_mutually_exclusive_group(required=False)
-			group.add_argument('-h', '--help', action='help')
+			group.add_argument("-h", "--help", action="help")
 			group.add_argument(
 				"-v",
 				"--version",
@@ -506,13 +506,13 @@ class mtool(abc.ABC):
 				version=str("%(prog)s {version}").format(version=str(__version__))
 			)
 			calling_parser_group.add_argument(
-				"""--use-std""", dest='is_std', default=False, action='store_true'
+				"--use-std", dest="is_std", default=False, action="store_true"
 			)
 			calling_parser_group.add_argument(
-				"""--daemon""", dest='is_daemon', default=False, action='store_true'
+				"--daemon", dest="is_daemon", default=False, action="store_true"
 			)
 		subparsers = calling_parser_group.add_subparsers(
-			title="Tools", dest="cmd_tool", help=str("""Sub-Commands."""), metavar="CMD"
+			title="Tools", dest="cmd_tool", help=str("Sub-Commands."), metavar="CMD"
 		)
 		if mtool.__class__.__subclasscheck__(mtool, cls):  # pragma: no branch
 			cls.setupArgs(subparsers)
@@ -662,11 +662,11 @@ class mtool(abc.ABC):
 		raise NotImplementedError("Subclasses must implement this method.")
 
 
-if 'multicast.skt' not in sys.modules:
+if "multicast.skt" not in sys.modules:
 	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global skt  # skipcq: PYL-W0604
-	skt = sys.modules["""multicast.skt"""]
+	skt = sys.modules["multicast.skt"]
 
 genSocket = skt.genSocket
 """See multicast.skt.genSocket."""
@@ -674,32 +674,32 @@ genSocket = skt.genSocket
 endSocket = skt.endSocket
 """See multicast.skt.endSocket."""
 
-if 'multicast.recv' not in sys.modules:
+if "multicast.recv" not in sys.modules:
 	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global recv  # skipcq: PYL-W0604
-	recv = sys.modules["""multicast.recv"""]
+	recv = sys.modules["multicast.recv"]
 
-if 'multicast.send' not in sys.modules:
+if "multicast.send" not in sys.modules:
 	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global send  # skipcq: PYL-W0604
-	send = sys.modules["""multicast.send"""]
+	send = sys.modules["multicast.send"]
 
-if 'multicast.hear' not in sys.modules:
+if "multicast.hear" not in sys.modules:
 	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global hear  # skipcq: PYL-W0604
-	hear = sys.modules["""multicast.hear"""]
+	hear = sys.modules["multicast.hear"]
 
 try:
-	if """multicast.__main__""" in sys.modules:  # pragma: no cover
+	if "multicast.__main__" in sys.modules:  # pragma: no cover
 		global __main__  # skipcq: PYL-W0604
-		__main__ = sys.modules["""multicast.__main__"""]
+		__main__ = sys.modules["multicast.__main__"]
 except Exception:
 	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
-if __name__ in u'__main__':
+if __name__ in u"__main__":
 	__EXIT_CODE = 2
 	if __main__.main is not None:
 		__EXIT_CODE = __main__.main(sys.argv[1:])

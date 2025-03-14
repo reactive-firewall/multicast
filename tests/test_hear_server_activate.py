@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
@@ -44,9 +44,9 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 	of the multicast server, including socket setup and cleanup procedures.
 	"""
 
-	__module__ = """tests.test_hear_server_activate"""
+	__module__ = "tests.test_hear_server_activate"
 
-	__name__ = """tests.test_hear_server_activate.McastServerActivateTestSuite"""
+	__name__ = "tests.test_hear_server_activate.McastServerActivateTestSuite"
 
 	def test_server_activate(self):
 		"""
