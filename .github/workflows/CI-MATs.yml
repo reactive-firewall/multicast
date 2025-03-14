@@ -103,7 +103,7 @@ jobs:
       - name: Summerize MATs for python ${{ matrix.python-version }}
         id: sumerize-mats
         run: |
-          echo "- [x] MATS succedded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
       - name: Post-Clean
         id: post
