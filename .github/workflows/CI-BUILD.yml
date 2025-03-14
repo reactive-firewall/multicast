@@ -1,6 +1,7 @@
 ---
 name: CI-BUILD
-# Continuous Integration workflow for building, the project
+description: "Continuous Integration workflow for building, the project."
+run-name: Build ${{ github.ref_name }} by @${{ github.actor }}
 #
 # Jobs included:
 # - BUILD: Ensures the project compiles correctly
@@ -20,11 +21,9 @@ permissions: {}
 env:
   ENVIRONMENT: ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
   # Define Python versions at the top level
-  PYTHON_DEFAULT: "3.12"
-  PYTHON_OLD_MIN: "3.10"  # For Oldest Python versions
-  PYTHON_EXPERIMENTAL: "3.13"  # For future Python versions
-  PYTHON_VERSIONS: '[${{ env.PYTHON_OLD_MIN }}, ${{ env.PYTHON_DEFAULT }}, ${{ env.PYTHON_EXPERIMENTAL }}]'
-  PYTHON_VERSIONS_MATRIX: '{"python-version": ${{ env.PYTHON_VERSIONS }}}'
+  PYTHON_DEFAULT: "${{ vars.PYTHON_DEFAULT }}"
+  PYTHON_OLD_MIN: "${{ vars.PYTHON_OLD_MIN }}"  # For Oldest Python versions
+  PYTHON_EXPERIMENTAL: "${{ vars.PYTHON_EXPERIMENTAL }}"  # For future Python versions
 
 jobs:
   BUILD:
@@ -43,6 +42,7 @@ jobs:
         shell: bash
     env:
       LANG: "en_US.UTF-8"
+      PYTHON_DEFAULT: "${{ vars.PYTHON_DEFAULT }}"
     outputs:
       build_status: ${{ steps.build.outcome }}
     steps:
@@ -83,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ${{ env.PYTHON_VERSIONS }}
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
@@ -99,7 +99,7 @@ jobs:
           - python-version: "3.11"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: ${{ env.PYTHON_DEFAULT }}
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "en_US.utf-8"
             experimental: false
           - python-version: "3.12"
@@ -166,6 +166,7 @@ jobs:
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
       build_ref: ${{ steps.check_status.outputs.build_ref }}
+      build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
     steps:
       - id: check_status
         run: |
@@ -175,3 +176,4 @@ jobs:
             echo "build_success=false" >> "$GITHUB_OUTPUT"
           fi
           echo "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          echo "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
