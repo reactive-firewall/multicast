@@ -19,6 +19,12 @@ permissions: {}
 
 env:
   ENVIRONMENT: ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
+  # Define Python versions at the top level
+  PYTHON_DEFAULT: "3.12"
+  PYTHON_OLD_MIN: "3.10"  # For Oldest Python versions
+  PYTHON_EXPERIMENTAL: "3.13"  # For future Python versions
+  PYTHON_VERSIONS: '[${{ env.PYTHON_OLD_MIN }}, ${{ env.PYTHON_DEFAULT }}, ${{ env.PYTHON_EXPERIMENTAL }}]'
+  PYTHON_VERSIONS_MATRIX: '{"python-version": ${{ env.PYTHON_VERSIONS }}}'
 
 jobs:
   BUILD:
@@ -46,7 +52,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_DEFAULT }}
       - name: Pre-Clean
         id: clean
         run: make -j1 -f Makefile purge 2>/dev/null || true
@@ -77,7 +83,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ${{ env.PYTHON_VERSIONS }}
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
@@ -93,7 +99,7 @@ jobs:
           - python-version: "3.11"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.11"
+          - python-version: ${{ env.PYTHON_DEFAULT }}
             lang-var: "en_US.utf-8"
             experimental: false
           - python-version: "3.12"
@@ -126,7 +132,7 @@ jobs:
       - name: Summerize Building
         id: sumerize-py-build
         run: |
-          echo "- Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
         if: ${{ success() }}
         shell: bash
       - name: Run Tests
@@ -159,6 +165,7 @@ jobs:
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
+      build_ref: ${{ steps.check_status.outputs.build_ref }}
     steps:
       - id: check_status
         run: |
@@ -167,3 +174,4 @@ jobs:
           else
             echo "build_success=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
