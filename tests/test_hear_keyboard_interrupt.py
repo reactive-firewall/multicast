@@ -17,6 +17,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Test module for verifying keyboard interrupt handling in multicast operations.
+
+This module contains test suites that verify proper handling of `SIGINT` signals,
+ensuring clean shutdown and resource cleanup during keyboard interrupts.
+"""
+
 __module__ = "tests"
 
 try:
@@ -45,6 +52,7 @@ try:
 		from context import subprocess
 		import signal
 		import time
+		from typing import List
 		from context import BasicUsageTestSuite
 except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
@@ -62,22 +70,58 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	__module__ = "tests.test_hear_keyboard_interrupt"
 
 	# Constants for test configuration
-	STARTUP_DELAY_SECONDS = 1  # Allow server to start
-	PROCESS_TIMEOUT_SECONDS = 5
-	EXPECTED_SIGINT_EXIT_CODE = 130
-	INVALID_ARGS_EXIT_CODE = 2
+	STARTUP_DELAY_SECONDS: int = 1
+	"""
+	Time to wait for server initialization before sending `SIGINT`.
 
-	def test_hear_keyboard_interrupt(self):
-		"""Tests the special hear and stop test"""
-		theResult = False
-		fail_fixture = str("C^INT --> HEAR == error")
-		_fixture_port_num = self._the_test_port
+	Must be > 0 to ensure server is ready.
+	"""
+
+	PROCESS_TIMEOUT_SECONDS: int = 5
+	"""
+	Maximum time to wait for process completion after `SIGINT`.
+
+	Should be sufficient for cleanup but not too long.
+	"""
+
+	EXPECTED_SIGINT_EXIT_CODE: int = 130
+	"""
+	Expected exit code when process receives SIGINT.
+
+	`130` = `128` + `SIGINT(2)` as per POSIX convention.
+	"""
+
+	INVALID_ARGS_EXIT_CODE: int = 2
+	"""Exit code indicating invalid command-line arguments."""
+
+	TEST_MULTICAST_GROUP: str = "224.0.0.1"
+	"""Standard multicast group address for testing."""
+
+	COVERAGE_CMD_TEMPLATE: str = f"{str(sys.executable)} -m coverage run -p --context=Integration"
+	"""Coverage command template for test execution."""
+
+	def test_hear_keyboard_interrupt(self) -> None:
+		"""
+		Test proper handling of keyboard interrupts (SIGINT).
+
+		This test:
+			1. Starts a multicast server (with coverage tracking)
+			2. Waits for server initialization
+			3. Sends a SIGINT signal to simulate Ctrl+C
+			4. Verifies that the server exits with the expected status code
+
+		Success criteria:
+			- Server must exit with status code 130 (standard SIGINT exit code)
+			- Server must not exit with status code 2 (invalid arguments)
+		"""
+		theResult: bool = False
+		fail_fixture: str = str("C^INT --> HEAR == error")
+		_fixture_port_num: int = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_cmd = f"{str(sys.executable)} -m coverage run -p --context=Integration"
-			_fixture_HEAR_args = [
-				_fixture_cmd,
+			_fixture_HEAR_args: List[str] = [
+				self.COVERAGE_CMD_TEMPLATE,
 				"--source=multicast",
 				"-m",
 				"multicast",
@@ -86,10 +130,10 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				"--port",
 				str(_fixture_port_num),
 				"--group",
-				"224.0.0.1"
+				self.TEST_MULTICAST_GROUP
 			]
 			self.assertIsNotNone(_fixture_HEAR_args)
-			process = subprocess.Popen(
+			process: subprocess.Popen = subprocess.Popen(
 				context.checkCovCommand(*_fixture_HEAR_args),
 				stdout=subprocess.PIPE,
 				stderr=subprocess.PIPE,
