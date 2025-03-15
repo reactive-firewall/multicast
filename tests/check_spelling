@@ -139,6 +139,7 @@ CODESPELL_OPTIONS="--quiet-level=4 --builtin clear,rare,code -L assertIn"
 # Define specific typos to check for (regression tests)
 declare -a SPECIFIC_TYPOS=(
 	"RECCOMENDED:RECOMMENDED"
+	"succedded:succeeded"
 )
 
 function cleanup() {

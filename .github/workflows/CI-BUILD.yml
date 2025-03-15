@@ -1,6 +1,7 @@
 ---
 name: CI-BUILD
-# Continuous Integration workflow for building, the project
+description: "Continuous Integration workflow for building, the project."
+run-name: Build ${{ github.ref_name }} by @${{ github.actor }}
 #
 # Jobs included:
 # - BUILD: Ensures the project compiles correctly
@@ -19,6 +20,10 @@ permissions: {}
 
 env:
   ENVIRONMENT: ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/patch-') || startsWith(github.ref, 'refs/tags/v')) && 'Testing' || 'Experimenting' }}
+  # Define Python versions at the top level -- Expected format: X.Y (e.g., 3.13)
+  PYTHON_DEFAULT: "${{ vars.PYTHON_DEFAULT }}"
+  PYTHON_OLD_MIN: "${{ vars.PYTHON_OLD_MIN }}"  # For Oldest Python versions
+  PYTHON_EXPERIMENTAL: "${{ vars.PYTHON_EXPERIMENTAL }}"  # For future Python versions
 
 jobs:
   BUILD:
@@ -46,7 +51,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
-          python-version: "3.12"
+          python-version: "${{ vars.PYTHON_DEFAULT }}"
       - name: Pre-Clean
         id: clean
         run: make -j1 -f Makefile purge 2>/dev/null || true
@@ -77,28 +82,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "de.utf-8"
             experimental: false
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "jp.utf-8"
             experimental: false
-          - python-version: "3.10"
+          - python-version: "${{ vars.PYTHON_OLD_MIN }}"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.11"
+          - python-version: "${{ vars.PYTHON_OLD_EXTRA }}"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.11"
+          - python-version: "${{ vars.PYTHON_DEFAULT }}"
             lang-var: "en_US.utf-8"
             experimental: false
-          - python-version: "3.12"
+          - python-version: "${{ vars.PYTHON_EXPERIMENTAL }}"
             lang-var: "en_US.utf-8"
-            experimental: false
+            experimental: ${{ (needs.BUILD.environment == 'Experimenting') }}
     outputs:
       bootstrap_status: ${{ steps.bootstrap.outcome }}
     env:
@@ -126,7 +131,7 @@ jobs:
       - name: Summerize Building
         id: sumerize-py-build
         run: |
-          echo "- Building works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Building works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
         shell: bash
       - name: Run Tests
@@ -136,7 +141,7 @@ jobs:
       - name: Summerize Install
         id: sumerize-user-install
         run: |
-          echo "- User Installing works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] User Installing works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
         shell: bash
       - name: Test Info
@@ -159,6 +164,8 @@ jobs:
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
+      build_ref: ${{ steps.check_status.outputs.build_ref }}
+      build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
     steps:
       - id: check_status
         run: |
@@ -167,3 +174,5 @@ jobs:
           else
             echo "build_success=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          echo "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
