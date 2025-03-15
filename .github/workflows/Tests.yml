@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -166,7 +166,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-      PYTHON_VERSION: '3.13'
+      PYTHON_VERSION: "${{ vars.PYTHON_DEFAULT }}"
       LANG: "en_US.utf-8"
 
     steps:
@@ -174,7 +174,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
-        python-version: "3.13"
+        python-version: "${{ vars.PYTHON_DEFAULT }}"
     - name: Install dependencies for python Linters
       run: |
         pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.2";
@@ -210,7 +210,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -330,7 +330,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -411,7 +411,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
       OS: 'ubuntu-latest'
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -464,7 +464,7 @@ jobs:
 
     env:
       OS: 'ubuntu-latest'
-      PYTHON_VERSION: '3.12'
+      PYTHON_VERSION: "${{ vars.PYTHON_DEFAULT }}"
       LANG: 'en_US.utf-8'
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
@@ -475,11 +475,11 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
-        python-version: "3.12"
+        python-version: "${{ vars.PYTHON_DEFAULT }}"
     - name: Prep Testing Tox
       id: prep-tox
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { sudo apt-get update || true ;} ; wait ; { sudo apt-get install --assume-yes python3.10 python3.11 python3.11-venv || echo "::warning file=.github/workflows/Tests.yml,line=677,endLine=677,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
+        if [ "$OS" == "ubuntu-latest" ] ; then { sudo apt-get update || true ;} ; wait ; { sudo apt-get install --assume-yes python3.10 python3.11 python3.11-venv || echo "::warning file=.github/workflows/Tests.yml,line=482,endLine=482,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
     - name: Install dependencies for Tox
       run: |
         pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";

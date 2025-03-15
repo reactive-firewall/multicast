@@ -1,6 +1,7 @@
 ---
 name: CI-MATs
-# Continuous Integration workflow for Minimal Acceptance Tests (MATs).
+description: "Continuous Integration workflow for Minimal Acceptance Tests (MATs)."
+run-name: Minimal Acceptance Tests for ${{ github.ref_name }} by @${{ github.actor }}
 #
 # This workflow runs after successful completion of CI-BUILD to ensure
 # that the codebase meets minimal acceptance criteria.
@@ -60,6 +61,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
       statuses: write
     needs: check_build
     if: ${{ !cancelled() && (needs.check_build.outputs.should_run == 'true') }}
@@ -71,7 +73,7 @@ jobs:
     timeout-minutes: 8
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     outputs:
       mats_status: ${{ steps.tests.outcome }}
     env:
@@ -101,7 +103,7 @@ jobs:
       - name: Summerize MATs for python ${{ matrix.python-version }}
         id: sumerize-mats
         run: |
-          echo "- MATS works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
       - name: Post-Clean
         id: post
@@ -111,6 +113,7 @@ jobs:
   MATS_STATUS:
     permissions:
       actions: read
+      pull-requests: read
     needs: [check_build, MATS]
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}

@@ -661,6 +661,34 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				theResult = False
 		self.assertTrue(theResult, str("Could Not find version from multicast --version"))
 
+	def _validate_help_output(self, args: list) -> bool:
+		"""
+		Helper method to validate help command output.
+
+		Args:
+			args (list) -- List of command arguments to execute
+
+		Returns:
+			bool: True if validation passes, False otherwise
+		"""
+		usageText = "usage:"
+		theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+		subResult = False
+		try:
+			if isinstance(theOutputtxt, bytes):
+				theOutputtxt = theOutputtxt.decode('utf8')
+		except UnicodeDecodeError:
+			theOutputtxt = str(repr(bytes(theOutputtxt)))
+		self.assertIsNotNone(theOutputtxt)
+		self.assertIn(str(usageText), str(theOutputtxt))
+		if str(usageText) in str(theOutputtxt):
+			subResult = True
+		else:
+			context.debugUnexpectedOutput(
+				str(usageText), str(theOutputtxt), self._thepython
+			)
+		return subResult
+
 	def test_Usage_Error_WHEN_the_help_command_is_called(self):
 		"""Test case for multicast* --help."""
 		theResult = False
@@ -674,24 +702,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						str("multicast{}").format(str(test_case)),
 						str("--help")
 					]
-					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
-					context.debugBlob(theOutputtxt)
-					# now test it
-					try:
-						if isinstance(theOutputtxt, bytes):
-							theOutputtxt = theOutputtxt.decode('utf8')
-					except UnicodeDecodeError:
-						theOutputtxt = str(repr(bytes(theOutputtxt)))
-					# or simply:
-					self.assertIsNotNone(theOutputtxt)
-					self.assertIn(str("usage:"), str(theOutputtxt))
-					if (str("usage:") in str(theOutputtxt)):
-						theResult = True or theResult
-					else:
-						theResult = False
-						context.debugUnexpectedOutput(
-							str("usage:"), str(theOutputtxt), self._thepython
-						)
+					with self.subTest(args=args):
+						if self._validate_help_output(args):
+							theResult = True
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
@@ -736,24 +749,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 							str(test_case_i.mode).format(str(test_case_i.command)),
 							str("--help")
 						]
-						theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
-						context.debugBlob(theOutputtxt)
-						# now test it
-						try:
-							if isinstance(theOutputtxt, bytes):
-								theOutputtxt = theOutputtxt.decode('utf8')
-						except UnicodeDecodeError:
-							theOutputtxt = str(repr(bytes(theOutputtxt)))
-						# or simply:
-						self.assertIsNotNone(theOutputtxt)
-						self.assertIn(str("usage:"), str(theOutputtxt))
-						if (str("usage:") in str(theOutputtxt)):
-							theResult = True and theResult
-						else:
-							theResult = False
-							context.debugUnexpectedOutput(
-								str("usage:"), str(theOutputtxt), self._thepython
-							)
+						with self.subTest(args=args):
+							if not self._validate_help_output(args):
+								theResult = False
 		except Exception as err:
 			context.debugtestError(err)
 			err = None
