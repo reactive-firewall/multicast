@@ -138,7 +138,10 @@ fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
-for _TEST_DOC in $(git ls-files -z --exclude-standard -- '*.py' '*.md' '*.txt' 2>&1 | xargs -0 -I{} "${_TEST_FILE_VALIDATOR} {}" ; wait ;) ; do
+# Get a list of files to check using git ls-tree with filtering
+FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- *.md *.py *.txt **/*.md **/*.txt **/*.py 2>/dev/null || EXIT_CODE=3)
+
+for _TEST_DOC in $FILES_TO_CHECK ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
 		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126;
