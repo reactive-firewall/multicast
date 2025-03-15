@@ -51,7 +51,7 @@ except Exception as err:
 	raise ImportError(f"[CWE-758] {__file__} Failed to import test context") from err
 
 
-_has_hypothesis = False
+_has_hypothesis: bool = False
 """
 	Hypothesis is not compatible with this project's license, however for users that accept the
 	relevant terms and conditions of the Hypothesis module and have installed it, the following
@@ -76,7 +76,7 @@ if not _has_hypothesis:
 		_has_hypothesis = False
 
 
-def onlyIfHasHypothesis(has_hypothesis):
+def onlyIfHasHypothesis(has_hypothesis: bool) -> callable:
 	"""
 	Conditionally enable a class based on the availability of the hypothesis library.
 
@@ -91,7 +91,7 @@ def onlyIfHasHypothesis(has_hypothesis):
 		callable: A decorator function that returns either the original class or a dummy class
 		with a placeholder method, depending on the has_hypothesis flag.
 	"""
-	def decorator(cls):
+	def decorator(cls: callable) -> callable:
 		if not has_hypothesis:
 			# Create an empty class with a method that returns None
 			return type(cls.__name__, (object,), {
@@ -127,7 +127,7 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 
 	@given(st.binary(min_size=1, max_size=1472))
 	@settings(deadline=None)
-	def test_multicast_sender_with_random_data(self, data):
+	def test_multicast_sender_with_random_data(self, data: any) -> None:
 		"""
 		Tests the multicast sender and receiver with random binary data.
 
@@ -143,9 +143,9 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 		- The test sets up a receiver process and sends the data multiple times.
 		- If the receiver process encounters an error, the test is skipped.
 		"""
-		theResult = False
-		fail_fixture = str("SAY --> HEAR == error")
-		_fixture_port_num = self._always_generate_random_port_WHEN_called()
+		theResult: bool = False
+		fail_fixture: str = "SAY --> HEAR == error"
+		_fixture_port_num: int = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
@@ -192,7 +192,7 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=3, max_size=15))
 	@settings(deadline=400)
-	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text):
+	def test_invalid_Error_WHEN_cli_called_GIVEN_invalid_fuzz_input(self, text: str) -> None:
 		"""
 		Test the multicast CLI's response to invalid fuzzed input.
 
@@ -208,8 +208,8 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 			- The CLI output contains "invalid choice:" message
 			- The CLI output includes the invalid input text
 		"""
-		theResult = False
-		fail_fixture = str("XZY? --> Multicast != error")
+		theResult: bool = False
+		fail_fixture: str = "XZY? --> Multicast != error"
 		if (self._thepython is not None):
 			try:
 				args = [str(self._thepython), str("-m"), str("multicast"), str(text)]
@@ -228,7 +228,7 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=56, max_size=2048))
 	@settings(deadline=2222)
-	def test_say_works_WHEN_using_stdin_GIVEN_alnum_of_any_size_fuzz_input(self, text):
+	def test_say_works_WHEN_using_stdin_GIVEN_alnum_of_any_size_fuzz_input(self, text: str) -> None:
 		"""
 		Test the multicast send response to valid alnum input.
 
@@ -241,12 +241,12 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 			- Confirms the process exits successfully after sending the message
 			- Validates the receiver process terminates cleanly
 		"""
-		theResult = False
-		fail_fixture = str(f"stdin({text.__sizeof__()}) --> SAY == error")
-		sub_fail_fixture = str(
+		theResult: bool = False
+		fail_fixture: str = f"stdin({text.__sizeof__()}) --> SAY == error"
+		sub_fail_fixture: str = str(
 			"""stdin({text.__sizeof__()}) --> SAY ?-> HEAR? == Error X-> HEAR"""
 		)
-		_fixture_port_num = self._the_test_port
+		_fixture_port_num: int = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))

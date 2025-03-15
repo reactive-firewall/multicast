@@ -235,7 +235,7 @@ class CommandExecutionError(RuntimeError):
 
 	__name__ = "multicast.exceptions.CommandExecutionError"
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwargs) -> None:
 		"""
 		Initialize CommandExecutionError with a message and exit code.
 
@@ -335,7 +335,7 @@ class ShutdownCommandReceived(RuntimeError):
 
 	__name__ = "multicast.exceptions.ShutdownCommandReceived"
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwargs) -> None:
 		"""
 		Initialize the ShutdownCommandReceived exception.
 
@@ -575,7 +575,7 @@ def get_exit_code_from_exception(exc: BaseException) -> int:
 	return 70  # Default to 'Internal Software Error'
 
 
-def exit_on_exception(func):
+def exit_on_exception(func: callable) -> callable:
 	"""
 	Decorator that wraps a function to handle exceptions and exit with appropriate exit codes.
 
@@ -629,7 +629,7 @@ def exit_on_exception(func):
 	"""
 
 	@functools.wraps(func)
-	def wrapper(*args, **kwargs):
+	def wrapper(*args, **kwargs) -> callable:
 		try:
 			return func(*args, **kwargs)
 		except SystemExit as exc:
