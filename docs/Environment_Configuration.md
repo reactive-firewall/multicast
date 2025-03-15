@@ -110,3 +110,9 @@ and does not actually update Multicast after import)_
 
 - [RFC-1112: Host Extensions for IP Multicasting](https://datatracker.ietf.org/doc/html/rfc1112)
 - [RFC-6335: IANA Port Number Registry](https://datatracker.ietf.org/doc/html/rfc6335)
+
+---
+
+### Copyright (c) 2024-2025, Mr. Walls
+
+[![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
