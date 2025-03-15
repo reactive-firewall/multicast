@@ -100,6 +100,25 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	COVERAGE_CMD_TEMPLATE: str = f"{str(sys.executable)} -m coverage run -p --context=Integration"
 	"""Coverage command template for test execution."""
 
+	def _build_hear_command(self, port: int, group: str = "224.0.0.1") -> List[str]:
+		"""
+		Build the command for running the multicast HEAR service.
+
+		Args:
+			port (int): The port number to use
+			group (str, optional): The multicast group. Defaults to "224.0.0.1"
+
+		Returns:
+			list: The command arguments list
+		"""
+		return [
+			self.COVERAGE_CMD_TEMPLATE, "--source=multicast",
+			"-m", "multicast",
+			"--daemon", "HEAR",
+			"--port", str(port),
+			"--group", group
+		]
+
 	def test_hear_keyboard_interrupt(self) -> None:
 		"""
 		Test proper handling of keyboard interrupts (SIGINT).
@@ -120,18 +139,10 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_HEAR_args: List[str] = [
-				self.COVERAGE_CMD_TEMPLATE,
-				"--source=multicast",
-				"-m",
-				"multicast",
-				"--daemon",
-				"HEAR",
-				"--port",
-				str(_fixture_port_num),
-				"--group",
-				self.TEST_MULTICAST_GROUP
-			]
+			_fixture_HEAR_args: List[str] = self._build_hear_command(
+				port=_fixture_port_num,
+				group=self.TEST_MULTICAST_GROUP
+			)
 			self.assertIsNotNone(_fixture_HEAR_args)
 			process: subprocess.Popen = subprocess.Popen(
 				context.checkCovCommand(*_fixture_HEAR_args),
