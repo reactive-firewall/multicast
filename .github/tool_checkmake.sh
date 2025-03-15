@@ -60,13 +60,22 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 #
+# Tool to lint Makefiles using checkmake.
+# Validates Makefile syntax and enforces best practices.
+#
 # .github/tool_checkmake.sh
 readonly SCRIPT_NAME="${0##*/}"
 
 # local build path fix-up
 if [[ -d "./checkmake" ]] && [[ ":$PATH:" != *":./checkmake:"* ]] ; then
-	PATH="${PATH:+"$PATH:"}./checkmake" ;
-	export PATH ;
+	if [[ -x "./checkmake/checkmake" ]]; then
+		# shellcheck disable=SC2123
+		PATH="${PATH:+"$PATH:"}./checkmake" ;
+		export PATH ;
+	else
+		readonly LOC_DESC="Local checkmake found but not executable."
+		printf "%s\n" "::warning file=${SCRIPT_NAME},title=PATH::${LOC_DESC}" >&2
+	fi
 fi
 
 # USAGE:
@@ -106,19 +115,42 @@ function usage() {
 }
 
 # Validate parameters
-if [[ ( "$#" -lt 1 ) ]]; then
+if [[ "$#" -lt 1 ]] || [[ "$#" -gt 1 ]]; then
 	usage
+fi
+
+# Validate file path (no path traversal)
+if [[ "${1}" == *".."* ]]; then
+	readonly SEC_DESC="Path traversal detected in argument."
+	printf "%s\n" "::error file=${SCRIPT_NAME},title=SECURITY::${SEC_DESC}" >&2
+	exit 1
 fi
 readonly FILE="${1}"
 readonly EMSG="Checkmake linter complained."
 
 # Check if file exists
-if [[ ! ( -f "${FILE}" ) ]]; then
+if [[ ! -f "${FILE}" ]] || [[ ! -r "${FILE}" ]]; then
 	printf "%s\n" "::error file=${FILE},title=MISSING::File '${FILE}' not found." >&2
 	exit 64
+elif [[ ! "${FILE}" =~ Makefile|\.mk$ ]]; then
+	readonly KIND_DESC="File '${FILE}' doesn't appear to be a Makefile."
+	printf "%s\n" "::error file=${FILE},title=INVALID::${KIND_DESC}" >&2
+	exit 65
 fi
 
-# Main functionality
+if [[ -L "${FILE}" ]]; then
+	printf "%s\n" "::warning file=${FILE},title=SYMLINK::File is a symbolic link." >&2
+fi
+
+# process_checkmake_output processes the output of checkmake for a given file.
+#
+# Args:
+#   $1: The file to check
+#   $2: The error message to display
+#
+# Returns:
+#   0 if no lint errors found
+#   1 if lint errors found or checkmake failed
 process_checkmake_output() {
 	local file="$1"
 	local emsg="$2"
