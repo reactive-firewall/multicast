@@ -661,16 +661,17 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				theResult = False
 		self.assertTrue(theResult, str("""Could Not find version from multicast --version"""))
 
-	def _validate_help_output(self, args):
+	def _validate_help_output(self, args: list) -> bool:
 		"""
 		Helper method to validate help command output.
 
 		Args:
-			args: List of command arguments to execute
+			args (list) -- List of command arguments to execute
 
 		Returns:
 			bool: True if validation passes, False otherwise
 		"""
+		usageText = "usage:"
 		theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 		subResult = False
 		try:
@@ -679,12 +680,12 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		except UnicodeDecodeError:
 			theOutputtxt = str(repr(bytes(theOutputtxt)))
 		self.assertIsNotNone(theOutputtxt)
-		self.assertIn(str("usage:"), str(theOutputtxt))
-		if str("usage:") in str(theOutputtxt):
+		self.assertIn(str(usageText), str(theOutputtxt))
+		if str(usageText) in str(theOutputtxt):
 			subResult = True
 		else:
 			context.debugUnexpectedOutput(
-				str("usage:"), str(theOutputtxt), self._thepython
+				str(usageText), str(theOutputtxt), self._thepython
 			)
 		return subResult
 
