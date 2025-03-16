@@ -70,6 +70,15 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 
 
 class McastServerTestSuite(McastHearTestSuite):
+	"""Test suite for McastServer functionality.
+
+	This suite verifies the server's behavior in handling various types of requests,
+	error conditions, and resource management.
+
+	Attributes:
+		__module__ (str): Module identifier
+		__name__ (str): Full class name
+	"""
 
 	__module__ = "tests.test_hear_server"
 
@@ -94,6 +103,9 @@ class McastServerTestSuite(McastHearTestSuite):
 			client_address = (self.get_default_ip(), _fixture_port_num)
 			# Mock a request not containing "STOP"
 			request = (str("Regular message"), multicast.genSocket())
+			# Add assertions for initial state
+			self.assertIsNotNone(request[1], "Socket should be created")
+			self.assertIsInstance(request[0], str, "Request should be a string")
 			try:
 				server.handle_error(request, client_address)
 			finally:
