@@ -303,7 +303,7 @@ class CommandExecutionError(RuntimeError):
 			self.__cause__ = cause
 		msg = args[0] if args else kwargs.get("message", "An error occurred")
 		self.message = msg if msg else "An error occurred"
-		del msg  # cleanup overhead early
+		del msg  # skipcq: PTC-W0043
 		self.exit_code = exit_code
 
 
