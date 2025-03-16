@@ -339,7 +339,7 @@ class ShutdownCommandReceived(RuntimeError):
 		"""
 		Initialize the ShutdownCommandReceived exception.
 
-		The ShutdownComandRecived exception is used by the default handler
+		The ShutdownCommandReceived exception is used by the default handler
 		for the HEAR servers, to instruct the HEAR server to shutdown gracefully.
 
 		Parameters:
