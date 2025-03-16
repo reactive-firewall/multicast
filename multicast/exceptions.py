@@ -301,7 +301,9 @@ class CommandExecutionError(RuntimeError):
 		super().__init__(*args, **kwargs)
 		if cause is not None:
 			self.__cause__ = cause
-		self.message = args[0] if args else kwargs.get("message", "An error occurred")
+		msg = args[0] if args else kwargs.get("message", "An error occurred")
+		self.message = msg if msg else "An error occurred"
+		del msg  # cleanup overhead early
 		self.exit_code = exit_code
 
 

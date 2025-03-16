@@ -51,8 +51,15 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 	"""
 	Test suite for validating the behavior of exception classes in the multicast package.
 
-	This suite focuses on testing the CommandExecutionError class, verifying its
-	initialization with different arguments and proper error propagation.
+	This suite comprehensively tests both CommandExecutionError and ShutdownCommandReceived
+	classes, verifying:
+	- Initialization with various argument combinations
+	- Default values and overrides
+	- Exception chaining and cause propagation
+	- Exit code handling and constraints
+
+	The suite extends BasicUsageTestSuite to leverage common test infrastructure
+	and maintain consistency across the test framework.
 	"""
 
 	__module__ = "tests.test_exceptions"
@@ -138,6 +145,46 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertEqual(error.message, "Shutdown with cause")
 		self.assertNotEqual(error.exit_code, 77, "Unexpectedly was able to override exit code!")
 		self.assertEqual(error.exit_code, 143)
+
+	def test_command_execution_error_with_bad_inputs(self):
+		"""Test CommandExecutionError handling of garbage inputs.
+
+		Verifies that the class properly handles edge cases and invalid inputs
+		by either raising appropriate exceptions or applying sensible defaults.
+		"""
+		error = multicast.exceptions.CommandExecutionError(None)
+		self.assertIsNotNone(error.message, "Unexpectedly was able to override None as message!")
+		# Test with invalid cause type
+		with self.assertRaises(TypeError):
+			multicast.exceptions.CommandExecutionError(__cause__=42, message="Test")
+
+	def test_shutdown_received_error_scenarios(self):
+		"""Test ShutdownCommandReceived across multiple scenarios using parameterized tests."""
+		test_cases = [
+			{
+				"name": "custom_message",
+				"args": ("Test Shutdown",),
+				"expected": {"message": "Test Shutdown", "exit_code": 143}
+			},
+			{
+				"name": "with_exit_code_override_attempt",
+				"args": ("Test Shutdown", 42),
+				"expected": {"message": "Test Shutdown", "exit_code": 143}
+			},
+			{
+				"name": "no_args",
+				"args": (),
+				"expected": {"message": "SHUTDOWN", "exit_code": 143}
+			}
+		]
+		for case in test_cases:
+			with self.subTest(name=case["name"]):
+				error = multicast.exceptions.ShutdownCommandReceived(*case["args"])
+				self.assertIsNotNone(error)
+				self.assertIsNotNone(error.message)
+				self.assertEqual(error.message, case["expected"]["message"])
+				self.assertIsNotNone(error.exit_code)
+				self.assertEqual(error.exit_code, case["expected"]["exit_code"])
 
 
 # leave this part
