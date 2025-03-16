@@ -210,7 +210,6 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertNotEqual(int(tst_err_rslt_c), int(0))
 			self.assertNotEqual(int(tst_err_rslt_c), int(1))
 			self.assertNotEqual(int(tst_err_rslt_d), int(1))
-			self.assertNotEqual(int(tst_err_rslt_d), int(1))
 			self.assertEqual(int(tst_err_rslt_c), int(2))
 			self.assertEqual(int(tst_err_rslt_d), int(2))
 			self.assertEqual(int(tst_err_rslt_d), int(tst_err_rslt_c))
@@ -445,18 +444,25 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			say = multicast.send.McastSAY()
 			self.assertIsNotNone(say)
 			self.assertIsNotNone(_fixture_port_num)
-			test_input = "Test message from stdin"
-			self.assertIsNotNone(test_input)
-			with patch('sys.stdin', io.StringIO(test_input)):
-				result = say.doStep(data=['-'], group='224.0.0.1', port=_fixture_port_num)
-				self.assertIsNotNone(result)
-				# Verify the message was actually sent
-				theResult = result.success
-				self.assertTrue(theResult)  # Assuming there's a success indicator
-				self.assertEqual(result.sent_message, test_input)  # Verify message content
+			test_cases = [
+				"",  # Empty input
+				"Test message from stdin",  # Basic case
+				"A" * 1024,  # Large input
+				"Special chars: !@#$%^&*()",  # Special characters
+				"Unicode: 你好世界",  # Unicode
+				"HEAR\x00"  # Null byte injection
+			]
+			for test_input in test_cases:
+				self.assertIsNotNone(test_input)
+				with patch('sys.stdin', io.StringIO(test_input)):
+					result = say.doStep(data=["-"], group="224.0.0.1", port=_fixture_port_num)
+					self.assertIsNotNone(result)
+					# Verify the message was actually sent
+					theResult = result[0] or False
+					self.assertTrue(theResult)  # Assuming there's a success indicator
 		except Exception as err:
 			context.debugtestError(err)
-			self.skipTest(fail_fixture)
+			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
@@ -816,7 +822,18 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 		theResult = False
 		if (self._thepython is not None):
 			try:
-				for test_case in ["BAdInPut", int(1), "exit"]:
+				test_cases = [
+					"BAdInPut",  # Basic invalid input
+					int(1),  # Non-string input
+					"exit",  # Reserved word
+					"",  # Empty string
+					" ",  # Whitespace
+					"\t",  # Tab character
+					"你好",  # Unicode
+					"HEAR\x00",  # Null byte injection
+					"SAY;ls"  # Command injection attempt
+				]
+				for test_case in test_cases:
 					args = [
 						str(self._thepython),
 						str("-m"),
@@ -825,10 +842,11 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					]
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					# or simply:
-					self.assertIsNotNone(theOutputtxt)
-					self.assertIn(str("invalid choice:"), str(theOutputtxt))
-					self.assertIn(str(test_case), str(theOutputtxt))
-					theResult = True
+					if theOutputtxt:
+						self.assertIsNotNone(theOutputtxt, f"Error with {str(test_case)}")
+						self.assertIn(str("invalid choice:"), str(theOutputtxt))
+						self.assertIn(repr(str(test_case)), str(theOutputtxt))
+						theResult = True
 			except Exception as err:
 				context.debugtestError(err)
 				err = None

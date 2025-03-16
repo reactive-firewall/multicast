@@ -380,6 +380,24 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	return [*args]
 
 
+def validateCommandArgs(args):
+	"""
+	Validates command arguments to ensure they do not contain null characters.
+
+	Args:
+		args (list): A list of command arguments to be validated.
+
+	Raises:
+		ValueError: If any argument contains a null character.
+	"""
+	if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
+		# skipcq: TCV-002
+		raise ValueError("[CWE-1286] args must be an array of positional arguments") from None
+	for arg in args:
+		if isinstance(arg, str) and "\x00" in arg:
+			raise ValueError("[CWE-20] Null characters are not allowed in command arguments.")
+
+
 def checkStrOrByte(theInput):
 	"""
 	Converts the input to a string if possible, otherwise returns it as bytes.
@@ -520,6 +538,7 @@ def checkPythonCommand(args, stderr=None):
 		if (args is None) or (args == [None]) or (len(args) <= 0):  # pragma: no branch
 			theOutput = None  # None is safer than subprocess.check_output(["exit 1 ; #"])
 		else:
+			validateCommandArgs(args)
 			if str("coverage") in args[0]:
 				args = checkCovCommand(*args)
 			theOutput = subprocess.check_output(args, stderr=stderr)
