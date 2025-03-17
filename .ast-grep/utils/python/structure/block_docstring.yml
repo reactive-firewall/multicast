@@ -1,5 +1,5 @@
-# .ast-grep/utils/structure.yml
-# Documentation structure utilities
+# .ast-grep/utils/python/structure/block_docstring.yml
+# Documentation structure utilities.
 id: block_docstring
 rule:
   matches: docstring_statement

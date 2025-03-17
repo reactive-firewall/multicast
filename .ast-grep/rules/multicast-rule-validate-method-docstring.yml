@@ -18,8 +18,8 @@ rule:
   kind: string
   all:
     - any:
-      - matches: function_docstring
-      - matches: method_docstring
+        - matches: function_docstring
+        - matches: method_docstring
     - not:
         matches: cep7_docstring_tests
 language: python

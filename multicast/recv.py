@@ -407,7 +407,7 @@ def recvstep(msgbuffer, chunk, sock):
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
-			print(str("User Interrupted"))
+			print("User Interrupted")
 	except OSError:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok

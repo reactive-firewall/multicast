@@ -134,14 +134,14 @@ __name__ = "multicast.send"  # skipcq: PYL-W0622 - Ensures the correct name valu
 
 try:
 	import sys
-	if 'multicast' not in sys.modules:
+	if "multicast" not in sys.modules:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
+except Exception as _cause:
+	del _cause  # skipcq - cleanup any error leaks early
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
@@ -158,9 +158,9 @@ try:
 					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
 		except Exception as _cause:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
-except Exception as err:
-	raise ImportError(err) from err
+			raise ImportError("[CWE-758] Module failed completely.") from _cause
+except Exception as baton:  # pragma: no branch
+	raise ImportError(baton) from baton
 
 
 class McastSAY(multicast.mtool):
@@ -297,7 +297,7 @@ class McastSAY(multicast.mtool):
 				"--message",
 				nargs="+",
 				dest="data",
-				default=str("PING from {name}: group: {group}, port: {port}")
+				default="PING from {name}: group: {group}, port: {port}",
 			)
 
 	@staticmethod
@@ -363,7 +363,7 @@ class McastSAY(multicast.mtool):
 				_result = _result and self._sayStep(group, port, chunk)
 		elif isinstance(data, list):
 			# Join multiple arguments into a single string
-			message = str(" ").join(data)
+			message = " ".join(data)
 			_result = self._sayStep(group, port, message)
 		else:
 			message = data.decode('utf8') if isinstance(data, bytes) else str(data)

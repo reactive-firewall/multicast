@@ -74,14 +74,14 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			- No lingering processes or sockets
 		"""
 		theResult = False
-		fail_fixture = str("STOP --> HEAR == error")
+		fail_fixture = "STOP --> HEAR == error"
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
 			_fixture_HEAR_kwargs = {
 				"port": _fixture_port_num,
-				"group": "224.0.0.1"
+				"group": "224.0.0.1",
 			}
 			self.assertIsNotNone(_fixture_HEAR_kwargs)
 			p = Process(

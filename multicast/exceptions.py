@@ -433,6 +433,10 @@ class ShutdownCommandReceived(RuntimeError):
 		self.exit_code = 143  # Use SIGTERM exit code for graceful shutdown
 
 
+# Error message constants
+EXIT_CODE_RANGE_ERROR = "Exit code must be an integer between 0 and 255"
+
+
 def validate_exit_code(code) -> None:
 	"""
 	Validate that an exit code is within the valid range (0-255).
@@ -506,7 +510,7 @@ def validate_exit_code(code) -> None:
 			True
 	"""
 	if not isinstance(code, int) or code < 0 or code > 255:
-		raise ValueError("Exit code must be an integer between 0 and 255")
+		raise ValueError(EXIT_CODE_RANGE_ERROR)
 
 
 EXIT_CODES = {
@@ -728,7 +732,7 @@ def exit_on_exception(func: callable) -> callable:
 	"""
 
 	@functools.wraps(func)
-	def wrapper(*args, **kwargs) -> callable:
+	def wrapper(*args, **kwargs):
 		try:
 			return func(*args, **kwargs)
 		except SystemExit as exc:

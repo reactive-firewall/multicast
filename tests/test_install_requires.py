@@ -46,12 +46,12 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 	requirements_file = None
 	"""stores the temporary requirements file path for testing"""
 
-	def setUp(self):
+	def setUp(self) -> None:
 		super(ParseRequirementsTestSuite, self).setUp()
 		# Create a temporary requirements file for testing
 		self.requirements_file = "test_requirements.txt"
 
-	def tearDown(self):
+	def tearDown(self) -> None:
 		"""Clean up the temporary requirements file"""
 		try:
 			if os.path.exists(self.requirements_file):
@@ -59,11 +59,11 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		finally:
 			super(ParseRequirementsTestSuite, self).tearDown()
 
-	def write_requirements(self, content):
+	def write_requirements(self, content) -> None:
 		with open(self.requirements_file, 'w') as f:
 			f.write(content)
 
-	def test_simple_version_constraint(self):
+	def test_simple_version_constraint(self) -> None:
 		"""Test parsing a simple version constraint."""
 		self.write_requirements("package>=1.0\n")
 		install_requires = parse_requirements_for_install_requires(
@@ -71,7 +71,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		)
 		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_multiple_version_constraints(self):
+	def test_multiple_version_constraints(self) -> None:
 		"""Test parsing multiple version constraints."""
 		self.write_requirements("package>=1.0,!=1.5,<2.0\n")
 		install_requires = parse_requirements_for_install_requires(
@@ -79,7 +79,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		)
 		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_comments_and_empty_lines(self):
+	def test_comments_and_empty_lines(self) -> None:
 		"""Test handling comments and empty lines."""
 		content = str(
 			"""
@@ -94,7 +94,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		)
 		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_options_and_urls_ignored(self):
+	def test_options_and_urls_ignored(self) -> None:
 		"""Test that options and URLs are ignored."""
 		content = str(
 			"""
@@ -109,7 +109,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		)
 		self.assertEqual(install_requires, [])
 
-	def test_malformed_lines(self):
+	def test_malformed_lines(self) -> None:
 		"""Test handling of malformed requirement lines."""
 		self.write_requirements("bad_package==\n")
 		install_requires = parse_requirements_for_install_requires(
@@ -117,7 +117,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		)
 		self.assertEqual(install_requires, [])
 
-	def test_nonexistent_requirements_file(self):
+	def test_nonexistent_requirements_file(self) -> None:
 		"""Test behavior when requirements file does not exist."""
 		_test_fixture = "nonexistent.txt"
 		install_requires = parse_requirements_for_install_requires(readFile(_test_fixture))
@@ -125,5 +125,5 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

@@ -66,7 +66,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 
 	__name__ = "tests.test_exceptions.ExceptionsTestSuite"
 
-	def test_command_execution_error_with_args(self):
+	def test_command_execution_error_with_args(self) -> None:
 		"""
 		Test CommandExecutionError initialization with custom message and exit code.
 
@@ -77,7 +77,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertEqual(error.message, "Test error")
 		self.assertEqual(error.exit_code, 42)
 
-	def test_command_execution_error_default_exit_code(self):
+	def test_command_execution_error_default_exit_code(self) -> None:
 		"""Test CommandExecutionError initialization with default exit code.
 
 		Verifies that the exit code defaults to 1 when only a message is provided.
@@ -85,7 +85,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		error = multicast.exceptions.CommandExecutionError("Test error")
 		self.assertEqual(error.exit_code, 1)
 
-	def test_command_execution_error_with_cause(self):
+	def test_command_execution_error_with_cause(self) -> None:
 		"""Test CommandExecutionError initialization with a cause.
 
 		Verifies that the error properly chains exceptions when initialized with a
@@ -100,7 +100,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertEqual(error.message, "Test with cause")
 		self.assertEqual(error.exit_code, 77)
 
-	def test_shutdown_received_error_with_args(self):
+	def test_shutdown_received_error_with_args(self) -> None:
 		"""
 		Test ShutdownCommandReceived initialization with custom message and exit code.
 
@@ -112,7 +112,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertNotEqual(error.exit_code, 42, "Unexpectedly was able to override exit code!")
 		self.assertEqual(error.exit_code, 143)
 
-	def test_shutdown_received_error_default_exit_code(self):
+	def test_shutdown_received_error_default_exit_code(self) -> None:
 		"""Test ShutdownCommandReceived initialization with default exit code.
 
 		Verifies that the exit code defaults to 143 when only a message is provided.
@@ -120,7 +120,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		error = multicast.exceptions.ShutdownCommandReceived("Test Shutdown")
 		self.assertEqual(error.exit_code, 143)
 
-	def test_shutdown_received_error_GIVEN_no_args(self):
+	def test_shutdown_received_error_GIVEN_no_args(self) -> None:
 		"""Test ShutdownCommandReceived initialization with default exit code.
 
 		Verifies that the exit code defaults to 143 when no arguments are provided.
@@ -130,7 +130,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertEqual(error.message, "SHUTDOWN")
 		self.assertEqual(error.exit_code, 143)
 
-	def test_shutdown_received_error_with_cause(self):
+	def test_shutdown_received_error_with_cause(self) -> None:
 		"""Test ShutdownCommandReceived initialization with a cause.
 
 		Verifies that the error properly chains exceptions when initialized with a
@@ -146,7 +146,7 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		self.assertNotEqual(error.exit_code, 77, "Unexpectedly was able to override exit code!")
 		self.assertEqual(error.exit_code, 143)
 
-	def test_command_execution_error_with_bad_inputs(self):
+	def test_command_execution_error_with_bad_inputs(self) -> None:
 		"""Test CommandExecutionError handling of garbage inputs.
 
 		Verifies that the class properly handles edge cases and invalid inputs
@@ -158,24 +158,24 @@ class ExceptionsTestSuite(BasicUsageTestSuite):
 		with self.assertRaises(TypeError):
 			multicast.exceptions.CommandExecutionError(__cause__=42, message="Test")
 
-	def test_shutdown_received_error_scenarios(self):
+	def test_shutdown_received_error_scenarios(self) -> None:
 		"""Test ShutdownCommandReceived across multiple scenarios using parameterized tests."""
 		test_cases = [
 			{
 				"name": "custom_message",
 				"args": ("Test Shutdown",),
-				"expected": {"message": "Test Shutdown", "exit_code": 143}
+				"expected": {"message": "Test Shutdown", "exit_code": 143},
 			},
 			{
 				"name": "with_exit_code_override_attempt",
 				"args": ("Test Shutdown", 42),
-				"expected": {"message": "Test Shutdown", "exit_code": 143}
+				"expected": {"message": "Test Shutdown", "exit_code": 143},
 			},
 			{
 				"name": "no_args",
 				"args": (),
-				"expected": {"message": "SHUTDOWN", "exit_code": 143}
-			}
+				"expected": {"message": "SHUTDOWN", "exit_code": 143},
+			},
 		]
 		for case in test_cases:
 			with self.subTest(name=case["name"]):

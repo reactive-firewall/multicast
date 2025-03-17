@@ -23,12 +23,26 @@ import sys
 import argparse
 import unittest
 from tests import get_test_suite
+from tests import TEST_GROUPS
 
 
-def main():
+def main() -> None:
+	"""Run selective tests based on specified group and category.
+
+	Parses command line arguments to select the appropriate test suite and executes the tests using
+	`unittest.TextTestRunner`. Exits the program with a status code corresponding to the test
+	results.
+
+	Returns:
+		None: Exits the application.
+	"""
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--group', help='Test group (mat|extra|fuzzing|performance)')
-	parser.add_argument('--category', help='Test category within the group')
+	parser.add_argument(
+		"--group",
+		help="Specify test group to run (valid values: mat, extra, fuzzing, performance)",
+		choices=TEST_GROUPS.keys()
+	)
+	parser.add_argument("--category", help="Specify test category within the selected group")
 	args = parser.parse_args()
 	try:
 		_bar = str("-" * 20)

@@ -47,13 +47,13 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 
 	__name__ = "tests.test_hear_data_processing.RecvDataProcessingTestSuite"
 
-	def test_multicast_sender_with_no_data(self):
+	def test_multicast_sender_with_no_data(self) -> None:
 		"""
 		Tests the multicast sender and receiver with Empty binary data.
 
 		"""
 		theResult = False
-		fail_fixture = str("SAY -X] RECV? != error")
+		fail_fixture = "SAY -X] RECV? != error"
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -64,7 +64,7 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 				"--groups",
 				"'224.0.0.1'",
 				"--group",
-				"'224.0.0.1'"
+				"'224.0.0.1'",
 			]
 			p = Process(
 				target=multicast.__main__.main, name="RECV", args=(
@@ -97,13 +97,13 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
 
-	def test_multicast_sender_with_no_data_before_follow_by_stop(self):
+	def test_multicast_sender_with_no_data_before_follow_by_stop(self) -> None:
 		"""
 		Tests the multicast sender and receiver with Empty binary data, followed by a stop.
 
 		"""
 		theResult = False
-		fail_fixture = str("SAY -X] HEAR? != error")
+		fail_fixture = "SAY -X] HEAR? != error"
 		_fixture_port_num = self._always_generate_random_port_WHEN_called()
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -114,7 +114,7 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 				"--groups",
 				"'224.0.0.1'",
 				"--group",
-				"'224.0.0.1'"
+				"'224.0.0.1'",
 			]
 			p = Process(
 				target=multicast.__main__.main,
@@ -167,7 +167,7 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 
 	__name__ = "tests.test_hear_data_processing.HearHandleNoneDataTestSuite"
 
-	def test_handle_none_data(self):
+	def test_handle_none_data(self) -> None:
 		"""Test that HearUDPHandler properly handles None data without raising exceptions.
 
 		This test verifies that:
@@ -190,7 +190,7 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 			mock_socket.method_calls, [], "Socket should not be used when data is None"
 		)
 
-	def test_handle_with_invalid_utf8_data(self):
+	def test_handle_with_invalid_utf8_data(self) -> None:
 		"""Test that HearUDPHandler silently ignores invalid UTF-8 data.
 
 		This test verifies that:

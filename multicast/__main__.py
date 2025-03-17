@@ -478,7 +478,7 @@ class McastRecvHearDispatch(mtool):
 			parser.add_argument(
 				"--port",
 				type=int,
-				default=_MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+				default=_MCAST_DEFAULT_PORT,  # skipcq: PYL-W0212 - module ok
 			)
 			__tmp_help = "local interface to use for listening to multicast data; "
 			__tmp_help += "if unspecified, any one interface may be chosen."

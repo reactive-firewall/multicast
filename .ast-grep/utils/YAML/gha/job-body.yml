@@ -1,4 +1,5 @@
-# .ast-grep/utils/yaml/gha/job-body.yml
+# .ast-grep/utils/YAML/gha/job-body.yml
+# Utilities for enforcing structure in GitHub Actions job bodies
 id: gha_job_body
 rule:
   pattern:

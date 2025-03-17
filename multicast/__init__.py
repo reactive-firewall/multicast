@@ -503,7 +503,7 @@ class mtool(abc.ABC):
 				"-v",
 				"--version",
 				action="version",
-				version=str("%(prog)s {version}").format(version=str(__version__))
+				version="%(prog)s {version}".format(version=str(__version__))
 			)
 			calling_parser_group.add_argument(
 				"--use-std", dest="is_std", default=False, action="store_true"
@@ -512,7 +512,7 @@ class mtool(abc.ABC):
 				"--daemon", dest="is_daemon", default=False, action="store_true"
 			)
 		subparsers = calling_parser_group.add_subparsers(
-			title="Tools", dest="cmd_tool", help=str("Sub-Commands."), metavar="CMD"
+			title="Tools", dest="cmd_tool", help="Sub-Commands.", metavar="CMD"
 		)
 		if mtool.__class__.__subclasscheck__(mtool, cls):  # pragma: no branch
 			cls.setupArgs(subparsers)

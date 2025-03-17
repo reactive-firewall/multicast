@@ -65,9 +65,9 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = "tests.test_basic"
 
-	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
+	@unittest.skipUnless(True, "Insanity Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test 1: Because it only matters if we're not mad as hatters."""
+		"""Insanity Test 1: Because it only matters if we're not mad as hatters."""
 		assert True
 
 	def test_Does_Pass_WHEN_Meta_Test(self):
@@ -122,7 +122,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 				(_ignored_code, test_fixture) = tst_dispatch.useTool(tst_in)
 				self.assertIsNone(
 					test_fixture,
-					str("multicast.McastDispatch().useTool({}) == ERROR").format(str(tst_in))
+					f"multicast.McastDispatch().useTool({str(tst_in)}) == ERROR"
 				)
 			theResult = True
 		except Exception:

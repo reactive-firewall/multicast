@@ -1,0 +1,50 @@
+# .ast-grep/python-rule-simplify-u-string.yml
+---
+id: simplify-unicode-strings
+rule:
+  kind: string
+  any:
+    - pattern:
+        selector: string
+        context: |
+          u"$STRING"
+    - pattern:
+        selector: string
+        context: |
+          u'$STRING'
+    - pattern:
+        selector: string
+        context: |
+          u"""$STRING"""
+    - pattern:
+        selector: string
+        context: |
+          u'''$STRING'''
+  has:
+    kind: string_content
+    any:
+      - all:
+          - follows:
+              kind: string_start
+              regex: u(?:'{1,3})
+          - precedes:
+              kind: string_end
+              regex: (?:'{1,3})
+      - all:
+          - follows:
+              kind: string_start
+              regex: u(?:"{1,3})
+          - precedes:
+              kind: string_end
+              regex: (?:"{1,3})
+message: "Consider simplifying by removing unicode prefix which is unnecessary in Python 3."
+severity: error
+fix:
+  '"$STRING"'
+description: Rule for simplifying unicode prefix
+language: python
+examples:
+  - name: unnecessary unicode prefix for string
+    code: |
+      if __name__ in u"__main__":
+        main()

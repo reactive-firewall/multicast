@@ -52,7 +52,6 @@ try:
 		from context import subprocess
 		import signal
 		import time
-		from typing import List
 		from context import BasicUsageTestSuite
 except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
@@ -100,7 +99,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	COVERAGE_CMD_TEMPLATE: str = f"{str(sys.executable)} -m coverage run -p --context=Integration"
 	"""Coverage command template for test execution."""
 
-	def _build_hear_command(self, port: int, group: str = "224.0.0.1") -> List[str]:
+	def _build_hear_command(self, port: int, group: str = "224.0.0.1") -> list[str]:
 		"""
 		Build the command for running the multicast HEAR service.
 
@@ -139,7 +138,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 		try:
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertEqual(type(_fixture_port_num), type(int(0)))
-			_fixture_HEAR_args: List[str] = self._build_hear_command(
+			_fixture_HEAR_args: list[str] = self._build_hear_command(
 				port=_fixture_port_num,
 				group=self.TEST_MULTICAST_GROUP
 			)
@@ -178,5 +177,5 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

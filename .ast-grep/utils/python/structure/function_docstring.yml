@@ -1,4 +1,4 @@
-# .ast-grep/utils/structure.yml
+# .ast-grep/utils/python/structure/function_docstring.yml
 # Documentation structure utilities
 id: function_docstring
 rule:

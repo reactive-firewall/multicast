@@ -173,7 +173,7 @@ __BLANK = str("""""")
 """
 
 
-def markWithMetaTag(*marks: str):
+def markWithMetaTag(*marks: str) -> callable:
 	"""Decorator to apply pytest marks if pytest is available."""
 	try:
 		import pytest
@@ -181,7 +181,7 @@ def markWithMetaTag(*marks: str):
 	except ImportError:
 		pytest_available = False
 
-	def decorator(cls):
+	def decorator(cls) -> any:
 		if pytest_available:
 			for mark in marks:
 				cls = pytest.mark.__getattr__(mark)(cls)
@@ -380,7 +380,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	return [*args]
 
 
-def validateCommandArgs(args):
+def validateCommandArgs(args: list) -> None:
 	"""
 	Validates command arguments to ensure they do not contain null characters.
 
@@ -921,7 +921,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	__name__ = "tests.context.BasicUsageTestSuite"
 
-	NO_PYTHON_ERROR = "No python cmd to test with!"  # skipcq: TCV-002
+	NO_PYTHON_ERROR: str = "No python cmd to test with!"  # skipcq: TCV-002
 	"""Error message used when Python command is not available for testing.
 
 	This constant is used across multiple test methods to maintain consistency
@@ -929,12 +929,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 	"""
 
 	@classmethod
-	def setUpClass(cls):
+	def setUpClass(cls) -> None:
 		"Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."
 		cls._thepython = getPythonCommand()
 
 	@staticmethod
-	def _always_generate_random_port_WHEN_called():
+	def _always_generate_random_port_WHEN_called() -> int:
 		"""
 		Generates a pseudo-random port number within the dynamic/private port range.
 
@@ -947,7 +947,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 		"""
 		return secrets.randbelow(65535 - 49152 + 1) + 49152
 
-	def setUp(self):
+	def setUp(self) -> None:
 		"""Overrides unittest.TestCase.setUp(unittest.TestCase).
 			Defaults is to skip test if class is missing thepython test fixture.
 		"""
@@ -955,7 +955,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			self.skipTest(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self._the_test_port = self._always_generate_random_port_WHEN_called()
 
-	def _should_get_package_version_WHEN_valid(self):
+	def _should_get_package_version_WHEN_valid(self) -> None:
 		"""
 		Retrieve the current version of the package.
 
@@ -987,19 +987,19 @@ class BasicUsageTestSuite(unittest.TestCase):
 		except ImportError:
 			self.fail("Failed to import the multicast package to retrieve version.")
 
-	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
-	def test_absolute_truth_and_meaning(self):
-		"""Test case 0: Insanitty Test."""
+	@unittest.skipUnless(True, "Insanity Test. Good luck debugging.")
+	def test_absolute_truth_and_meaning(self) -> None:
+		"""Test case 0: Insanity Test."""
 		assert True
-		self.assertTrue(True, "Insanitty Test Failed")  # skipcq: PYL-W1503
+		self.assertTrue(True, "Insanity Test Failed")  # skipcq: PYL-W1503
 
-	def test_finds_python_WHEN_testing(self):
+	def test_finds_python_WHEN_testing(self) -> None:
 		"""Test case 1: Class Test-Fixture Meta Test."""
 		if (self._thepython is not None) and (len(self._thepython) <= 0):
 			self.fail(self.NO_PYTHON_ERROR)  # skipcq: TCV-002
 		self.test_absolute_truth_and_meaning()
 
-	def tearDown(self):
+	def tearDown(self) -> None:
 		"""Overrides unittest.TestCase.tearDown(unittest.TestCase).
 			Defaults is to reset the random port test fixture.
 		"""
@@ -1007,6 +1007,6 @@ class BasicUsageTestSuite(unittest.TestCase):
 			self._the_test_port = None
 
 	@classmethod
-	def tearDownClass(cls):
+	def tearDownClass(cls) -> None:
 		"""Overrides unittest.TestCase.tearDownClass(cls) to clean up thepython test fixture."""
 		cls._thepython = None

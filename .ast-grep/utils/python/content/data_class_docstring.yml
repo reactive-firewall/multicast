@@ -1,4 +1,4 @@
-# .ast-grep/utils/content.yml
+# .ast-grep/utils/python/content/data_class_docstring.yml
 # CEP-7 content validation utilities
 id: data_class_docstring
 rule:

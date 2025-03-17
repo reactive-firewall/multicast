@@ -4,9 +4,9 @@ id: check-test-documentation
 rule:
   all:
     - any:
-      - matches: data_class_docstring
-      - matches: function_docstring
-      - matches: method_docstring
+        - matches: data_class_docstring
+        - matches: function_docstring
+        - matches: method_docstring
     - not:
         all:
           - matches: cep7_docstring_purpose

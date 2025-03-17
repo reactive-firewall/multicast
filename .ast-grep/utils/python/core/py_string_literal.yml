@@ -6,18 +6,18 @@ rule:
       inside:
         kind: string
     - any:
-      - all:
-          - follows:
-              kind: string_start
-              regex: (?:'{3})
-          - precedes:
-              kind: string_end
-              regex: (?:'{3})
-      - all:
-          - follows:
-              kind: string_start
-              regex: (?:"{3})
-          - precedes:
-              kind: string_end
-              regex: (?:"{3})
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:'{3})
+            - precedes:
+                kind: string_end
+                regex: (?:'{3})
+        - all:
+            - follows:
+                kind: string_start
+                regex: (?:"{3})
+            - precedes:
+                kind: string_end
+                regex: (?:"{3})
 language: python

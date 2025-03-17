@@ -1,4 +1,4 @@
-# .ast-grep/utils/yaml/gha/jobs-block.yml
+# .ast-grep/utils/YAML/gha/jobs-block.yml
 id: gha_jobs_block
 rule:
   inside:

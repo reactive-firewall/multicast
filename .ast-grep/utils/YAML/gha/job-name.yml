@@ -1,4 +1,4 @@
-# .ast-grep/utils/yaml/gha/job-name.yml
+# .ast-grep/utils/YAML/gha/job-name.yml
 id: gha_job_name
 rule:
   pattern:

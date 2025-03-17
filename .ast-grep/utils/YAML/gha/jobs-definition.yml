@@ -1,4 +1,4 @@
-# .ast-grep/utils/yaml/gha/jobs-definition.yml
+# .ast-grep/utils/YAML/gha/jobs-definition.yml
 id: gha_jobs_definition
 rule:
   pattern:

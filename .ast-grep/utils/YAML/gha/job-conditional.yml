@@ -1,4 +1,4 @@
-# .ast-grep/utils/yaml/gha/job-conditional.yml
+# .ast-grep/utils/YAML/gha/job-conditional.yml
 id: gha_job_condition_map
 rule:
   pattern:

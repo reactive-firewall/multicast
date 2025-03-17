@@ -55,14 +55,14 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	def test_requirements_path_exists(self):
 		"""Test that 'tests/requirements.txt' exists."""
 		self.assertTrue(
-			os.path.isdir('tests'),
+			os.path.isdir("tests"),
 			"The 'tests/' directory does not exist."
 		)
 
 	def test_requirements_file_exists(self):
 		"""Test that 'tests/requirements.txt' exists."""
 		self.assertTrue(
-			os.path.isfile('tests/requirements.txt'),
+			os.path.isfile("tests/requirements.txt"),
 			"The 'tests/requirements.txt' file does not exist."
 		)
 
@@ -76,10 +76,10 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 			r'(?:\.[a-zA-Z]+[0-9]*)*)+'
 			r'(?:\s*(?:#.*)?)$'
 		)
-		with open('tests/requirements.txt', 'r') as req_file:
+		with open("tests/requirements.txt", "r") as req_file:
 			for line_number, line in enumerate(req_file, start=1):
 				line = line.strip()
-				if not line or line.startswith('#'):
+				if not line or line.startswith("#"):
 					continue  # Skip empty lines and comments
 				self.assertRegex(
 					line,
@@ -97,15 +97,15 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 	)
 	def test_requirements_installation(self):
 		"""Attempt to install dependencies from 'tests/requirements.txt' in a virtual env."""
-		env_dir = 'test_env'
+		env_dir = "test_env"
 		builder = venv.EnvBuilder(with_pip=True)
 		builder.create(env_dir)
 		result = context.checkPythonCommand(
-			[context.getPythonCommand(), '-m pip', 'install', '-r', 'tests/requirements.txt']
+			[context.getPythonCommand(), "-m pip", "install", "-r", "tests/requirements.txt"]
 		)
-		self.assertIsNotNone(result, str("Failed to install requirements!"))
+		self.assertIsNotNone(result, "Failed to install requirements!")
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

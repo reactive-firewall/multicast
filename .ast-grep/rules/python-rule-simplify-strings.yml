@@ -1,0 +1,29 @@
+# .ast-grep/python-rule-simplify-strings.yml
+---
+id: simplify-literal-string-casts
+rule:
+  kind: call
+  pattern: |
+    str($STRING)
+  has:
+    kind: argument_list
+    has:
+      kind: string
+      pattern:
+        $STRING
+message: "Consider replacing unnecessary str() calls with string literals."
+severity: error
+fix:
+  "$STRING"
+description: Rule for simplifying unnecessary str() calls with string literals
+language: python
+examples:
+  - name: unnecessary string cast for string literal
+    code: |
+      slower = str(" ").join(list)  # match slow concatination
+  - name: resulting string concatination
+    code: |
+      faster = " ".join(list)  # does not match faster concatination
+  - name: Non-matching case of non-string casts via str
+    code: |
+      ignore = str("prefix" + data)  # does not match in this case

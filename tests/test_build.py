@@ -61,7 +61,7 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 
 	__module__ = "tests.test_build"
 
-	def test_build_with_pep517(self):
+	def test_build_with_pep517(self) -> None:
 		"""
 		Test building the package using PEP 517 standards.
 
@@ -79,17 +79,17 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running clean"), str(theBuildtxt))
+		self.assertIn("running clean", str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
 			f"{str(sys.executable)} -m coverage run", "-m", "build", "--sdist", "--wheel"
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running build"), str(theBuildtxt))
-		self.assertIn(str("Successfully built"), str(theBuildtxt))
+		self.assertIn("running build", str(theBuildtxt))
+		self.assertIn("Successfully built", str(theBuildtxt))
 		# Verify that the dist directory contains the expected files
-		dist_dir = os.path.join(os.getcwd(), 'dist')
+		dist_dir = os.path.join(os.getcwd(), "dist")
 		pkg_version = str(self._should_get_package_version_WHEN_valid())
 		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		expected_files = [
@@ -105,5 +105,5 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

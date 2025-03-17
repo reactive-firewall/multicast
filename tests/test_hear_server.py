@@ -92,7 +92,7 @@ class McastServerTestSuite(McastHearTestSuite):
 		the STOP command and cleans up resources.
 		"""
 		theResult = False
-		fail_fixture = str("Mock(BLAH) --> Handler-HEAR == error")
+		fail_fixture = "Mock(BLAH) --> Handler-HEAR == error"
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -102,7 +102,7 @@ class McastServerTestSuite(McastHearTestSuite):
 			server = multicast.hear.McastServer(server_address, multicast.hear.HearUDPHandler)
 			client_address = (self.get_default_ip(), _fixture_port_num)
 			# Mock a request not containing "STOP"
-			request = (str("Regular message"), multicast.genSocket())
+			request = ("Regular message", multicast.genSocket())
 			# Add assertions for initial state
 			self.assertIsNotNone(request[1], "Socket should be created")
 			self.assertIsInstance(request[0], str, "Request should be a string")
@@ -120,7 +120,7 @@ class McastServerTestSuite(McastHearTestSuite):
 
 	def test_handle_error_with_none_request(self):
 		theResult = False
-		fail_fixture = str("Mock(EMPTY) --X Handler-HEAR != Safe")
+		fail_fixture = "Mock(EMPTY) --X Handler-HEAR != Safe"
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)
@@ -151,7 +151,7 @@ class HearUDPHandlerTestSuite(McastHearTestSuite):
 	__name__ = "tests.test_hear_server.HearUDPHandlerTestSuite"
 
 	def test_handle_with_none_data_and_sock(self):
-		fail_fixture = str("Handler(None, None) --> HEAR == error")
+		fail_fixture = "Handler(None, None) --> HEAR == error"
 		_fixture_port_num = self._the_test_port
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)
@@ -165,7 +165,7 @@ class HearUDPHandlerTestSuite(McastHearTestSuite):
 		self.assertIsNone(result, fail_fixture)
 
 	def test_handle_with_data_none_sock(self):
-		fail_fixture = str("""Handler(None, None) --> HEAR == error""")
+		fail_fixture = """Handler(None, None) --> HEAR == error"""
 		_fixture_port_num = self._the_test_port
 		self.assertIsNotNone(_fixture_port_num)
 		self.assertIsInstance(_fixture_port_num, int)
@@ -180,7 +180,7 @@ class HearUDPHandlerTestSuite(McastHearTestSuite):
 
 	def test_handle_with_valid_data_and_sock(self):
 		sock = multicast.genSocket()
-		fail_fixture = str("""Handler("The Test", sock) --> HEAR == error""")
+		fail_fixture = """Handler("The Test", sock) --> HEAR == error"""
 		_fixture_port_num = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)

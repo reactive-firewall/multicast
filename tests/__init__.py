@@ -143,7 +143,7 @@ except ImportError as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
 
-def loadDocstringsFromModule(module):
+def loadDocstringsFromModule(module) -> unittest.TestSuite:
 	"""
 	Load and return a test suite containing doctests from the specified module.
 
@@ -299,7 +299,7 @@ TEST_GROUPS = {
 }
 
 
-def get_test_suite(group=None, category=None):
+def get_test_suite(group: str = None, category: str = None) -> unittest.TestSuite:
 	"""Get a test suite based on group and category.
 
 	Args:
@@ -313,7 +313,7 @@ def get_test_suite(group=None, category=None):
 	loader = unittest.TestLoader()
 
 	# Helper function to add test cases to suite
-	def add_test_cases(test_cases):
+	def add_test_cases(test_cases: list) -> None:
 		for test_case in test_cases:
 			if isinstance(test_case, unittest.TestSuite):
 				# Handle doctests
@@ -342,7 +342,7 @@ def get_test_suite(group=None, category=None):
 	return suite
 
 
-def load_tests(loader, tests, pattern):
+def load_tests(loader, tests, pattern) -> unittest.TestSuite:
 	"""Will Load the tests from the project and then attempts to load the doctests too.
 
 	Meta Testing:
