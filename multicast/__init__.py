@@ -503,13 +503,13 @@ class mtool(abc.ABC):
 				"-v",
 				"--version",
 				action="version",
-				version="%(prog)s {version}".format(version=str(__version__))
+				version=f"%(prog)s {__version__}"
 			)
 			calling_parser_group.add_argument(
-				"--use-std", dest="is_std", default=False, action="store_true"
+				"--use-std", dest="is_std", default=False, action="store_true",
 			)
 			calling_parser_group.add_argument(
-				"--daemon", dest="is_daemon", default=False, action="store_true"
+				"--daemon", dest="is_daemon", default=False, action="store_true",
 			)
 		subparsers = calling_parser_group.add_subparsers(
 			title="Tools", dest="cmd_tool", help="Sub-Commands.", metavar="CMD"
@@ -699,7 +699,7 @@ try:
 except Exception:
 	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
-if __name__ in u"__main__":
+if __name__ in "__main__":
 	__EXIT_CODE = 2
 	if __main__.main is not None:
 		__EXIT_CODE = __main__.main(sys.argv[1:])

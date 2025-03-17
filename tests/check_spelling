@@ -142,6 +142,9 @@ declare -a SPECIFIC_TYPOS=(
 	"succedded:succeeded"
 	"ShutdownComandRecived:ShutdownCommandReceived"  # from #224
 	"Insanitty:Insanity"  # from #330
+	"concatination:concatenation"  # from #330
+	"imperitive:imperative"  # from #330
+	"sentance:sentence"  # from #330
 )
 
 function cleanup() {

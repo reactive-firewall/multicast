@@ -678,7 +678,7 @@ def get_exit_code_from_exception(exc: BaseException) -> int:
 	return 70  # Default to 'Internal Software Error'
 
 
-def exit_on_exception(func: callable) -> callable:
+def exit_on_exception(func: callable):
 	"""
 	Decorator that wraps a function to handle exceptions and exit with appropriate exit codes.
 

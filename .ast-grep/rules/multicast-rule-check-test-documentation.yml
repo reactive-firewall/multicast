@@ -26,7 +26,7 @@ examples:
     code: |
       def something():
         """
-        Demonstrate with imperitive.
+        Demonstrate with imperative.
 
         Describes the subject after a oneline gap as per PEP-257 and PEP-8 style.
         No line gap is needed for additional documentation.
@@ -52,7 +52,7 @@ examples:
     code: |
       def something():
         """
-        Terse descriptive phrase. Second sentance on same line.
+        Terse descriptive phrase. Second sentence on same line.
         No gap before next line.
 
         Test description

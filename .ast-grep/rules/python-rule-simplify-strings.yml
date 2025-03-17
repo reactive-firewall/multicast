@@ -20,10 +20,10 @@ language: python
 examples:
   - name: unnecessary string cast for string literal
     code: |
-      slower = str(" ").join(list)  # match slow concatination
-  - name: resulting string concatination
+      slower = str(" ").join(list)  # match slow concatenation
+  - name: resulting string concatenation
     code: |
-      faster = " ".join(list)  # does not match faster concatination
+      faster = " ".join(list)  # does not match faster concatenation
   - name: Non-matching case of non-string casts via str
     code: |
       ignore = str("prefix" + data)  # does not match in this case

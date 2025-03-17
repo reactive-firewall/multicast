@@ -578,9 +578,7 @@ class McastDispatch(mtool):
 
 	__prologue__ = "The Main Entrypoint."
 
-	__epilogue__ = str(
-		"When called from the command line the __main__ component handles the CLI dispatch."
-	)
+	__epilogue__ = "Called from the command line, the __main__ component handles the CLI dispatch."
 
 	@classmethod
 	def setupArgs(cls, parser):

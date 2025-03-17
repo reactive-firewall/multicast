@@ -57,6 +57,9 @@ try:
 	import sys
 	import os
 	import unittest
+	from unittest import TestSuite as TestSuite
+	import types
+	from typing import Optional
 except ImportError as baton:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Module failed to import.") from baton
 
@@ -143,7 +146,7 @@ except ImportError as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
 
-def loadDocstringsFromModule(module) -> unittest.TestSuite:
+def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 	"""
 	Load and return a test suite containing doctests from the specified module.
 
@@ -299,7 +302,7 @@ TEST_GROUPS = {
 }
 
 
-def get_test_suite(group: str = None, category: str = None) -> unittest.TestSuite:
+def get_test_suite(group: Optional[str] = None, category: Optional[str] = None) -> TestSuite:
 	"""Get a test suite based on group and category.
 
 	Args:
