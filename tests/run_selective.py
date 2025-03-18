@@ -40,7 +40,7 @@ def main() -> None:
 	parser.add_argument(
 		"--group",
 		help="Specify test group to run (valid values: mat, extra, fuzzing, performance)",
-		choices=TEST_GROUPS.keys()
+		choices=TEST_GROUPS.keys(),
 	)
 	parser.add_argument("--category", help="Specify test category within the selected group")
 	args = parser.parse_args()

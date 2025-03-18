@@ -52,7 +52,7 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = "tests.test_deps"
 
-	def test_requirements_path_exists(self):
+	def test_requirements_path_exists(self) -> None:
 		"""Test that 'tests/requirements.txt' exists."""
 		self.assertTrue(
 			os.path.isdir("tests"),

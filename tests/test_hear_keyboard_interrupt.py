@@ -96,7 +96,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	TEST_MULTICAST_GROUP: str = "224.0.0.1"
 	"""Standard multicast group address for testing."""
 
-	COVERAGE_CMD_TEMPLATE: str = f"{str(sys.executable)} -m coverage run -p --context=Integration"
+	COVERAGE_CMD_TEMPLATE: str = f"{sys.executable} -m coverage run -p --context=Integration"
 	"""Coverage command template for test execution."""
 
 	def _build_hear_command(self, port: int, group: str = "224.0.0.1") -> list[str]:
@@ -133,7 +133,7 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 			- Server must not exit with status code 2 (invalid arguments)
 		"""
 		theResult: bool = False
-		fail_fixture: str = str("C^INT --> HEAR == error")
+		fail_fixture: str = "C^INT --> HEAR == error"
 		_fixture_port_num: int = self._the_test_port
 		try:
 			self.assertIsNotNone(_fixture_port_num)

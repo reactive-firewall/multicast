@@ -930,7 +930,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@classmethod
 	def setUpClass(cls) -> None:
-		"Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."
+		"""Overrides unittest.TestCase.setUpClass(cls) to set up thepython test fixture."""
 		cls._thepython = getPythonCommand()
 
 	@staticmethod

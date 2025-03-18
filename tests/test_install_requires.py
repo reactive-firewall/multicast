@@ -59,7 +59,7 @@ class ParseRequirementsTestSuite(BasicUsageTestSuite):
 		finally:
 			super(ParseRequirementsTestSuite, self).tearDown()
 
-	def write_requirements(self, content) -> None:
+	def write_requirements(self, content: str) -> None:
 		with open(self.requirements_file, 'w') as f:
 			f.write(content)
 

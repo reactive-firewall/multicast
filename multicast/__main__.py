@@ -492,7 +492,7 @@ class McastRecvHearDispatch(mtool):
 			parser.add_argument(
 				"--group",
 				default=_MCAST_DEFAULT_GROUP,  # skipcq: PYL-W0212 - module ok
-				help=str(__tmp_help)
+				help=__tmp_help,
 			)
 			__tmp_help = "multicast groups (ip addresses) to join globally; "
 			__tmp_help += "should be one of the multicast groups joined globally "
