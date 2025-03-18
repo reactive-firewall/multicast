@@ -17,6 +17,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Selective test runner for the Multicast project.
+
+This script provides a command-line interface for running specific test groups
+and categories from the test suite. It allows developers to focus on particular
+areas of testing during development and debugging.
+
+Usage:
+	python3 -m tests.run_selective --group [mat|extra|fuzzing|performance] [--category CATEGORY]
+"""
+
 __module__ = "tests"
 
 import sys

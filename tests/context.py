@@ -773,7 +773,7 @@ def check_exec_command_has_output(test_case, someArgs):
 		returns True if has output and False otherwise.
 	"""
 	theResult = False
-	fail_msg_fixture = str("Expecting output: CLI test had no output.")
+	fail_msg_fixture = "Expecting output: CLI test had no output."
 	try:
 		if (test_case._thepython is not None):
 			try:

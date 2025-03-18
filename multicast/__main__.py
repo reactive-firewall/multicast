@@ -757,5 +757,5 @@ if __name__ in '__main__':
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):
-		__EXIT_CODE = main([str(__name__), "-h"])
+		__EXIT_CODE = main([__name__, "-h"])
 	exit(__EXIT_CODE[0])  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
