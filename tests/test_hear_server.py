@@ -145,6 +145,16 @@ class McastServerTestSuite(McastHearTestSuite):
 
 
 class HearUDPHandlerTestSuite(McastHearTestSuite):
+	"""
+	Test suite for validating HearUDPHandler functionality.
+
+	This suite tests the behavior of the UDP handler with various
+	input combinations, including edge cases with None data and sockets.
+
+	Attributes:
+		__module__ (str): Module identifier
+		__name__ (str): Full class name
+	"""
 
 	__module__ = "tests.test_hear_server"
 
