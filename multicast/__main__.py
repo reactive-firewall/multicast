@@ -482,7 +482,7 @@ class McastRecvHearDispatch(mtool):
 			)
 			__tmp_help = "local interface to use for listening to multicast data; "
 			__tmp_help += "if unspecified, any one interface may be chosen."
-			parser.add_argument("--iface", default=None, help=str(__tmp_help))
+			parser.add_argument("--iface", default=None, help=__tmp_help)
 			__tmp_help = "multicast group (ip address) to bind-to for the udp socket; "
 			__tmp_help += "should be one of the multicast groups joined globally "
 			__tmp_help += "(not necessarily joined in this python program) "
@@ -503,7 +503,7 @@ class McastRecvHearDispatch(mtool):
 			__tmp_help += "of that interface) instead of not joining. NOTE: If you really need "
 			__tmp_help += "to NOT join the multicast group you should instead use the sockets "
 			__tmp_help += "module directly, as this module does not support such a use-case."
-			parser.add_argument("--groups", default=[], nargs="*", help=str(__tmp_help))
+			parser.add_argument("--groups", default=[], nargs="*", help=__tmp_help)
 
 	@staticmethod
 	def _help_daemon_dispatch(*args, **kwargs):
