@@ -1,0 +1,14 @@
+---
+name: 'Upgrade Windows Pip'
+description: 'Fixes Windows pip issues by upgrading'
+author: 'Mr. Walls'
+branding:
+  icon: 'chevron-up'
+  color: 'yellow'
+
+runs:
+  using: composite
+  steps:
+    - run: python -m pip install --upgrade pip
+      shell: bash
+      if: ${{ !cancelled() && runner.os == 'Windows' }}
