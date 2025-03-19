@@ -53,6 +53,8 @@ pep8>=1.0
 pytest>=7.0, !=8.1.0
 # pytest-checkdocs - MIT license
 pytest-checkdocs>=1.2.5
+# pytest-doctestplus - BSD license
+pytest-doctestplus>=1.4.0
 # pytest-cov - MIT license
 pytest-cov>=3.0.0
 # pytest-enabler - MIT license

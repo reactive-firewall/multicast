@@ -50,7 +50,7 @@ jobs:
           fi
       - id: get_env
         run: |
-          ENV_VALUE=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.environment')
+          ENV_VALUE=$(gh api "${{ github.event.workflow_run.check_suite_url }}" --jq '.check_suite.pull_requests[0].head.repo.environment')
           if [[ -n "$ENV_VALUE" ]]; then
             echo "environment=$ENV_VALUE" >> "$GITHUB_OUTPUT"
           else

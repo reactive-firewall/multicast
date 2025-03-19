@@ -46,7 +46,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-@context.markWithMetaTag("mat", "mat_bootstrap")
+@context.markWithMetaTag("mat", "bootstrap")
 class ExceptionsTestSuite(BasicUsageTestSuite):
 	"""
 	Test suite for validating the behavior of exception classes in the multicast package.

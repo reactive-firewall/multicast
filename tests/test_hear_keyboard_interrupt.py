@@ -57,7 +57,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-@context.markWithMetaTag("extra", "extra_coverage")
+@context.markWithMetaTag("extra", "coverage")
 class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 	"""
 	Test suite for verifying keyboard interrupt (SIGINT) handling.

@@ -39,7 +39,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-@context.markWithMetaTag("mat", "mat_build")
+@context.markWithMetaTag("mat", "build")
 class ManifestInclusionTestSuite(BasicUsageTestSuite):
 
 	__module__ = "tests.test_manifest"

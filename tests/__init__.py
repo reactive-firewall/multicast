@@ -279,13 +279,13 @@ EXTRA_TESTS = {
 
 try:
 	FUZZING_TESTS = {
-		"basic": [
+		"slow": [
 			test_fuzz.HypothesisTestSuite,  # Assuming this exists
 		],
 		# Future fuzzing test categories to be added
 	}
 except Exception:
-	FUZZING_TESTS = {"basic": []}
+	FUZZING_TESTS = {"slow": []}
 
 PERFORMANCE_TESTS = {
 	"scalability": [],  # Future implementation

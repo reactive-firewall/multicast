@@ -67,7 +67,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
-@context.markWithMetaTag("mat", "mat_say", "mat_hear")
+@context.markWithMetaTag("mat", "say", "hear")
 class MulticastTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite for special Multicast usage scenarios.
@@ -509,7 +509,7 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult, fail_fixture)
 
 
-@context.markWithMetaTag("mat", "mat_usage")
+@context.markWithMetaTag("mat", "usage")
 class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite for basic functional integration tests of the multicast module.

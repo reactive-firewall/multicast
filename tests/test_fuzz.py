@@ -101,7 +101,7 @@ def onlyIfHasHypothesis(has_hypothesis: bool) -> callable:
 	return decorator
 
 
-@context.markWithMetaTag("fuzzing", "fuzzing_basic")
+@context.markWithMetaTag("fuzzing", "slow")
 @onlyIfHasHypothesis(_has_hypothesis)
 class HypothesisTestSuite(BasicUsageTestSuite):
 	"""

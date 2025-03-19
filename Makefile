@@ -95,6 +95,11 @@ ifndef PYTEST
 	PYTEST=$(PYTHON) -m pytest --cache-clear --junitxml=test-reports/junit.xml -v --rootdir=.
 endif
 
+ifndef DOCTEST_ARGS
+	# Define common doctest flags
+	DOCTEST_ARGS := --doctest-glob=**/*.py --doctest-modules
+endif
+
 ifndef PIP_COMMON_FLAGS
 	# Define common pip install flags
 	PIP_COMMON_FLAGS := --use-pep517 --exists-action s --upgrade --upgrade-strategy eager
@@ -252,9 +257,21 @@ test-mat: test-mat-build test-mat-bootstrap test-mat-basic test-mat-say test-mat
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
+test-mat-doctests: MANIFEST.in ## Run doctests MAT category (doctests are special)
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		$(ECHO) "SKIP: The target '$@' is not compatable with pytests;"; \
+		$(ECHO) "Try 'make test-mat-doctests' instead."; \
+	else \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category doctests || DO_FAIL="exit 2" ; \
+		$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml --include=* 2>$(ERROR_LOG_PATH) || : ; \
+	fi
+	$(QUIET)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
+
 test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|usage|build|bootstrap)
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) --junitxml=test-reports/junit.xml -v --rootdir=. -m "mat and $*" || DO_FAIL="exit 2" ; \
+		$(PYTEST) $(COVERAGE_ARGS) -m "mat and $*" tests/ || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $*; \
 	fi
@@ -263,7 +280,7 @@ test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|us
 
 test-extra: ## Run all extra tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
-		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra" || DO_FAIL="exit 2" ; \
+		$(PYTEST) $(COVERAGE_ARGS) -m "extra" tests/ || DO_FAIL="exit 2" ; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra; \
 	fi

@@ -35,7 +35,7 @@ except Exception as err:
 	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
-@context.markWithMetaTag("mat", "mat_hear")
+@context.markWithMetaTag("mat", "hear")
 class McastHearTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = "tests.test_hear_server"

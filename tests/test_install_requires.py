@@ -38,7 +38,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import setup or test context") from _cause
 
 
-@context.markWithMetaTag("mat", "mat_build")
+@context.markWithMetaTag("mat", "build")
 class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
 	__module__ = "tests.test_install_requires"
