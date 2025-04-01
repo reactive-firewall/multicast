@@ -289,7 +289,7 @@ jobs:
         ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
       if: ${{ !cancelled() }}
-      uses: codecov/test-results-action@9739113ad922ea0a9abb4b2c0f8bf6a4aa8ef820 # v1.0.1
+      uses: codecov/test-results-action@f2dba722c67b86c6caa034178c6e4d35335f6706 # v1.1.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/junit.xml
