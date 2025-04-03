@@ -98,6 +98,41 @@ except Exception as err:
 	raise baton from err
 
 
+def validate_buffer_size(size: int) -> bool:
+	"""
+	Validate if the buffer size is a positive integer.
+
+	Arguments:
+		size (int) -- The buffer size to validate.
+
+	Returns:
+		bool: True if the buffer size is valid (> 0), False otherwise.
+
+	Raises:
+		ValueError: If the size cannot be converted to an integer.
+
+	Minimum Acceptance Testing:
+		>>> validate_buffer_size(1316)
+		True
+		>>> validate_buffer_size(1)
+		True
+		>>> validate_buffer_size(0)
+		False
+		>>> validate_buffer_size(-1)
+		False
+		>>> try:
+		...     validate_buffer_size('invalid')
+		... except ValueError:
+		...     print('ValueError raised')
+		ValueError raised
+	"""
+	try:
+		size_num = int(size)
+		return size_num > 0
+	except (ValueError, TypeError) as err:
+		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from err
+
+
 def validate_port(port: int) -> bool:
 	"""
 	Validate if the port number is within the dynamic/private port range.
@@ -200,6 +235,49 @@ def validate_ttl(ttl: int) -> bool:
 		raise ValueError(
 			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
 		) from err
+
+
+def load_buffer() -> int:
+	"""
+	Load and validate the multicast buffer size from environment variable.
+
+	This function attempts to load the buffer size from the MULTICAST_PORT
+	environment variable. If the value is valid, it updates the global
+	_MCAST_DEFAULT_PORT. Invalid values trigger warnings and fall back to
+	the default.
+
+	Returns:
+		int: The validated port number to use for multicast operations.
+			Returns the default port if the environment value is invalid.
+
+	Raises:
+		ImportError: If the multicast module cannot be imported.
+
+	[WIP - DRAFT]
+
+	"""
+	# Import globals that we'll potentially update
+	from multicast import _MCAST_DEFAULT_BUFFER_SIZE
+	try:
+		buffer_size = int(
+			os.getenv("MULTICAST_BUFFER_SIZE", _MCAST_DEFAULT_BUFFER_SIZE)  # skipcq: PYL-W1508
+		)
+	except ValueError:
+		warnings.warn(
+			"Invalid MULTICAST_BUFFER_SIZE value, using default 1316",
+			stacklevel=2
+		)
+		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
+	# Validate and potentially update port
+	if validate_buffer_size(buffer_size):
+		globals()["_MCAST_DEFAULT_BUFFER_SIZE"] = buffer_size
+	else:
+		warnings.warn(
+			f"Invalid MULTICAST_BUFFER_SIZE {buffer_size}, using default 1316",
+			stacklevel=2
+		)
+		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
+	return buffer_size
 
 
 def load_port() -> int:
@@ -673,8 +751,8 @@ def load_config() -> dict:
 		...     config = load_config()
 		...     len(w) == 0  # expected failure - Warning was NOT issued
 		True
-		>>> config['buffer_size']  # expected failure - undefined or Falls back to default
-		-1024
+		>>> config['buffer_size']  # Undefined or Falls-back to default
+		1316
 
 		# Cleanup
 		>>> os.environ.pop('MULTICAST_BUFFER_SIZE', None)
@@ -705,7 +783,7 @@ def load_config() -> dict:
 	ttl = load_TTL()
 	groups_str = os.getenv("MULTICAST_GROUPS", "")
 	bind_addr = os.getenv("MULTICAST_BIND_ADDR", group)  # skipcq: PYL-W1508
-	buffer_size = int(os.getenv("MULTICAST_BUFFER_SIZE", 1316))  # skipcq: PYL-W1508
+	buffer_size = load_buffer()
 	# Process and validate groups
 	groups = set()
 	if groups_str:

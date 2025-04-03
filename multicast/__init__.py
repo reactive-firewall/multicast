@@ -217,6 +217,52 @@ Minimal Acceptance Testing:
 
 """
 
+global _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0604
+
+_MCAST_DEFAULT_BUFFER_SIZE = 1316
+"""
+	Arbitrary bugger size to use by default, though any value below 1500 would probably work well.
+
+	Minimal Testing:
+
+	First set up test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default port.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE > int(1)
+		True
+		>>>
+
+	Testcase 1: Multicast should have a default port.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-??? compliant.
+
+		>>> multicast._MCAST_DEFAULT_PORT is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE >= int(56)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(1500)
+		True
+		>>>
+
+
+"""
+
 global _MCAST_DEFAULT_PORT  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_PORT = 59259
@@ -414,8 +460,7 @@ else:
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
 	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
-	global _MCAST_DEFAULT_BUFFER  # skipcq: PYL-W0604
-	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
+	_MCAST_DEFAULT_BUFFER_SIZE = _config["buffer_size"]
 
 del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
