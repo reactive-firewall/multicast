@@ -52,6 +52,7 @@ __all__ = [
 	"""EXIT_CODES""",
 	"""EXCEPTION_EXIT_CODES""",
 	"""_BLANK""",
+	"""_MCAST_DEFAULT_BUFFER_SIZE""",  # added in version 2.0.6
 	"""_MCAST_DEFAULT_PORT""",
 	"""_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""",
@@ -156,6 +157,7 @@ Security Considerations:
 
 Attributes:
 	__version__ (str): The version of this package.
+	_MCAST_DEFAULT_BUFFER_SIZE (int): Default buffer size for multicast communication (1316).
 	_MCAST_DEFAULT_PORT (int): Default port for multicast communication (59259).
 	_MCAST_DEFAULT_GROUP (str): Default multicast group address ('224.0.0.1').
 	_MCAST_DEFAULT_TTL (int): Default TTL for multicast packets (1).
@@ -221,7 +223,7 @@ global _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_BUFFER_SIZE = 1316
 """
-	Arbitrary bugger size to use by default, though any value below 1500 would probably work well.
+	Arbitrary bugger size to use by default, though any value below 65507 should work.
 
 	Minimal Testing:
 
@@ -456,11 +458,11 @@ else:
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
 	_MCAST_DEFAULT_TTL = _config["ttl"]
+	_MCAST_DEFAULT_BUFFER_SIZE = _config["buffer_size"]
 	global _MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
 	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
-	_MCAST_DEFAULT_BUFFER_SIZE = _config["buffer_size"]
 
 del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
