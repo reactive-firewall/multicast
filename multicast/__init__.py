@@ -245,7 +245,7 @@ _MCAST_DEFAULT_BUFFER_SIZE = 1316
 		True
 		>>>
 
-	Testcase 1: Multicast should have a default and valid buffer size.
+	Testcase 1: Multicast should validate buffer size constraints.
 		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
 		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
 		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-791 & RFC-768 compliant.

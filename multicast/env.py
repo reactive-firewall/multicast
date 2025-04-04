@@ -120,7 +120,7 @@ def validate_buffer_size(size: int) -> bool:
 		False
 		>>> validate_buffer_size(-1)  # Negative is invalid
 		False
-		>>> validate_buffer_size(65527)  # Maximum UDP payload size 65,535-8 - RFC 791 & RFC 768
+		>>> validate_buffer_size(65507)  # Maximum UDP payload size 65,535 -8 -20 (RFC-791 & RFC-768)
 		True
 		>>> validate_buffer_size("1316")  # String that can be converted
 		True
@@ -133,7 +133,7 @@ def validate_buffer_size(size: int) -> bool:
 	"""
 	try:
 		size_num = int(size)
-		return 0 < size_num <= 65527
+		return 0 < size_num <= 65507
 	except (ValueError, TypeError) as err:
 		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from err
 
@@ -828,7 +828,7 @@ def load_config() -> dict:
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
 		...     config = load_config()
-		...     len(w) == 1  # expected failure - Warning was issued
+		...     len(w) == 1  # expected warning was issued
 		True
 		>>> config['buffer_size'] == _MCAST_DEFAULT_BUFFER_SIZE  # Falls back to default
 		True
