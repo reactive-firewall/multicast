@@ -223,7 +223,7 @@ global _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0604
 
 _MCAST_DEFAULT_BUFFER_SIZE = 1316
 """
-	Arbitrary bugger size to use by default, though any value below 65507 should work.
+	Arbitrary buffer size to use by default, though any value below 65507 should work.
 
 	Minimal Testing:
 
@@ -232,7 +232,7 @@ _MCAST_DEFAULT_BUFFER_SIZE = 1316
 		>>> import multicast
 		>>>
 
-	Testcase 0: Multicast should have a default port.
+	Testcase 0: Multicast should have a default buffer size.
 		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
 		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
 
@@ -245,17 +245,22 @@ _MCAST_DEFAULT_BUFFER_SIZE = 1316
 		True
 		>>>
 
-	Testcase 1: Multicast should have a default port.
+	Testcase 1: Multicast should have a default and valid buffer size.
 		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
 		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
-		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-??? compliant.
+		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-791 & RFC-768 compliant.
+		D: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is a smaller than fragment thresholds
+			for typical ethernet MTUs by default.
 
-		>>> multicast._MCAST_DEFAULT_PORT is not None
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
 		True
 		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
 		True
 		>>>
 		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE >= int(56)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(65527)
 		True
 		>>>
 		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(1500)

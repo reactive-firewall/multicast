@@ -246,23 +246,23 @@ def load_buffer_size() -> int:
 	"""
 	Load and validate the multicast buffer size from environment variable.
 
-	This function attempts to load the buffer size from the MULTICAST_PORT
-	environment variable. If the value is valid, it updates the global
-	_MCAST_DEFAULT_PORT. Invalid values trigger warnings and fall back to
-	the default.
-
-	Returns:
-		int: The validated port number to use for multicast operations.
-			Returns the default port if the environment value is invalid.
-
-	Raises:
-		ImportError: If the multicast module cannot be imported.
-
-	Load buffer size from environment variables.
-
 	This function attempts to load the buffer size from the MULTICAST_BUFFER_SIZE
 	environment variable. If the value is valid, it returns the buffer size.
 	Invalid values trigger warnings and fall back to the default.
+
+	MTU Considerations for Buffer Size:
+		When setting a buffer size, consider the MTU of the underlying network:
+		- Ethernet: 1500 bytes MTU → 1472 bytes max payload (1500 - 28 bytes overhead)
+		- PPP: 296 bytes MTU → 268 bytes max payload
+		- Wi-Fi (802.11): 2304 bytes MTU → 2276 bytes max payload
+		- Frame Relay: 128 bytes MTU → 100 bytes max payload
+
+		The overhead consists of:
+		- UDP header: 8 bytes
+		- IP header: 20 bytes (without options)
+
+		Setting buffer sizes larger than the network's max payload may cause IP
+		fragmentation, which can lead to performance issues and increased complexity.
 
 	Returns:
 		int: The validated buffer size, or the default value if not set/invalid.
@@ -274,19 +274,23 @@ def load_buffer_size() -> int:
 		ImportError: If the multicast module cannot be imported.
 
 	Minimum Acceptance Testing:
+
+	Testcase 0: Setup test fixtures.
 		>>> import os
 		>>> from multicast import _MCAST_DEFAULT_BUFFER_SIZE
 		>>> original_buffer = _MCAST_DEFAULT_BUFFER_SIZE
 
-		>>> # Test with valid environment variable
+	Testcase 1: Test with valid environment variable
 		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "2048"
 		>>> buffer_size = load_buffer_size()
 		>>> buffer_size
 		2048
-		>>> _MCAST_DEFAULT_BUFFER_SIZE != 2048  # Global should not be updated by this function
+		>>> # The function updates the global in the module's namespace, but this doesn't affect
+		>>> # the imported value in the test namespace
+		>>> _MCAST_DEFAULT_BUFFER_SIZE != 2048  # Global in test namespace is not updated
 		True
 
-		>>> # Test with invalid (negative) environment variable
+	Testcase 2: Test with invalid (negative) environment variable
 		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "-100"
 		>>> import warnings
 		>>> with warnings.catch_warnings(record=True) as w:
@@ -297,7 +301,7 @@ def load_buffer_size() -> int:
 		>>> buffer_size == 1316  # Falls back to default
 		True
 
-		>>> # Test with invalid (zero) environment variable
+	Testcase 3: Test with invalid (zero) environment variable
 		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "0"
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
@@ -307,7 +311,7 @@ def load_buffer_size() -> int:
 		>>> buffer_size == 1316  # Falls back to default
 		True
 
-		>>> # Test with invalid (non-integer) environment variable
+	Testcase 4: Test with invalid (non-integer) environment variable
 		>>> os.environ["MULTICAST_BUFFER_SIZE"] = 'not_an_integer'
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
@@ -317,7 +321,7 @@ def load_buffer_size() -> int:
 		>>> buffer_size == 1316  # Falls back to default
 		True
 
-		>>> # Test with no environment variable
+	Testcase 5: Test with no environment variable
 		>>> if "MULTICAST_BUFFER_SIZE" in os.environ: os.environ.pop("MULTICAST_BUFFER_SIZE")
 		'not_an_integer'
 		>>> buffer_size = load_buffer_size()
@@ -580,13 +584,15 @@ def load_TTL() -> int:
 		ImportError: If the multicast module cannot be imported.
 
 	Minimum Acceptance Testing:
+
+	Testcase 0: Setup
 		>>> import os
 		>>> import socket
 		>>> from multicast import _MCAST_DEFAULT_TTL
 		>>> original_ttl = _MCAST_DEFAULT_TTL
 		>>> original_timeout = socket.getdefaulttimeout()
 
-		# Test with valid TTL
+	Testcase 1: Test with valid TTL
 		>>> os.environ['MULTICAST_TTL'] = '2'
 		>>> ttl = load_TTL()
 		>>> ttl
@@ -596,7 +602,7 @@ def load_TTL() -> int:
 		>>> socket.getdefaulttimeout() == 2  # Socket timeout was updated
 		True
 
-		# Test with invalid numeric TTL
+	Testcase 2: Test with invalid numeric TTL
 		>>> os.environ['MULTICAST_TTL'] = '127'
 		>>> import warnings
 		>>> with warnings.catch_warnings(record=True) as w:
@@ -607,7 +613,7 @@ def load_TTL() -> int:
 		>>> ttl == original_ttl  # Falls back to original default
 		True
 
-		# Test with non-numeric TTL
+	Testcase 3: Test with non-numeric TTL
 		>>> os.environ['MULTICAST_TTL'] = 'invalid'
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
@@ -620,7 +626,7 @@ def load_TTL() -> int:
 		'invalid'
 		>>>
 
-		# Test with unset environment variable
+	Testcase 4: Test with unset environment variable
 		>>> os.environ.pop('MULTICAST_TTL', None)
 		>>> ttl = load_TTL()
 		>>> ttl == original_ttl  # Uses default
@@ -840,8 +846,9 @@ def load_config() -> dict:
 		...     config = load_config()
 		... except ValueError:
 		...     print('ValueError raised')
-		>>> config is None
-		False
+		>>> # Verify config is not None (load_config should handle the error and use default)
+		>>> config is not None
+		True
 
 		# Cleanup
 		>>> os.environ.pop('MULTICAST_BUFFER_SIZE', None)
