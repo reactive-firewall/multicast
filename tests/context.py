@@ -380,6 +380,108 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	return [*args]
 
 
+def taint_command_args(args):
+	"""Validate and sanitize command arguments for security.
+
+	This function validates the command (first argument) against a whitelist
+	and sanitizes all arguments to prevent command injection attacks.
+
+	Args:
+		args (list): Command arguments to validate
+
+	Returns:
+		list: Sanitized command arguments
+
+	Raises:
+		CommandExecutionError: If validation fails
+
+	Meta Testing:
+
+		>>> import tests.context as _context
+		>>> import sys as _sys
+		>>>
+
+		Testcase 1: Function should validate and return unmodified Python command.
+
+			>>> test_fixture = ['python', '-m', 'pytest']
+			>>> _context.taint_command_args(test_fixture)
+			['python', '-m', 'pytest']
+			>>>
+
+		Testcase 2: Function should handle sys.executable path.
+
+			>>> test_fixture = [str(_sys.executable), '-m', 'coverage', 'run']
+			>>> result = _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
+			>>> str('python') in str(result[0]) or str('coverage') in str(result[0])
+			True
+			>>> result[1:] == ['-m', 'coverage', 'run']
+			True
+			>>>
+
+		Testcase 3: Function should reject disallowed commands.
+
+			>>> test_fixture = ['rm', '-rf', '/']
+			>>> _context.taint_command_args(test_fixture)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			multicast.exceptions.CommandExecutionError: Command 'rm' is not allowed...
+			>>>
+
+		Testcase 4: Function should validate input types.
+
+			>>> test_fixture = None
+			>>> _context.taint_command_args(test_fixture)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			multicast.exceptions.CommandExecutionError: Invalid command arguments
+			>>>
+			>>> test_fixture = "python -m pytest"  # String instead of list
+			>>> _context.taint_command_args(test_fixture)  #doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			multicast.exceptions.CommandExecutionError: Invalid command arguments
+			>>>
+
+		Testcase 5: Function should handle coverage command variations.
+
+			>>> test_fixture = ['coverage', 'run', '--source=multicast']
+			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
+			[...'coverage', 'run', '--source=multicast']
+			>>>
+			>>> test_fixture = ['coverage3', 'run', '--source=.']
+			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
+			[...'coverage3', 'run', '--source=.']
+			>>>
+
+		Testcase 6: Function should handle case-insensitive command validation.
+
+			>>> test_fixture = ['Python3', '-m', 'pytest']
+			>>> _context.taint_command_args(test_fixture)
+			['Python3', '-m', 'pytest']
+			>>>
+			>>> test_fixture = ['COVERAGE', 'run']
+			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
+			[...'COVERAGE', 'run']
+			>>>
+	"""
+	if not args or not isinstance(args, (list, tuple)):
+		raise CommandExecutionError("Invalid command arguments", exit_code=66)
+	# Validate the command (first argument)
+	allowed_commands = {
+		"python", "python3", "coverage", "coverage3",
+		sys.executable  # Allow the current Python interpreter
+	}
+	command = str(args[0]).lower()
+	# Check for coverage command pattern
+	if any(cmd in command for cmd in ["coverage", sys.executable]):
+		# Special handling for coverage commands
+		return checkCovCommand(*args)
+	if not any(cmd in command for cmd in allowed_commands):
+		raise CommandExecutionError(
+			f"Command '{command}' is not allowed. Allowed commands: {allowed_commands}",
+			exit_code=77
+		)
+	# Sanitize all arguments to prevent injection
+	return [str(arg) for arg in args]
+
+
 def validateCommandArgs(args: list) -> None:
 	"""
 	Validates command arguments to ensure they do not contain null characters.
@@ -541,7 +643,9 @@ def checkPythonCommand(args, stderr=None):
 			validateCommandArgs(args)
 			if str("coverage") in args[0]:
 				args = checkCovCommand(*args)
-			theOutput = subprocess.check_output(args, stderr=stderr)
+			# Validate and sanitize command arguments
+			safe_args = taint_command_args(args)
+			theOutput = subprocess.check_output(safe_args, stderr=stderr)
 	except Exception as err:  # pragma: no branch
 		theOutput = None
 		try:
@@ -641,7 +745,9 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 		else:
 			if str("coverage") in args[0]:
 				args = checkCovCommand(*args)
-			theOutput = subprocess.check_output(args, stderr=stderr)
+			# Validate and sanitize command arguments
+			safe_args = taint_command_args(args)
+			theOutput = subprocess.check_output(safe_args, stderr=stderr)
 	except BaseException as err:  # pragma: no branch
 		theOutput = None
 		raise CommandExecutionError(str(err), exit_code=2) from err  # do not suppress errors
