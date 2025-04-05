@@ -145,6 +145,8 @@ declare -a SPECIFIC_TYPOS=(
 	"concatination:concatenation"  # from #330
 	"imperitive:imperative"  # from #330
 	"sentance:sentence"  # from #330
+	"reccomended:recommended"  # from #348
+	"absolutly:absolutely"  # from #348
 )
 
 function cleanup() {

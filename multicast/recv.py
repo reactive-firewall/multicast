@@ -316,10 +316,10 @@ def tryrecv(msgbuffer, chunk, sock):
 
 	Tries to receive data without blocking and appends it to the message buffer.
 
-	Individual chunk sizes are controled by the module attribute `_MCAST_DEFAULT_BUFFER_SIZE` set
+	Individual chunk sizes are controlled by the module attribute `_MCAST_DEFAULT_BUFFER_SIZE` set
 	at module's load-time. It is possible to override the buffer size via the environment variable
-	"MULTICAST_BUFFER_SIZE" if available at load-time. However changing the value is not reccomended
-	unless absolutly needed, and can be done on the sender side too.
+	"MULTICAST_BUFFER_SIZE" if available at load-time. However changing the value is not recommended
+	unless absolutely needed, and can be done on the sender side too.
 
 	Args:
 		msgbuffer (list or None): Caller-instantiated collection to store received messages.
