@@ -380,7 +380,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	return [*args]
 
 
-def taint_command_args(args):
+def taint_command_args(args: (list, tuple)) -> list:
 	"""Validate and sanitize command arguments for security.
 
 	This function validates the command (first argument) against a whitelist
@@ -441,13 +441,17 @@ def taint_command_args(args):
 
 		Testcase 5: Function should handle coverage command variations.
 
-			>>> test_fixture = ['coverage', 'run', '--source=multicast']
+			>>> test_fixture = [str(_sys.executable), 'coverage', 'run', '--source=multicast']
 			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
 			[...'coverage', 'run', '--source=multicast']
 			>>>
+			>>> test_fixture = ['coverage', 'run', '--source=multicast']
+			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
+			['exit 1 ; #', 'run',...'run', '--source=multicast']
+			>>>
 			>>> test_fixture = ['coverage3', 'run', '--source=.']
 			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
-			[...'coverage3', 'run', '--source=.']
+			['exit 1 ; #', 'run',...'--source=.']
 			>>>
 
 		Testcase 6: Function should handle case-insensitive command validation.
@@ -458,7 +462,7 @@ def taint_command_args(args):
 			>>>
 			>>> test_fixture = ['COVERAGE', 'run']
 			>>> _context.taint_command_args(test_fixture)  #doctest: +ELLIPSIS
-			[...'COVERAGE', 'run']
+			[...'COVERAGE', 'run'...]
 			>>>
 	"""
 	if not args or not isinstance(args, (list, tuple)):
@@ -469,17 +473,22 @@ def taint_command_args(args):
 		sys.executable  # Allow the current Python interpreter
 	}
 	command = str(args[0]).lower()
-	# Check for coverage command pattern
-	if any(cmd in command for cmd in ["coverage", sys.executable]):
-		# Special handling for coverage commands
-		return checkCovCommand(*args)
-	if not any(cmd in command for cmd in allowed_commands):
+	# Extract base command name for exact matching
+	# Handle both path separators (/ for Unix, \ for Windows)
+	command_base = command.split("/")[-1].split("\\")[-1]
+	# Check if command is allowed (exact match on base name or full path match with sys.executable)
+	if command_base not in allowed_commands and command != str(sys.executable).lower():
 		raise CommandExecutionError(
 			f"Command '{command}' is not allowed. Allowed commands: {allowed_commands}",
 			exit_code=77
 		)
 	# Sanitize all arguments to prevent injection
-	return [str(arg) for arg in args]
+	tainted_args = [str(arg) for arg in args]
+	# Special handling for coverage commands
+	if "coverage" in command:
+		tainted_args = checkCovCommand(*tainted_args)
+	# Sanitize all arguments to prevent injection
+	return tainted_args
 
 
 def validateCommandArgs(args: list) -> None:
