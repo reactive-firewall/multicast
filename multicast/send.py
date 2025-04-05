@@ -354,7 +354,8 @@ class McastSAY(multicast.mtool):
 			# Read from stdin in chunks
 			while True:
 				try:
-					chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
+					# Read configured amount of bytes at a time - matches read size by default
+					chunk = sys.stdin.read(multicast._MCAST_DEFAULT_BUFFER_SIZE)
 				except IOError as e:
 					print(f"Error reading from stdin: {e}", file=sys.stderr)
 					break

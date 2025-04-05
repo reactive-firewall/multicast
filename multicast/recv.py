@@ -310,11 +310,16 @@ def tryrecv(msgbuffer, chunk, sock):
 
 	Will try to listen on the given socket directly into the given chunk for decoding.
 	If the read into the chunk results in content, the chunk will be decoded and appended
-	to the caller-instantiated `msgbuffer`, which is a collection of strings (or None).
+	to the caller-instantiated `msgbuffer`, which is a collection of utf8 strings (or None).
 	After decoding, `chunk` is zeroed for memory efficiency and security. Either way the
 	message buffer will be returned.
 
 	Tries to receive data without blocking and appends it to the message buffer.
+
+	Individual chunk sizes are controled by the module attribute `_MCAST_DEFAULT_BUFFER_SIZE` set
+	at module's load-time. It is possible to override the buffer size via the environment variable
+	"MULTICAST_BUFFER_SIZE" if available at load-time. However changing the value is not reccomended
+	unless absolutly needed, and can be done on the sender side too.
 
 	Args:
 		msgbuffer (list or None): Caller-instantiated collection to store received messages.
@@ -381,7 +386,7 @@ def tryrecv(msgbuffer, chunk, sock):
 			>>>
 
 	"""
-	chunk = sock.recv(1316)
+	chunk = sock.recv(multicast._MCAST_DEFAULT_BUFFER_SIZE)
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
 		chunk = None  # pragma: no cover

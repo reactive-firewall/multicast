@@ -862,7 +862,7 @@ def load_config() -> dict:
 	ttl = load_TTL()
 	buffer_size = load_buffer_size()
 	groups_str = os.getenv("MULTICAST_GROUPS", "")
-	bind_addr = os.getenv("MULTICAST_BIND_ADDR", group)  # skipcq: PYL-W1508
+	bind_addr = os.getenv("MULTICAST_BIND_ADDR", str(group))  # skipcq: PYL-W1508
 	# Process and validate groups
 	groups = set()
 	if groups_str:
