@@ -357,7 +357,7 @@ class McastSAY(multicast.mtool):
 					# Read configured amount of bytes at a time - matches read size by default
 					# skipcq: PYL-W0212
 					chunk = sys.stdin.read(
-						multicast._MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0212 - module ok
+						multicast._MCAST_DEFAULT_BUFFER_SIZE,  # skipcq: PYL-W0212 - module ok
 					)
 				except IOError as e:
 					print(f"Error reading from stdin: {e}", file=sys.stderr)
