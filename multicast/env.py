@@ -98,6 +98,46 @@ except Exception as err:
 	raise baton from err
 
 
+def validate_buffer_size(size: int) -> bool:
+	"""
+	Validate if the buffer size is a positive integer.
+
+	Arguments:
+		size (int) -- The buffer size to validate.
+
+	Returns:
+		bool: True if the buffer size is valid ( > 0), False otherwise.
+
+	Raises:
+		ValueError: If the size cannot be converted to an integer.
+
+	Minimum Acceptance Testing:
+		>>> validate_buffer_size(1316)  # Default value
+		True
+		>>> validate_buffer_size(1)  # Minimum valid value
+		True
+		>>> validate_buffer_size(0)  # Zero is invalid
+		False
+		>>> validate_buffer_size(-1)  # Negative is invalid
+		False
+		>>> validate_buffer_size(65507)  # Maximum UDP payload size 65,535 -8 -20 (RFC-791 & RFC-768)
+		True
+		>>> validate_buffer_size("1316")  # String that can be converted
+		True
+		>>> try:
+		...     validate_buffer_size('invalid')
+		... except ValueError:
+		...     print('ValueError raised')
+		ValueError raised
+
+	"""
+	try:
+		size_num = int(size)
+		return 0 < size_num <= 65507
+	except (ValueError, TypeError) as err:
+		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from err
+
+
 def validate_port(port: int) -> bool:
 	"""
 	Validate if the port number is within the dynamic/private port range.
@@ -200,6 +240,121 @@ def validate_ttl(ttl: int) -> bool:
 		raise ValueError(
 			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
 		) from err
+
+
+def load_buffer_size() -> int:
+	"""
+	Load and validate the multicast buffer size from environment variable.
+
+	This function attempts to load the buffer size from the MULTICAST_BUFFER_SIZE
+	environment variable. If the value is valid, it returns the buffer size.
+	Invalid values trigger warnings and fall back to the default.
+
+	MTU Considerations for Buffer Size:
+		When setting a buffer size, consider the MTU of the underlying network:
+		- Ethernet: 1500 bytes MTU → 1472 bytes max payload (1500 - 28 bytes overhead)
+		- PPP: 296 bytes MTU → 268 bytes max payload
+		- Wi-Fi (802.11): 2304 bytes MTU → 2276 bytes max payload
+		- Frame Relay: 128 bytes MTU → 100 bytes max payload
+
+		The overhead consists of:
+		- UDP header: 8 bytes
+		- IP header: 20 bytes (without options)
+
+		Setting buffer sizes larger than the network's max payload may cause IP
+		fragmentation, which can lead to performance issues and increased complexity.
+
+	Returns:
+		int: The validated buffer size, or the default value if not set/invalid.
+
+	Environment:
+		MULTICAST_BUFFER_SIZE -- The buffer size in bytes.
+
+	Raises:
+		ImportError: If the multicast module cannot be imported.
+
+	Minimum Acceptance Testing:
+
+	Testcase 0: Setup test fixtures.
+		>>> import os
+		>>> from multicast import _MCAST_DEFAULT_BUFFER_SIZE
+		>>> original_buffer = _MCAST_DEFAULT_BUFFER_SIZE
+
+	Testcase 1: Test with valid environment variable
+		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "2048"
+		>>> buffer_size = load_buffer_size()
+		>>> buffer_size
+		2048
+		>>> # The function updates the global in the module's namespace, but this doesn't affect
+		>>> # the imported value in the test namespace
+		>>> _MCAST_DEFAULT_BUFFER_SIZE != 2048  # Global in test namespace is not updated
+		True
+
+	Testcase 2: Test with invalid (negative) environment variable
+		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "-100"
+		>>> import warnings
+		>>> with warnings.catch_warnings(record=True) as w:
+		...     warnings.simplefilter("always")
+		...     buffer_size = load_buffer_size()
+		...     len(w) == 1  # One warning was issued
+		True
+		>>> buffer_size == 1316  # Falls back to default
+		True
+
+	Testcase 3: Test with invalid (zero) environment variable
+		>>> os.environ["MULTICAST_BUFFER_SIZE"] = "0"
+		>>> with warnings.catch_warnings(record=True) as w:
+		...     warnings.simplefilter("always")
+		...     buffer_size = load_buffer_size()
+		...     len(w) == 1  # One warning was issued
+		True
+		>>> buffer_size == 1316  # Falls back to default
+		True
+
+	Testcase 4: Test with invalid (non-integer) environment variable
+		>>> os.environ["MULTICAST_BUFFER_SIZE"] = 'not_an_integer'
+		>>> with warnings.catch_warnings(record=True) as w:
+		...     warnings.simplefilter("always")
+		...     buffer_size = load_buffer_size()
+		...     len(w) == 1  # One warning was issued
+		True
+		>>> buffer_size == 1316  # Falls back to default
+		True
+
+	Testcase 5: Test with no environment variable
+		>>> if "MULTICAST_BUFFER_SIZE" in os.environ: os.environ.pop("MULTICAST_BUFFER_SIZE")
+		'not_an_integer'
+		>>> buffer_size = load_buffer_size()
+		>>> buffer_size == 1316  # Uses default
+		True
+
+		# Cleanup
+		>>> globals()['_MCAST_DEFAULT_BUFFER_SIZE'] = original_buffer
+
+	"""
+	# Import globals that we'll potentially update
+	from multicast import _MCAST_DEFAULT_BUFFER_SIZE
+	try:
+		buffer_size = int(os.getenv(
+			"MULTICAST_BUFFER_SIZE",
+			_MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
+		))
+	except ValueError:
+		warnings.warn(
+			f"Invalid MULTICAST_BUFFER_SIZE value, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
+			stacklevel=2
+		)
+		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
+	# Validate and potentially update port
+	if validate_buffer_size(buffer_size):
+		globals()["_MCAST_DEFAULT_BUFFER_SIZE"] = buffer_size
+	else:
+		warnings.warn(
+			f"Invalid MULTICAST_BUFFER_SIZE {buffer_size}, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
+			stacklevel=2
+		)
+		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
+	return buffer_size
 
 
 def load_port() -> int:
@@ -429,13 +584,15 @@ def load_TTL() -> int:
 		ImportError: If the multicast module cannot be imported.
 
 	Minimum Acceptance Testing:
+
+	Testcase 0: Setup
 		>>> import os
 		>>> import socket
 		>>> from multicast import _MCAST_DEFAULT_TTL
 		>>> original_ttl = _MCAST_DEFAULT_TTL
 		>>> original_timeout = socket.getdefaulttimeout()
 
-		# Test with valid TTL
+	Testcase 1: Test with valid TTL
 		>>> os.environ['MULTICAST_TTL'] = '2'
 		>>> ttl = load_TTL()
 		>>> ttl
@@ -445,7 +602,7 @@ def load_TTL() -> int:
 		>>> socket.getdefaulttimeout() == 2  # Socket timeout was updated
 		True
 
-		# Test with invalid numeric TTL
+	Testcase 2: Test with invalid numeric TTL
 		>>> os.environ['MULTICAST_TTL'] = '127'
 		>>> import warnings
 		>>> with warnings.catch_warnings(record=True) as w:
@@ -456,7 +613,7 @@ def load_TTL() -> int:
 		>>> ttl == original_ttl  # Falls back to original default
 		True
 
-		# Test with non-numeric TTL
+	Testcase 3: Test with non-numeric TTL
 		>>> os.environ['MULTICAST_TTL'] = 'invalid'
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
@@ -469,7 +626,7 @@ def load_TTL() -> int:
 		'invalid'
 		>>>
 
-		# Test with unset environment variable
+	Testcase 4: Test with unset environment variable
 		>>> os.environ.pop('MULTICAST_TTL', None)
 		>>> ttl = load_TTL()
 		>>> ttl == original_ttl  # Uses default
@@ -671,10 +828,10 @@ def load_config() -> dict:
 		>>> with warnings.catch_warnings(record=True) as w:
 		...     warnings.simplefilter("always")
 		...     config = load_config()
-		...     len(w) == 0  # expected failure - Warning was NOT issued
+		...     len(w) == 1  # expected warning was issued
 		True
-		>>> config['buffer_size']  # expected failure - undefined or Falls back to default
-		-1024
+		>>> config['buffer_size'] == _MCAST_DEFAULT_BUFFER_SIZE  # Falls back to default
+		True
 
 		# Cleanup
 		>>> os.environ.pop('MULTICAST_BUFFER_SIZE', None)
@@ -689,8 +846,8 @@ def load_config() -> dict:
 		...     config = load_config()
 		... except ValueError:
 		...     print('ValueError raised')
-		ValueError raised
-		>>> config is None
+		>>> # Verify config is not None (load_config should handle the error and use default)
+		>>> config is not None
 		True
 
 		# Cleanup
@@ -703,9 +860,9 @@ def load_config() -> dict:
 	port = load_port()
 	group = load_group()
 	ttl = load_TTL()
+	buffer_size = load_buffer_size()
 	groups_str = os.getenv("MULTICAST_GROUPS", "")
-	bind_addr = os.getenv("MULTICAST_BIND_ADDR", group)  # skipcq: PYL-W1508
-	buffer_size = int(os.getenv("MULTICAST_BUFFER_SIZE", 1316))  # skipcq: PYL-W1508
+	bind_addr = os.getenv("MULTICAST_BIND_ADDR", str(group))  # skipcq: PYL-W1508
 	# Process and validate groups
 	groups = set()
 	if groups_str:
@@ -737,6 +894,7 @@ __all__ = [
 	"""__module__""",
 	"""__name__""",
 	"""__doc__""",  # skipcq: PYL-E0603
+	"""validate_buffer_size""",
 	"""validate_port""",
 	"""validate_multicast_address""",
 	"""validate_ttl""",

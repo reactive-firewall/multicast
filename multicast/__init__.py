@@ -52,6 +52,7 @@ __all__ = [
 	"""EXIT_CODES""",
 	"""EXCEPTION_EXIT_CODES""",
 	"""_BLANK""",
+	"""_MCAST_DEFAULT_BUFFER_SIZE""",  # added in version 2.0.6
 	"""_MCAST_DEFAULT_PORT""",
 	"""_MCAST_DEFAULT_GROUP""",
 	"""_MCAST_DEFAULT_TTL""",
@@ -156,6 +157,7 @@ Security Considerations:
 
 Attributes:
 	__version__ (str): The version of this package.
+	_MCAST_DEFAULT_BUFFER_SIZE (int): Default buffer size for multicast communication (1316).
 	_MCAST_DEFAULT_PORT (int): Default port for multicast communication (59259).
 	_MCAST_DEFAULT_GROUP (str): Default multicast group address ('224.0.0.1').
 	_MCAST_DEFAULT_TTL (int): Default TTL for multicast packets (1).
@@ -211,6 +213,57 @@ Minimal Acceptance Testing:
 		>>> _main.__module__ is not None
 		True
 		>>> _main.__doc__ is not None
+		True
+		>>>
+
+
+"""
+
+global _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0604
+
+_MCAST_DEFAULT_BUFFER_SIZE = 1316
+"""
+	Arbitrary buffer size to use by default, though any value below 65507 should work.
+
+	Minimal Testing:
+
+	First set up test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default buffer size.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE > int(1)
+		True
+		>>>
+
+	Testcase 1: Multicast should validate buffer size constraints.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-791 & RFC-768 compliant.
+		D: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is a smaller than fragment thresholds
+			for typical ethernet MTUs by default.
+
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE >= int(56)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(65527)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(1500)
 		True
 		>>>
 
@@ -410,12 +463,11 @@ else:
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
 	_MCAST_DEFAULT_TTL = _config["ttl"]
+	_MCAST_DEFAULT_BUFFER_SIZE = _config["buffer_size"]
 	global _MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
 	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
-	global _MCAST_DEFAULT_BUFFER  # skipcq: PYL-W0604
-	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
 
 del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
