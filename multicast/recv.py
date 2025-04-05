@@ -386,7 +386,7 @@ def tryrecv(msgbuffer, chunk, sock):
 			>>>
 
 	"""
-	chunk = sock.recv(multicast._MCAST_DEFAULT_BUFFER_SIZE)
+	chunk = sock.recv(multicast._MCAST_DEFAULT_BUFFER_SIZE)  # skipcq: PYL-W0212 - module ok
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
 		chunk = None  # pragma: no cover
