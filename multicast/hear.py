@@ -345,7 +345,10 @@ class McastServer(socketserver.UDPServer):
 		super(McastServer, self).server_bind()
 		self._sync_logger()
 		# enter critical section
-		self.logger.info(f"bound on: {str(self.socket.getsockname())}")
+		self.logger.info(
+			"bound on: %s",  # lazy formatting to avoid PYL-W1203
+			str(self.socket.getsockname()),
+		)
 		# exit critical section
 
 	def close_request(self, request):
@@ -521,7 +524,10 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				return  # silently ignore invalid UTF-8 data -- fail quickly.
 		_logger = logging.getLogger(self.__name__)
 		if __debug__:
-			_logger.info(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
+			_logger.info(
+			"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
+			str(self.client_address[0]), data.strip(),
+		)
 		if data is not None:
 			me = str(sock.getsockname()[0])
 			if __debug__:  # pragma: no cover

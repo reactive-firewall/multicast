@@ -66,13 +66,13 @@ def main() -> None:
 	try:
 		_bar = str("-" * 20)
 		logger = logging.getLogger(__module__)
-		logger.info(f"{_bar}GROUP{_bar}")
-		logger.info(f"{args.group}:{args.category}")
-		logger.info(f"{_bar}START{_bar}")
+		logger.info(f"{_bar}GROUP{_bar}")  # skipcq PYL-W1203 - test code ok
+		logger.info(f"{args.group}:{args.category}")  # skipcq PYL-W1203 - test code ok
+		logger.info(f"{_bar}START{_bar}")  # skipcq PYL-W1203 - test code ok
 		suite = get_test_suite(args.group, args.category)
 		runner = unittest.TextTestRunner(verbosity=2)
 		result = runner.run(suite)
-		logger.info(f"{_bar} END {_bar}")
+		logger.info(f"{_bar} END {_bar}")  # skipcq PYL-W1203 - test code ok
 		del _bar  # skipcq - cleanup any object leaks early
 		sys.exit(not result.wasSuccessful())
 	except ValueError as e:
