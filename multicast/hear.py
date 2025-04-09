@@ -272,13 +272,53 @@ class McastServer(socketserver.UDPServer):
 
 	"""
 
-	def __init__(self, *args, **kwargs) -> None:
-		(logger_name, _) = kwargs.get("server_address", (None, None))
+	def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True) -> None:
+		"""
+		Initialize a new instance of the McastServer.
+
+		Creates a new UDP server for multicast communication and sets up an appropriate logger
+		based on the server address provided. May be extended, do not override.
+
+		Returns:
+			None
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Basic initialization of McastServer.
+			A: Test that McastServer can be initialized with minimal arguments.
+			B: Test that the resulting instance is of the correct type.
+
+			>>> import multicast
+			>>> from multicast.hear import McastServer
+			>>> server = McastServer(('224.0.0.1', 12345), None)
+			>>> isinstance(server, McastServer)
+			True
+			>>> isinstance(server, multicast.hear.socketserver.UDPServer)
+			True
+			>>>
+
+		Testcase 1: Server initialization with logger name extraction.
+			A: Test that the server extracts the logger name from server_address.
+			B: Test that the logger is properly initialized.
+
+			>>> from multicast.hear import McastServer
+			>>> test_addr = ('227.0.0.1', 23456)
+			>>> server = McastServer(test_addr, None)
+			>>> server.logger is not None
+			True
+			>>> server.logger.name.endswith('227.0.0.1')
+			True
+			>>>
+
+		"""
+		logger_name = server_address[0] if server_address and len(server_address) > 0 else None
 		if logger_name:  # pragma: no branch
 			self.__logger = logging.getLogger(f"{McastServer.__name__}.{logger_name}")
 		else:
 			self.__logger = logging.getLogger(f"{McastServer.__name__}")
-		super().__init__(*args, **kwargs)
+		super().__init__(server_address, RequestHandlerClass, bind_and_activate)
 
 	def _sync_logger(self) -> None:
 		"""Internal function to sync logger with bound socket address."""
@@ -525,18 +565,20 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		_logger = logging.getLogger(self.__name__)
 		if __debug__:
 			_logger.info(
-			"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
-			str(self.client_address[0]), data.strip(),
-		)
+				"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
+				str(self.client_address[0]), data.strip(),
+			)
 		if data is not None:
 			me = str(sock.getsockname()[0])
 			if __debug__:  # pragma: no cover
 				_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
 				_logger.info(
-					f"{me} HEAR: [{self.client_address} SAID {str(_what)}]"
+					"%s HEAR: [%s SAID %s]",  # lazy formatting to avoid PYL-W1203
+					str(me), str(self.client_address), str(_what),
 				)
 				_logger.info(
-					f"{me} SAYS [ HEAR [ {str(_what)} SAID {self.client_address} ] from {me} ]"  # noqa
+					"%s SAYS [ HEAR [ {%s SAID %s ] from %s ]",  # lazy formatting to avoid PYL-W1203
+					str(me), str(_what), str(self.client_address), str(me),
 				)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
