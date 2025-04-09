@@ -205,7 +205,10 @@ except Exception as err:
 
 
 module_logger = logging.getLogger(__name__)
-module_logger.debug(f"loading {__name__}")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
@@ -544,9 +547,12 @@ class McastRECV(multicast.mtool):
 
 
 		"""
-		module_logger.debug(f"Joining {str(groups)} on port {port} using {iface} as {bind_group}")
+		module_logger.debug(
+			"Joining %s on port %d using %s as %s",  # lazy formatting to avoid PYL-W1203
+			str(groups), port, str(iface), bind_group,
+		)
 		sock = joinstep(groups, port, iface, bind_group, None)
-		module_logger.debug(f"Opened {sock}")
+		module_logger.debug("Opened %s", sock)  # lazy formatting to avoid PYL-W1203
 		msgbuffer = str(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		chunk = None
 		module_logger.debug("Ready.")

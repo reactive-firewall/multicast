@@ -100,8 +100,14 @@ except Exception as err:
 
 
 module_logger = logging.getLogger(__module__)
-module_logger.debug(f"loading {__module__}")
-module_logger.debug(f"Initializing {__package__} environment.")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
+module_logger.debug(
+	"Initializing %s environment.",  # lazy formatting to avoid PYL-W1203
+	__package__,
+)
 
 
 def validate_buffer_size(size: int) -> bool:
@@ -364,7 +370,10 @@ def load_buffer_size() -> int:
 			stacklevel=2
 		)
 		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
-	module_logger.debug(f"Loaded {buffer_size} as internal multicast buffer size.")
+	module_logger.debug(
+		"Loaded %s as internal multicast buffer size.",  # lazy formatting to avoid PYL-W1203
+		str(buffer_size),
+	)
 	return buffer_size
 
 
@@ -466,7 +475,10 @@ def load_port() -> int:
 			stacklevel=2
 		)
 		port = _MCAST_DEFAULT_PORT
-	module_logger.debug(f"Loaded {port} as default multicast port.")
+	module_logger.debug(
+		"Loaded %s as default multicast port.",  # lazy formatting to avoid PYL-W1203
+		str(port),
+	)
 	return port
 
 
@@ -583,7 +595,10 @@ def load_group() -> ipaddress.IPv4Address:
 			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2
 		)
 		group = _MCAST_DEFAULT_GROUP
-	module_logger.debug(f"Loaded {group} as default multicast group.")
+	module_logger.debug(
+		"Loaded %s as default multicast group.",  # lazy formatting to avoid PYL-W1203
+		group,
+	)
 	return ipaddress.IPv4Address(group)
 
 
@@ -678,7 +693,10 @@ def load_TTL() -> int:
 			stacklevel=2
 		)
 		ttl = _MCAST_DEFAULT_TTL
-	module_logger.debug(f"Loaded {ttl} as default multicast time-to-live.")
+	module_logger.debug(
+		"Loaded %d as default multicast time-to-live.",  # lazy formatting to avoid PYL-W1203
+		ttl,
+	)
 	# Update socket default timeout
 	module_logger.debug("Update socket default timeout.")
 	socket.setdefaulttimeout(int(ttl))

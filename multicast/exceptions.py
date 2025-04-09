@@ -205,8 +205,14 @@ except Exception as err:
 
 
 module_logger = logging.getLogger(__module__)
-module_logger.debug(f"loading {__module__}")
-module_logger.debug(f"Initializing {__package__} exceptions.")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
+module_logger.debug(
+	"Initializing %s exceptions.",  # lazy formatting to avoid PYL-W1203
+	__package__,
+)
 
 
 class CommandExecutionError(RuntimeError):
@@ -769,7 +775,10 @@ def exit_on_exception(func: callable):
 	return wrapper
 
 
-module_logger.debug(f"loaded {__module__}")
+module_logger.debug(
+	"Loaded %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
 
 
 # skipcq

@@ -165,7 +165,10 @@ except Exception as baton:  # pragma: no branch
 
 
 module_logger = logging.getLogger(__name__)
-module_logger.debug(f"loading {__name__}")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 class McastSAY(multicast.mtool):
@@ -282,7 +285,10 @@ class McastSAY(multicast.mtool):
 		"""
 		if parser is not None:  # pragma: no branch
 			if __debug__:
-				module_logger.debug(f"Adding {__name__} arguments.")
+				module_logger.debug(
+					"Adding %s arguments.",  # lazy formatting to avoid PYL-W1203
+					__name__,
+				)
 			parser.add_argument(
 				"--port",
 				type=int,
@@ -331,10 +337,19 @@ class McastSAY(multicast.mtool):
 			if __debug__ and module_logger.isEnabledFor(logging.DEBUG):  # pragma: no branch
 				module_logger.debug("Encoding.")
 				_payload = data.encode('utf8')
-				module_logger.debug(f"Encoded {len(_payload)}.")
-				module_logger.debug(f"Sending {_payload} to ({group}, {port}).")
+				module_logger.debug(
+					"Encoded %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
+				module_logger.debug(
+					"Sending %s to (%s, %d).",  # lazy formatting to avoid PYL-W1203
+					_payload, group, port,
+				)
 				sock.sendto(data.encode('utf8'), (group, port))
-				module_logger.debug(f"Sent {len(_payload)}.")
+				module_logger.debug(
+					"Sent %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
 			else:
 				sock.sendto(data.encode('utf8'), (group, port))
 			_success = True
@@ -400,7 +415,13 @@ class McastSAY(multicast.mtool):
 			_result = self._sayStep(group, port, message)
 		if __debug__:  # pragma: no branch
 			if _result:
-				module_logger.debug(f"SEND result was {_result}. Reporting success.")
-			else:  # pragma: no branch
-				module_logger.debug(f"SEND result was {_result}. Reporting failure.")
+				module_logger.debug(
+					"SEND result was %s. Reporting success.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
+			else:
+				module_logger.debug(
+					"SEND result was %s. Reporting failure.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
 		return (_result, None)  # skipcq: PTC-W0020  - intended

@@ -218,7 +218,10 @@ except Exception as err:
 
 
 module_logger = logging.getLogger(__name__)
-module_logger.debug(f"loading {__name__}")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 class McastServer(socketserver.UDPServer):
@@ -619,7 +622,10 @@ class McastHEAR(multicast.mtool):
 		server_initialized = False
 		server = None
 		try:
-			_logger.debug(f"Initializing server on port {PORT} as {HOST}.")
+			_logger.debug(
+				"Initializing server on port %d as %s.",  # lazy formatting to avoid PYL-W1203
+				PORT, HOST,
+			)
 			with McastServer((HOST, PORT), HearUDPHandler) as server:
 				server_initialized = True
 				server.serve_forever()
@@ -633,7 +639,10 @@ class McastHEAR(multicast.mtool):
 					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
 				) from userInterrupt
 		finally:
-			_logger.debug(f"Finalizing server with port {PORT} from {HOST}.")
+			_logger.debug(
+				"Finalizing server with port %d from %s.",  # lazy formatting to avoid PYL-W1203
+				PORT, HOST,
+			)
 			if server:  # pragma: no cover
 				# deadlocks if not called by other thread
 				end_it = threading.Thread(name="Kill_Thread", target=server.shutdown, args=[])
@@ -641,7 +650,13 @@ class McastHEAR(multicast.mtool):
 				end_it.join(1)
 		if __debug__:
 			if server_initialized:
-				module_logger.debug(f"HEAR result was {server_initialized}. Reporting success.")
+				module_logger.debug(
+					"HEAR result was %s. Reporting success.",  # lazy formatting to avoid PYL-W1203
+					server_initialized,
+				)
 			else:
-				module_logger.debug(f"HEAR result was {server_initialized}. Reporting failure.")
+				module_logger.debug(
+					"HEAR result was %s. Reporting failure.",  # lazy formatting to avoid PYL-W1203
+					server_initialized,
+				)
 		return (server_initialized, None)

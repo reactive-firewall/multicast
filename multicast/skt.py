@@ -150,7 +150,10 @@ except Exception as err:
 
 
 module_logger = logging.getLogger(__module__)
-module_logger.debug(f"loading {__module__}")
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
 
 
 def genSocket() -> _socket.socket:

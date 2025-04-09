@@ -36,7 +36,10 @@ import unittest
 import logging
 
 if __debug__ and __name__ == "__main__":
-	logging.getLogger(__module__).debug(f"Bootstrapping {__file__}")
+	logging.getLogger(__module__).debug(
+		"Bootstrapping %s",  # lazy formatting to avoid PYL-W1203
+		__file__,
+	)
 
 from tests import get_test_suite
 from tests import TEST_GROUPS
