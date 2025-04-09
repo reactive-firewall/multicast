@@ -102,7 +102,7 @@ try:
 				# Validate the log level
 				if not isinstance(loglevel, str):
 					raise ValueError("Invalid log level")
-				if loglevel not in logging_color.keys():
+				if loglevel not in logging_color:
 					raise ValueError("Invalid log level")
 				# Determine color based on whether the output is a terminal
 				if sys.stdout.isatty():
