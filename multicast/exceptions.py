@@ -193,8 +193,8 @@ __name__ = "multicast.exceptions"  # skipcq: PYL-W0622
 """
 
 try:
-	from . import sys  # skipcq: PYL-C0414
 	from . import argparse  # skipcq: PYL-C0414
+	from . import logging  # skipcq: PYL-C0414
 	import functools
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
@@ -202,6 +202,11 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton from err
+
+
+module_logger = logging.getLogger(__module__)
+module_logger.debug(f"loading {__module__}")
+module_logger.debug(f"Initializing {__package__} exceptions.")
 
 
 class CommandExecutionError(RuntimeError):
@@ -433,8 +438,11 @@ class ShutdownCommandReceived(RuntimeError):
 		self.exit_code = 143  # Use SIGTERM exit code for graceful shutdown
 
 
+module_logger.debug("Initialized exceptions.")
+module_logger.debug("Initializing error message strings.")
 # Error message constants
 EXIT_CODE_RANGE_ERROR = "Exit code must be an integer between 0 and 255"
+module_logger.debug("Initialized message strings.")
 
 
 def validate_exit_code(code) -> None:
@@ -509,8 +517,13 @@ def validate_exit_code(code) -> None:
 			>>> success
 			True
 	"""
+	module_logger.info("Validating possible exit code.")
 	if not isinstance(code, int) or code < 0 or code > 255:
 		raise ValueError(EXIT_CODE_RANGE_ERROR)
+	module_logger.info("Validated possible exit code.")
+
+
+module_logger.debug("Initializing CEP-8 EXIT_CODES")
 
 
 EXIT_CODES = {
@@ -555,6 +568,7 @@ CEP-8 Compliance:
 
 Usage Example:
 	```python
+		import sys
 		from multicast.exceptions import EXIT_CODES
 		from multicast.exceptions import get_exit_code_from_exception
 
@@ -619,6 +633,9 @@ Minimal Acceptance Testing:
 		False
 
 """
+
+
+module_logger.debug("Initialized EXIT_CODES.")
 
 
 def get_exit_code_from_exception(exc: BaseException) -> int:
@@ -733,23 +750,26 @@ def exit_on_exception(func: callable):
 
 	@functools.wraps(func)
 	def wrapper(*args, **kwargs):
+		_func_logger = module_logger
 		try:
+			_func_logger = logging.getLogger(func.__name__)
 			return func(*args, **kwargs)
 		except SystemExit as exc:
 			# Handle SystemExit exceptions, possibly from argparse
 			exit_code = exc.code if isinstance(exc.code, int) else 2
-			if (sys.stderr.isatty()):
-				print(f"{EXIT_CODES[exit_code][1]}: {exc}", file=sys.stderr)
+			_func_logger.warning(f"{EXIT_CODES[exit_code][1]}: {exc}")
 			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 		except BaseException as err:
 			exit_code = get_exit_code_from_exception(err)
-			if (sys.stderr.isatty()):
-				print(f"{EXIT_CODES[exit_code][1]}: {err}", file=sys.stderr)
+			_func_logger.warning(f"{EXIT_CODES[exit_code][1]}: {err}")
 			raise SystemExit(exit_code) from err
 			# otherwise sys.exit(exit_code)
 
 	return wrapper
+
+
+module_logger.debug(f"loaded {__module__}")
 
 
 # skipcq

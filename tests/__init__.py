@@ -64,6 +64,71 @@ except ImportError as baton:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Module failed to import.") from baton
 
 try:
+	import logging
+	try:
+		class ANSIColors:
+			# Define ANSI color codes
+			BLACK = """\033[30m"""
+			RED = """\033[31m"""
+			GREEN = """\033[32m"""
+			YELLOW = """\033[33m"""
+			BLUE = """\033[34m"""
+			MAGENTA = """\033[35m"""
+			CYAN = """\033[36m"""
+			GREY = """\033[37m"""
+			AMBER = """\033[93m"""
+			REDBG = """\033[41m"""  # Red background
+			ENDC = """\033[0m"""
+
+		logging_color = {
+			'debug': ANSIColors.BLUE, 'info': ANSIColors.GREY,
+			'warning': ANSIColors.AMBER,
+			'error': ANSIColors.RED,
+			'critical': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG))
+		}
+
+		logging_level = {
+			'debug': logging.DEBUG,
+			'info': logging.INFO,
+			'warning': logging.WARNING,
+			'error': logging.ERROR,
+			'critical': logging.CRITICAL
+		}
+
+		class ColoredStreamHandler(logging.StreamHandler):
+			def emit(self, record):
+				# Get the log level as a string
+				loglevel = record.levelname.lower()
+				# Validate the log level
+				if not isinstance(loglevel, str):
+					raise ValueError("Invalid log level")
+				if loglevel not in logging_color.keys():
+					raise ValueError("Invalid log level")
+				# Determine color based on whether the output is a terminal
+				if sys.stdout.isatty():
+					colorPrefix = logging_color[loglevel]
+					endColor = ANSIColors.ENDC
+				else:
+					colorPrefix = str()
+					endColor = str()
+				# Format the message
+				msg = self.format(record)
+				formatted_msg = f"{colorPrefix}{msg}{endColor}"
+				# Write the formatted message to the stream
+				self.stream.write(formatted_msg + self.terminator)
+				self.flush()
+
+	except Exception as _cause:
+		raise ImportError("[CWE-909] Could Not Initialize Test Logger") from _cause
+	# Setup logging for testing
+	root = logging.getLogger()
+	root.setLevel(logging.INFO)
+	handler = ColoredStreamHandler()
+	root.addHandler(handler)
+except ImportError as baton:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Logging failed to initialize.") from baton
+
+try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
@@ -72,6 +137,8 @@ except Exception as err:  # pragma: no branch
 	raise ImportError("[CWE-440] multicast Failed to import.") from err
 
 try:
+	_LOGGER = logging.getLogger(__module__)
+	_LOGGER.debug("Initializing tests.")
 	_DIR_NAME = str(".")
 	_PARENT_DIR_NAME = str("..")
 	_BASE_NAME = os.path.dirname(__file__)
@@ -117,7 +184,7 @@ try:
 		from tests import test_fuzz
 		depends.insert(10, test_fuzz)
 	except Exception as e:  # pragma: no branch
-		print(f"Error loading optional Fuzzing tests: {e}")
+		_LOGGER.exception(f"Error loading optional Fuzzing tests: {e}")
 
 	for unit_test in depends:
 		try:
@@ -128,11 +195,9 @@ try:
 		except Exception as impErr:  # pragma: no branch
 			raise ImportError(str("[CWE-758] Test module failed completely.")) from impErr
 except Exception as badErr:  # pragma: no branch
-	print(str(''))
-	print(str(type(badErr)))
-	print(str(badErr))
-	print(str((badErr.args)))
-	print(str(''))
+	_LOGGER.debug(str(type(badErr)))
+	_LOGGER.exception(str(badErr))
+	_LOGGER.debug(str((badErr.args)))
 	badErr = None
 	del badErr  # skipcq - cleanup any error leaks early
 	exit(0)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
@@ -216,9 +281,9 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
 	except ValueError as e:
 		# ValueError is raised when no tests are found
-		print(f"No doctests found in {module.__name__}: {e}")
+		_LOGGER.warning(f"No doctests found in {module.__name__}: {e}")
 	except Exception as e:
-		print(f"Error loading doctests from {module.__name__}: {e}")
+		_LOGGER.error(f"Error loading doctests from {module.__name__}: {e}")
 	return doc_suite
 
 

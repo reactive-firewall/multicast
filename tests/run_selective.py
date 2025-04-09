@@ -33,6 +33,11 @@ __module__ = "tests"
 import sys
 import argparse
 import unittest
+import logging
+
+if __debug__ and __name__ == "__main__":
+	logging.getLogger(__module__).debug(f"Bootstrapping {__file__}")
+
 from tests import get_test_suite
 from tests import TEST_GROUPS
 
@@ -57,18 +62,18 @@ def main() -> None:
 	args = parser.parse_args()
 	try:
 		_bar = str("-" * 20)
-		if (sys.stdout.isatty()):
-			print(f"{_bar}START{_bar}", file=sys.stdout)
+		logger = logging.getLogger(__module__)
+		logger.info(f"{_bar}GROUP{_bar}")
+		logger.info(f"{args.group}:{args.category}")
+		logger.info(f"{_bar}START{_bar}")
 		suite = get_test_suite(args.group, args.category)
 		runner = unittest.TextTestRunner(verbosity=2)
 		result = runner.run(suite)
-		if (sys.stdout.isatty()):
-			print(f"{_bar} END {_bar}", file=sys.stdout)
+		logger.info(f"{_bar} END {_bar}")
 		del _bar  # skipcq - cleanup any object leaks early
 		sys.exit(not result.wasSuccessful())
 	except ValueError as e:
-		if (sys.stderr.isatty()):
-			print(f"Error: {e}", file=sys.stderr)
+		logger.exception(f"Error: {e}")
 		sys.exit(1)
 
 

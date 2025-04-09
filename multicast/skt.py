@@ -137,6 +137,7 @@ __name__ = "multicast.skt"  # skipcq: PYL-W0622
 """
 
 try:
+	from . import logging
 	from . import socket as _socket  # skipcq: PYL-C0414
 	from . import struct as _struct  # noqa
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL  # skipcq: PYL-C0414
@@ -146,6 +147,10 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton from err
+
+
+module_logger = logging.getLogger(__module__)
+module_logger.debug(f"loading {__module__}")
 
 
 def genSocket() -> _socket.socket:

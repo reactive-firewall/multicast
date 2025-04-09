@@ -183,6 +183,7 @@ except Exception as importErr:
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 try:
+	from multicast import logging
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
@@ -201,6 +202,10 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton from err
+
+
+module_logger = logging.getLogger(__name__)
+module_logger.debug(f"loading {__name__}")
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
@@ -411,11 +416,9 @@ def recvstep(msgbuffer, chunk, sock):
 		msgbuffer = tryrecv(msgbuffer, chunk, sock)
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
-			print("User Interrupted")
+			module_logger.warning("User Interrupted")
 	except OSError:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
+		module_logger.debug("[CWE-440] Nothing happened. There seems to have been an OS error.")
 	finally:
 		sock = multicast.endSocket(sock)
 	if not (chunk is None):  # pragma: no branch
@@ -541,12 +544,17 @@ class McastRECV(multicast.mtool):
 
 
 		"""
+		module_logger.debug(f"Joining {str(groups)} on port {port} using {iface} as {bind_group}")
 		sock = joinstep(groups, port, iface, bind_group, None)
+		module_logger.debug(f"Opened {sock}")
 		msgbuffer = str(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		chunk = None
+		module_logger.debug("Ready.")
 		msgbuffer = recvstep(msgbuffer, chunk, sock)
 		# about 969 bytes in base64 encoded as chars
+		module_logger.debug("Closing.")
 		multicast.endSocket(sock)
+		module_logger.debug("Done.")
 		return msgbuffer
 
 	def doStep(self, *args, **kwargs):
@@ -563,6 +571,7 @@ class McastRECV(multicast.mtool):
 		Returns:
 			tuple: A tuple containing received data and a status indicator.
 		"""
+		module_logger.debug("RECV")
 		response = self._hearstep(
 			kwargs.get(
 				"groups",
@@ -574,8 +583,13 @@ class McastRECV(multicast.mtool):
 		)
 		_is_std = kwargs.get("is_std", False)
 		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
+			module_logger.debug("Will Print to Console.")
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 			print(str(response))
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		_result = (len(response) > 0) is True
+		if _result:
+			module_logger.info("Success")
+		else:
+			module_logger.debug("Nothing Received.")
 		return (_result, None if not _result else response)  # skipcq: PTC-W0020  - intended

@@ -180,11 +180,11 @@ __name__ = "multicast.hear"  # skipcq: PYL-W0622
 """
 
 try:
-	import sys as _sys
-	if 'multicast' not in _sys.modules:
+	import sys
+	if 'multicast' not in sys.modules:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = _sys.modules["multicast"]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 	# skipcq
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
@@ -196,6 +196,7 @@ except Exception as importErr:
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 try:
+	import logging
 	import threading
 	import socketserver
 	import warnings
@@ -214,6 +215,10 @@ try:
 			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
 except Exception as err:
 	raise ImportError(err) from err
+
+
+module_logger = logging.getLogger(__name__)
+module_logger.debug(f"loading {__name__}")
 
 
 class McastServer(socketserver.UDPServer):
@@ -244,6 +249,47 @@ class McastServer(socketserver.UDPServer):
 
 	"""
 
+	__name__ = """multicast.hear.McastServer"""  # skipcq: PYL-W0622
+	"""Names this server
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import multicast
+			>>>
+
+		Testcase 1: McastServer should be automatically imported.
+
+			>>> multicast.hear.McastServer.__name__ is not None
+			True
+			>>>
+
+	"""
+
+	def __init__(self, *args, **kwargs) -> None:
+		(logger_name, _) = kwargs.get("server_address", (None, None))
+		if logger_name:  # pragma: no branch
+			self.__logger = logging.getLogger(f"{McastServer.__name__}.{logger_name}")
+		else:
+			self.__logger = logging.getLogger(f"{McastServer.__name__}")
+		super().__init__(*args, **kwargs)
+
+	def _sync_logger(self) -> None:
+		"""Internal function to sync logger with bound socket address."""
+		(logger_name, _) = self.socket.getsockname()
+		if logger_name:
+			self.__logger = logging.getLogger(f"{McastServer.__name__}.{logger_name}")
+		else:  # pragma: no branch
+			self.__logger = logging.getLogger(f"{McastServer.__name__}")
+
+	@property
+	def logger(self) -> logging.Logger:
+		"""Getter for the logger attribute."""
+		return self.__logger
+
 	def server_activate(self):
 		"""
 		Activate the server to begin handling requests.
@@ -253,7 +299,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("server_activate"))
+		self.logger.info("server_activate")
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
@@ -274,7 +320,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("open_request"))
+		self.logger.info("open_request")
 		# enter critical section
 		old_socket = self.socket
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
@@ -292,10 +338,11 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("server_bind"))
+		self.logger.info("server_bind")
 		super(McastServer, self).server_bind()
+		self._sync_logger()
 		# enter critical section
-		print(f"bound on: {str(self.socket.getsockname())}")
+		self.logger.info(f"bound on: {str(self.socket.getsockname())}")
 		# exit critical section
 
 	def close_request(self, request):
@@ -311,7 +358,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("close_request"))
+		self.logger.info("close_request")
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
@@ -331,7 +378,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("handle_error"))
+		self.logger.info("handle_error")
 		if request is not None and request[0] is not None and "STOP" in str(request[0]):
 			def kill_func(a_server):
 				"""
@@ -375,6 +422,27 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		>>> HearUDPHandler.__name__ is not None
 		True
 		>>>
+
+
+	"""
+
+	__name__ = "multicast.hear.HearUDPHandler"  # skipcq: PYL-W0622
+	"""Names this handler type.
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import multicast
+			>>>
+
+		Testcase 1: HearUDPHandler should be automatically imported.
+
+			>>> multicast.hear.HearUDPHandler.__name__ is not None
+			True
+			>>>
 
 
 	"""
@@ -443,17 +511,22 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			try:
 				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			except UnicodeDecodeError:  # pragma: no cover
+				if __debug__:
+					logging.getLogger(self.__name__).debug(
+						f"Received invalid UTF-8 data from {self.client_address[0]}"
+					)
 				return  # silently ignore invalid UTF-8 data -- fail quickly.
-		if (_sys.stdout.isatty()):  # pragma: no cover
-			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
+		_logger = logging.getLogger(self.__name__)
+		if __debug__:
+			_logger.info(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
 		if data is not None:
 			me = str(sock.getsockname()[0])
-			if (_sys.stdout.isatty()):  # pragma: no cover
+			if __debug__:  # pragma: no cover
 				_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
-				print(
+				_logger.info(
 					f"{me} HEAR: [{self.client_address} SAID {str(_what)}]"
 				)
-				print(
+				_logger.info(
 					f"{me} SAYS [ HEAR [ {str(_what)} SAID {self.client_address} ] from {me} ]"  # noqa
 				)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
@@ -539,11 +612,14 @@ class McastHEAR(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and an optional result message.
 		"""
+		_logger = logging.getLogger(__name__)
+		_logger.debug(McastHEAR.__proc__)
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		server_initialized = False
 		server = None
 		try:
+			_logger.debug(f"Initializing server on port {PORT} as {HOST}.")
 			with McastServer((HOST, PORT), HearUDPHandler) as server:
 				server_initialized = True
 				server.serve_forever()
@@ -557,9 +633,15 @@ class McastHEAR(multicast.mtool):
 					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
 				) from userInterrupt
 		finally:
+			_logger.debug(f"Finalizing server with port {PORT} from {HOST}.")
 			if server:  # pragma: no cover
 				# deadlocks if not called by other thread
 				end_it = threading.Thread(name="Kill_Thread", target=server.shutdown, args=[])
 				end_it.start()
 				end_it.join(1)
+		if __debug__:
+			if server_initialized:
+				module_logger.debug(f"HEAR result was {server_initialized}. Reporting success.")
+			else:
+				module_logger.debug(f"HEAR result was {server_initialized}. Reporting failure.")
 		return (server_initialized, None)

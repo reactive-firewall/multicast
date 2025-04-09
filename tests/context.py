@@ -91,6 +91,7 @@ try:
 		raise ModuleNotFoundError("[CWE-440] string support is not available.") from None
 	import secrets
 	import unittest
+	import warnings
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] Module Failed to import.") from err
 
@@ -1001,9 +1002,11 @@ def managed_process(process):
 				if process.is_alive():
 					process.kill()
 		except Exception as e:
-			if (sys.stderr.isatty()):
+			if (__debug__ and sys.stderr.isatty()):
 				# Log the error but don't re-raise as this is cleanup code
-				print(f"Error during process cleanup: {e}", file=sys.stderr)
+				warnings.warn(
+					f"Error during process cleanup: {e}", stacklevel=2
+				)
 
 
 class BasicUsageTestSuite(unittest.TestCase):
