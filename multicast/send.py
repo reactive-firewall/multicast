@@ -146,6 +146,7 @@ except Exception as _cause:
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 try:
+	import logging
 	from multicast import argparse as _argparse  # skipcq: PYL-C0414
 	from multicast import unicodedata as _unicodedata  # skipcq: PYL-C0414
 	from multicast import socket as _socket  # skipcq: PYL-C0414
@@ -161,6 +162,13 @@ try:
 			raise ImportError("[CWE-758] Module failed completely.") from _cause
 except Exception as baton:  # pragma: no branch
 	raise ImportError(baton) from baton
+
+
+module_logger = logging.getLogger(__name__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 class McastSAY(multicast.mtool):
@@ -276,6 +284,11 @@ class McastSAY(multicast.mtool):
 
 		"""
 		if parser is not None:  # pragma: no branch
+			if __debug__:
+				module_logger.debug(
+					"Adding %s arguments.",  # lazy formatting to avoid PYL-W1203
+					__name__,
+				)
 			parser.add_argument(
 				"--port",
 				type=int,
@@ -318,11 +331,38 @@ class McastSAY(multicast.mtool):
 		"""
 		_success = False
 		sock = multicast.genSocket()
+		if __debug__:
+				module_logger.info(
+					"Preparing to send %d",  # lazy formatting to avoid PYL-W1203
+					len(data),
+				)
 		try:
-			sock.sendto(data.encode('utf8'), (group, port))
+			if __debug__ and module_logger.isEnabledFor(logging.DEBUG):  # pragma: no branch
+				module_logger.debug("Encoding.")
+				_payload = data.encode('utf8')
+				module_logger.debug(
+					"Encoded %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
+				module_logger.debug(
+					"Sending %s to (%s, %d).",  # lazy formatting to avoid PYL-W1203
+					_payload, group, port,
+				)
+				sock.sendto(data.encode('utf8'), (group, port))
+				module_logger.debug(
+					"Sent %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
+			else:
+				sock.sendto(data.encode('utf8'), (group, port))
 			_success = True
 		finally:
 			multicast.endSocket(sock)
+		if __debug__:  # pragma: no branch
+			if _success:
+				module_logger.info("Finished sending. Reporting success.")
+			else:  # pragma: no branch
+				module_logger.warning("Failed to send. Reporting failure.")
 		return _success
 
 	def doStep(self, *args, **kwargs):
@@ -342,6 +382,8 @@ class McastSAY(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and optional error message.
 		"""
+		_logger = logging.getLogger(McastSAY.__name__)
+		_logger.debug(McastSAY.__proc__)
 		group = kwargs.get(
 			"group",
 			multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
@@ -350,6 +392,7 @@ class McastSAY(multicast.mtool):
 		data = kwargs.get("data")
 		_result = False
 		if data == ["-"]:
+			_logger.debug("Reading from stdin")
 			_result = True
 			# Read from stdin in chunks
 			while True:
@@ -360,11 +403,12 @@ class McastSAY(multicast.mtool):
 						multicast._MCAST_DEFAULT_BUFFER_SIZE,  # skipcq: PYL-W0212 - module ok
 					)
 				except IOError as e:
-					print(f"Error reading from stdin: {e}", file=sys.stderr)
+					_logger.exception(f"[CWE-228] Error reading from stdin: {e}")
 					break
 				if not chunk:
 					break
 				_result = _result and self._sayStep(group, port, chunk)
+			_logger.debug("Finished reading stdin.")
 		elif isinstance(data, list):
 			# Join multiple arguments into a single string
 			message = " ".join(data)
@@ -372,4 +416,15 @@ class McastSAY(multicast.mtool):
 		else:
 			message = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			_result = self._sayStep(group, port, message)
+		if __debug__:  # pragma: no branch
+			if _result:
+				module_logger.debug(
+					"SEND result was %s. Reporting success.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
+			else:
+				module_logger.debug(
+					"SEND result was %s. Reporting failure.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
 		return (_result, None)  # skipcq: PTC-W0020  - intended

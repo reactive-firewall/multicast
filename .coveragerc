@@ -34,6 +34,7 @@ exclude_lines =
     if __name__ in u"__main__":
     if __name__ .. .__main__.:
     if __sys_path__ not in sys.path:
+    if __debug__
     os.abort()
     exit
 
@@ -52,6 +53,7 @@ partial_branches =
     if __name__ in u'__main__':
     if __name__ in u"__main__":
     if __name__ in '__main__':
+    if __debug__
     if __sys_path__ not in sys.path:
     # don't complain about sys.modules
     sys.modules

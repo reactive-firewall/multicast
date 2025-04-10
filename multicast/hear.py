@@ -180,11 +180,11 @@ __name__ = "multicast.hear"  # skipcq: PYL-W0622
 """
 
 try:
-	import sys as _sys
-	if 'multicast' not in _sys.modules:
+	import sys
+	if 'multicast' not in sys.modules:
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = _sys.modules["multicast"]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
 	# skipcq
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
@@ -196,6 +196,7 @@ except Exception as importErr:
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
 try:
+	import logging
 	import threading
 	import socketserver
 	import warnings
@@ -214,6 +215,13 @@ try:
 			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
 except Exception as err:
 	raise ImportError(err) from err
+
+
+module_logger = logging.getLogger(__name__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 class McastServer(socketserver.UDPServer):
@@ -244,6 +252,236 @@ class McastServer(socketserver.UDPServer):
 
 	"""
 
+	__log_handle__ = """multicast.hear.McastServer"""  # skipcq: PYL-W0622
+	"""Names this server's Logger.
+
+	Basically just the prefix of the logger's name. Subclasses should override.
+
+	Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import multicast
+			>>>
+
+		Testcase 1: McastServer should be automatically imported.
+
+			>>> multicast.hear.McastServer.__name__ is not None
+			True
+			>>> multicast.hear.McastServer.__log_handle__ is not None
+			True
+			>>>
+
+	"""
+
+	def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True) -> None:
+		"""
+		Initialize a new instance of the McastServer.
+
+		Creates a new UDP server for multicast communication and sets up an appropriate logger
+		based on the server address provided. May be extended, do not override.
+
+		Returns:
+			None
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import socketserver
+			>>> import multicast
+			>>>
+
+		Testcase 0: Basic initialization of McastServer.
+			A: Test that McastServer can be initialized with minimal arguments.
+			B: Test that the resulting instance is of the correct type.
+
+			>>> server = multicast.hear.McastServer(('224.0.0.1', 12345), None)
+			>>> isinstance(server, multicast.hear.McastServer)
+			True
+			>>> isinstance(server, socketserver.UDPServer)
+			True
+			>>> server.server_close()  # Clean up
+			>>>
+
+		Testcase 1: Server initialization with logger name extraction.
+			A: Test that the server extracts the logger name from server_address.
+			B: Test that the logger is properly initialized.
+
+			>>> test_addr = ('239.0.0.9', 23456)
+			>>> server = multicast.hear.McastServer(test_addr, None)
+			>>> server.logger is not None
+			True
+			>>> server.logger.name.endswith('239.0.0.9')
+			True
+			>>> server.server_close()  # Clean up
+			>>>
+
+		"""
+		logger_name = server_address[0] if server_address and len(server_address) > 0 else None
+		if logger_name:  # pragma: no branch
+			self.__logger = logging.getLogger(f"{self.__log_handle__}.{logger_name}")
+		else:
+			self.__logger = logging.getLogger(f"{self.__log_handle__}")
+		super().__init__(server_address, RequestHandlerClass, bind_and_activate)
+
+	def _sync_logger(self) -> None:
+		"""Synchronize the logger instance with the bound socket address.
+
+		This internal method updates the instance's logger attribute based on the current
+		socket address. It extracts the address component from the socket's bound address
+		and uses it to create a hierarchical logger name in the format
+		'multicast.hear.McastServer.[address]'.
+
+		If no valid address is found, it falls back to the base McastServer logger.
+		This method is typically called after server_bind() to ensure the logger
+		reflects the actual bound socket address.
+
+		Note:
+			This is an internal method and should not be called directly from outside
+			the class.
+
+		Args:
+			None
+
+		Returns:
+			None
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import types
+			>>> import logging
+			>>> import multicast
+			>>>
+
+		Testcase 1: Method exists and takes expected arguments.
+			A: Test method exists in McastServer class.
+			B: Test method signature does not accept arguments.
+
+			>>> from multicast.hear import McastServer
+			>>> hasattr(McastServer, '_sync_logger')
+			True
+			>>> import inspect
+			>>> len(inspect.signature(McastServer._sync_logger).parameters) - 1  # Remove 'self'
+			0
+			>>>
+
+		Testcase 2: Method handles case where socket has a valid address.
+			A: Use a mock socket with a valid address.
+			B: Verify logger name is properly formatted.
+
+			>>> # Setup a server instance with mock socket
+			>>> server = multicast.hear.McastServer(('239.0.0.9', 51234), None)
+			>>> # Create mock socket with valid address
+			>>> mock_socket = types.SimpleNamespace()
+			>>> mock_socket.getsockname = lambda: ('239.0.0.9', 51234)
+			>>> server.socket = mock_socket
+			>>> # Call method and verify logger name
+			>>> server._sync_logger()
+			>>> server.logger.name
+			'multicast.hear.McastServer.239.0.0.9'
+			>>>
+
+		Testcase 3: Method handles case where socket address name component is None.
+			A: Use a mock socket with None as the address component.
+			B: Verify logger falls back to base logger name.
+
+			>>> # Setup a server instance
+			>>> server = multicast.hear.McastServer(('239.0.0.9', 51234), None)
+			>>> # Create mock socket with None as the address
+			>>> mock_socket = types.SimpleNamespace()
+			>>> mock_socket.getsockname = lambda: (None, 5678)
+			>>> server.socket = mock_socket
+			>>> # Call method and verify logger name
+			>>> server._sync_logger()
+			>>> server.logger.name
+			'multicast.hear.McastServer'
+			>>>
+
+		Testcase 4: Method handles case where socket address has special formatting.
+			A: Use a mock socket with an IPv6 address.
+			B: Verify logger name incorporates the address correctly.
+
+			>>> import multicast
+			>>> from multicast.hear import McastServer
+			>>> import types
+			>>> import logging
+			>>> # Setup a server instance
+			>>> server = McastServer(('239.0.0.9', 51234), None)
+			>>> # Create mock socket with IPv6 address format
+			>>> mock_socket = types.SimpleNamespace()
+			>>> mock_socket.getsockname = lambda: ('2001:db8::1', 5678)
+			>>> server.socket = mock_socket
+			>>> # Call method and verify logger name
+			>>> server._sync_logger()
+			>>> server.logger.name
+			'multicast.hear.McastServer.2001:db8::1'
+			>>>
+		"""
+		(logger_name, _) = self.socket.getsockname()
+		if logger_name:
+			self.__logger = logging.getLogger(f"{self.__log_handle__}.{logger_name}")
+		else:  # pragma: no branch
+			self.__logger = logging.getLogger(f"{self.__log_handle__}")
+
+	@property
+	def logger(self) -> logging.Logger:
+		"""Getter for the logger attribute of McastServer.
+
+		This property provides access to the server's internal logger instance. The logger name
+		is determined during initialization and may be updated by calling _sync_logger when the
+		server's socket address changes.
+
+		Returns:
+			logging.Logger -- The logger instance associated with this server.
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> import logging
+			>>>
+
+		Testcase 0: Verify logger accessibility.
+			A: Test that the logger property exists.
+			B: Test that it's accessible from an McastServer instance.
+
+			>>> server = multicast.hear.McastServer(("239.0.0.9", 0), multicast.hear.HearUDPHandler)
+			>>> hasattr(server, 'logger')
+			True
+			>>> server.server_close()  # Clean up
+			>>>
+
+		Testcase 1: Verify logger type.
+			A: Test that the logger property returns a logging.Logger instance.
+
+			>>> server = multicast.hear.McastServer(("239.0.0.9", 0), multicast.hear.HearUDPHandler)
+			>>> isinstance(server.logger, logging.Logger)
+			True
+			>>> server.server_close()  # Clean up
+			>>>
+
+		Testcase 2: Verify logger name.
+			A: Test that the logger name includes the server class name.
+			B: Test that it's properly formatted.
+
+			>>> server = multicast.hear.McastServer(("239.0.0.9", 0), multicast.hear.HearUDPHandler)
+			>>> server.logger.name.startswith('multicast.hear.McastServer')
+			True
+			>>> server.server_close()  # Clean up
+			>>>
+		"""
+		return self.__logger
+
 	def server_activate(self):
 		"""
 		Activate the server to begin handling requests.
@@ -253,7 +491,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("server_activate"))
+		self.logger.info("server_activate")
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
@@ -274,7 +512,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("open_request"))
+		self.logger.info("open_request")
 		# enter critical section
 		old_socket = self.socket
 		(tmp_addr, tmp_prt) = old_socket.getsockname()
@@ -292,10 +530,14 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("server_bind"))
+		self.logger.info("server_bind")
 		super(McastServer, self).server_bind()
+		self._sync_logger()
 		# enter critical section
-		print(f"bound on: {str(self.socket.getsockname())}")
+		self.logger.info(
+			"bound on: %s",  # lazy formatting to avoid PYL-W1203
+			str(self.socket.getsockname()),
+		)
 		# exit critical section
 
 	def close_request(self, request):
@@ -311,7 +553,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("close_request"))
+		self.logger.info("close_request")
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore", category=ResourceWarning)
 			self.open_for_request()
@@ -331,7 +573,7 @@ class McastServer(socketserver.UDPServer):
 		Returns:
 			None
 		"""
-		print(str("handle_error"))
+		self.logger.info("handle_error")
 		if request is not None and request[0] is not None and "STOP" in str(request[0]):
 			def kill_func(a_server):
 				"""
@@ -375,6 +617,27 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		>>> HearUDPHandler.__name__ is not None
 		True
 		>>>
+
+
+	"""
+
+	__name__ = "multicast.hear.HearUDPHandler"  # skipcq: PYL-W0622
+	"""Names this handler type.
+
+		Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+		Testcase 0: Multicast should be importable.
+
+			>>> import multicast
+			>>>
+
+		Testcase 1: HearUDPHandler should be automatically imported.
+
+			>>> multicast.hear.HearUDPHandler.__name__ is not None
+			True
+			>>>
 
 
 	"""
@@ -443,18 +706,28 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			try:
 				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			except UnicodeDecodeError:  # pragma: no cover
+				if __debug__:
+					logging.getLogger(self.__name__).debug(
+						f"Received invalid UTF-8 data from {self.client_address[0]}"
+					)
 				return  # silently ignore invalid UTF-8 data -- fail quickly.
-		if (_sys.stdout.isatty()):  # pragma: no cover
-			print(f"{self.client_address[0]} SAYS: {data.strip()} to ALL")
+		_logger = logging.getLogger(self.__name__)
+		if __debug__:
+			_logger.info(
+				"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
+				str(self.client_address[0]), data.strip(),
+			)
 		if data is not None:
 			me = str(sock.getsockname()[0])
-			if (_sys.stdout.isatty()):  # pragma: no cover
+			if __debug__:  # pragma: no cover
 				_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
-				print(
-					f"{me} HEAR: [{self.client_address} SAID {str(_what)}]"
+				_logger.info(
+					"%s HEAR: [%s SAID %s]",  # lazy formatting to avoid PYL-W1203
+					str(me), str(self.client_address), str(_what),
 				)
-				print(
-					f"{me} SAYS [ HEAR [ {str(_what)} SAID {self.client_address} ] from {me} ]"  # noqa
+				_logger.info(
+					"%s SAYS [ HEAR [ {%s SAID %s ] from %s ]",  # lazy formatting to avoid PYL-W1203
+					str(me), str(_what), str(self.client_address), str(me),
 				)
 			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
 				self.client_address[0], self.client_address[1],
@@ -539,11 +812,17 @@ class McastHEAR(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and an optional result message.
 		"""
+		_logger = logging.getLogger(__name__)
+		_logger.debug(McastHEAR.__proc__)
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		server_initialized = False
 		server = None
 		try:
+			_logger.debug(
+				"Initializing server on port %d as %s.",  # lazy formatting to avoid PYL-W1203
+				PORT, HOST,
+			)
 			with McastServer((HOST, PORT), HearUDPHandler) as server:
 				server_initialized = True
 				server.serve_forever()
@@ -557,9 +836,24 @@ class McastHEAR(multicast.mtool):
 					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
 				) from userInterrupt
 		finally:
+			_logger.debug(
+				"Finalizing server with port %d from %s.",  # lazy formatting to avoid PYL-W1203
+				PORT, HOST,
+			)
 			if server:  # pragma: no cover
 				# deadlocks if not called by other thread
 				end_it = threading.Thread(name="Kill_Thread", target=server.shutdown, args=[])
 				end_it.start()
 				end_it.join(1)
+		if __debug__:
+			if server_initialized:
+				module_logger.debug(
+					"HEAR result was %s. Reporting success.",  # lazy formatting to avoid PYL-W1203
+					server_initialized,
+				)
+			else:
+				module_logger.debug(
+					"HEAR result was %s. Reporting failure.",  # lazy formatting to avoid PYL-W1203
+					server_initialized,
+				)
 		return (server_initialized, None)

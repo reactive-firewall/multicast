@@ -22,6 +22,7 @@ import unicodedata
 import socket
 import struct
 import abc
+import logging
 
 # skipcq
 __all__ = [
@@ -404,6 +405,13 @@ _BLANK = str("""""")
 
 """
 
+if logging.__name__ is not None:  # pragma: no branch
+	logging.getLogger(__module__).addHandler(logging.NullHandler())
+	logging.getLogger(__module__).debug(
+		"Loading %s",  # lazy formatting to avoid PYL-W1203
+		__module__,
+	)
+
 if sys.__name__ is None:
 	raise ModuleNotFoundError(
 		"FAIL: we could not import sys. We're like in the matrix! ABORT."
@@ -418,6 +426,10 @@ if unicodedata.__name__ is None:
 if socket.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
 else:  # pragma: no branch
+	logging.getLogger(__module__).debug(
+		"Setting default packet timeout to %n",  # lazy formatting to avoid PYL-W1203
+		_MCAST_DEFAULT_TTL,
+	)
 	socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
 
 if struct.__name__ is None:
@@ -460,6 +472,7 @@ _config = env.load_config()
 if _config is None:
 	raise ImportError("FAIL: we could not import environment. ABORT.") from None
 else:
+	logging.getLogger(__module__).debug("Configuring overrides and defaults.")
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
 	_MCAST_DEFAULT_TTL = _config["ttl"]
@@ -468,6 +481,14 @@ else:
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
 	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
+	if __debug__:  # pragma: no branch
+		logging.getLogger(__module__).info("Overrides and defaults are configured.")
+		logging.getLogger(__module__).debug("Defaults:")
+		for key, value in _config.items():
+			logging.getLogger(__module__).debug(
+				"\t%s=%s",  # lazy formatting to avoid PYL-W1203
+				key, value,
+			)
 
 del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
@@ -543,6 +564,10 @@ class mtool(abc.ABC):
 
 		"""
 		if calling_parser_group is None:  # pragma: no branch
+			logging.getLogger(__module__).debug(
+				"Building %s arguments.",  # lazy formatting to avoid PYL-W1203
+				__name__,
+			)
 			calling_parser_group = argparse.ArgumentParser(
 				prog=str(cls.__name__ if cls.__proc__ is None else cls.__proc__),
 				description=cls.__prologue__,

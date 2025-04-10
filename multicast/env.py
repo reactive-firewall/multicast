@@ -88,6 +88,7 @@ __name__ = "multicast.env"  # skipcq: PYL-W0622
 try:
 	import os
 	import warnings
+	from . import logging  # skipcq: PLY-C0414
 	from . import socket  # skipcq: PYL-C0414
 	import ipaddress
 except Exception as err:
@@ -96,6 +97,17 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton from err
+
+
+module_logger = logging.getLogger(__module__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
+module_logger.debug(
+	"Initializing %s environment.",  # lazy formatting to avoid PYL-W1203
+	__package__,
+)
 
 
 def validate_buffer_size(size: int) -> bool:
@@ -334,26 +346,34 @@ def load_buffer_size() -> int:
 	"""
 	# Import globals that we'll potentially update
 	from multicast import _MCAST_DEFAULT_BUFFER_SIZE
+	module_logger.debug("Looking for MULTICAST_BUFFER_SIZE in environment.")
 	try:
 		buffer_size = int(os.getenv(
 			"MULTICAST_BUFFER_SIZE",
 			_MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
 		))
+		module_logger.debug("Done.")
 	except ValueError:
 		warnings.warn(
 			f"Invalid MULTICAST_BUFFER_SIZE value, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
 			stacklevel=2
 		)
 		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
-	# Validate and potentially update port
+	# Validate and potentially update buffer-size
+	module_logger.debug("Validating MULTICAST_BUFFER_SIZE.")
 	if validate_buffer_size(buffer_size):
 		globals()["_MCAST_DEFAULT_BUFFER_SIZE"] = buffer_size
+		module_logger.debug("Valid.")
 	else:
 		warnings.warn(
 			f"Invalid MULTICAST_BUFFER_SIZE {buffer_size}, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
 			stacklevel=2
 		)
 		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
+	module_logger.debug(
+		"Loaded %s as internal multicast buffer size.",  # lazy formatting to avoid PYL-W1203
+		str(buffer_size),
+	)
 	return buffer_size
 
 
@@ -435,22 +455,30 @@ def load_port() -> int:
 	"""
 	# Import globals that we'll potentially update
 	from multicast import _MCAST_DEFAULT_PORT
+	module_logger.debug("Looking for MULTICAST_PORT in environment.")
 	try:
 		port = int(os.getenv("MULTICAST_PORT", _MCAST_DEFAULT_PORT))
+		module_logger.debug("Done.")
 	except ValueError:
 		warnings.warn(
 			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}", stacklevel=2
 		)
 		port = _MCAST_DEFAULT_PORT
 	# Validate and potentially update port
+	module_logger.debug("Validating MULTICAST_PORT.")
 	if validate_port(port):
 		globals()["_MCAST_DEFAULT_PORT"] = port
+		module_logger.debug("Valid.")
 	else:
 		warnings.warn(
 			f"Port {port} is outside valid range (49152-65535), using default {_MCAST_DEFAULT_PORT}",
 			stacklevel=2
 		)
 		port = _MCAST_DEFAULT_PORT
+	module_logger.debug(
+		"Loaded %s as default multicast port.",  # lazy formatting to avoid PYL-W1203
+		str(port),
+	)
 	return port
 
 
@@ -555,15 +583,22 @@ def load_group() -> ipaddress.IPv4Address:
 	"""
 	# Import globals that we'll potentially update
 	from multicast import _MCAST_DEFAULT_GROUP
+	module_logger.debug("Looking for any MULTICAST_GROUP in environment.")
 	group = os.getenv("MULTICAST_GROUP", _MCAST_DEFAULT_GROUP)
 	# Validate and potentially update group
+	module_logger.debug("Validating either MULTICAST_GROUP or default.")
 	if validate_multicast_address(group):
 		globals()["_MCAST_DEFAULT_GROUP"] = group
+		module_logger.debug("Valid.")
 	else:
 		warnings.warn(
 			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2
 		)
 		group = _MCAST_DEFAULT_GROUP
+	module_logger.debug(
+		"Loaded %s as default multicast group.",  # lazy formatting to avoid PYL-W1203
+		group,
+	)
 	return ipaddress.IPv4Address(group)
 
 
@@ -638,24 +673,34 @@ def load_TTL() -> int:
 	"""
 	# Import globals that we'll potentially update
 	from multicast import _MCAST_DEFAULT_TTL
+	module_logger.debug("Looking for MULTICAST_TTL in environment.")
 	try:
 		ttl = int(os.getenv("MULTICAST_TTL", _MCAST_DEFAULT_TTL))
+		module_logger.debug("Done.")
 	except ValueError:
 		warnings.warn(
 			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}", stacklevel=2
 		)
 		ttl = _MCAST_DEFAULT_TTL
 	# Validate and potentially update TTL
+	module_logger.debug("Validating MULTICAST_TTL.")
 	if validate_ttl(ttl):
 		globals()["_MCAST_DEFAULT_TTL"] = ttl
+		module_logger.debug("Valid.")
 	else:
 		warnings.warn(
 			f"TTL {ttl} is outside valid range (1-126), using default {_MCAST_DEFAULT_TTL}",
 			stacklevel=2
 		)
 		ttl = _MCAST_DEFAULT_TTL
+	module_logger.debug(
+		"Loaded %d as default multicast time-to-live.",  # lazy formatting to avoid PYL-W1203
+		ttl,
+	)
 	# Update socket default timeout
+	module_logger.debug("Update socket default timeout.")
 	socket.setdefaulttimeout(int(ttl))
+	module_logger.debug("Updated.")
 	return ttl
 
 
@@ -857,13 +902,19 @@ def load_config() -> dict:
 
 	"""
 	# Load values from environment with defaults
+	module_logger.info("Loading multicast overrides from environment.")
 	port = load_port()
 	group = load_group()
 	ttl = load_TTL()
 	buffer_size = load_buffer_size()
+	module_logger.debug("Looking for MULTICAST_GROUPS in environment.")
 	groups_str = os.getenv("MULTICAST_GROUPS", "")
+	module_logger.debug("Done.")
+	module_logger.debug("Looking for MULTICAST_BIND_ADDR in environment.")
 	bind_addr = os.getenv("MULTICAST_BIND_ADDR", str(group))  # skipcq: PYL-W1508
+	module_logger.debug("Done.")
 	# Process and validate groups
+	module_logger.debug("Processing and validating groups.")
 	groups = set()
 	if groups_str:
 		for addr in groups_str.split():
@@ -875,9 +926,14 @@ def load_config() -> dict:
 				)
 	# Always include the primary group
 	groups.add(str(group))
+	module_logger.debug("Processed groups.")
 	# Include bind_addr if it's a valid multicast address
+	module_logger.debug("Processing and validating bind-address.")
 	if validate_multicast_address(bind_addr):
+		module_logger.debug("Adding multicast bind-address to groups.")
 		groups.add(str(bind_addr))
+	module_logger.debug("Processed bind-address.")
+	module_logger.debug("Overrides and defaults are ready to configure.")
 	return {
 		"port": port,
 		"group": str(group),
