@@ -212,12 +212,17 @@ legacy-purge: clean uninstall
 	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || :
 
-purge: legacy-purge
+purge-test-reports::
 	$(QUIET)$(RM) ./test-reports/*.xml 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
+
+purge-coverage-artifacts: legacy-purge
 	$(QUIET)$(RM) ./coverage_* 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RM) ./.coverage.* 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RM) ./coverage_doctests.xml 2>$(ERROR_LOG_PATH) || :
-	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
+
+purge: purge-coverage-artifacts purge-test-reports
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 test: just-test
