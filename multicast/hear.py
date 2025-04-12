@@ -276,7 +276,7 @@ class McastServer(socketserver.UDPServer):
 
 	"""
 
-	def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True) -> None:
+	def __init__(self, server_address: tuple, RequestHandlerClass: type, bind_and_activate: bool = True) -> None:
 		"""
 		Initialize a new instance of the McastServer.
 

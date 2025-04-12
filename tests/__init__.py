@@ -184,7 +184,7 @@ try:
 		from tests import test_fuzz
 		depends.insert(10, test_fuzz)
 	except Exception as e:  # pragma: no branch
-		_LOGGER.exception(f"Error loading optional Fuzzing tests: {e}")
+		_LOGGER.exception("Error loading optional Fuzzing tests")
 
 	for unit_test in depends:
 		try:

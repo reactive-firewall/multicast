@@ -523,10 +523,10 @@ def validate_exit_code(code) -> None:
 			>>> success
 			True
 	"""
-	module_logger.info("Validating possible exit code.")
+	module_logger.debug("Validating possible exit code.")
 	if not isinstance(code, int) or code < 0 or code > 255:
 		raise ValueError(EXIT_CODE_RANGE_ERROR)
-	module_logger.info("Validated possible exit code.")
+	module_logger.debug("Validated possible exit code.")
 
 
 module_logger.debug("Initializing CEP-8 EXIT_CODES")

@@ -76,7 +76,7 @@ def main() -> None:
 		del _bar  # skipcq - cleanup any object leaks early
 		sys.exit(not result.wasSuccessful())
 	except ValueError as e:
-		logger.exception(f"Error: {e}")
+		logger.exception("Error occurred")
 		sys.exit(1)
 
 
