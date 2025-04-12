@@ -109,8 +109,8 @@ try:
 					colorPrefix = logging_color[loglevel]
 					endColor = ANSIColors.ENDC
 				else:
-					colorPrefix = str()
-					endColor = str()
+					colorPrefix = ""
+					endColor = ""
 				# Format the message
 				msg = self.format(record)
 				formatted_msg = f"{colorPrefix}{msg}{endColor}"
@@ -183,7 +183,7 @@ try:
 	try:
 		from tests import test_fuzz
 		depends.insert(10, test_fuzz)
-	except Exception as e:  # pragma: no branch
+	except Exception:  # pragma: no branch
 		_LOGGER.exception("Error loading optional Fuzzing tests")
 
 	for unit_test in depends:
@@ -281,9 +281,17 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
 	except ValueError as e:
 		# ValueError is raised when no tests are found
-		_LOGGER.warning(f"No doctests found in {module.__name__}: {e}")
-	except Exception as e:
-		_LOGGER.error(f"Error loading doctests from {module.__name__}: {e}")
+		_LOGGER.warning(
+			"No doctests found in %s: %s",  # lazy formatting to avoid PYL-W1203
+			module.__name__,
+			e,  # log as just warning level, instead of exception (error), but still detailed.
+			exec_info=True,
+		)
+	except Exception:
+		_LOGGER.exception(
+			"Error loading doctests from %s",  # lazy formatting to avoid PYL-W1203
+			module.__name__,
+		)
 	return doc_suite
 
 

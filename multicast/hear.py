@@ -276,7 +276,9 @@ class McastServer(socketserver.UDPServer):
 
 	"""
 
-	def __init__(self, server_address: tuple, RequestHandlerClass: type, bind_and_activate: bool = True) -> None:
+	def __init__(
+		self, server_address: tuple, RequestHandlerClass: type, bind_and_activate: bool = True
+	) -> None:
 		"""
 		Initialize a new instance of the McastServer.
 
@@ -707,11 +709,12 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			except UnicodeDecodeError:  # pragma: no cover
 				if __debug__:
-					logging.getLogger(self.__name__).debug(
-						f"Received invalid UTF-8 data from {self.client_address[0]}"
+					module_logger.debug(
+						"Received invalid UTF-8 data from %s",  # lazy formatting to avoid PYL-W1203
+						self.client_address[0],
 					)
 				return  # silently ignore invalid UTF-8 data -- fail quickly.
-		_logger = logging.getLogger(self.__name__)
+		_logger = logging.getLogger(f"{type(self).__module__}.{type(self).__qualname__}")
 		if __debug__:
 			_logger.info(
 				"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
@@ -812,7 +815,7 @@ class McastHEAR(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and an optional result message.
 		"""
-		_logger = logging.getLogger(__name__)
+		_logger = logging.getLogger(f"{type(self).__module__}.{type(self).__qualname__}")
 		_logger.debug(McastHEAR.__proc__)
 		HOST = kwargs.get("group", multicast._MCAST_DEFAULT_GROUP)  # skipcq: PYL-W0212 - module ok
 		PORT = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok

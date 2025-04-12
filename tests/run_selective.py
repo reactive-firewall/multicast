@@ -75,7 +75,7 @@ def main() -> None:
 		logger.info(f"{_bar} END {_bar}")  # skipcq PYL-W1203 - test code ok
 		del _bar  # skipcq - cleanup any object leaks early
 		sys.exit(not result.wasSuccessful())
-	except ValueError as e:
+	except ValueError:
 		logger.exception("Error occurred")
 		sys.exit(1)
 
