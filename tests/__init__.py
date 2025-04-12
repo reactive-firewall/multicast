@@ -285,7 +285,7 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 			"No doctests found in %s: %s",  # lazy formatting to avoid PYL-W1203
 			module.__name__,
 			e,  # log as just warning level, instead of exception (error), but still detailed.
-			exec_info=True,
+			exc_info=True,
 		)
 	except Exception:
 		_LOGGER.exception(
@@ -349,6 +349,13 @@ EXTRA_TESTS = {
 	"linting": [],  # To be implemented
 	"security": [],  # To be implemented
 }
+
+try:
+	from tests import test_recv
+	depends.insert(11, test_recv)
+	EXTRA_TESTS["coverage"].append(test_recv.McastRECVTestSuite)
+except Exception:  # pragma: no branch
+	_LOGGER.warning("Error loading optional debug tests", exc_info=True)
 
 try:
 	FUZZING_TESTS = {

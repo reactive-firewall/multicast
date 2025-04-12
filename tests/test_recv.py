@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Multicast Python Test Module
+# Multicast Python Module (Testing)
 # ..................................
 # Copyright (c) 2017-2025, Mr. Walls
 # ..................................
@@ -23,155 +23,150 @@ This module provides test cases for the recv module, focusing on the
 McastRECV.doStep method's branching logic for success/failure logging.
 """
 
-import unittest
-from unittest import mock
-import sys
-import io
 
-from multicast import recv
+__module__ = "tests"
 
-# Import necessary modules to avoid cyclic dependency
+
 try:
-    import multicast
-except ImportError:  # pragma: no cover
-    import sys
-    import os
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    import multicast
+	try:
+		import context
+	except Exception as _:  # pragma: no branch
+		del _  # skipcq - cleanup any error vars early
+		from . import context
+	if context.__name__ is None:
+		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
+	else:
+		from context import sys
+		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
+		from context import unittest
+		from unittest import mock
+		import io
+except Exception as err:
+	raise ImportError("[CWE-758] Failed to import test context") from err
 
 
-class TestMcastRECV(unittest.TestCase):
-    """Test cases for McastRECV class doStep method."""
+@context.markWithMetaTag("extra", "coverage")
+class McastRECVTestSuite(context.BasicUsageTestSuite):
+	"""Test cases for McastRECV class doStep method."""
 
-    def setUp(self):
-        """Set up test fixtures."""
-        self.recv_tool = recv.McastRECV()
-        # Store original stdout for later restoration
-        self.original_stdout = sys.stdout
+	__module__ = "tests.test_recv"
 
-    def tearDown(self):
-        """Tear down test fixtures."""
-        # Restore original stdout
-        sys.stdout = self.original_stdout
+	def setUp(self):
+		"""Set up test fixtures."""
+		super(McastRECVTestSuite, self).setUp()
+		self.recv_tool = multicast.recv.McastRECV()
+		# Store original stdout for later restoration
+		self.original_stdout = sys.stdout
 
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_with_response(self, mock_logger):
-        """Test case 1: Test doStep with successful response."""
-        # Mock _hearstep to return a non-empty response
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value='Test response'
-        ) as mock_hear:
-            result, response = self.recv_tool.doStep(is_std=False)
+	def tearDown(self):
+		"""Tear down test fixtures."""
+		# Restore original stdout
+		sys.stdout = self.original_stdout
+		super(McastRECVTestSuite, self).tearDown()
 
-            # Verify results
-            self.assertTrue(result)
-            self.assertEqual(response, 'Test response')
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_with_response(self, mock_logger):
+		"""Test case 1: Test doStep with successful response."""
+		# Mock _hearstep to return a non-empty response
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value='Test response'
+		) as mock_hear:
+			result, response = self.recv_tool.doStep(is_std=False)
+			# Verify results
+			self.assertTrue(result)
+			self.assertEqual(response, 'Test response')
+			# Verify logger called with success message
+			mock_logger.info.assert_called_once_with("Success")
+			# Verify _hearstep was called with expected defaults
+			mock_hear.assert_called_once()
 
-            # Verify logger called with success message
-            mock_logger.info.assert_called_once_with("Success")
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_with_empty_response(self, mock_logger):
+		"""Test case 2: Test doStep with empty response."""
+		# Mock _hearstep to return an empty response
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value=''
+		) as mock_hear:
+			result, response = self.recv_tool.doStep(is_std=False)
+			# Verify results: expect a failure (False) and no response (None)
+			self.assertFalse(result)
+			self.assertIsNone(response)
+			# Verify logger called with nothing received message
+			mock_logger.debug.assert_any_call("Nothing Received.")
+			# Verify _hearstep was called with expected defaults
+			mock_hear.assert_called_once()
 
-            # Verify _hearstep was called with expected defaults
-            mock_hear.assert_called_once()
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_logging_sequence_success(self, mock_logger):
+		"""Test case 3: Verify logging sequence for successful response."""
+		# Mock _hearstep to return a non-empty response
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value='Test response'
+		):
+			self.recv_tool.doStep(is_std=False)
+			# Verify initial debug log and success log
+			mock_logger.debug.assert_any_call("RECV")
+			mock_logger.info.assert_called_once_with("Success")
+			# Ensure that "Nothing Received" is not logged
+			for call in mock_logger.debug.call_args_list:
+				self.assertNotEqual(call[0][0], "Nothing Received.")
 
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_with_empty_response(self, mock_logger):
-        """Test case 2: Test doStep with empty response."""
-        # Mock _hearstep to return an empty response
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value=''
-        ) as mock_hear:
-            result, response = self.recv_tool.doStep(is_std=False)
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_logging_sequence_empty(self, mock_logger):
+		"""Test case 4: Verify logging sequence for empty response."""
+		# Mock _hearstep to return an empty response
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value=''
+		):
+			self.recv_tool.doStep(is_std=False)
+			# Verify initial debug log and nothing received log
+			mock_logger.debug.assert_any_call("RECV")
+			mock_logger.debug.assert_any_call("Nothing Received.")
+			# Verify that no success log was called
+			mock_logger.info.assert_not_called()
 
-            # Verify results: expect a failure (False) and no response (None)
-            self.assertFalse(result)
-            self.assertIsNone(response)
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_console_output(self, mock_logger):
+		"""Test case 5: Test console output when is_std is True with data."""
+		# Capture printed output by redirecting stdout
+		mock_stdout = io.StringIO()
+		sys.stdout = mock_stdout
+		# Mock _hearstep to return a non-empty response
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value='Test response'
+		):
+			self.recv_tool.doStep(is_std=True)
+			# Verify that the response is printed to console
+			output = mock_stdout.getvalue()
+			self.assertIn('Test response', output)
+			# Verify that the logger recorded the intended debug message
+			mock_logger.debug.assert_any_call("Will Print to Console.")
 
-            # Verify logger called with nothing received message
-            mock_logger.debug.assert_any_call("Nothing Received.")
+	@mock.patch('multicast.recv.module_logger')
+	def test_doStep_with_custom_parameters(self, mock_logger):
+		"""Test case 6: Test doStep with custom parameters."""
+		# Mock _hearstep to capture and return custom test output
+		with mock.patch.object(
+			multicast.recv.McastRECV, '_hearstep', return_value='Custom test'
+		) as mock_hear:
+			custom_group = "224.0.0.2"
+			custom_port = 12345
+			custom_iface = "lo"
 
-            # Verify _hearstep was called with expected defaults
-            mock_hear.assert_called_once()
-
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_logging_sequence_success(self, mock_logger):
-        """Test case 3: Verify logging sequence for successful response."""
-        # Mock _hearstep to return a non-empty response
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value='Test response'
-        ):
-            self.recv_tool.doStep(is_std=False)
-
-            # Verify initial debug log and success log
-            mock_logger.debug.assert_any_call("RECV")
-            mock_logger.info.assert_called_once_with("Success")
-
-            # Ensure that "Nothing Received" is not logged
-            for call in mock_logger.debug.call_args_list:
-                self.assertNotEqual(call[0][0], "Nothing Received.")
-
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_logging_sequence_empty(self, mock_logger):
-        """Test case 4: Verify logging sequence for empty response."""
-        # Mock _hearstep to return an empty response
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value=''
-        ):
-            self.recv_tool.doStep(is_std=False)
-
-            # Verify initial debug log and nothing received log
-            mock_logger.debug.assert_any_call("RECV")
-            mock_logger.debug.assert_any_call("Nothing Received.")
-
-            # Verify that no success log was called
-            mock_logger.info.assert_not_called()
-
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_console_output(self, mock_logger):
-        """Test case 5: Test console output when is_std is True with data."""
-        # Capture printed output by redirecting stdout
-        mock_stdout = io.StringIO()
-        sys.stdout = mock_stdout
-
-        # Mock _hearstep to return a non-empty response
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value='Test response'
-        ):
-            self.recv_tool.doStep(is_std=True)
-
-            # Verify that the response is printed to console
-            output = mock_stdout.getvalue()
-            self.assertIn('Test response', output)
-
-            # Verify that the logger recorded the intended debug message
-            mock_logger.debug.assert_any_call("Will Print to Console.")
-
-    @mock.patch('multicast.recv.module_logger')
-    def test_doStep_with_custom_parameters(self, mock_logger):
-        """Test case 6: Test doStep with custom parameters."""
-        # Mock _hearstep to capture and return custom test output
-        with mock.patch.object(
-            recv.McastRECV, '_hearstep', return_value='Custom test'
-        ) as mock_hear:
-            custom_group = "224.0.0.2"
-            custom_port = 12345
-            custom_iface = "lo"
-
-            self.recv_tool.doStep(
-                groups=[custom_group],
-                port=custom_port,
-                iface=custom_iface,
-                group=custom_group,
-                is_std=False
-            )
-
-            # Verify _hearstep is called with custom parameters
-            mock_hear.assert_called_once_with(
-                [custom_group], custom_port, custom_iface, custom_group
-            )
-
-            # Verify that a success log is recorded for the custom parameters
-            mock_logger.info.assert_called_once_with("Success")
+			self.recv_tool.doStep(
+				groups=[custom_group],
+				port=custom_port,
+				iface=custom_iface,
+				group=custom_group,
+				is_std=False
+			)
+			# Verify _hearstep is called with custom parameters
+			mock_hear.assert_called_once_with(
+				[custom_group], custom_port, custom_iface, custom_group
+			)
+			# Verify that a success log is recorded for the custom parameters
+			mock_logger.info.assert_called_once_with("Success")
 
 
 if __name__ == '__main__':
-    unittest.main()
+	unittest.main()
