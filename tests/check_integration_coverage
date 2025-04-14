@@ -144,9 +144,15 @@ fi
 
 TEST_MCAST_PORT=$(((RANDOM % 16384) + 49152));
 TEST_MCAST_GROUP='224.0.0.1' ;
-PY_3_CMD=$(command -v python3);
+COVERAGE_DATA_FILE="./coverage_integration" ;
+if [[ -x "${PYTHON}" ]] ; then
+	PY_3_CMD="${PYTHON}"
+else
+	PY_3_CMD=$(command -v python3);
+fi ;
+printf "%s\n" "::debug:: Will Use ${PY_3_CMD}"
 # shellcheck disable=SC2086
-COVERAGE_CMD="${PY_3_CMD} -m coverage run --source=multicast -p -m"
+COVERAGE_CMD="${PY_3_CMD} -m coverage run -p --source=multicast -m";
 export COVERAGE_CMD
 
 # start test-suite
@@ -155,7 +161,8 @@ make -j1 -f Makefile test-reports || EXIT_CODE=3 ;
 printf "%s\n\n" "Start of Log:" > ./"${LOG_FILE}" ; wait ;
 printf "%s\n\n" "Will use host-port: [${TEST_MCAST_GROUP} : ${TEST_MCAST_PORT}]" >> ./"${LOG_FILE}" ; wait ;
 printf "%s\n\n" "Start of Integration Test one-shot:" >> ./"${LOG_FILE}" ; wait ;
-( sleep 1 ; "${COVERAGE_CMD} multicast --use-std RECV --port ${TEST_MCAST_PORT} --groups ${TEST_MCAST_GROUP} --group ${TEST_MCAST_GROUP}" 2>./"${ERR_FILE}" & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./"${LOG_FILE}" & true ;
+# shellcheck disable=SC2086
+( sleep 1 ; ${COVERAGE_CMD} multicast --use-std RECV --port "${TEST_MCAST_PORT}" --groups "${TEST_MCAST_GROUP}" --group "${TEST_MCAST_GROUP}" 2>./"${ERR_FILE}" & sleep 6 ; kill -9 $! 2>/dev/null ) >> ./"${LOG_FILE}" & true ;
 
 for PCOUNT in $(seq 1 5) ; do
 	# shellcheck disable=SC2086
@@ -184,14 +191,15 @@ printf "%s\n\n" "End of Integration Test daemon" >> ./"${LOG_FILE}" ; wait ;
 
 # cleanup from test-suite
 
-COVERAGE_DATE_FILE="./coverage_integration"
-
-$(command -v python3) -m coverage combine --data-file="${COVERAGE_DATE_FILE}" 2>/dev/null || EXIT_CODE=2 ;
-if [[ -r "${COVERAGE_DATE_FILE}" ]] ; then
-	$(command -v python3) -m coverage report -m --data-file="${COVERAGE_DATE_FILE}" 2>/dev/null || EXIT_CODE=2 ;
-	$(command -v python3) -m coverage xml -o ./test-reports/coverage_supplement.xml --include=multicast/* --data-file="${COVERAGE_DATE_FILE}" || EXIT_CODE=2 ;
+# shellcheck disable=SC2086
+${PY_3_CMD} -m coverage combine --data-file="${COVERAGE_DATA_FILE}" ./.coverage.* || EXIT_CODE=2 ;
+if [[ -r "${COVERAGE_DATA_FILE}" ]] ; then
+	# shellcheck disable=SC2086
+	${PY_3_CMD} -m coverage report -m --data-file="${COVERAGE_DATA_FILE}" 2>/dev/null || EXIT_CODE=2 ;
+	# shellcheck disable=SC2086
+	${PY_3_CMD} -m coverage xml -o ./test-reports/coverage_supplement.xml --include=multicast/* --data-file="${COVERAGE_DATA_FILE}" || EXIT_CODE=2 ;
 else
-	printf "%s\n" "Coverage collection FAILED!" 2>/dev/null || EXIT_CODE=2 ;
+	printf "%s\n" "::error file='${0}',title='No Coverage':: Coverage collection FAILED!" >>./"${ERR_FILE}" || EXIT_CODE=2 ;
 fi ;
 wait ;
 cp -f ./"${LOG_FILE}" ./test-reports/integration_data_log.log 2>/dev/null ; wait ;
