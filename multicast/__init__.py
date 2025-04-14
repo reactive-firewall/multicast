@@ -426,11 +426,13 @@ if unicodedata.__name__ is None:
 if socket.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
 else:  # pragma: no branch
-	# skipcq: PYL-W1203
+	_tmp_mcast_value = int(_MCAST_DEFAULT_TTL)
 	logging.getLogger(__module__).debug(
-		f"Setting default packet timeout to {_MCAST_DEFAULT_TTL:n}",  # skipcq: PYL-W1203 - see PEP-3101
+		"Setting default packet timeout to %d",  # lazy formatting to avoid PYL-W1203
+		_tmp_mcast_value,
 	)
-	socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
+	socket.setdefaulttimeout(_tmp_mcast_value)
+	del _tmp_mcast_value  # skipcq - cleanup any bootstrap/setup leaks early
 
 if struct.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import struct. ABORT.") from None
