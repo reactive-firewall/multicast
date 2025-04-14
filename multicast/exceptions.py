@@ -763,12 +763,20 @@ def exit_on_exception(func: callable):
 		except SystemExit as exc:
 			# Handle SystemExit exceptions, possibly from argparse
 			exit_code = exc.code if isinstance(exc.code, int) else 2
-			_func_logger.warning(f"{EXIT_CODES[exit_code][1]}: {exc}")
+			_func_logger.warning(
+				"%s: %s",  # lazy formatting to avoid PYL-W1203
+				EXIT_CODES[exit_code][1],
+				exc,
+			)
 			raise SystemExit(exit_code) from exc
 			# otherwise sys.exit(exit_code)
 		except BaseException as err:
 			exit_code = get_exit_code_from_exception(err)
-			_func_logger.warning(f"{EXIT_CODES[exit_code][1]}: {err}")
+			_func_logger.warning(
+				"%s: %s",  # lazy formatting to avoid PYL-W1203
+				EXIT_CODES[exit_code][1],
+				err,
+			)
 			raise SystemExit(exit_code) from err
 			# otherwise sys.exit(exit_code)
 
