@@ -402,7 +402,7 @@ class McastSAY(multicast.mtool):
 					chunk = sys.stdin.read(
 						multicast._MCAST_DEFAULT_BUFFER_SIZE,  # skipcq: PYL-W0212 - module ok
 					)
-				except IOError:
+				except OSError:
 					_logger.exception("[CWE-228] Error reading from stdin.")
 					break
 				if not chunk:
