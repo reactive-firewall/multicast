@@ -66,18 +66,18 @@ jobs:
         run: |
           git clone --depth 1 --branch main https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
-          EXPECTED_SHA="bd26d7905e47713ff0bf3b0e5e7b9c55f0d24e53" # v0.2.2+8
+          EXPECTED_SHA="3295ff785d8f62a088431d2086161ed294d64995" # v0.2.2+18
           ACTUAL_SHA=$(git rev-parse HEAD)
           if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
             ERR_MSG_STUB="Checkmake repository hash verification failed."
-            ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=75,endLine=79,title=FAILURE"
+            ERR_DETAILS="file=.github/workflows/makefile-lint.yml,line=72,endLine=75,title=FAILURE"
             ERR_MSG_LINE="::error ${ERR_DETAILS}::ERROR ${ERR_MSG_STUB}"
             printf "%s\n" "${ERR_MSG_LINE}"
             exit 1;
           fi
           make && make install || { \
             ERR_MSG_STUB="Checkmake build failed." \
-            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=77,endLine=83,title=FAILURE" \
+            ERR_DETS="file=.github/workflows/makefile-lint.yml,line=79,endLine=83,title=FAILURE" \
             ERR_MSG_LINE="::error ${ERR_DETS}::ERROR ${ERR_MSG_STUB}" \
             printf "%s\n" "${ERR_MSG_LINE}" \
             exit 1 \
@@ -116,6 +116,6 @@ jobs:
           fi
           FILE="${{ steps.makefiles.outputs.files }}" ;
           printf "::group::%s\n" "${FILE}" ;
-          "$TOOL_PATH" "${FILE}" || { print_error "Linting failed." 118 118; exit 1; } ;
+          "$TOOL_PATH" "${FILE}" || { print_error "Linting failed." 119 119; exit 1; } ;
           printf "::endgroup::\n" ; unset FILE 2>/dev/null || true ;
         if: ${{ !cancelled() && steps.makefiles.outputs.files != '' }}
