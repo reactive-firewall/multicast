@@ -426,9 +426,9 @@ if unicodedata.__name__ is None:
 if socket.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
 else:  # pragma: no branch
+	# skipcq: PYL-W1203
 	logging.getLogger(__module__).debug(
-		"Setting default packet timeout to %n",  # lazy formatting to avoid PYL-W1203
-		_MCAST_DEFAULT_TTL,
+		f"Setting default packet timeout to {_MCAST_DEFAULT_TTL:n}",  # skipcq: PYL-W1203 - see PEP-3101
 	)
 	socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
 
