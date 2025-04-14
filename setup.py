@@ -155,7 +155,7 @@ if __name__ == '__main__':
 		]
 	except Exception as e:
 		warnings.warn(
-			f"Warning: Error occurred while setting class_tags: {e}",
+			f"Error occurred while setting class_tags: {e}",
 			stacklevel=2,
 		)
 		class_tags = ["Development Status :: 5 - Production/Stable"]

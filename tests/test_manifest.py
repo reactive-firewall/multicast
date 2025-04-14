@@ -72,7 +72,7 @@ class ManifestInclusionTestSuite(BasicUsageTestSuite):
 			f"{str(sys.executable)} -m coverage run",
 			'setup.py',
 			'sdist',
-			'--formats=gztar'
+			'--formats=gztar',
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)

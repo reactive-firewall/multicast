@@ -1,0 +1,13 @@
+# .ast-grep/utils/python/structure/argument-list-with-comma.yml
+# Argument Structure utils
+id: python-rule-argument-list-with-comma
+rule:
+  kind: argument_list
+  pattern: |
+      $_FULL_ARG_LIST
+  has:
+    all:
+      - regex: "[,]"
+      - regex: "\
+          "
+language: python

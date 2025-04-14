@@ -471,7 +471,7 @@ def taint_command_args(args: (list, tuple)) -> list:
 	# Validate the command (first argument)
 	allowed_commands = {
 		"python", "python3", "coverage", "coverage3",
-		sys.executable  # Allow the current Python interpreter
+		sys.executable,  # Allow the current Python interpreter
 	}
 	command = str(args[0]).lower()
 	# Extract base command name for exact matching
@@ -1005,7 +1005,7 @@ def managed_process(process):
 			if (__debug__ and sys.stderr.isatty()):
 				# Log the error but don't re-raise as this is cleanup code
 				warnings.warn(
-					f"Error during process cleanup: {e}", stacklevel=2
+					f"Error during process cleanup: {e}", stacklevel=2,
 				)
 
 

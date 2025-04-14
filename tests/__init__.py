@@ -84,7 +84,7 @@ try:
 			'debug': ANSIColors.BLUE, 'info': ANSIColors.GREY,
 			'warning': ANSIColors.AMBER,
 			'error': ANSIColors.RED,
-			'critical': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG))
+			'critical': str(str(ANSIColors.BLACK) + str(ANSIColors.REDBG)),
 		}
 
 		logging_level = {
@@ -92,18 +92,16 @@ try:
 			'info': logging.INFO,
 			'warning': logging.WARNING,
 			'error': logging.ERROR,
-			'critical': logging.CRITICAL
+			'critical': logging.CRITICAL,
 		}
 
 		class ColoredStreamHandler(logging.StreamHandler):
-			def emit(self, record):
+			def emit(self, record: logging.LogRecord) -> None:
 				# Get the log level as a string
 				loglevel = record.levelname.lower()
 				# Validate the log level
-				if not isinstance(loglevel, str):
-					raise ValueError("Invalid log level")
-				if loglevel not in logging_color:
-					raise ValueError("Invalid log level")
+				if not isinstance(loglevel, str) or loglevel not in logging_color:
+					raise ValueError("Invalid log level") from None
 				# Determine color based on whether the output is a terminal
 				if sys.stdout.isatty():
 					colorPrefix = logging_color[loglevel]

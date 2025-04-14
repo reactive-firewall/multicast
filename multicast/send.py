@@ -348,7 +348,7 @@ class McastSAY(multicast.mtool):
 					"Sending %s to (%s, %d).",  # lazy formatting to avoid PYL-W1203
 					_payload, group, port,
 				)
-				sock.sendto(data.encode('utf8'), (group, port))
+				sock.sendto(_payload, (group, port))
 				module_logger.debug(
 					"Sent %d.",  # lazy formatting to avoid PYL-W1203
 					len(_payload),

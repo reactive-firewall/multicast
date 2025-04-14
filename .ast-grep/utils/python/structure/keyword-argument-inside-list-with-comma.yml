@@ -1,0 +1,17 @@
+# .ast-grep/utils/python/structure/keyword-argument-inside-list-with-comma.yml
+# Argument Structure utils
+id: python-rule-keyword-argument-inside-list-with-comma
+rule:
+  kind: keyword_argument
+  inside:
+    all:
+      - kind: argument_list
+        matches: python-rule-argument-list-with-comma
+      - regex: |
+          [^(]*[^,]
+  nthChild:
+    position: 1
+    reverse: true
+  pattern:
+    $_KW_ARG
+language: python

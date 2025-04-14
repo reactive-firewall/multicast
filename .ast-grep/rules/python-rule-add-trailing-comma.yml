@@ -1,0 +1,29 @@
+# .ast-grep/python-rule-add-trailing-comma.yml
+id: python-rule-add-trailing-comma
+rule:
+  all:
+    - matches: python-rule-argument-last-without-comma
+    - not:
+        pattern:
+          $LAST_ARG,
+language: python
+message: "Consider adding a trailing comma."
+description: Rule for improving future maintainability by pre-emptivly adding trailing commas.
+severity: hint
+fix:
+  $LAST_ARG,
+examples:
+  - name: Argument list with missing trailing comma
+    code: |
+      # trivial example should match
+      warnings.warn(
+        "This should match. because there is no trailing comma.",
+        stacklevel=2
+      )
+  - name: Resulting argument list with trailing comma
+    code: |
+      # trivial example should no-longer match
+      warnings.warn(
+        "This should match. because there is no trailing comma.",
+        stacklevel=2,
+      )

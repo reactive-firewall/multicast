@@ -1,0 +1,30 @@
+# .ast-grep/utils/python/structure/argument-last-without-comma.yml
+# Argument Structure utils
+id: python-rule-argument-last-without-comma
+rule:
+  any:
+    - kind: identifier
+    - kind: integer
+    - kind: float
+    - kind: string
+    - kind: keyword_argument
+      matches: python-rule-keyword-argument-inside-list-with-comma
+  nthChild:
+    position: 1
+    reverse: true
+  inside:
+    all:
+      - kind: argument_list
+        matches: python-rule-argument-list-with-comma
+  precedes:
+    pattern: )
+  pattern:
+    $LAST_ARG
+  all:
+    - not:
+        pattern:
+          $LAST_ARG,
+    - not:
+        pattern:
+          $$$, $LAST_ARG)
+language: python

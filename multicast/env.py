@@ -356,7 +356,7 @@ def load_buffer_size() -> int:
 	except ValueError:
 		warnings.warn(
 			f"Invalid MULTICAST_BUFFER_SIZE value, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
-			stacklevel=2
+			stacklevel=2,
 		)
 		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
 	# Validate and potentially update buffer-size
@@ -367,7 +367,7 @@ def load_buffer_size() -> int:
 	else:
 		warnings.warn(
 			f"Invalid MULTICAST_BUFFER_SIZE {buffer_size}, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
-			stacklevel=2
+			stacklevel=2,
 		)
 		buffer_size = _MCAST_DEFAULT_BUFFER_SIZE
 	module_logger.debug(
@@ -461,7 +461,7 @@ def load_port() -> int:
 		module_logger.debug("Done.")
 	except ValueError:
 		warnings.warn(
-			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}", stacklevel=2
+			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}", stacklevel=2,
 		)
 		port = _MCAST_DEFAULT_PORT
 	# Validate and potentially update port
@@ -472,7 +472,7 @@ def load_port() -> int:
 	else:
 		warnings.warn(
 			f"Port {port} is outside valid range (49152-65535), using default {_MCAST_DEFAULT_PORT}",
-			stacklevel=2
+			stacklevel=2,
 		)
 		port = _MCAST_DEFAULT_PORT
 	module_logger.debug(
@@ -592,7 +592,7 @@ def load_group() -> ipaddress.IPv4Address:
 		module_logger.debug("Valid.")
 	else:
 		warnings.warn(
-			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2
+			f"Invalid multicast group {group}, using default {_MCAST_DEFAULT_GROUP}", stacklevel=2,
 		)
 		group = _MCAST_DEFAULT_GROUP
 	module_logger.debug(
@@ -679,7 +679,7 @@ def load_TTL() -> int:
 		module_logger.debug("Done.")
 	except ValueError:
 		warnings.warn(
-			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}", stacklevel=2
+			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}", stacklevel=2,
 		)
 		ttl = _MCAST_DEFAULT_TTL
 	# Validate and potentially update TTL
@@ -690,7 +690,7 @@ def load_TTL() -> int:
 	else:
 		warnings.warn(
 			f"TTL {ttl} is outside valid range (1-126), using default {_MCAST_DEFAULT_TTL}",
-			stacklevel=2
+			stacklevel=2,
 		)
 		ttl = _MCAST_DEFAULT_TTL
 	module_logger.debug(
@@ -922,7 +922,7 @@ def load_config() -> dict:
 				groups.add(str(addr))
 			else:
 				warnings.warn(
-					f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping", stacklevel=2
+					f"Invalid multicast group {addr} in MULTICAST_GROUPS, skipping", stacklevel=2,
 				)
 	# Always include the primary group
 	groups.add(str(group))
