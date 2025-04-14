@@ -271,7 +271,7 @@ test-mat: cleanup MANIFEST.in test-mat-build test-mat-bootstrap test-mat-basic t
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
-test-mat-doctests: MANIFEST.in ## Run doctests MAT category (doctests are special)
+test-mat-doctests: test-reports MANIFEST.in ## Run doctests MAT category (doctests are special)
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(ECHO) "SKIP: The target '$@' is not compatable with pytests;"; \
 		$(ECHO) "Try 'make test-mat-doctests' instead."; \
@@ -280,7 +280,7 @@ test-mat-doctests: MANIFEST.in ## Run doctests MAT category (doctests are specia
 		$(QUIET)$(WAIT) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_doctests ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
-		$(COVERAGE) xml -o coverage_doctests.xml --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

@@ -428,7 +428,7 @@ if socket.__name__ is None:
 else:  # pragma: no branch
 	_tmp_mcast_value = int(_MCAST_DEFAULT_TTL)
 	logging.getLogger(__module__).debug(
-		"Setting default packet timeout to %d",  # lazy formatting to avoid PYL-W1203
+		"Setting default socket timeout to %d",  # lazy formatting to avoid PYL-W1203
 		_tmp_mcast_value,
 	)
 	socket.setdefaulttimeout(_tmp_mcast_value)
