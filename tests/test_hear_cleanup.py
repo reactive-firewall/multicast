@@ -157,7 +157,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			self.assertEqual(
 				int(p.exitcode),
 				int(self.EXPECTED_STOP_EXIT_CODE),
-				"CEP-8 VIOLATION."
+				"CEP-8 VIOLATION.",
 			)
 			theResult = (int(p.exitcode) <= int(self.EXPECTED_STOP_EXIT_CODE))
 		except Exception as err:
