@@ -114,7 +114,7 @@ jobs:
         TESTS_USE_PYTEST: 1
       run: make -f Makefile test >> $GITHUB_STEP_SUMMARY ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+      uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
@@ -266,7 +266,7 @@ jobs:
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} integration coverage to Codecov
-      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+      uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
@@ -368,7 +368,7 @@ jobs:
         ./tests/check_legacy_setup_coverage || echo "::warning file=tests/check_legacy_setup_coverage,line=1,endLine=1,title=SKIPPED::SKIP Legacy Setup.py Tests." ;
       if: ${{ !cancelled() }}
     - name: Upload Python ${{ matrix.python-version }} Legacy Setup.py coverage to Codecov
-      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+      uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_setup.xml
