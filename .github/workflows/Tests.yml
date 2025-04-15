@@ -269,7 +269,7 @@ jobs:
       uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        job_code: ${{ join( [github.run_id, github.run_number], '-' ) }}
+        job_code: ${{ github.run_id }}-${{ github.run_number }}
         os: ${{ matrix.os }}
         files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml
         directory: .
