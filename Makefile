@@ -179,6 +179,7 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .DS_Store" >>"$@" ;
+	$(QUIET)$(ECHO) "global-exclude .local_pip_cleanup.txt" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .gitattributes" >>"$@" ;
 	$(QUIET)$(ECHO) "prune test-reports" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .github" >>"$@" ;
@@ -186,7 +187,7 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "prune venv" >>"$@" ;
 
 build: init ./setup.py MANIFEST.in
-	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
+	$(QUIET)$(PYTHON) -W ignore -m build --installer=pip ./ || $(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
@@ -195,8 +196,8 @@ init:
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: init build must_be_root
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+install: init build
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) dist/multicast-*-py3-*.whl
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 

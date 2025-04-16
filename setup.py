@@ -143,7 +143,7 @@ if __name__ == '__main__':
 			str("""Operating System :: POSIX"""),
 			str("""Operating System :: MacOS :: MacOS X"""),
 			str("""Operating System :: POSIX :: Linux"""),
-			str("""License :: OSI Approved :: MIT License"""),
+			# PEP-639 removed str("""License :: OSI Approved :: MIT License"""),
 			str("""Programming Language :: Python :: 3"""),
 			str("""Programming Language :: Python :: 3 :: Only"""),
 			str("""Programming Language :: Python :: 3.13"""),
