@@ -436,8 +436,8 @@ clean-docs: ./docs/ ./docs/Makefile
 	$(QUIET)$(WAIT) ;
 
 ./docs/:
-	$(QUIET)test -d "$@" || DO_FAIL="exit 77" ;  # set fail if can't verify directory
-	$(QUIET)test -e "$@" || DO_FAIL="exit 69" ;  # overwrite exitcode if does not exsist.
+	$(QUIET)test -d "$@" || DO_FAIL="exit 77" ;  # 77: Permission denied - can't verify directory.
+	$(QUIET)test -e "$@" || DO_FAIL="exit 69" ;  # 69: [Docs] Service unavailable - does not exist.
 	$(QUIET)$(DO_FAIL) ;
 
 ./docs/Makefile: ./docs/
