@@ -46,6 +46,8 @@ from urllib.parse import quote
 sys.path.insert(0, os.path.abspath(".."))
 from docs.utils import _validate_git_ref  # noqa
 from docs.utils import slugify_header  # noqa
+from docs.utils import sanitize_url  # noqa
+from docs.utils import sanitize_intersphinx_mapping  # noqa
 
 # Define the branch reference for linkcode_resolve
 DOCS_BUILD_REF: str = _validate_git_ref(os.environ.get("DOCS_BUILD_REF", "stable"))
@@ -309,7 +311,7 @@ myst_linkify_fuzzy_links = False
 myst_gfm_only = False
 
 myst_html_meta = {
-	"github_url": f"https://github.com/reactive-firewall/{project}"
+	"github_url": sanitize_url(f"https://github.com/reactive-firewall/{project}")
 }
 
 # For GH-style admonitions to MyST conversion
@@ -419,7 +421,7 @@ texinfo_documents = [
 
 # -- Link resolver -------------------------------------------------------------
 
-linkcode_url_prefix: str = f"https://github.com/reactive-firewall/{project}"
+linkcode_url_prefix: str = sanitize_url(f"https://github.com/reactive-firewall/{project}")
 
 suffix = "/issues/%s"
 
@@ -432,9 +434,11 @@ extlinks = {
 
 # try to link with official python3 documentation.
 # see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
-intersphinx_mapping = {
-	"python": ("https://docs.python.org/3", (None, "python-inv.txt"))
-}
+intersphinx_mapping = sanitize_intersphinx_mapping(
+	{
+		"python": ("https://docs.python.org/3", (None, "python-inv.txt")),
+	},
+)
 
 
 def linkcode_resolve(domain, info):
@@ -450,4 +454,4 @@ def linkcode_resolve(domain, info):
 		theResult = theResult.replace("/multicast.py", "/multicast/__init__.py")
 	if "/tests.py" in theResult:
 		theResult = theResult.replace("/tests.py", "/tests/__init__.py")
-	return quote(theResult, safe=":/-._")
+	return sanitize_url(quote(theResult, safe=":/-._"))

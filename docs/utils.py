@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import re
+from urllib.parse import urlparse, urlunparse, quote
 
 
 # Git reference validation pattern
@@ -24,6 +25,18 @@ import re
 # - Must start with alphanumeric character
 # - Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
 GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
+
+
+# URL allowed scheme list
+# Enforces:
+# - URLs Must start with https
+URL_ALLOWED_SCHEMES = {"https"}
+
+
+# URL allowed domain list
+# Enforces:
+# - URLs Must belone to one of these domains
+URL_ALLOWED_NETLOCS = {"github.com", "readthedocs.com"}
 
 
 def _validate_git_ref(ref: str) -> str:
@@ -126,3 +139,34 @@ def slugify_header(s: str) -> str:
 	text = re.sub(r'[^\w\- ]', "", s).strip().lower()
 	# Then replace consecutive spaces or dashes with a single dash
 	return re.sub(r'[-\s]+', "-", text)
+
+
+def sanitize_url(url):
+	"""ADD DOCS.
+	"""
+	parsed_url = urlparse(url)
+	# Validate scheme
+	if parsed_url.scheme not in URL_ALLOWED_SCHEMES:
+		raise ValueError("Invalid URL scheme. Only 'https' is allowed.")
+	# Validate netloc
+	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
+		raise ValueError(f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed.")
+	# Sanitize path and query
+	sanitized_path = quote(parsed_url.path)
+	sanitized_query = quote(parsed_url.query)
+	# Reconstruct the sanitized URL
+	sanitized_url = urlunparse((
+		parsed_url.scheme,
+		parsed_url.netloc,
+		sanitized_path,
+		parsed_url.params,
+		sanitized_query,
+		parsed_url.fragment
+	))
+	return sanitized_url
+
+
+def sanitize_intersphinx_mapping(mapping):
+	"""ADD DOCS.
+	"""
+	return {key: (sanitize_url(url), extra_value) for key, (url, extra_value) in mapping.items()}
