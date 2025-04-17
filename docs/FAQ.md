@@ -199,9 +199,9 @@ From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
 
-While developers and network admistrators must consider other factors in the real world deployment,
+While developers and network administrators must consider other factors in real-world deployments,
 it is fair to say any free port in the dynamic or "ephemeral" port range of `49152`-`65535` should
-work so far as this Multicast module is concerned.
+work as far as this Multicast module is concerned.
 
 * For `SAY` the port refers to the destination port.
 * for `RECV` and `HEAR` the port refers to the port to listen on.
@@ -231,7 +231,8 @@ work so far as this Multicast module is concerned.
 * Typically, the documentation will be automatically built by CI/CD and posted to the official
   documentation site.
 
-* However if one still wishes to manually build the documentation, there is a make target for this:
+* However, if one still wishes to build the documentation manually, there is a `make` target
+  specifically for this:
 
   ```bash
   make build-docs
