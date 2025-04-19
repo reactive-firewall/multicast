@@ -171,6 +171,7 @@ __name__ = "multicast.recv"  # skipcq: PYL-W0622
 
 try:
 	import sys
+	import warnings
 	if 'multicast' not in sys.modules:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
@@ -209,6 +210,82 @@ module_logger.debug(
 	"Loading %s",  # lazy formatting to avoid PYL-W1203
 	__name__,
 )
+
+
+_mcast_recv_bind_not_join_prefix = "Unusual call to multicast.joinstep with no groups."
+
+
+_mcast_recv_just_bind_code = """
+sock = multicast.genSocket() if isock is None else isock
+sock.bind((multicast._MCAST_DEFAULT_GROUP, port))
+
+"""
+
+
+_mcast_recv_bind_not_join_msg = "...".join([
+	"Consider using",
+	_mcast_recv_just_bind_code,
+	"instead, for improved performance. Otherwise specify the multicast bind group.",
+])
+
+
+_mcast_recv_empty_join_warn_message = "\n".join([
+	_mcast_recv_bind_not_join_prefix,
+	_mcast_recv_bind_not_join_msg,
+])
+
+
+_mcast_recv_lazy_bind_warning_message = "\n".join([
+	"Lazy call to multicast.joinstep with unspecified bind group.",
+	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",
+	"Tip: Pass a value for bind_group to suppress this message",
+	"(such as 'bind_group=multicast._MCAST_DEFAULT_BIND_IP')",
+])
+
+_mcast_recv_join_only_multicast_warn_msg = "\n".join([
+	_mcast_recv_bind_not_join_prefix,
+	"Just use socket.Socket.bind(...) for non-multicast networking.",
+])
+
+
+def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, isock=None):
+	"""Validates joinstep arguments.
+
+	This is a helper function and should NOT be called directly.
+
+	Returns:
+		List of inputs after normalizing.
+	"""
+	if not groups:
+		groups = []
+		if __debug__:  # pragma: no branch
+			if not bind_group:
+				warnings.warn(
+					_mcast_recv_empty_join_warn_message,
+					category=SyntaxWarning,
+					stacklevel=3,
+				)
+			else:
+				if multicast.env.validate_multicast_address(bind_group):
+					groups = [bind_group]
+				else:
+					warnings.warn(
+						_mcast_recv_join_only_multicast_warn_msg,
+						category=SyntaxWarning,
+						stacklevel=3,
+					)
+		else:
+			if multicast.env.validate_multicast_address(bind_group):
+				groups = [bind_group]
+	else:
+		if __debug__ and not bind_group:  # pragma: no branch
+			if (len(groups) == 1) and (groups[0] != multicast._MCAST_DEFAULT_BIND_IP):
+				warnings.warn(
+					_mcast_recv_lazy_bind_warning_message,
+					category=ResourceWarning,
+					stacklevel=3,
+				)
+	return (groups, port, iface, bind_group, isock)
 
 
 def joinstep(groups, port, iface=None, bind_group=None, isock=None):
@@ -292,14 +369,13 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 	"""
-	if not groups:
-		groups = []
+	groups, _, _, bind_group, _ = _validate_join_args(groups=groups, bind_group=bind_group)
 	if isock is None:
 		sock = multicast.genSocket()
 	else:
 		sock = isock.dup()
 	try:
-		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
+		sock.bind((multicast._MCAST_DEFAULT_BIND_IP if bind_group is None else bind_group, port))
 		for group in groups:
 			mreq = _struct.pack(
 				'4sl' if iface is None else '4s4s',
