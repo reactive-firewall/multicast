@@ -237,7 +237,7 @@ _mcast_recv_empty_join_warn_message = "\n".join([
 
 _mcast_recv_lazy_bind_warning_message = "\n".join([
 	"Lazy call to multicast.joinstep with unspecified bind group.",
-	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",
+	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",  # skipcq: PYL-W0212 - module ok
 	"Tip: Pass a value for bind_group to suppress this message",
 	"(such as 'bind_group=multicast._MCAST_DEFAULT_BIND_IP')",
 ])
@@ -279,7 +279,10 @@ def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, iso
 				groups = [bind_group]
 	else:
 		if __debug__ and not bind_group:  # pragma: no branch
-			if (len(groups) == 1) and (groups[0] != multicast._MCAST_DEFAULT_BIND_IP):
+			# skipcq: PYL-W0212
+			if (len(groups) == 1) and (
+				groups[0] != multicast._MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0212 - module ok
+			):
 				warnings.warn(
 					_mcast_recv_lazy_bind_warning_message,
 					category=ResourceWarning,
@@ -375,6 +378,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	else:
 		sock = isock.dup()
 	try:
+		# skipcq: PYL-W0212
 		sock.bind((multicast._MCAST_DEFAULT_BIND_IP if bind_group is None else bind_group, port))
 		for group in groups:
 			mreq = _struct.pack(
