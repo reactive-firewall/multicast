@@ -244,5 +244,22 @@ def sanitize_intersphinx_mapping(mapping: dict) -> dict:
 
 	Returns:
 		dict -- A dictionary with the same structure but with sanitized URLs.
+
+	Unit-Testing:
+
+		Testcase 1: Basic intersphinx mapping.
+
+		>>> mapping = {'python': ('https://docs.python.org/3', None)}
+		>>> sanitize_intersphinx_mapping(mapping)
+		{'python': ('https://docs.python.org/3', None)}
+
+		Testcase 2: Mapping with URL containing special characters.
+
+		>>> mapping = {'project': ('https://github.com/user/project with spaces', None)}
+		>>> result = sanitize_intersphinx_mapping(mapping)
+		>>> result['project'][0]
+		'https://github.com/user/project%20with%20spaces'
+		>>>
+
 	"""
 	return {key: (sanitize_url(url), extra_value) for key, (url, extra_value) in mapping.items()}
