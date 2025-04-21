@@ -35,8 +35,8 @@ URL_ALLOWED_SCHEMES = {"https"}
 
 # URL allowed domain list
 # Enforces:
-# - URLs Must belone to one of these domains
-URL_ALLOWED_NETLOCS = {"github.com", "readthedocs.com"}
+# - URLs Must belong to one of these domains
+URL_ALLOWED_NETLOCS = {"github.com", "readthedocs.com", "docs.python.org"}
 
 
 def _validate_git_ref(ref: str) -> str:
@@ -141,8 +141,32 @@ def slugify_header(s: str) -> str:
 	return re.sub(r'[-\s]+', "-", text)
 
 
-def sanitize_url(url):
-	"""ADD DOCS.
+def sanitize_url(url: str) -> str:
+	"""
+	Sanitize and validate a URL according to allowed schemes and domains.
+
+	This function validates that the URL uses an allowed scheme (https) and points
+	to a trusted domain, then safely encodes its path and query components.
+
+	Args:
+		url (str) -- The URL to sanitize.
+
+	Returns:
+		str -- The sanitized URL.
+
+	Raises:
+		ValueError -- If the URL has an invalid scheme or points to an untrusted domain.
+
+
+	Unit-Testing:
+
+		Testcase 1: Basic URL with spaces and special characters.
+
+		>>> url_fxtr = "https://github.com/user/Hello World!"
+		>>> utils.sanitize_url(url_fxtr)
+		'https://github.com/user/Hello%20World%21'
+		>>>
+
 	"""
 	parsed_url = urlparse(url)
 	# Validate scheme
@@ -155,18 +179,27 @@ def sanitize_url(url):
 	sanitized_path = quote(parsed_url.path)
 	sanitized_query = quote(parsed_url.query)
 	# Reconstruct the sanitized URL
-	sanitized_url = urlunparse((
+	return urlunparse((
 		parsed_url.scheme,
 		parsed_url.netloc,
 		sanitized_path,
 		parsed_url.params,
 		sanitized_query,
-		parsed_url.fragment
+		parsed_url.fragment,
 	))
-	return sanitized_url
 
 
-def sanitize_intersphinx_mapping(mapping):
-	"""ADD DOCS.
+def sanitize_intersphinx_mapping(mapping: dict) -> dict:
+	"""
+	Sanitize URLs in an intersphinx mapping dictionary.
+
+	This function applies URL sanitization to each URL in the mapping while
+	preserving the associated extra values.
+
+	Args:
+		mapping (dict) -- A dictionary mapping names to tuples of (url, extra_value).
+
+	Returns:
+		dict -- A dictionary with the same structure but with sanitized URLs.
 	"""
 	return {key: (sanitize_url(url), extra_value) for key, (url, extra_value) in mapping.items()}
