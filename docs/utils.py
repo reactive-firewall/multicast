@@ -203,10 +203,15 @@ def sanitize_url(url: str) -> str:
 
 	Unit-Testing:
 
+		Testcase 0: First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
 		Testcase 1: Basic URL with spaces and special characters.
 
 		>>> url_fxtr = "https://github.com/user/Hello World!"
-		>>> utils.sanitize_url(url_fxtr)
+		>>> _utils.sanitize_url(url_fxtr)
 		'https://github.com/user/Hello%20World%21'
 		>>>
 
