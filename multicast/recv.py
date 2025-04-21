@@ -212,56 +212,65 @@ module_logger.debug(
 )
 
 
-_mcast_recv_bind_not_join_prefix = "Unusual call to multicast.joinstep with no groups."
+_w_prefix: str = "Unusual call to multicast.joinstep with no groups."
 
 
-_mcast_recv_just_bind_code = """
+_w_example_code: str = """
 sock = multicast.genSocket() if isock is None else isock
 sock.bind((multicast._MCAST_DEFAULT_GROUP, port))
 
 """
 
 
-_mcast_recv_bind_not_join_msg = "...".join([
+_w_advice: str = "...".join([
 	"Consider using",
-	_mcast_recv_just_bind_code,
+	_w_example_code,
 	"instead, for improved performance. Otherwise specify the multicast bind group.",
 ])
 
 
-_mcast_recv_empty_join_warn_message = "\n".join([
-	_mcast_recv_bind_not_join_prefix,
-	_mcast_recv_bind_not_join_msg,
+_w_empty_join_warning: str = "\n".join([
+	_w_prefix,
+	_w_advice,
 ])
 
 
-_mcast_recv_lazy_bind_warning_message = "\n".join([
+_w_unspec_bind: str = "\n".join([
 	"Lazy call to multicast.joinstep with unspecified bind group.",
 	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",  # skipcq: PYL-W0212 - module ok
 	"Tip: Pass a value for bind_group to suppress this message",
 	"(such as 'bind_group=multicast._MCAST_DEFAULT_BIND_IP')",
 ])
 
-_mcast_recv_join_only_multicast_warn_msg = "\n".join([
-	_mcast_recv_bind_not_join_prefix,
-	"Just use socket.Socket.bind(...) for non-multicast networking.",
-])
+
+_w_non_multicast = f"{_w_prefix}\nJust use socket.Socket.bind(...) for non-multicast networking."
 
 
-def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, isock=None):
+def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, isock=None) -> tuple:
 	"""Validates joinstep arguments.
 
 	This is a helper function and should NOT be called directly.
 
+	Args:
+		groups (list): List of multicast group addresses to join.
+		port (int): Port number to bind the socket to.
+		iface (str, optional): Network interface to use.
+		bind_group (str, optional): Specific group address to bind to.
+		isock (socket.socket, optional): Existing socket to configure.
+
+	Note:
+		All warning messages are only emitted when __debug__ is True
+		(i.e., when Python is not running with -O or -OO).
+
 	Returns:
-		List of inputs after normalizing.
+		A tuple of (groups, port, iface, bind_group, isock) after normalization.
 	"""
 	if not groups:
 		groups = []
 		if __debug__:  # pragma: no branch
 			if not bind_group:
 				warnings.warn(
-					_mcast_recv_empty_join_warn_message,
+					_w_empty_join_warning,
 					category=SyntaxWarning,
 					stacklevel=3,
 				)
@@ -270,7 +279,7 @@ def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, iso
 					groups = [bind_group]
 				else:
 					warnings.warn(
-						_mcast_recv_join_only_multicast_warn_msg,
+						_w_non_multicast,
 						category=SyntaxWarning,
 						stacklevel=3,
 					)
@@ -284,14 +293,14 @@ def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, iso
 				groups[0] != multicast._MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0212 - module ok
 			):
 				warnings.warn(
-					_mcast_recv_lazy_bind_warning_message,
+					_w_unspec_bind,
 					category=ResourceWarning,
 					stacklevel=3,
 				)
 	return (groups, port, iface, bind_group, isock)
 
 
-def joinstep(groups, port, iface=None, bind_group=None, isock=None):
+def joinstep(groups, port, iface=None, bind_group=None, isock=None) -> _socket.socket:
 	"""
 	Join multicast groups to prepare for receiving messages.
 
@@ -373,10 +382,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 	"""
 	groups, _, _, bind_group, _ = _validate_join_args(groups=groups, bind_group=bind_group)
-	if isock is None:
-		sock = multicast.genSocket()
-	else:
-		sock = isock.dup()
+	sock = multicast.genSocket() if isock is None else isock.dup()
 	try:
 		# skipcq: PYL-W0212
 		sock.bind((multicast._MCAST_DEFAULT_BIND_IP if bind_group is None else bind_group, port))
@@ -392,7 +398,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	return sock
 
 
-def tryrecv(msgbuffer, chunk, sock):
+def tryrecv(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Attempt to receive data on the given socket and decode it into the message buffer.
 
@@ -481,7 +487,7 @@ def tryrecv(msgbuffer, chunk, sock):
 	return msgbuffer
 
 
-def recvstep(msgbuffer, chunk, sock):
+def recvstep(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Receive messages continuously until interrupted.
 
