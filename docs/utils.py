@@ -39,6 +39,49 @@ URL_ALLOWED_SCHEMES = {"https"}
 URL_ALLOWED_NETLOCS = {"github.com", "readthedocs.com", "docs.python.org"}
 
 
+# Error messages for URL validation
+INVALID_SCHEME_ERROR = "Invalid URL scheme. Only 'https' is allowed."
+"""Scheme error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_SCHEME_ERROR is not None
+		True
+		>>> type(_utils.INVALID_SCHEME_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_SCHEME_ERROR) > 0
+		True
+		>>>
+
+"""
+
+
+INVALID_DOMAIN_ERROR = f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed."
+"""Domain error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_DOMAIN_ERROR is not None
+		True
+		>>> type(_utils.INVALID_DOMAIN_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_DOMAIN_ERROR) > 0
+		True
+		>>>
+
+"""
+
+
 def _validate_git_ref(ref: str) -> str:
 	"""
 	Validate if the provided string is a valid Git reference.
@@ -171,10 +214,10 @@ def sanitize_url(url: str) -> str:
 	parsed_url = urlparse(url)
 	# Validate scheme
 	if parsed_url.scheme not in URL_ALLOWED_SCHEMES:
-		raise ValueError("Invalid URL scheme. Only 'https' is allowed.")
+		raise ValueError(INVALID_SCHEME_ERROR)
 	# Validate netloc
 	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
-		raise ValueError(f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed.")
+		raise ValueError(INVALID_DOMAIN_ERROR)
 	# Sanitize path and query
 	sanitized_path = quote(parsed_url.path)
 	sanitized_query = quote(parsed_url.query)
