@@ -223,9 +223,9 @@ def sanitize_url(url: str) -> str:
 	# Validate netloc
 	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
 		raise ValueError(INVALID_DOMAIN_ERROR)
-	# Sanitize path and query
-	sanitized_path = quote(parsed_url.path)
-	sanitized_query = quote(parsed_url.query)
+	# Sanitize path and query - using the safe parameter to preserve URL structure
+	sanitized_path = quote(parsed_url.path, safe="/=")
+	sanitized_query = quote(parsed_url.query, safe="&=")
 	# Reconstruct the sanitized URL
 	return urlunparse((
 		parsed_url.scheme,
