@@ -311,7 +311,7 @@ myst_linkify_fuzzy_links = False
 myst_gfm_only = False
 
 myst_html_meta = {
-	"github_url": sanitize_url(f"https://github.com/reactive-firewall/{project}")
+	"github_url": sanitize_url(f"https://github.com/reactive-firewall/{project}"),
 }
 
 # For GH-style admonitions to MyST conversion
