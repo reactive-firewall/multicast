@@ -75,23 +75,21 @@ class ExtraDocsUtilsTestSuite(context.BasicUsageTestSuite):
 		"""Test case 1: Test to ensure reliable URL sanitization."""
 		# Mock _hearstep to return a non-empty response
 		for test_params in self.URL_TEST_FIXTURES:
+			sanitized_url = docs.utils.sanitize_url(test_params["input_url"])
+			# check for results
+			self.assertIsNotNone(sanitized_url)
+			# Verify results
 			if test_params["input_url"] == test_params["expected"]:
-				continue
+				self.assertEqual(
+					test_params["input_url"], sanitized_url,
+					"Input and output URLs were different, should be the same.",
+				)
 			else:
 				self.assertNotEqual(
-					test_params["input_url"],
-					test_params["expected"],
-					"Invalid test case. Input and expected URLs were the same, but not skipped.",
-				)
-				sanitized_url = docs.utils.sanitize_url(test_params["input_url"])
-				# check for results
-				self.assertIsNotNone(sanitized_url)
-				# Verify results
-				self.assertNotEqual(
 					test_params["input_url"], sanitized_url,
-					"Invalid test case. Input and output URLs were the same, should be skipped.",
+					"Input and output URLs were the same, should be different.",
 				)
-				self.assertEqual(sanitized_url, test_params["expected"])
+			self.assertEqual(sanitized_url, test_params["expected"])
 
 
 if __name__ == '__main__':
