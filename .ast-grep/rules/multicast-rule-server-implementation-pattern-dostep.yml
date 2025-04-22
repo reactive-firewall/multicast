@@ -1,4 +1,4 @@
-# .ast-grep/multicast-rule-server-implementation-pattern-dostep.yml
+# .ast-grep/rules/multicast-rule-server-implementation-pattern-dostep.yml
 id: multicast-rule-server-implementation-pattern-dostep
 rule:
   kind: block

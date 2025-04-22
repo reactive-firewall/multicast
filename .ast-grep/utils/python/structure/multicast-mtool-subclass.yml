@@ -1,4 +1,4 @@
-# .ast-grep/utils/multicast-mtool-subclass.yml
+# .ast-grep/utils/python/structure/multicast-mtool-subclass.yml
 # Multicast module's mtool subclass structure utility
 id: multicast-mtool-subclass
 rule:
@@ -23,6 +23,6 @@ rule:
               regex: \bmtool\b
               pattern: $SUPERCLASS
             - kind: attribute
-              regex: \b(:?multicast\.)?mtool\b
+              regex: \b(?:multicast\.)?mtool\b
               pattern: $SUPERCLASS
 language: python
