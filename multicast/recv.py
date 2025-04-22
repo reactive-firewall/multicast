@@ -171,6 +171,7 @@ __name__ = "multicast.recv"  # skipcq: PYL-W0622
 
 try:
 	import sys
+	import warnings
 	if 'multicast' not in sys.modules:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
@@ -211,7 +212,95 @@ module_logger.debug(
 )
 
 
-def joinstep(groups, port, iface=None, bind_group=None, isock=None):
+_w_prefix: str = "Unusual call to multicast.joinstep with no groups."
+
+
+_w_example_code: str = """
+sock = multicast.genSocket() if isock is None else isock
+sock.bind((multicast._MCAST_DEFAULT_GROUP, port))
+
+"""
+
+
+_w_advice: str = "...".join([
+	"Consider using",
+	_w_example_code,
+	"instead, for improved performance. Otherwise specify the multicast bind group.",
+])
+
+
+_w_empty_join_warning: str = "\n".join([
+	_w_prefix,
+	_w_advice,
+])
+
+
+_w_unspec_bind: str = "\n".join([
+	"Lazy call to multicast.joinstep with unspecified bind group.",
+	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",  # skipcq: PYL-W0212 - module ok
+	"Tip: Pass a value for bind_group to suppress this message",
+	"(such as 'bind_group=multicast._MCAST_DEFAULT_BIND_IP')",
+])
+
+
+_w_non_multicast = f"{_w_prefix}\nJust use socket.Socket.bind(...) for non-multicast networking."
+
+
+def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, isock=None) -> tuple:
+	"""Validates joinstep arguments.
+
+	This is a helper function and should NOT be called directly.
+
+	Args:
+		groups (list): List of multicast group addresses to join.
+		port (int): Port number to bind the socket to.
+		iface (str, optional): Network interface to use.
+		bind_group (str, optional): Specific group address to bind to.
+		isock (socket.socket, optional): Existing socket to configure.
+
+	Note:
+		All warning messages are only emitted when __debug__ is True
+		(i.e., when Python is not running with -O or -OO).
+
+	Returns:
+		A tuple of (groups, port, iface, bind_group, isock) after normalization.
+	"""
+	if not groups:
+		groups = []
+		if __debug__:  # pragma: no branch
+			if not bind_group:
+				warnings.warn(
+					_w_empty_join_warning,
+					category=SyntaxWarning,
+					stacklevel=3,
+				)
+			else:
+				if multicast.env.validate_multicast_address(bind_group):
+					groups = [bind_group]
+				else:
+					warnings.warn(
+						_w_non_multicast,
+						category=SyntaxWarning,
+						stacklevel=3,
+					)
+		else:
+			if multicast.env.validate_multicast_address(bind_group):
+				groups = [bind_group]
+	else:
+		if __debug__ and not bind_group:  # pragma: no branch
+			# skipcq: PYL-W0212
+			if (len(groups) == 1) and (
+				groups[0] != multicast._MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0212 - module ok
+			):
+				warnings.warn(
+					_w_unspec_bind,
+					category=ResourceWarning,
+					stacklevel=3,
+				)
+	return (groups, port, iface, bind_group, isock)
+
+
+def joinstep(groups, port, iface=None, bind_group=None, isock=None) -> _socket.socket:
 	"""
 	Join multicast groups to prepare for receiving messages.
 
@@ -292,14 +381,11 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 
 
 	"""
-	if not groups:
-		groups = []
-	if isock is None:
-		sock = multicast.genSocket()
-	else:
-		sock = isock.dup()
+	groups, _, _, bind_group, _ = _validate_join_args(groups=groups, bind_group=bind_group)
+	sock = multicast.genSocket() if isock is None else isock.dup()
 	try:
-		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
+		# skipcq: PYL-W0212
+		sock.bind((multicast._MCAST_DEFAULT_BIND_IP if bind_group is None else bind_group, port))
 		for group in groups:
 			mreq = _struct.pack(
 				'4sl' if iface is None else '4s4s',
@@ -312,7 +398,7 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 	return sock
 
 
-def tryrecv(msgbuffer, chunk, sock):
+def tryrecv(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Attempt to receive data on the given socket and decode it into the message buffer.
 
@@ -401,7 +487,7 @@ def tryrecv(msgbuffer, chunk, sock):
 	return msgbuffer
 
 
-def recvstep(msgbuffer, chunk, sock):
+def recvstep(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Receive messages continuously until interrupted.
 
