@@ -1,4 +1,4 @@
-# .ast-grep/utils/python/structure/undecorated_function_definition.yml
+# .ast-grep/utils/python/structure/multicast-mtool-subclass-definitions/undecorated_function_definition.yml
 # function without decorator utility
 id: undecorated_function_definition
 rule:
