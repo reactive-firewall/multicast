@@ -1,0 +1,13 @@
+# .ast-grep/utils/python/structure/undecorated_function_definition.yml
+# function without decorator utility
+id: undecorated_function_definition
+rule:
+  kind: function_definition
+  pattern: |
+    def $FUNC_NAME($$$)
+  inside:
+    kind: block
+    inside:
+      kind: class_definition
+      matches: multicast-mtool-subclass
+language: python

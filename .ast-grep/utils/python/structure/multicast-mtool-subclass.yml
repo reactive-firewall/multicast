@@ -1,0 +1,28 @@
+# .ast-grep/utils/multicast-mtool-subclass.yml
+# Multicast module's mtool subclass structure utility
+id: multicast-mtool-subclass
+rule:
+  kind: class_definition
+  pattern:
+    selector: class_definition
+    context: |
+      class $MCASTNAME($$$):
+        $$$
+  all:
+    - has:
+        field: name
+        kind: identifier
+        regex: \bMcast.*\b
+        pattern: $NAME
+    - has:
+        field: superclasses
+        kind: argument_list
+        has:
+          any:
+            - kind: identifier
+              regex: \bmtool\b
+              pattern: $SUPERCLASS
+            - kind: attribute
+              regex: \b(:?multicast\.)?mtool\b
+              pattern: $SUPERCLASS
+language: python

@@ -1,0 +1,9 @@
+# .ast-grep/utils/python/structure/multicast-mtool-subclass-function_definition.yml
+# function with OR without decorator utility
+id: multicast-mtool-subclass-function_definition
+rule:
+  kind: function_definition
+  any:
+    - matches: undecorated_function_definition
+    - matches: decorated_function_definition
+language: python

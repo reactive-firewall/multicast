@@ -523,7 +523,7 @@ class mtool(abc.ABC):
 	__epilogue__ = "Add an epilogue here."
 
 	@classmethod
-	def buildArgs(cls, calling_parser_group):
+	def buildArgs(cls, calling_parser_group: argparse.ArgumentParser) -> argparse.ArgumentParser:
 		"""
 		Will build the argparse parser.
 
@@ -598,7 +598,7 @@ class mtool(abc.ABC):
 		return calling_parser_group
 
 	@classmethod
-	def parseArgs(cls, arguments):
+	def parseArgs(cls, arguments) -> tuple:
 		"""
 		Will attempt to parse the given CLI arguments.
 
@@ -653,7 +653,7 @@ class mtool(abc.ABC):
 		return cls.buildArgs(None).parse_known_args(arguments)
 
 	@classmethod
-	def checkToolArgs(cls, args):
+	def checkToolArgs(cls, args) -> list:
 		"""
 		Will handle the None case for arguments.
 
@@ -715,12 +715,12 @@ class mtool(abc.ABC):
 
 	@classmethod
 	@abc.abstractmethod
-	def setupArgs(cls, parser):  # pragma: no cover
+	def setupArgs(cls, parser) -> None:  # pragma: no cover
 		"""Abstract hook for setting up the tool's arguments."""
 		pass  # skipcq - abstract method
 
 	@abc.abstractmethod
-	def doStep(self, *args, **kwargs):  # pragma: no cover
+	def doStep(self, *args, **kwargs) -> tuple:  # pragma: no cover
 		"""
 		Abstracts the __call__ behavior for sub-classing the tool.
 
