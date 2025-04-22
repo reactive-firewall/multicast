@@ -1,5 +1,5 @@
 # .ast-grep/utils/python/content/multicast-mtool-subclass-implementation.yml
-id: multicast-mtool-subbclass-implementation
+id: multicast-mtool-subclass-implementation
 rule:
   kind: block
   pattern: |
