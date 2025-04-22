@@ -30,16 +30,65 @@ GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
 # URL allowed scheme list
 # Enforces:
 # - URLs Must start with https
-URL_ALLOWED_SCHEMES = {"https"}
+URL_ALLOWED_SCHEMES = frozenset({"https"})
 
 
 # URL allowed domain list
 # Enforces:
 # - URLs Must belong to one of these domains
-URL_ALLOWED_NETLOCS = {"github.com", "readthedocs.com", "docs.python.org"}
+URL_ALLOWED_NETLOCS = frozenset({"github.com", "readthedocs.com", "docs.python.org"})
+
+
+# Maximum allowed URL length
+MAX_URL_LENGTH = 2048  # Common browser limit
+"""Maximum allowed length for URL validation.
+
+Should be large enough for most URLs but no larger than common browser limits.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.MAX_URL_LENGTH is not None
+		True
+		>>> type(_utils.MAX_URL_LENGTH) is type(int())
+		True
+		>>> _utils.MAX_URL_LENGTH > 0
+		True
+		>>> _utils.MAX_URL_LENGTH >= 256
+		True
+		>>> _utils.MAX_URL_LENGTH <= 2048
+		True
+		>>>
+
+"""
 
 
 # Error messages for URL validation
+INVALID_LENGTH_ERROR = f"URL exceeds maximum length of {MAX_URL_LENGTH} characters."
+"""Length error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_LENGTH_ERROR is not None
+		True
+		>>> type(_utils.INVALID_LENGTH_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_LENGTH_ERROR) > 0
+		True
+		>>>
+
+"""
+
+
 INVALID_SCHEME_ERROR = "Invalid URL scheme. Only 'https' is allowed."
 """Scheme error message for URL validation.
 
@@ -216,6 +265,9 @@ def sanitize_url(url: str) -> str:
 		>>>
 
 	"""
+	# Validate length
+	if len(url) > MAX_URL_LENGTH:
+		raise ValueError(INVALID_LENGTH_ERROR)
 	parsed_url = urlparse(url)
 	# Validate scheme
 	if parsed_url.scheme not in URL_ALLOWED_SCHEMES:
