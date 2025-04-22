@@ -147,6 +147,8 @@ declare -a SPECIFIC_TYPOS=(
 	"sentance:sentence"  # from #330
 	"reccomended:recommended"  # from #348
 	"absolutly:absolutely"  # from #348
+	"specificly:specifically"  # from #205
+	"belone:belong"  # from #373
 )
 
 function cleanup() {

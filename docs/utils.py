@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import re
+from urllib.parse import urlparse, urlunparse, quote
 
 
 # Git reference validation pattern
@@ -24,6 +25,110 @@ import re
 # - Must start with alphanumeric character
 # - Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
 GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
+
+
+# URL allowed scheme list
+# Enforces:
+# - URLs Must start with https
+URL_ALLOWED_SCHEMES = frozenset({"https"})
+
+
+# URL allowed domain list
+# Enforces:
+# - URLs Must belong to one of these domains
+URL_ALLOWED_NETLOCS = frozenset({"github.com", "readthedocs.com", "docs.python.org"})
+
+
+# Maximum allowed URL length
+MAX_URL_LENGTH = 2048  # Common browser limit
+"""Maximum allowed length for URL validation.
+
+Should be large enough for most URLs but no larger than common browser limits.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.MAX_URL_LENGTH is not None
+		True
+		>>> type(_utils.MAX_URL_LENGTH) is type(int())
+		True
+		>>> _utils.MAX_URL_LENGTH > 0
+		True
+		>>> _utils.MAX_URL_LENGTH >= 256
+		True
+		>>> _utils.MAX_URL_LENGTH <= 2048
+		True
+		>>>
+
+"""
+
+
+# Error messages for URL validation
+INVALID_LENGTH_ERROR = f"URL exceeds maximum length of {MAX_URL_LENGTH} characters."
+"""Length error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_LENGTH_ERROR is not None
+		True
+		>>> type(_utils.INVALID_LENGTH_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_LENGTH_ERROR) > 0
+		True
+		>>>
+
+"""
+
+
+INVALID_SCHEME_ERROR = "Invalid URL scheme. Only 'https' is allowed."
+"""Scheme error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_SCHEME_ERROR is not None
+		True
+		>>> type(_utils.INVALID_SCHEME_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_SCHEME_ERROR) > 0
+		True
+		>>>
+
+"""
+
+
+INVALID_DOMAIN_ERROR = f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed."
+"""Domain error message for URL validation.
+
+Unit-Testing:
+
+	First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		>>> _utils.INVALID_DOMAIN_ERROR is not None
+		True
+		>>> type(_utils.INVALID_DOMAIN_ERROR) is type(str())
+		True
+		>>> len(_utils.INVALID_DOMAIN_ERROR) > 0
+		True
+		>>>
+
+"""
 
 
 def _validate_git_ref(ref: str) -> str:
@@ -126,3 +231,92 @@ def slugify_header(s: str) -> str:
 	text = re.sub(r'[^\w\- ]', "", s).strip().lower()
 	# Then replace consecutive spaces or dashes with a single dash
 	return re.sub(r'[-\s]+', "-", text)
+
+
+def sanitize_url(url: str) -> str:
+	"""
+	Sanitize and validate a URL according to allowed schemes and domains.
+
+	This function validates that the URL uses an allowed scheme (https) and points
+	to a trusted domain, then safely encodes its path and query components.
+
+	Args:
+		url (str) -- The URL to sanitize.
+
+	Returns:
+		str -- The sanitized URL.
+
+	Raises:
+		ValueError -- If the URL has an invalid scheme or points to an untrusted domain.
+
+
+	Unit-Testing:
+
+		Testcase 0: First set up test fixtures by importing utils.
+
+		>>> import docs.utils as _utils
+		>>>
+
+		Testcase 1: Basic URL with spaces and special characters.
+
+		>>> url_fxtr = "https://github.com/user/Hello World!"
+		>>> _utils.sanitize_url(url_fxtr)
+		'https://github.com/user/Hello%20World%21'
+		>>>
+
+	"""
+	# Validate length
+	if len(url) > MAX_URL_LENGTH:
+		raise ValueError(INVALID_LENGTH_ERROR)
+	parsed_url = urlparse(url)
+	# Validate scheme
+	if parsed_url.scheme not in URL_ALLOWED_SCHEMES:
+		raise ValueError(INVALID_SCHEME_ERROR)
+	# Validate netloc
+	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
+		raise ValueError(INVALID_DOMAIN_ERROR)
+	# Sanitize path and query - using the safe parameter to preserve URL structure
+	sanitized_path = quote(parsed_url.path, safe="/=")
+	sanitized_query = quote(parsed_url.query, safe="&=")
+	# Reconstruct the sanitized URL
+	return urlunparse((
+		parsed_url.scheme,
+		parsed_url.netloc,
+		sanitized_path,
+		parsed_url.params,
+		sanitized_query,
+		parsed_url.fragment,
+	))
+
+
+def sanitize_intersphinx_mapping(mapping: dict) -> dict:
+	"""
+	Sanitize URLs in an intersphinx mapping dictionary.
+
+	This function applies URL sanitization to each URL in the mapping while
+	preserving the associated extra values.
+
+	Args:
+		mapping (dict) -- A dictionary mapping names to tuples of (url, extra_value).
+
+	Returns:
+		dict -- A dictionary with the same structure but with sanitized URLs.
+
+	Unit-Testing:
+
+		Testcase 1: Basic intersphinx mapping.
+
+		>>> mapping = {'python': ('https://docs.python.org/3', None)}
+		>>> sanitize_intersphinx_mapping(mapping)
+		{'python': ('https://docs.python.org/3', None)}
+
+		Testcase 2: Mapping with URL containing special characters.
+
+		>>> mapping = {'project': ('https://github.com/user/project with spaces', None)}
+		>>> result = sanitize_intersphinx_mapping(mapping)
+		>>> result['project'][0]
+		'https://github.com/user/project%20with%20spaces'
+		>>>
+
+	"""
+	return {key: (sanitize_url(url), extra_value) for key, (url, extra_value) in mapping.items()}

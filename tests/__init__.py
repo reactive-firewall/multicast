@@ -356,6 +356,13 @@ except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional debug tests", exc_info=True)
 
 try:
+	from tests import test_extra
+	depends.insert(11, test_extra)
+	EXTRA_TESTS["security"].append(test_extra.ExtraDocsUtilsTestSuite)
+except Exception:  # pragma: no branch
+	_LOGGER.warning("Error loading optional extra tests", exc_info=True)
+
+try:
 	FUZZING_TESTS = {
 		"slow": [
 			test_fuzz.HypothesisTestSuite,  # Assuming this exists
