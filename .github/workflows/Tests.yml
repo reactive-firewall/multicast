@@ -74,6 +74,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
+      OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       COVERAGE_RCFILE: ./.coveragerc
@@ -117,7 +118,6 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
-        os: ${{ matrix.os }}
         files: ./coverage.xml
         directory: .
         flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
@@ -210,6 +210,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     env:
+      OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
       LC_CTYPE: "en_US.utf-8"
@@ -268,7 +269,6 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
-        os: ${{ matrix.os }}
         files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml
         directory: .
         flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
