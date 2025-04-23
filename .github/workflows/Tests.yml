@@ -136,7 +136,7 @@ jobs:
         directory: .
         env_vars: OS,PYTHON_VERSION
         flags: doctests
-        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-doctests
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
@@ -269,11 +269,13 @@ jobs:
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile user-install || true ;
       if: ${{ success() }}
-    - name: Re-Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Re-Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         make -j1 -f Makefile test-pytest ;
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
       shell: bash
+    - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -f Makefile test-mat-doctests ;
     - name: Generate Extra Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
         hash -p ./.github/tool_shlock_helper.sh shlock ;
@@ -284,7 +286,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
-        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml
+        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage_doctests.xml,./test-reports/coverage.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
         flags: multicast
