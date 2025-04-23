@@ -1,0 +1,10 @@
+# .ast-grep/utils/python/content/multicast-mtool-subclass-function-setupArgs.yml
+id: multicast-mtool-subclass-function-setupargs
+rule:
+  kind: function_definition
+  all:
+    - matches: multicast-mtool-subclass-function_definition
+    - pattern: |
+        def setupArgs(self, $$$)$$$:
+          $$$
+language: python

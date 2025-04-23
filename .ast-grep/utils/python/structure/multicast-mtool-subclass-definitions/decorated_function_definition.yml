@@ -1,0 +1,15 @@
+# .ast-grep/utils/python/structure/multicast-mtool-subclass-definitions/decorated_function_definition.yml
+# decorator function utility
+id: decorated_function_definition
+rule:
+  kind: function_definition
+  pattern: |
+    def $FUNC_NAME($$$)
+  inside:
+    kind: decorated_definition
+    inside:
+      kind: block
+      inside:
+        kind: class_definition
+        matches: multicast-mtool-subclass
+language: python

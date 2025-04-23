@@ -208,6 +208,10 @@ reviews:
       - master
       - HOTFIX-*
   tools:
+    ast-grep:
+      essential_rules: true
+      util_dirs: [".ast-grep/utils"]
+      rule_dirs: [".ast-grep/rules"]
     languagetool:
       enabled: true
       language: en-US

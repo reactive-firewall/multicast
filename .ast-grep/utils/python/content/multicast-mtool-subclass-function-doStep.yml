@@ -1,0 +1,10 @@
+# .ast-grep/utils/python/content/multicast-mtool-subclass-function-doStep.yml
+id: multicast-mtool-subclass-function-dostep
+rule:
+  kind: function_definition
+  all:
+    - matches: multicast-mtool-subclass-function_definition
+    - pattern: |
+        def doStep(self, $$$)$$$:
+          $$$
+language: python

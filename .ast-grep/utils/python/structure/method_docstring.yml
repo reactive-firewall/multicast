@@ -11,7 +11,13 @@ rule:
       inside:
         kind: function_definition
         inside:
-          kind: block
-          inside:
-            kind: class_definition
+          any:
+            - kind: block
+              inside:
+                kind: class_definition
+            - kind: decorated_definition
+              inside:
+                kind: block
+                inside:
+                  kind: class_definition
 language: python

@@ -149,6 +149,7 @@ declare -a SPECIFIC_TYPOS=(
 	"absolutly:absolutely"  # from #348
 	"specificly:specifically"  # from #205
 	"belone:belong"  # from #373
+	"subbclass:subclass"  # from #379
 )
 
 function cleanup() {
