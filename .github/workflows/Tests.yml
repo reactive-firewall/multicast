@@ -109,18 +109,33 @@ jobs:
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       env:
         TESTS_USE_PYTEST: 1
       run: make -f Makefile test >> $GITHUB_STEP_SUMMARY ;
-    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
+    - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -f Makefile test-mat-doctests ;
+    - name: Upload Python ${{ matrix.python-version }} test coverage to Codecov
       uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
-        files: ./coverage.xml
+        files: ./coverage.xml,./test-reports/coverage.xml
         directory: .
-        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
+        env_vars: OS,PYTHON_VERSION
+        flags: unittests
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
+        verbose: true
+        fail_ci_if_error: false
+    - name: Upload Python ${{ matrix.python-version }} doctest coverage to Codecov
+      uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        job_code: ${{ github.run_id }}-${{ github.run_number }}
+        files: ./test-reports/coverage_doctests.xml
+        directory: .
+        env_vars: OS,PYTHON_VERSION
+        flags: doctests
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
@@ -271,7 +286,8 @@ jobs:
         job_code: ${{ github.run_id }}-${{ github.run_number }}
         files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml
         directory: .
-        flags: multicast,${{ matrix.os }},${{ matrix.python-version }}
+        env_vars: OS,PYTHON_VERSION
+        flags: multicast
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
