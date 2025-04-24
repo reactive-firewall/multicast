@@ -131,7 +131,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 
 	def test_None_WHEN_Nothing(self):
 		"""Try adding new tests."""
-		self.assertIsNone(None)
+		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
 		# define new tests below
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")

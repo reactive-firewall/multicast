@@ -281,7 +281,7 @@ test-mat-doctests: test-reports MANIFEST.in ## Run doctests MAT category (doctes
 		$(QUIET)$(WAIT) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_doctests ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
-		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

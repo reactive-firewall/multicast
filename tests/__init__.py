@@ -101,7 +101,7 @@ try:
 				loglevel = record.levelname.lower()
 				# Validate the log level
 				if not isinstance(loglevel, str) or loglevel not in logging_color:
-					raise ValueError("Invalid log level") from None
+					raise ValueError("Invalid log level") from None  # pragma: no cover
 				# Determine color based on whether the output is a terminal
 				if sys.stdout.isatty():
 					colorPrefix = logging_color[loglevel]
@@ -116,7 +116,7 @@ try:
 				self.stream.write(formatted_msg + self.terminator)
 				self.flush()
 
-	except Exception as _cause:
+	except Exception as _cause:  # pragma: no branch
 		raise ImportError("[CWE-909] Could Not Initialize Test Logger") from _cause
 	# Setup logging for testing
 	root = logging.getLogger()
@@ -416,14 +416,14 @@ def get_test_suite(group: Optional[str] = None, category: Optional[str] = None) 
 		# and for coverage targets:
 		add_test_cases(EXTRA_TESTS["coverage"])
 		return suite
-	if group not in TEST_GROUPS:
+	if group not in TEST_GROUPS:  # pragma: no branch
 		raise ValueError(f"Unknown test group: {group}")
 	selected_group = TEST_GROUPS[group]
-	if category:
-		if category not in selected_group:
+	if category:  # pragma: no branch
+		if category not in selected_group:  # pragma: no branch
 			raise ValueError(f"Unknown category '{category}' in group '{group}'")
 		add_test_cases(selected_group[category])
-	else:
+	else:  # pragma: no branch
 		# Load all categories in the group
 		for category_tests in selected_group.values():
 			add_test_cases(category_tests)

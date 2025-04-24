@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: Bug, Failing
+labels: Bug
 assignees: reactive-firewall
 
 ---
@@ -12,6 +12,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -26,11 +27,22 @@ If applicable, add logs here to help explain your problem.
 **Screenshots** _(optional)_
 If applicable, add screenshots to help explain your problem.
 
-**PiAP Device (please complete the following information):**
- - OS: [e.g. macOS]
- - OS Version: [e.g. 22]
- - Python Version [e.g. 3.12] _(optional)_
- - Multicast Python Library Version: [e.g. v0.5.0]
+**Device (please complete the following information)**
+
+ * Python Version: _e.g. 3.14_
+
+> `python3 --version || python --version`
+
+ * OS type
+   - [ ] Linux
+   - [ ] MacOS (darwin)
+
+> `uname -s`
+
+ * OS Version: _e.g. 24_
+ * `Multicast` Library Version: _e.g. v2.1.0_
+
+> `python3 -m multicast --version`
 
 **Additional context** _(optional)_
 Add any other context about the problem here.

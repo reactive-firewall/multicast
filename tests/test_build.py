@@ -61,7 +61,7 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 
 	__module__ = "tests.test_build"
 
-	def test_build_with_pep517(self) -> None:
+	def test_build_works_WHEN_supporting_pep517(self) -> None:
 		"""
 		Test building the package using PEP 517 standards.
 
@@ -75,14 +75,14 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 		"""
 		# Arguments need to clean
 		build_arguments = [
-			f"{str(sys.executable)} -m coverage run", "setup.py", "clean", "--all"
+			f"{str(sys.executable)} -m coverage run", "-p", "setup.py", "clean", "--all",
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
 		self.assertIn("running clean", str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
-			f"{str(sys.executable)} -m coverage run", "-m", "build", "--sdist", "--wheel"
+			f"{str(sys.executable)} -m coverage run", "-p", "-m", "build", "--sdist", "--wheel",
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
@@ -100,7 +100,7 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 			self.assertIn(
 				expected_file,
 				dist_files,
-				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}"
+				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}",
 			)
 
 

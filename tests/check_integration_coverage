@@ -195,7 +195,7 @@ printf "%s\n\n" "End of Integration Test daemon" >> ./"${LOG_FILE}" ; wait ;
 ${PY_3_CMD} -m coverage combine --data-file="${COVERAGE_DATA_FILE}" ./.coverage.* || EXIT_CODE=2 ;
 if [[ -r "${COVERAGE_DATA_FILE}" ]] ; then
 	# shellcheck disable=SC2086
-	${PY_3_CMD} -m coverage report -m --data-file="${COVERAGE_DATA_FILE}" 2>/dev/null || EXIT_CODE=2 ;
+	${PY_3_CMD} -m coverage report -m --include=multicast/* --data-file="${COVERAGE_DATA_FILE}" 2>/dev/null || EXIT_CODE=2 ;
 	# shellcheck disable=SC2086
 	${PY_3_CMD} -m coverage xml -o ./test-reports/coverage_supplement.xml --include=multicast/* --data-file="${COVERAGE_DATA_FILE}" || EXIT_CODE=2 ;
 else

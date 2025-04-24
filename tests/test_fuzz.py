@@ -210,20 +210,23 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 		"""
 		theResult: bool = False
 		fail_fixture: str = "XZY? --> Multicast != error"
-		if (self._thepython is not None):
-			try:
-				args = [str(self._thepython), str("-m"), str("multicast"), str(text)]
-				theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
-				# or simply:
-				self.assertIsNotNone(theOutputtxt)
-				self.assertIn(str("invalid choice:"), str(theOutputtxt))
-				self.assertIn(str(text), str(theOutputtxt))
-				theResult = True
-			except Exception as err:
-				context.debugtestError(err)
-				err = None
-				del err  # skipcq - cleanup any error leaks early
-				theResult = False
+		if (self._thepython is not None) and (multicast.__main__.TASK_OPTIONS is not None):
+			if str(text) not in multicast.__main__.TASK_OPTIONS:
+				try:
+					args = [str(self._thepython), str("-m"), str("multicast"), str(text)]
+					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
+					# or simply:
+					self.assertIsNotNone(theOutputtxt)
+					self.assertIn(str("invalid choice:"), str(theOutputtxt))
+					self.assertIn(str(text), str(theOutputtxt))
+					theResult = True
+				except Exception as err:
+					context.debugtestError(err)
+					err = None
+					del err  # skipcq - cleanup any error leaks early
+					theResult = False
+			else:  # pragma: no branch
+				theResult = True  # but this won't have "invalid choice"
 		self.assertTrue(theResult, fail_fixture)
 
 	@given(st.text(alphabet=string.ascii_letters + string.digits, min_size=56, max_size=2048))

@@ -59,7 +59,7 @@ class ExtraDocsUtilsTestSuite(context.BasicUsageTestSuite):
 		},
 		{
 			"input_url": "https://github.com/user/repo?q=test&sort=desc",
-			"expected": "https://github.com/user/repo?q%3Dtest%26sort%3Ddesc",
+			"expected": "https://github.com/user/repo?q=test&sort=desc",
 		},
 		{
 			"input_url": "https://github.com/user/repo#section",

@@ -81,9 +81,6 @@ jobs:
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
       COV_CORE_DATAFILE: ./coverage.xml
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Set up Python ${{ matrix.python-version }}
@@ -97,6 +94,9 @@ jobs:
     - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Linux' }}
       shell: bash
+      env:
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
         chmod +x ./cc-test-reporter 2>/dev/null || true ;
@@ -104,6 +104,8 @@ jobs:
     - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Linux' }}
       shell: bash
+      env:
+        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
       run: |
         (curl https://deepsource.io/cli | sh) || true ;
     - name: Pre-Clean
@@ -112,9 +114,7 @@ jobs:
     - name: Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       env:
         TESTS_USE_PYTEST: 1
-      run: make -f Makefile test >> $GITHUB_STEP_SUMMARY ;
-    - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      run: make -f Makefile test-mat-doctests ;
+      run: make -f Makefile test >> "$GITHUB_STEP_SUMMARY" ;
     - name: Upload Python ${{ matrix.python-version }} test coverage to Codecov
       uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
@@ -127,6 +127,101 @@ jobs:
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
         verbose: true
         fail_ci_if_error: false
+    - name: Upload Python ${{ matrix.python-version }} second flag coverage to Codecov
+      uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        job_code: ${{ github.run_id }}-${{ github.run_number }}
+        files:  ./coverage.xml,./test-reports/coverage.xml
+        directory: .
+        env_vars: OS,PYTHON_VERSION
+        flags: multicast
+        name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-merge
+        verbose: true
+        fail_ci_if_error: false
+    - name: Upload Python ${{ matrix.python-version }} Artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        path: ./test-reports/
+        if-no-files-found: ignore
+    - name: code-climate for ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      shell: bash
+      env:
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      run: |
+        ./cc-test-reporter after-build --exit-code 0 || true ;
+    - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      shell: bash
+      env:
+        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+      run: |
+        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
+    - name: Post-Clean
+      id: post
+      run: make -j1 -f Makefile clean || true ;
+      if: ${{ always() }}
+
+
+  DOCTESTS:
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+      packages: none
+      pull-requests: read
+      security-events: none
+    environment: ${{ needs.check_mats.outputs.mats_environment }}
+    if: ${{ !cancelled() && (needs.check_mats.outputs.should_run == 'true') }}
+    needs: [check_mats]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      LANG: "en_US.utf-8"
+      COVERAGE_RCFILE: ./.coveragerc
+      COV_CORE_SOURCE: ./
+      COV_CORE_CONFIG: ./.coveragerc
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
+      uses: ./.github/actions/upgrade-windows-pip
+    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -f Makefile test-reqs || true ;
+    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      shell: bash
+      env:
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
+        chmod +x ./cc-test-reporter 2>/dev/null || true ;
+        ./cc-test-reporter before-build || true ;
+    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      shell: bash
+      env:
+        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+      run: |
+        (curl https://deepsource.io/cli | sh) || true ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
+    - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
+      run: make -f Makefile test-mat-doctests ;
     - name: Upload Python ${{ matrix.python-version }} doctest coverage to Codecov
       uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
       with:
@@ -142,17 +237,22 @@ jobs:
     - name: Upload Python ${{ matrix.python-version }} Artifact
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
-        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
+        name: DocTest-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Linux' }}
       shell: bash
+      env:
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Linux' }}
       shell: bash
+      env:
+        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
       run: |
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Post-Clean
@@ -217,7 +317,7 @@ jobs:
       security-events: none
     environment: ${{ needs.check_mats.outputs.mats_environment }}
     if: ${{ success() }}
-    needs: [check_mats, COVERAGE]
+    needs: [check_mats, COVERAGE, DOCTESTS]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
@@ -337,7 +437,7 @@ jobs:
       pull-requests: read
       security-events: none
     environment: ${{ needs.check_mats.outputs.mats_environment }}
-    if: ${{ success() }}
+    if: ${{ !cancelled() && success() }}
     needs: [COVERAGE, STYLE]
     runs-on: ${{ matrix.os }}
     defaults:
