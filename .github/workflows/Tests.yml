@@ -132,7 +132,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ github.run_id }}-${{ github.run_number }}
-        files:  ./coverage.xml,./test-reports/coverage.xml
+        files: ./coverage.xml,./test-reports/coverage.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
         flags: multicast
