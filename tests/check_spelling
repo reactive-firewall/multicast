@@ -180,11 +180,11 @@ function report_summary() {
 	printf "::group::%s\n" "Results" ;
 	# Improved reporting based on EXIT_CODE
 	case "${EXIT_CODE}" in
-		0) printf "::notice title=OK::%s\n" "OK: Found no detected spelling errors." ;;
-		1) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CHECK-SPELLING::%s\n" "FAIL: General failure during script execution." >&2 ;;
-		3) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
-		126) printf "::warning file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
-		*) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=FAILED::%s\n" "FAIL: Detected spelling errors." >&2 ;;
+		0) python3 -B .github/tools/cioutput.py --log-level debug --level info --title "CHECK-SPELLING" "OK: Found no detected spelling errors." ;;
+		1) python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CHECK-SPELLING" "FAIL: General failure during script execution." >&2 ;;
+		3) python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repostory's requirements failed." >&2 ;;
+		126) python3 -B .github/tools/cioutput.py --log-level debug --level warning --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIPPED" "SKIP: Unable to continue script execution." >&2 ;;
+		*) python3 -B .github/tools/cioutput.py --log-level debug --level critical --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAILED" "FAIL: Detected spelling errors." >&2 ;;
 	esac
 	printf "::endgroup::\n" ;
 }
@@ -197,9 +197,9 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 	if [ -z "${_TEST_ROOT_DIR}" ]; then
 		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 	fi
-		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
+		python3 -B .github/tools/cioutput.py --log-level debug --level debug "Found ${_TEST_ROOT_DIR} ..." ;
 	else
-		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
+	python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "${FUNCNAME:-$0}" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 
@@ -209,7 +209,7 @@ FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- *.md *.py *.txt 
 # Enable auto-correction if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	CODESPELL_OPTIONS="--write-changes --interactive 2 ${CODESPELL_OPTIONS}"
-	printf "::debug::%s\n" "Auto-correction enabled."
+	python3 -B .github/tools/cioutput.py --log-level debug --level debug "Auto-correction enabled." ;
 fi
 
 # THIS IS THE ACTUAL TEST
@@ -218,10 +218,10 @@ fi
 for FILE in $FILES_TO_CHECK; do
 	# Part 1: Run codespell
 	printf "::group::%s\n" "Checking ${FILE}" ;
-	printf "::debug::%s\n" "Running codespell tests for typos." ;
+	python3 -B .github/tools/cioutput.py --log-level debug --level debug "Running codespell tests for typos." ;
 	{ codespell $CODESPELL_OPTIONS "${FILE}" || EXIT_CODE=$? ;} 2>/dev/null ; wait ;
 	# Part 2: Run specific regression tests for known typos
-	printf "::debug::%s\n" "Running regression tests for specific typos." ;
+	python3 -B .github/tools/cioutput.py --log-level debug --level debug "Running regression tests for specific typos." ;
 	for TYPO_PAIR in "${SPECIFIC_TYPOS[@]}"; do
 		# Split the pair into typo and correction
 		TYPO="${TYPO_PAIR%%:*}"
@@ -229,13 +229,13 @@ for FILE in $FILES_TO_CHECK; do
 		
 		# Check for the specific typo
 		if grep -q "$TYPO" "$FILE" 2>/dev/null; then
-			printf "::error file=%s,title=Regression Test Failed::%s\n" "${FILE}" "Found typo '$TYPO' (should be '$CORRECTION')" >&2
+			python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${FILE}" --title "REGRESSION" "Found typo '$TYPO' (should be '$CORRECTION')" >&2
 			EXIT_CODE=2
 			
 			# Auto-correct if --fix is provided
 			if [[ "$1" == "--fix" ]]; then
 				if sed -i "s/$TYPO/$CORRECTION/g" "${FILE}" 2>/dev/null; then
-					printf "::notice file=%s,title=Auto-corrected::%s\n" "$FILE" "Fixed typo '$TYPO' to '$CORRECTION'"
+					python3 -B .github/tools/cioutput.py --log-level debug --level info --file "$FILE" "Fixed typo '$TYPO' to '$CORRECTION'" ;
 				fi
 			fi
 		fi
