@@ -65,11 +65,12 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 
 	__module__ = "tests.test_basic"
 
-	@unittest.skipUnless(True, "Insanity Test. Good luck debugging.")
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
 		"""Insanity Test 1: Because it only matters if we're not mad as hatters."""
 		assert True
 
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
 	def test_Does_Pass_WHEN_Meta_Test(self):
 		"""Insanity Test 2: for unittests assertion."""
 		self.assertTrue(True)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
@@ -77,6 +78,12 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
 		self.test_absolute_truth_and_meaning()
 		self.test_None_WHEN_Nothing()
+
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
+	def test_None_WHEN_Nothing(self):
+		"""Insanity Test 3: indirect call for unittests assertion."""
+		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
+		# define new tests below
 
 	def test_Does_Pass_WHEN_Using_Import_From_Syntax(self):
 		"""Test case 0: importing multicast."""
@@ -110,7 +117,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult)
 
 	def test_IsNone_WHEN_given_corner_case_input(self):
-		"""Example Test case for bad input directly into function."""
+		"""Test case 2: Example for bad input directly into function."""
 		theResult = False
 		try:
 			from .context import multicast
@@ -128,11 +135,6 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		except Exception:
 			theResult = False
 		self.assertTrue(theResult)
-
-	def test_None_WHEN_Nothing(self):
-		"""Try adding new tests."""
-		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
-		# define new tests below
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")
 	def test_Skip_UNLESS_linux_only(self):
