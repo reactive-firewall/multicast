@@ -116,44 +116,85 @@ class GithubActionsFormatter(logging.Formatter):
 			Formatted string in GitHub Actions annotation format
 		"""
 		# Extract file/line info if available in extra attributes
-		is_boundry = getattr(record, "is_boundry", False)
-		title = getattr(record, "title", None)
+		is_boundary = getattr(record, "is_boundry", False)
+		message = super().format(record)
+
+		if is_boundary:
+			return self._format_boundary(message)
+
+		annotation_level = self.LEVEL_MAPPING.get(record.levelno, "notice")
+		command = self._create_annotation_command(record, annotation_level)
+		return f"{command}:: {message}"
+
+	def _format_boundary(self, message: str) -> str:
+		"""Format the boundary message for GitHub Actions.
+
+		Args:
+			message: The log message
+
+		Returns:
+			Formatted boundary string
+		"""
+		if message:
+			return f"::group::{message}"
+		return "::endgroup::"
+
+	def _create_annotation_command(self, record: logging.LogRecord, annotation_level: str) -> str:
+		"""Create the annotation command based on the log record.
+
+		Args:
+			record: The log record
+			annotation_level: The level of the annotation
+
+		Returns:
+			The constructed annotation command
+		"""
+		command = f"::{annotation_level}"
+		if annotation_level != "debug":
+			command += self._add_location_parameters(record)
+			command += self._add_title_parameter(record)
+		return command
+
+	def _add_location_parameters(self, record: logging.LogRecord) -> str:
+		"""Add location parameters to the annotation command.
+
+		Args:
+			record: The log record
+
+		Returns:
+			Location parameters as a string
+		"""
+		params = []
 		file_path = getattr(record, "file_path", None)
 		line_num = getattr(record, "line_num", None)
 		end_line_num = getattr(record, "end_line_num", None)
 		col_num = getattr(record, "col_num", None)
 		end_col_num = getattr(record, "end_col_num", None)
-		# Get the annotation level based on log level
-		annotation_level = self.LEVEL_MAPPING.get(record.levelno, "notice")
-		# Format the basic message
-		message = super().format(record)
-		if is_boundry:
-			if message and (len(message) > 0):
-				annotation_level = "group"
-				return f"::group::{message}"
-			else:
-				return "::endgroup::"
-		# Create the annotation command
-		command = f"::{annotation_level}"
-		if annotation_level not in "debug":
-			# Add location parameters if available
-			if file_path:
-				command += f" file={file_path}"
-				if line_num:
-					command += f",line={line_num}"
-					if end_line_num:
-						command += f",endLine={end_line_num}"
-					if col_num:
-						command += f",col={col_num}"
-						if end_col_num:
-							command += f",endCol={end_col_num}"
-			if title:
-				if file_path:
-					command += f",title={title}"
-				else:
-					command += f" title={title}"
-		# Complete the command with the message
-		return f"{command}:: {message}"
+		if file_path:
+			params.append(f"file={file_path}")
+			if line_num:
+				params.append(f"line={line_num}")
+				if end_line_num:
+					params.append(f"endLine={end_line_num}")
+				if col_num:
+					params.append(f"col={col_num}")
+					if end_col_num:
+						params.append(f"endCol={end_col_num}")
+		return ",".join(params) if params else ""
+
+	def _add_title_parameter(self, record: logging.LogRecord) -> str:
+		"""Add the title parameter to the annotation command.
+
+		Args:
+			record: The log record
+
+		Returns:
+			Title parameter as a string
+		"""
+		title = getattr(record, "title", None)
+		if title:
+			return f",title={title}" if getattr(record, "file_path", None) else f"title={title}"
+		return ""
 
 
 class MarkdownFormatter(logging.Formatter):
@@ -366,23 +407,54 @@ class CIOutputTool:
 			col_num: Optional column number for annotations
 			end_col_num: Optional end-column number for annotations
 		"""
+		extra = self._build_extra_info(
+			is_boundry, title, file_path,
+			line_num, end_line_num, col_num, end_col_num,
+		)
+		self._log_message(message, level, extra)
+		self._handle_github_actions_summary(level, message, file_path, line_num, extra)
+
+	def _build_extra_info(
+		self,
+		is_boundry: Optional[bool],
+		title: Optional[str],
+		file_path: Optional[str],
+		line_num: Optional[int],
+		end_line_num: Optional[int],
+		col_num: Optional[int],
+		end_col_num: Optional[int]
+	) -> dict:
+		"""Build extra information for logging."""
 		extra = {}
-		if is_boundry:
+		if is_boundry is not None:
 			extra["is_boundry"] = is_boundry
-		if file_path:
+		if title:
 			extra["title"] = title
 		if file_path:
 			extra["file_path"] = file_path
-		if line_num:
+		if line_num is not None:
 			extra["line_num"] = line_num
-		if end_line_num:
+		if end_line_num is not None:
 			extra["end_line_num"] = end_line_num
-		if col_num:
+		if col_num is not None:
 			extra["col_num"] = col_num
-		if end_col_num:
+		if end_col_num is not None:
 			extra["end_col_num"] = end_col_num
+		return extra
+
+	def _log_message(self, message: str, level: LogLevel, extra: dict) -> None:
+		"""Log the message with the specified level and extra information."""
 		self.logger.log(level.value, message, extra=extra if extra else None)
-		# Also add ERROR and higher messages to GitHub Actions summary
+
+	def _handle_github_actions_summary(
+		self,
+		level: LogLevel,
+		message: str,
+		file_path: Optional[str],
+		line_num: Optional[int],
+		extra: dict
+	) -> None:
+		"""Handle logging for GitHub Actions summary."""
 		if level.value >= logging.ERROR and self.format_type == OutputFormat.MARKDOWN:
 			if "GITHUB_STEP_SUMMARY" in os.environ:
 				md_formatter = MarkdownFormatter()
@@ -395,7 +467,7 @@ class CIOutputTool:
 					args=(),
 					exc_info=None
 				)
-				for key, value in extra.items() if extra else {}:
+				for key, value in extra.items():
 					setattr(record, key, value)
 				self.add_to_summary(md_formatter.format(record))
 
