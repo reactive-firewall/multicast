@@ -67,7 +67,7 @@ import sys
 import logging
 import argparse
 from enum import Enum, auto
-from typing import Optional, Dict, Any, List, Union, TextIO
+from typing import Optional
 
 # Module initialization
 __module__ = os.path.basename(__file__)
@@ -105,7 +105,7 @@ class GithubActionsFormatter(logging.Formatter):
 		logging.ERROR: "error",
 		logging.CRITICAL: "error"
 	}
-	
+
 	def format(self, record: logging.LogRecord) -> str:
 		"""Format the log record as a GitHub Actions annotation.
 
@@ -116,14 +116,23 @@ class GithubActionsFormatter(logging.Formatter):
 			Formatted string in GitHub Actions annotation format
 		"""
 		# Extract file/line info if available in extra attributes
+		is_boundry = getattr(record, "is_boundry", False)
 		title = getattr(record, "title", None)
 		file_path = getattr(record, "file_path", None)
 		line_num = getattr(record, "line_num", None)
+		end_line_num = getattr(record, "end_line_num", None)
 		col_num = getattr(record, "col_num", None)
+		end_col_num = getattr(record, "end_col_num", None)
 		# Get the annotation level based on log level
 		annotation_level = self.LEVEL_MAPPING.get(record.levelno, "notice")
 		# Format the basic message
 		message = super().format(record)
+		if is_boundry:
+			if message and (len(message) > 0):
+				annotation_level = "group"
+				return f"::group::{message}"
+			else:
+				return "::endgroup::"
 		# Create the annotation command
 		command = f"::{annotation_level}"
 		if annotation_level not in "debug":
@@ -132,8 +141,12 @@ class GithubActionsFormatter(logging.Formatter):
 				command += f" file={file_path}"
 				if line_num:
 					command += f",line={line_num}"
+					if end_line_num:
+						command += f",endLine={end_line_num}"
 					if col_num:
 						command += f",col={col_num}"
+						if end_col_num:
+							command += f",endCol={end_col_num}"
 			if title:
 				if file_path:
 					command += f",title={title}"
@@ -152,11 +165,11 @@ class MarkdownFormatter(logging.Formatter):
 
 	# Map between log levels and markdown formatting
 	LEVEL_MAPPING = {
-		logging.DEBUG: ("💬", "Debug"),
-		logging.INFO: ("ℹ️", "Info"),
-		logging.WARNING: ("⚠️", "Warning"),
-		logging.ERROR: ("❌", "Error"),
-		logging.CRITICAL: ("🔥", "Critical")
+		logging.DEBUG: (":speech_balloon:", "NOTE"),
+		logging.INFO: (":information_source:", "NOTE"),
+		logging.WARNING: (":warning:", "WARNING"),
+		logging.ERROR: (":x:", "CAUTION"),
+		logging.CRITICAL: (":fire:", "CAUTION")
 	}
 
 	def format(self, record: logging.LogRecord) -> str:
@@ -170,20 +183,33 @@ class MarkdownFormatter(logging.Formatter):
 		"""
 		# Get the icon and level name
 		icon, level_name = self.LEVEL_MAPPING.get(
-			record.levelno, ("ℹ️", "Info")
+			record.levelno, (":information_source:", "Info")
 		)
+		is_boundry = getattr(record, "is_boundry", False)
 		# Format the basic message
 		message = super().format(record)
+		if is_boundry:
+			if message and (len(message) > 0):
+				return f"<details><summary>{message}</summary>\n"
+			else:
+				return "</details>"
 		# Extract file/line info if available in extra attributes
+		title_info = ""
+		title = getattr(record, "title", None)
 		file_info = ""
 		file_path = getattr(record, "file_path", None)
 		line_num = getattr(record, "line_num", None)
+		end_line_num = getattr(record, "end_line_num", None)
+		if title:
+			title_info = f"**{title}**{icon}\n> "
 		if file_path:
-			file_info = f"\n> 📁 `{file_path}`"
+			file_info = f"\n> :file_folder: `{file_path}`"
 			if line_num:
 				file_info += f":{line_num}"
+				if end_line_num:
+					file_info += f"-{end_line_num}"
 		# Format as markdown
-		return f"{icon} **{level_name}**: {message}{file_info}"
+		return f"> [!{level_name}]\n> {title_info}{message}{file_info}"
 
 
 class ColorizedConsoleFormatter(logging.Formatter):
@@ -214,8 +240,14 @@ class ColorizedConsoleFormatter(logging.Formatter):
 		"""
 		# Check if output is a terminal before using colors
 		use_colors = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+		is_boundry = getattr(record, "is_boundry", False)
 		# Format the basic message
 		message = super().format(record)
+		if is_boundry:
+			if len(message) > 0:
+				return f"[START] {message}"
+			else:
+				return "[ END ]"
 		if use_colors:
 			# Get the color code for this level
 			color = self.COLORS.get(record.levelno, self.RESET)
@@ -313,29 +345,42 @@ class CIOutputTool:
 		self,
 		message: str,
 		level: LogLevel = LogLevel.INFO,
+		is_boundry: Optional[bool] = None,
 		title: Optional[str] = None,
 		file_path: Optional[str] = None,
 		line_num: Optional[int] = None,
-		col_num: Optional[int] = None
+		end_line_num: Optional[int] = None,
+		col_num: Optional[int] = None,
+		end_col_num: Optional[int] = None
 	) -> None:
 		"""Log a message with the configured formatter.
 
 		Args:
 			message: Message to log
 			level: Log level to use
+			group: Optional title for annotations
+			title: Optional title for annotations
 			file_path: Optional file path for annotations
 			line_num: Optional line number for annotations
+			end_line_num: Optional end-line number for annotations
 			col_num: Optional column number for annotations
+			end_col_num: Optional end-column number for annotations
 		"""
 		extra = {}
+		if is_boundry:
+			extra["is_boundry"] = is_boundry
 		if file_path:
 			extra["title"] = title
 		if file_path:
 			extra["file_path"] = file_path
 		if line_num:
 			extra["line_num"] = line_num
+		if end_line_num:
+			extra["end_line_num"] = end_line_num
 		if col_num:
 			extra["col_num"] = col_num
+		if end_col_num:
+			extra["end_col_num"] = end_col_num
 		self.logger.log(level.value, message, extra=extra if extra else None)
 		# Also add ERROR and higher messages to GitHub Actions summary
 		if level.value >= logging.ERROR and self.format_type == OutputFormat.MARKDOWN:
@@ -362,7 +407,7 @@ class CIOutputTool:
 			**kwargs: Additional parameters (title, file_path, line_num, col_num)
 		"""
 		self.log(message, LogLevel.DEBUG, **kwargs)
-	
+
 	def info(self, message: str, **kwargs) -> None:
 		"""Log an info message.
 
@@ -371,7 +416,7 @@ class CIOutputTool:
 			**kwargs: Additional parameters (title, file_path, line_num, col_num)
 		"""
 		self.log(message, LogLevel.INFO, **kwargs)
-	
+
 	def warning(self, message: str, **kwargs) -> None:
 		"""Log a warning message.
 
@@ -380,7 +425,7 @@ class CIOutputTool:
 			**kwargs: Additional parameters (title, file_path, line_num, col_num)
 		"""
 		self.log(message, LogLevel.WARNING, **kwargs)
-	
+
 	def error(self, message: str, **kwargs) -> None:
 		"""Log an error message.
 
@@ -389,7 +434,7 @@ class CIOutputTool:
 			**kwargs: Additional parameters (title, file_path, line_num, col_num)
 		"""
 		self.log(message, LogLevel.ERROR, **kwargs)
-	
+
 	def critical(self, message: str, **kwargs) -> None:
 		"""Log a critical message.
 
@@ -416,7 +461,7 @@ def configure_output_tool() -> CIOutputTool:
 		Configured CIOutputTool instance
 	"""
 	parser = argparse.ArgumentParser(
-		description="CI/CD output formatting tool for GitHub Actions"
+		description="CI/CD output formatting tool for GitHub Actions",
 	)
 	parser.add_argument(
 		"-f", "--format",
@@ -436,28 +481,71 @@ def configure_output_tool() -> CIOutputTool:
 		help="Optional message to log"
 	)
 	parser.add_argument(
-		"--title",
+		"-t", "--title",
 		help="File path for GitHub Actions annotations"
 	)
 	parser.add_argument(
 		"--file",
 		help="File path for GitHub Actions annotations"
 	)
-	parser.add_argument(
+	group = parser.add_argument_group()
+	lineGroup = group.add_argument_group()
+	lineSubGroup = lineGroup.add_mutually_exclusive_group(required=False)
+	colGroup = lineGroup.add_argument_group()
+	colSubGroup = colGroup.add_mutually_exclusive_group(required=False)
+	lineSubGroup.add_argument(
 		"--line",
+		dest="line",
 		type=int,
+		metavar="LINE",
 		help="Line number for GitHub Actions annotations"
 	)
-	parser.add_argument(
-		"--col",
+	lineSubGroup.add_argument(
+		"--start-line",
+		dest="line",
 		type=int,
+		metavar="START_LINE",
+		help="Line number for GitHub Actions annotations"
+	)
+	colSubGroup.add_argument(
+		"--col",
+		dest="col",
+		type=int,
+		metavar="COL",
 		help="Column number for GitHub Actions annotations"
+	)
+	colSubGroup.add_argument(
+		"--start-col",
+		dest="col",
+		type=int,
+		metavar="START_COL",
+		help="Column number for GitHub Actions annotations"
+	)
+	lineGroup.add_argument(
+		"--end-line",
+		dest="end_line",
+		type=int,
+		help="End line number for GitHub Actions annotations"
+	)
+	colGroup.add_argument(
+		"--end-col",
+		dest="end_col",
+		type=int,
+		metavar="END_COL",
+		help="End column number for GitHub Actions annotations"
 	)
 	parser.add_argument(
 		"--log-level",
 		choices=["debug", "info", "warning", "error", "critical"],
 		default="info",
 		help="Minimum log level to display"
+	)
+	parser.add_argument(
+		"--group",
+		dest="is_group",
+		default=False,
+		action="store_true",
+		help="Optionally treat this as a group boundry. Ends if message is empty, otherwise starts"
 	)
 	args = parser.parse_args()
 	# Determine output format
@@ -474,15 +562,18 @@ def configure_output_tool() -> CIOutputTool:
 	# Create and configure the tool
 	tool = CIOutputTool(format_type, log_level)
 	# Process message if provided
-	if args.message:
+	if args.message or args.is_group:
 		msg_level = getattr(LogLevel, args.level.upper())
 		tool.log(
-			args.message,
+			args.message if args.message else "",
 			level=msg_level,
+			is_boundry=args.is_group,
 			title=args.title,
 			file_path=args.file,
 			line_num=args.line,
+			end_line_num=args.end_line,
 			col_num=args.col,
+			end_col_num=args.end_col,
 		)
 	return tool
 
@@ -495,10 +586,11 @@ def main() -> int:
 	"""
 	try:
 		tool = configure_output_tool()
-		return 0
+		if tool:
+			return 0
 	except Exception as e:
 		print(f"Error initializing CI output tool: {e}", file=sys.stderr)
-		return 1
+	return 1
 
 
 if __name__ == "__main__":

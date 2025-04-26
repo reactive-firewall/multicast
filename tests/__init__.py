@@ -356,9 +356,18 @@ except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional debug tests", exc_info=True)
 
 try:
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(__module__))
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(context))
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule("tests.MulticastUDPClient"))
+except Exception:  # pragma: no branch
+	_LOGGER.warning("Error loading optional doctests", exc_info=True)
+
+try:
 	from tests import test_extra
 	depends.insert(11, test_extra)
 	EXTRA_TESTS["security"].append(test_extra.ExtraDocsUtilsTestSuite)
+	import docs.utils
+	EXTRA_TESTS["security"].append(loadDocstringsFromModule(docs.utils))
 except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional extra tests", exc_info=True)
 

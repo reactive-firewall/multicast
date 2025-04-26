@@ -177,16 +177,16 @@ else
 fi
 
 function report_summary() {
-	printf "::group::%s\n" "Results" ;
+	python3 -B .github/tools/cioutput.py --group "Results" ;
 	# Improved reporting based on EXIT_CODE
 	case "${EXIT_CODE}" in
-		0) python3 -B .github/tools/cioutput.py --log-level debug --level info --title "CHECK-SPELLING" "OK: Found no detected spelling errors." ;;
-		1) python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CHECK-SPELLING" "FAIL: General failure during script execution." >&2 ;;
-		3) python3 -B .github/tools/cioutput.py --log-level debug --level error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repostory's requirements failed." >&2 ;;
-		126) python3 -B .github/tools/cioutput.py --log-level debug --level warning --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIPPED" "SKIP: Unable to continue script execution." >&2 ;;
-		*) python3 -B .github/tools/cioutput.py --log-level debug --level critical --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAILED" "FAIL: Detected spelling errors." >&2 ;;
+		0) python3 -B .github/tools/cioutput.py -l info -t "CHECK-SPELLING" "OK: Found no detected spelling errors." ;;
+		1) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CHECK-SPELLING" "FAIL: General failure during script execution." >&2 ;;
+		3) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repostory's requirements failed." >&2 ;;
+		126) python3 -B .github/tools/cioutput.py --level warning --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIPPED" "SKIP: Unable to continue script execution." >&2 ;;
+		*) python3 -B .github/tools/cioutput.py --level critical --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAILED" "FAIL: Detected spelling errors." >&2 ;;
 	esac
-	printf "::endgroup::\n" ;
+	python3 -B .github/tools/cioutput.py --group ;
 }
 
 # this is how test files are found:
@@ -217,7 +217,7 @@ fi
 # shellcheck disable=SC2086
 for FILE in $FILES_TO_CHECK; do
 	# Part 1: Run codespell
-	printf "::group::%s\n" "Checking ${FILE}" ;
+	python3 -B .github/tools/cioutput.py --group "Checking ${FILE}" ;
 	python3 -B .github/tools/cioutput.py --log-level debug --level debug "Running codespell tests for typos." ;
 	{ codespell $CODESPELL_OPTIONS "${FILE}" || EXIT_CODE=$? ;} 2>/dev/null ; wait ;
 	# Part 2: Run specific regression tests for known typos
@@ -242,7 +242,7 @@ for FILE in $FILES_TO_CHECK; do
 		unset TYPO 2>/dev/null || : ;
 		unset CORRECTION 2>/dev/null || : ;
 	done
-	printf "::endgroup::\n" ;
+	python3 -B .github/tools/cioutput.py --group
 done
 
 # cleaning up and reporting
