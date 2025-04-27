@@ -138,10 +138,11 @@ try:
 except Exception:
     p.join()
     raise RuntimeError("multicast seems to have failed.")
-
-# clean up some stuff
-p.join() # if not already handled don't forget to join the process and other overhead
-didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
+finally:
+    # clean up some stuff
+    if p:
+        p.join() # if not already handled don't forget to join the process and other overhead
+    didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
 
 ```
 
