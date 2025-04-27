@@ -62,10 +62,10 @@ project's `EXIT_CODES` mapping.
   ```python
   try:
       import important_module
-  except ImportError:
+  except ImportError as _cause:
       raise ModuleNotFoundError(
           "[CWE-758] Module failed to import."
-      ) from None
+      ) from _cause
   ```
 
   **Example 2**: In `multicast/hear.py`, handling errors during module import.
@@ -97,8 +97,8 @@ project's `EXIT_CODES` mapping.
   In `multicast/__main__.py`, wrapping the original `ImportError` to provide additional context.
 
   ```python
-  except ImportError as impErr:
-      raise ImportError("[CWE-440] Error Importing Python") from impErr
+  except ImportError as _cause:
+      raise ImportError("[CWE-440] Error Importing Python") from _cause
   ```
 
 #### `OSError`
@@ -110,8 +110,8 @@ project's `EXIT_CODES` mapping.
   In `multicast/recv.py`, when a socket operation fails.
 
   ```python
-  except OSError as err:
-      raise OSError("[CWE-440] Socket operation failed.") from err
+  except OSError as _cause:
+      raise OSError("[CWE-440] Socket operation failed.") from _cause
   ```
 
 #### `FileNotFoundError`
@@ -263,8 +263,8 @@ context.
   Handling import errors with additional context.
 
   ```python
-  except ImportError as impErr:
-      raise ImportError("[CWE-440] Error Importing Python") from impErr
+  except ImportError as _cause:
+      raise ImportError("[CWE-440] Error Importing Python") from _cause
   ```
 
 ### Example 4: `ShutdownCommandReceived` in `multicast/hear.py`
@@ -285,8 +285,8 @@ context.
   Indicating a socket operation failure.
 
   ```python
-  except OSError as err:
-      raise OSError("[CWE-474] Socket operation failed.") from err
+  except OSError as _cause:
+      raise OSError("[CWE-474] Socket operation failed.") from _cause
   ```
 
 ### Example 6: `KeyboardInterrupt` in `multicast/hear.py`
@@ -296,8 +296,8 @@ context.
   Handling user interruption (e.g., pressing Ctrl+C).
 
   ```python
-  except KeyboardInterrupt as key_err:
-      raise KeyboardInterrupt("User interrupted the process.") from key_err
+  except KeyboardInterrupt as _cause:
+      raise KeyboardInterrupt("User interrupted the process.") from _cause
   ```
 
 ## Error Handling Practices

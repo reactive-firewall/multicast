@@ -32,8 +32,8 @@ try:
 		from context import unittest
 		import threading
 		import socket
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as _cause:
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 @context.markWithMetaTag("mat", "hear")

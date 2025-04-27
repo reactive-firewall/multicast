@@ -76,13 +76,14 @@ _fixture_SAY_args = [
 try:
     multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
     # Hint: use a loop to repeat or different arguments to vary message.
-except Exception:
+except multicast.exceptions.CommandExecutionError as baton:
     p.join()
-    raise RuntimeError("Multicast operation failed.")
-
-# clean up some stuff
-p.join() # if not already handled don't forget to join the process and other overhead
-didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
+    raise RuntimeError("Multicast operation failed.") from baton
+finally:
+    # clean up some stuff
+    if p:
+        p.join() # if not already handled don't forget to join the process and other overhead
+    didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
 
 ```
 

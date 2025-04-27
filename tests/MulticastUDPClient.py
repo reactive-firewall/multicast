@@ -111,19 +111,19 @@ try:
 		raise ModuleNotFoundError(
 			"[CWE-440] OMG! sys.modules is not available or empty."
 		) from None
-except ImportError as baton:
-	raise ImportError("[CWE-440] Unable to import sys module.") from baton
+except ImportError as _cause:
+	raise ImportError("[CWE-440] Unable to import sys module.") from _cause
 
 try:
 	import socket
 	import socketserver
-except ImportError as baton:
-	raise ImportError("[CWE-758] Test module failed completely.") from baton
+except ImportError as _cause:
+	raise ImportError("[CWE-758] Test module failed completely.") from _cause
 
 try:
 	import random
-except ImportError as baton:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-758] Test module failed to randomize.") from baton
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-758] Test module failed to randomize.") from _cause
 
 
 class MCastClient(object):  # skipcq: PYL-R0205

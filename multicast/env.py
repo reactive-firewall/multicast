@@ -91,12 +91,12 @@ try:
 	from . import logging  # skipcq: PLY-C0414
 	from . import socket  # skipcq: PYL-C0414
 	import ipaddress
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except ImportError as _cause:
+	baton = ImportError(_cause, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 module_logger = logging.getLogger(__module__)
@@ -146,8 +146,8 @@ def validate_buffer_size(size: int) -> bool:
 	try:
 		size_num = int(size)
 		return 0 < size_num <= 65507
-	except (ValueError, TypeError) as err:
-		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from err
+	except (ValueError, TypeError) as _cause:
+		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from _cause
 
 
 def validate_port(port: int) -> bool:
@@ -186,8 +186,8 @@ def validate_port(port: int) -> bool:
 	try:
 		port_num = int(port)
 		return 49152 <= port_num <= 65535
-	except (ValueError, TypeError) as err:
-		raise ValueError(f"Invalid port value: {port}. Must be an integer.") from err
+	except (ValueError, TypeError) as _cause:
+		raise ValueError(f"Invalid port value: {port}. Must be an integer.") from _cause
 
 
 def validate_multicast_address(addr: str) -> bool:
@@ -248,10 +248,10 @@ def validate_ttl(ttl: int) -> bool:
 	try:
 		ttl_num = int(ttl)
 		return 1 <= ttl_num <= 126
-	except (ValueError, TypeError) as err:
+	except (ValueError, TypeError) as _cause:
 		raise ValueError(
 			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
-		) from err
+		) from _cause
 
 
 def load_buffer_size() -> int:

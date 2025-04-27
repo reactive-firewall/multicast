@@ -141,12 +141,12 @@ try:
 	from . import socket as _socket  # skipcq: PYL-C0414
 	from . import struct as _struct  # noqa
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL  # skipcq: PYL-C0414
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except Exception as _cause:
+	baton = ImportError(_cause, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 module_logger = logging.getLogger(__module__)

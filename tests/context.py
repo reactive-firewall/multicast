@@ -79,8 +79,8 @@ try:
 	import sys
 	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-440] sys.modules is not available or empty.") from None
-except ImportError as err:
-	raise ImportError("[CWE-440] Unable to import sys module.") from err
+except ImportError as _cause:
+	raise ImportError("[CWE-440] Unable to import sys module.") from _cause
 
 try:
 	import os
@@ -92,26 +92,26 @@ try:
 	import secrets
 	import unittest
 	import warnings
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Module Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Module Failed to import.") from _cause
 
 try:
 	from contextlib import contextmanager
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] contextlib.contextmanager Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] contextlib.contextmanager Failed to import.") from _cause
 
 try:
 	if 'Process' not in sys.modules:
 		from multiprocessing import Process as Process  # skipcq: PYL-C0414
 	else:  # pragma: no branch
 		Process = sys.modules["Process"]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Process Failed to import.") from _cause
 
 try:
 	import subprocess
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] subprocess Failed to import.") from _cause
 
 try:
 	if 'packaging' not in sys.modules:
@@ -120,24 +120,24 @@ try:
 	else:  # pragma: no branch
 		packaging = sys.modules["packaging"]
 		from packaging import version
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from _cause
 
 try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]  # pylint: disable=cyclic-import
-except Exception as err:  # pragma: no branch
-	raise ImportError("[CWE-440] Multicast Python Module Failed to import.") from err
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] Multicast Python Module Failed to import.") from _cause
 
 try:
 	if 'tests.profiling' not in sys.modules:
 		import tests.profiling as profiling
 	else:  # pragma: no branch
 		profiling = sys.modules["tests.profiling"]
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from _cause
 
 try:
 	if 'multicast.exceptions' not in sys.modules:
@@ -145,8 +145,8 @@ try:
 	else:  # pragma: no branch
 		multicast.exceptions = sys.modules["multicast.exceptions"]
 	from multicast.exceptions import CommandExecutionError
-except ImportError as err:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Test Exceptions Failed to import.") from _cause
 
 __BLANK = str("""""")
 """
@@ -656,11 +656,11 @@ def checkPythonCommand(args, stderr=None):
 			# Validate and sanitize command arguments
 			safe_args = taint_command_args(args)
 			theOutput = subprocess.check_output(safe_args, stderr=stderr)
-	except Exception as err:  # pragma: no branch
+	except Exception as _cause:  # pragma: no branch
 		theOutput = None
 		try:
-			if err.output is not None:
-				theOutput = err.output
+			if _cause.output is not None:
+				theOutput = _cause.output
 		except Exception:
 			theOutput = None  # suppress all errors
 	theOutput = checkStrOrByte(theOutput)
@@ -758,9 +758,9 @@ def checkPythonFuzzing(args, stderr=None):  # skipcq: PYL-W0102  - [] != [None]
 			# Validate and sanitize command arguments
 			safe_args = taint_command_args(args)
 			theOutput = subprocess.check_output(safe_args, stderr=stderr)
-	except BaseException as err:  # pragma: no branch
+	except BaseException as _cause:  # pragma: no branch
 		theOutput = None
-		raise CommandExecutionError(str(err), exit_code=2) from err  # do not suppress errors
+		raise CommandExecutionError(str(_cause), exit_code=2) from _cause  # do not suppress errors
 	theOutput = checkStrOrByte(theOutput)
 	return theOutput
 
@@ -898,11 +898,11 @@ def check_exec_command_has_output(test_case, someArgs):
 					checkPythonCommand(theArgs, stderr=subprocess.STDOUT), fail_msg_fixture
 				)
 				theResult = True
-			except BaseException as othererr:
-				debugtestError(othererr)
+			except BaseException as _root_cause:
+				debugtestError(_root_cause)
 				theResult = False
-	except Exception as err:
-		debugtestError(err)
+	except Exception as _cause:
+		debugtestError(_cause)
 		theResult = False
 	test_case.assertTrue(theResult, fail_msg_fixture)
 	return theResult
@@ -1001,11 +1001,11 @@ def managed_process(process):
 				process.join(timeout=3)
 				if process.is_alive():
 					process.kill()
-		except Exception as e:
+		except Exception as _cause:
 			if (__debug__ and sys.stderr.isatty()):
 				# Log the error but don't re-raise as this is cleanup code
 				warnings.warn(
-					f"Error during process cleanup: {e}", stacklevel=2,
+					f"Error during process cleanup: {_cause}", stacklevel=2,
 				)
 
 

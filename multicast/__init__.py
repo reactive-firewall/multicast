@@ -440,7 +440,7 @@ if struct.__name__ is None:
 if abc.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import Abstract base class. ABORT.") from None
 
-if 'multicast.exceptions' not in sys.modules:
+if "multicast.exceptions" not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import exceptions  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch

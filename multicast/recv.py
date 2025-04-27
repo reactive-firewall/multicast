@@ -178,8 +178,8 @@ try:
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
+except Exception as _cause:
+	del _cause  # skipcq - cleanup any error leaks early
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
@@ -197,12 +197,12 @@ try:
 			)  # pragma: no cover
 			baton.module = unit  # pragma: no cover
 			raise baton from None  # pragma: no cover
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except Exception as _cause:
+	baton = ImportError(_cause, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 module_logger = logging.getLogger(__name__)
@@ -393,8 +393,8 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None) -> _socket.s
 				_socket.INADDR_ANY if iface is None else _socket.inet_aton(iface)
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
-	except Exception as err:  # pragma: no branch
-		raise OSError("[CWE-440] Socket operation failed.") from err  # pragma: no cover
+	except Exception as _cause:  # pragma: no branch
+		raise OSError("[CWE-440] Socket operation failed.") from _cause  # pragma: no cover
 	return sock
 
 

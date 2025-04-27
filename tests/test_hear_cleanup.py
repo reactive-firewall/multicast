@@ -49,8 +49,8 @@ try:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from context import Process
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as _cause:
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 @context.markWithMetaTag("mat", "hear")
@@ -146,12 +146,12 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 					)
 					p.join(self.STOP_DELAY_SECONDS)
 				self.assertFalse(p.is_alive())
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join(self.KILL_DELAY_SECONDS)
 				if p.is_alive():
 					p.terminate()
 					p.close()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join(self.PROCESS_TIMEOUT_SECONDS)
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(
@@ -160,8 +160,8 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 				"CEP-8 VIOLATION.",
 			)
 			theResult = (int(p.exitcode) <= int(self.EXPECTED_STOP_EXIT_CODE))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)

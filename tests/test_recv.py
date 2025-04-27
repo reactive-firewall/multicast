@@ -41,8 +41,8 @@ try:
 		from context import unittest
 		from unittest import mock
 		import io
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as _cause:
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 @context.markWithMetaTag("extra", "coverage")
