@@ -94,6 +94,7 @@ check_command grep ;
 check_command curl ;
 check_command find ;
 check_command git ;
+check_command python3 ;
 check_command shlock ;
 
 
@@ -118,8 +119,7 @@ if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
 		# shellcheck disable=SC2046
-		printf "%s\n" "Check for Copyright lines already in progress by "$(head "${LOCK_FILE}") >&2 ;
-		false ;
+		python3 -B .github/tools/cioutput.py -l info --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIP" "Check for Copyright lines already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 fi
 
@@ -132,7 +132,7 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 	fi
 else
-	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+	python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAIL" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 
@@ -143,24 +143,24 @@ FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- *.md *.py *.txt 
 
 for _TEST_DOC in $FILES_TO_CHECK ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
-		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
+		python3 -B .github/tools/cioutput.py -l warning --file "${_TEST_DOC}" --title "SKIP" "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126;
 	else
 		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || : ;) -le 0) ]] ; then
-			printf "%s\n" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
+			python3 -B .github/tools/cioutput.py -l error --file "${_TEST_DOC}" --title "COPYRIGHT" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
 			EXIT_CODE=127
 		fi
 		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
-			printf "%s\n" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
+			python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "COPYRIGHT" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
 		fi
 		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt "${_TEST_YEAR}") ]] ; then
-			printf "%s\n" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
+			python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "DATE" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
 		fi
 		# shellcheck disable=SC2086
 		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
 			case "$EXIT_CODE" in
 				0|126) true ;;
-				*) printf "%s\n" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
+				*) python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "SKIP" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
 			esac
 		fi
 	fi
