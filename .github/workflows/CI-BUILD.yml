@@ -76,8 +76,8 @@ jobs:
           else
             printf "%s\n" "Built files found:"
             printf "%s\n" "$FILES"
-            # Replace line breaks with spaces for GitHub Action Output
-            FILES="${FILES//$'\n'/ }"
+            # Replace line breaks with commas for GitHub Action Output
+            FILES="${FILES//$'\n'/,}"
             printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           fi
         if: ${{ success() }}
