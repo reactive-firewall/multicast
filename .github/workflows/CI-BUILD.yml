@@ -85,13 +85,14 @@ jobs:
         if: ${{ success() }}
       - name: Upload build artifact
         id: upload
+        if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           path: ${{ steps.buildfiles.outputs.files }}
           name: multicast-build-${{ github.sha }}.zip
       - name: Generate artifact attestation
         if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           subject-name: multicast-build-${{ github.sha }}.zip
           subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
