@@ -90,7 +90,7 @@ jobs:
           path: ${{ steps.buildfiles.outputs.files }}
           name: multicast-build-${{ github.sha }}.zip
       - name: Generate artifact attestation
-        if: ${{ !cancelled() && steps.buildfiles.outputs.files != '' && (github.repository == 'reactive-firewall/multicast') }}
+        if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: multicast-build-${{ github.sha }}.zip
@@ -195,6 +195,7 @@ jobs:
       pull-requests: read
     needs: [BUILD, BOOTSTRAP]
     runs-on: ubuntu-latest
+    environment: ${{ needs.BUILD.environment }}
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
@@ -214,5 +215,5 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
-          pattern: multicast-${{ github.sha }}
+          pattern: multicast-build-${{ github.sha }}
       - run: ls -R dist
