@@ -211,6 +211,7 @@ jobs:
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: ${{ github.workspace }}
           pattern: multicast-build-${{ github.sha }}.zip
+          merge-multiple: true
       - run: ls -R dist
