@@ -192,6 +192,7 @@ jobs:
   BUILD_STATUS:
     permissions:
       actions: read
+      contents: read
       pull-requests: read
     needs: [BUILD, BOOTSTRAP]
     runs-on: ubuntu-latest
