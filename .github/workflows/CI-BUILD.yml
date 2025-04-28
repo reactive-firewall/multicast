@@ -1,7 +1,7 @@
 ---
 name: CI-BUILD
 description: "Continuous Integration workflow for building, the project."
-run-name: Build ${{ github.ref_name }} by @${{ github.actor }}
+run-name: Build ${{ github.ref_name }}
 #
 # Jobs included:
 # - BUILD: Ensures the project compiles correctly
@@ -33,8 +33,6 @@ jobs:
       statuses: write
       packages: none
       pull-requests: read
-      id-token: write
-      attestations: write
       security-events: none
     if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
     runs-on: ubuntu-latest
@@ -44,7 +42,7 @@ jobs:
         shell: bash
     env:
       LANG: "en_US.UTF-8"
-      GIT_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
+      BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
     outputs:
       build_status: ${{ steps.build.outcome }}
     steps:
@@ -71,7 +69,7 @@ jobs:
         id: buildfiles
         shell: bash
         run: |
-          FILES=$(git ls-files -oi --exclude-standard -- ${{ env.GIT_MATCH_PATTERN }} )
+          FILES=$(git ls-files -oi --exclude-standard -- ${{ env.BUILD_MATCH_PATTERN }} )
           if [ -z "$FILES" ]; then
             printf "%s\n" "::warning file=.github/workflows/CI-BUILD.yml:: No Built files found."
             printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
@@ -90,12 +88,6 @@ jobs:
         with:
           path: ${{ steps.buildfiles.outputs.files }}
           name: multicast-build-${{ github.sha }}.zip
-      - name: Generate artifact attestation
-        if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
-        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
-        with:
-          subject-name: multicast-build-${{ github.sha }}.zip
-          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
 
   BOOTSTRAP:
     permissions:
@@ -217,5 +209,5 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: dist
-          pattern: multicast-build-${{ github.sha }}
+          pattern: multicast-build-${{ github.sha }}.zip
       - run: ls -R dist
