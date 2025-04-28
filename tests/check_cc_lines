@@ -154,7 +154,7 @@ for _TEST_DOC in $FILES_TO_CHECK ; do
 			python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "COPYRIGHT" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
 		fi
 		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt "${_TEST_YEAR}") ]] ; then
-			python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "DATE" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
+			python3 -B .github/tools/cioutput.py -l warning --file "${_TEST_DOC}" --title "DATE" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
 		fi
 		# shellcheck disable=SC2086
 		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
