@@ -77,7 +77,7 @@ jobs:
             printf "%s\n" "Built files found:"
             printf "%s\n" "$FILES"
             # Replace line breaks with commas for GitHub Action Output
-            FILES="${FILES//$'\n'/,}"
+            FILES="${FILES//$'\n'/ }"
             printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           fi
         if: ${{ success() }}
@@ -86,8 +86,10 @@ jobs:
         if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          path: ${{ steps.buildfiles.outputs.files }}
+          path: dist
           name: multicast-build-${{ github.sha }}.zip
+          compression-level: 3
+          overwrite: true
 
   BOOTSTRAP:
     permissions:
@@ -195,6 +197,7 @@ jobs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
       build_ref: ${{ steps.check_status.outputs.build_ref }}
       build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
+      environment: ${{ needs.BUILD.environment }}
     steps:
       - id: check_status
         run: |
