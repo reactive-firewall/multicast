@@ -1,7 +1,7 @@
 ---
 name: CI-MATs
 description: "Continuous Integration workflow for Minimal Acceptance Tests (MATs)."
-run-name: Minimal Acceptance Tests for ${{ github.ref_name }} by @${{ github.actor }}
+run-name: Minimal Acceptance Tests
 #
 # This workflow runs after successful completion of CI-BUILD to ensure
 # that the codebase meets minimal acceptance criteria.
@@ -39,7 +39,13 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
-      build_environment: ${{ steps.get_env.outputs.environment }}
+      head_branch: ${{ steps.get_sha.outputs.head_branch }}
+      sha: ${{ steps.get_sha.outputs.head_sha }}
+      branch_name: ${{ steps.get_env.outputs.branch }}
+      parent_sha: ${{ steps.get_env.outputs.parent_sha }}
+      branch_ref: ${{ steps.get_env.outputs.branch_ref }}
+      trigger_id: ${{ steps.get_env.outputs.trigger_id }}
+      build_environment: "Testing"
     steps:
       - id: check
         run: |
@@ -48,14 +54,34 @@ jobs:
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
+      - id: get_sha
+        run: |
+          SHA_VALUE=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.head_branch')
+          if [[ -n "$SHA_VALUE" ]]; then
+            echo "head_branch=$SHA_VALUE" >> "$GITHUB_OUTPUT"
+            echo "head_sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "head_branch={}" >> "$GITHUB_OUTPUT"  # Default fallback
+            echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback
+          fi
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Checkout target commit
+        run: git checkout ${{ steps.get_sha.outputs.head_sha }}
       - id: get_env
         run: |
-          ENV_VALUE=$(gh api "${{ github.event.workflow_run.check_suite_url }}" --jq '.check_suite.pull_requests[0].head.repo.environment')
+          ENV_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
           if [[ -n "$ENV_VALUE" ]]; then
-            echo "environment=$ENV_VALUE" >> "$GITHUB_OUTPUT"
+            echo "trigger_id=$ENV_VALUE" >> "$GITHUB_OUTPUT"
           else
-            echo "environment=Experimenting" >> "$GITHUB_OUTPUT"  # Default fallback
+            echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
+          echo "branch=$(git symbolic-ref --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "parent_sha=$(git show-ref --heads --hash stable)" >> "$GITHUB_OUTPUT"
+          echo "branch_ref=$(git symbolic-ref HEAD)" >> "$GITHUB_OUTPUT"
 
   MATS:
     permissions:
@@ -80,31 +106,25 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout repository for MATs with ${{ matrix.python-version }}
+        uses: ./.github/actions/checkout-and-rebuild
         with:
-          persist-credentials: false
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
-        with:
+          sha: ${{ needs.check_build.outputs.sha }}
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies for ${{ matrix.python-version }}
-        run: |
-          pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
-          pip install -r ./requirements.txt ;
-          pip install -r ./tests/requirements.txt || true ;
-          pip install --upgrade -r ./docs/requirements.txt || true ;
-      - name: Pre-Clean
-        id: clean
-        run: make -j1 -f Makefile clean || true ;
+          path: ${{ github.workspace }}
       - name: Run Tests for python ${{ matrix.python-version }}
         id: tests
-        run: make -j1 -f Makefile test ;
+        run: make -j1 -f Makefile test-mats ;
       - name: Summerize MATs for python ${{ matrix.python-version }}
         id: sumerize-mats
         run: |
           echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
+      - name: Summerize MATs for python ${{ matrix.python-version }} (FAILED)
+        id: sumerize-mats
+        run: |
+          echo "- [ ] MATS FAILED with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ failure() }}
       - name: Post-Clean
         id: post
         run: make -j1 -f Makefile clean || true ;
