@@ -30,7 +30,7 @@ inputs:
     description: |
       The python version to setup. The default is to use the value of the github
       variable 'PYTHON_DEFAULT'.
-    default: "${{ github.server_url == 'https://github.com' && vars.PYTHON_DEFAULT || 3.12 }}"
+    default: ${{ github.server_url == 'https://github.com' && vars.PYTHON_DEFAULT || '3.12' }}
     required: true
 outputs:
   branch-name:
