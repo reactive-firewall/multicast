@@ -742,6 +742,7 @@ class mtool(abc.ABC):
 
 
 if "multicast.skt" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global skt  # skipcq: PYL-W0604
@@ -754,18 +755,21 @@ endSocket = skt.endSocket
 """See multicast.skt.endSocket."""
 
 if "multicast.recv" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global recv  # skipcq: PYL-W0604
 	recv = sys.modules["multicast.recv"]
 
 if "multicast.send" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global send  # skipcq: PYL-W0604
 	send = sys.modules["multicast.send"]
 
 if "multicast.hear" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global hear  # skipcq: PYL-W0604

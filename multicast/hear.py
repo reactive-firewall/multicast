@@ -182,6 +182,7 @@ __name__ = "multicast.hear"  # skipcq: PYL-W0622
 try:
 	import sys
 	if 'multicast' not in sys.modules:
+		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]
