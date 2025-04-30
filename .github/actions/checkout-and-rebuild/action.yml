@@ -63,12 +63,11 @@ runs:
         path: ${{ inputs.path }}
         repository: reactive-firewall/multicast
         token: ${{ inputs.token }}
-    - run: git checkout ${{ inputs.sha }}
     - name: "Checkout Target Commit by SHA"
       shell: bash
       run: |
         printf "%s\n" "::group::target-commit"
-        git checkout ${{ inputs.sha }}
+        git checkout --force --detach ${{ inputs.sha }} --
         printf "%s\n" "::endgroup::"
       if: ${{ (github.sha != inputs.sha) && success() }}
     - id: output_branch_name
