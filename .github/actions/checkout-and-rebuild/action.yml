@@ -73,7 +73,8 @@ runs:
     - id: output_branch_name
       if: ${{ !cancelled() }}
       shell: bash
-      run: printf "branch-name=%s\n" $(git symbolic-ref --short HEAD) >> "$GITHUB_OUTPUT"
+      run: |
+        printf "branch-name=%s\n" $(git name-rev --name-only HEAD | cut -d~ -f1-1) >> "$GITHUB_OUTPUT"
     - id: output_sha
       shell: bash
       run: printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
