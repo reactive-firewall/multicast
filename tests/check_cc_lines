@@ -65,7 +65,7 @@ PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
 # tests/check_cc_lines.sh
-readonly SCRIPT_NAME="${0##*/}"
+readonly SCRIPT_FILE="${0##*/}"
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.copyright-lines-shell"
 EXIT_CODE=1
 

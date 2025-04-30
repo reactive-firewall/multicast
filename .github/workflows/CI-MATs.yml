@@ -55,11 +55,13 @@ jobs:
             echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
       - id: get_sha
+        env:
+          BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
+          SHA_VALUE: ${{ github.event.workflow_run.head_sha }}
         run: |
-          SHA_VALUE='${{ github.event.workflow_run.head_branch }}'
-          if [[ -n "$SHA_VALUE" ]]; then
-            echo "head_branch=$SHA_VALUE" >> "$GITHUB_OUTPUT"
-            echo "head_sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          if [[ -n "$BRANCH_VALUE" ]]; then
+            echo "head_branch=$BRANCH_VALUE" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$SHA_VALUE" >> "$GITHUB_OUTPUT"
           else
             echo "head_branch='undefined'" >> "$GITHUB_OUTPUT"  # Default fallback
             echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback

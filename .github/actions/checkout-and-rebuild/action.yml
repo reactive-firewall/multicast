@@ -30,13 +30,11 @@ inputs:
     description: |
       The python version to setup. The default is to use the value of the github
       variable 'PYTHON_DEFAULT'.
-    type: int
     default: "${{ github.server_url == 'https://github.com' && vars.PYTHON_DEFAULT || 3.12 }}"
     required: true
 outputs:
   branch-name:
     description: "The name of the branch that was checked-out"
-    type: string
     value: ${{ steps.output_branch_name.outputs.branch-name || '' }}
   sha:
     description: "The SHA of the commit checked-out"
