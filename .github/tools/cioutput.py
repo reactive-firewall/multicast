@@ -116,7 +116,7 @@ class GithubActionsFormatter(logging.Formatter):
 			Formatted string in GitHub Actions annotation format
 		"""
 		# Extract file/line info if available in extra attributes
-		is_boundary = getattr(record, "is_boundry", False)
+		is_boundary = getattr(record, "is_boundary", False)
 		message = super().format(record)
 
 		if is_boundary:
@@ -226,10 +226,10 @@ class MarkdownFormatter(logging.Formatter):
 		icon, level_name = self.LEVEL_MAPPING.get(
 			record.levelno, (":information_source:", "Info")
 		)
-		is_boundry = getattr(record, "is_boundry", False)
+		is_boundary = getattr(record, "is_boundary", False)
 		# Format the basic message
 		message = super().format(record)
-		if is_boundry:
+		if is_boundary:
 			if message and (len(message) > 0):
 				return f"<details><summary>{message}</summary>\n"
 			else:
@@ -281,10 +281,10 @@ class ColorizedConsoleFormatter(logging.Formatter):
 		"""
 		# Check if output is a terminal before using colors
 		use_colors = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
-		is_boundry = getattr(record, "is_boundry", False)
+		is_boundary = getattr(record, "is_boundary", False)
 		# Format the basic message
 		message = super().format(record)
-		if is_boundry:
+		if is_boundary:
 			if len(message) > 0:
 				return f"[START] {message}"
 			else:
@@ -386,7 +386,7 @@ class CIOutputTool:
 		self,
 		message: str,
 		level: LogLevel = LogLevel.INFO,
-		is_boundry: Optional[bool] = None,
+		is_boundary: Optional[bool] = None,
 		title: Optional[str] = None,
 		file_path: Optional[str] = None,
 		line_num: Optional[int] = None,
@@ -408,7 +408,7 @@ class CIOutputTool:
 			end_col_num: Optional end-column number for annotations
 		"""
 		extra = self._build_extra_info(
-			is_boundry, title, file_path,
+			is_boundary, title, file_path,
 			line_num, end_line_num, col_num, end_col_num,
 		)
 		self._log_message(message, level, extra)
@@ -416,7 +416,7 @@ class CIOutputTool:
 
 	def _build_extra_info(
 		self,
-		is_boundry: Optional[bool],
+		is_boundary: Optional[bool],
 		title: Optional[str],
 		file_path: Optional[str],
 		line_num: Optional[int],
@@ -426,8 +426,8 @@ class CIOutputTool:
 	) -> dict:
 		"""Build extra information for logging."""
 		extra = {}
-		if is_boundry is not None:
-			extra["is_boundry"] = is_boundry
+		if is_boundary is not None:
+			extra["is_boundary"] = is_boundary
 		if title:
 			extra["title"] = title
 		if file_path:
@@ -617,7 +617,7 @@ def configure_output_tool() -> CIOutputTool:
 		dest="is_group",
 		default=False,
 		action="store_true",
-		help="Optionally treat this as a group boundry. Ends if message is empty, otherwise starts"
+		help="Optionally treat this as a group boundary. Ends if message is empty, otherwise starts"
 	)
 	args = parser.parse_args()
 	# Determine output format
@@ -639,7 +639,7 @@ def configure_output_tool() -> CIOutputTool:
 		tool.log(
 			args.message if args.message else "",
 			level=msg_level,
-			is_boundry=args.is_group,
+			is_boundary=args.is_group,
 			title=args.title,
 			file_path=args.file,
 			line_num=args.line,

@@ -151,6 +151,7 @@ declare -a SPECIFIC_TYPOS=(
 	"belone:belong"  # from #373
 	"subbclass:subclass"  # from #379
 	"repostory's:repository's"  # from #384
+	"boundry:boundary"  #from #384
 )
 
 function cleanup() {
