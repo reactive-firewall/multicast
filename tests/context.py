@@ -116,10 +116,9 @@ except ImportError as err:  # pragma: no branch
 try:
 	if 'packaging' not in sys.modules:
 		import packaging
-		from packaging import version
 	else:  # pragma: no branch
 		packaging = sys.modules["packaging"]
-		from packaging import version
+	from packaging import version
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] packaging.version Failed to import.") from err
 
