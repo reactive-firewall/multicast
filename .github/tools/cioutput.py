@@ -171,7 +171,7 @@ class GithubActionsFormatter(logging.Formatter):
 		col_num = getattr(record, "col_num", None)
 		end_col_num = getattr(record, "end_col_num", None)
 		if file_path:
-			params.append(f"file={file_path}")
+			params.append(f" file={file_path}")
 			if line_num:
 				params.append(f"line={line_num}")
 				if end_line_num:
@@ -193,7 +193,7 @@ class GithubActionsFormatter(logging.Formatter):
 		"""
 		title = getattr(record, "title", None)
 		if title:
-			return f",title={title}" if getattr(record, "file_path", None) else f"title={title}"
+			return f",title={title}" if getattr(record, "file_path", None) else f" title={title}"
 		return ""
 
 
@@ -534,7 +534,7 @@ def configure_output_tool() -> CIOutputTool:
 	)
 	parser.add_argument(
 		"-f", "--format",
-		choices=["console", "gha", "markdown"],
+		choices=["auto", "console", "gha", "markdown"],
 		default="auto",
 		help="Output format (auto detects GHA environment if not specified)"
 	)
