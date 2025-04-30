@@ -285,10 +285,7 @@ class ColorizedConsoleFormatter(logging.Formatter):
 		# Format the basic message
 		message = super().format(record)
 		if is_boundary:
-			if len(message) > 0:
-				return f"[START] {message}"
-			else:
-				return "[ END ]"
+			return f"[START] {message}" if message else "[ END ]"
 		if use_colors:
 			# Get the color code for this level
 			color = self.COLORS.get(record.levelno, self.RESET)
