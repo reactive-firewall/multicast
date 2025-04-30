@@ -56,12 +56,12 @@ jobs:
           fi
       - id: get_sha
         run: |
-          SHA_VALUE=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.head_branch')
+          SHA_VALUE='${{ github.event.workflow_run.head_branch }}'
           if [[ -n "$SHA_VALUE" ]]; then
             echo "head_branch=$SHA_VALUE" >> "$GITHUB_OUTPUT"
             echo "head_sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
           else
-            echo "head_branch={}" >> "$GITHUB_OUTPUT"  # Default fallback
+            echo "head_branch='undefined'" >> "$GITHUB_OUTPUT"  # Default fallback
             echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
       - name: Checkout repository
@@ -79,7 +79,7 @@ jobs:
           else
             echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
-          echo "branch=$(git symbolic-ref --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=$(git name-rev --name-only HEAD | cut -d~ -f1-1)" >> "$GITHUB_OUTPUT"
           echo "parent_sha=$(git show-ref --heads --hash stable)" >> "$GITHUB_OUTPUT"
           echo "branch_ref=$(git symbolic-ref HEAD)" >> "$GITHUB_OUTPUT"
 
