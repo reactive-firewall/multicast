@@ -117,12 +117,12 @@ jobs:
       - name: Run Tests for python ${{ matrix.python-version }}
         id: tests
         run: make -j1 -f Makefile test-mats ;
-      - name: Summerize MATs for python ${{ matrix.python-version }}
-        id: summerize-mats-success
+      - name: Summarize MATs for python ${{ matrix.python-version }}
+        id: summarize-mats-success
         run: |
           echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
-      - name: Summerize MATs for python ${{ matrix.python-version }} (FAILED)
+      - name: Summarize MATs for python ${{ matrix.python-version }} (FAILED)
         id: summarize-mats-failure
         run: |
           echo "- [ ] ~MATS succeeded with python version ${{ matrix.python-version }}~" >> "$GITHUB_STEP_SUMMARY"
