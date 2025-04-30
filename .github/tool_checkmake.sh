@@ -1,1 +1,1 @@
-./tools/checkmake.sh
+./tools/checkmake.bash

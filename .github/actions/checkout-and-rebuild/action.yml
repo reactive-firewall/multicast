@@ -70,7 +70,7 @@ runs:
         printf "%s\n" "::group::target-commit"
         git checkout ${{ inputs.sha }}
         printf "%s\n" "::endgroup::"
-      if: {{ (github.sha != inputs.sha) && success() }}
+      if: ${{ (github.sha != inputs.sha) && success() }}
     - id: output_branch_name
       if: ${{ !cancelled() }}
       shell: bash
@@ -94,12 +94,12 @@ runs:
     - name: "Fetch Build Files"
       if: ${{ success() }}
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          path: ${{ inputs.path }}/dist
-          pattern: multicast-build-${{ steps.output_sha.outputs.sha }}.zip
-          merge-multiple: true
-          repository: reactive-firewall/multicast
-          github-token: ${{ inputs.token }}
+      with:
+        path: ${{ inputs.path }}/dist
+        pattern: multicast-build-${{ steps.output_sha.outputs.sha }}.zip
+        merge-multiple: true
+        repository: reactive-firewall/multicast
+        github-token: ${{ inputs.token }}
     - name: "Enumerate Fetched Files"
       id: output_artifact_files
       env:

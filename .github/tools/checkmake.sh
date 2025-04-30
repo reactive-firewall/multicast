@@ -1,1 +1,1 @@
-tool_checkmake.bash
+checkmake.bash
