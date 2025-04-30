@@ -116,14 +116,14 @@ jobs:
         id: tests
         run: make -j1 -f Makefile test-mats ;
       - name: Summerize MATs for python ${{ matrix.python-version }}
-        id: sumerize-mats
+        id: summerize-mats-success
         run: |
           echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
       - name: Summerize MATs for python ${{ matrix.python-version }} (FAILED)
-        id: sumerize-mats
+        id: summarize-mats-failure
         run: |
-          echo "- [ ] MATS FAILED with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- [ ] ~MATS succeeded with python version ${{ matrix.python-version }}~" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ failure() }}
       - name: Post-Clean
         id: post
@@ -143,7 +143,7 @@ jobs:
     steps:
       - id: check_status
         run: |
-          if [[ "${{ needs.MATS.result }}" == "success" ]]; then
+          if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
           else
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
