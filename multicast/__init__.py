@@ -33,7 +33,7 @@ __all__ = [
 	"""__prologue__""",
 	"""__doc__""",
 	"""exceptions""",
-	"""exceptions.CommandExecutionError""",
+	"""exceptions.CommandExecutionError""",  # skipcq: PYL-E0603 -- imports ok
 	"""exceptions.get_exit_code_from_exception""",
 	"""exceptions.exit_on_exception""",
 	"""get_exit_code_from_exception""",
@@ -43,13 +43,13 @@ __all__ = [
 	"""skt.__package__""",
 	"""skt.__module__""",
 	"""skt.__name__""",
-	"""skt.__file__""",
+	"""skt.__file__""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""skt.genSocket""",
-	"""skt.genSocket.__func__""",
-	"""genSocket""",
-	"""skt.endSocket""",
-	"""skt.endSocket.__func__""",
-	"""endSocket""",
+	"""skt.genSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""genSocket""",  # skipcq: PYL-E0603 -- imports ok
+	"""skt.endSocket""",  # skipcq: PYL-E0603 -- imports ok
+	"""skt.endSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""endSocket""",  # skipcq: PYL-E0603 -- imports ok
 	"""EXIT_CODES""",
 	"""EXCEPTION_EXIT_CODES""",
 	"""_BLANK""",
@@ -61,9 +61,9 @@ __all__ = [
 	"""recv""",
 	"""send""",
 	"""hear""",
-	"""recv.McastRECV""",
-	"""send.McastSAY""",
-	"""hear.McastHEAR""",
+	"""recv.McastRECV""",  # skipcq: PYL-E0603 -- imports ok
+	"""send.McastSAY""",  # skipcq: PYL-E0603 -- imports ok
+	"""hear.McastHEAR""",  # skipcq: PYL-E0603 -- imports ok
 ]
 
 __package__ = "multicast"  # skipcq: PYL-W0622
