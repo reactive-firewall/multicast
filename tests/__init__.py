@@ -359,9 +359,9 @@ try:
 	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(__module__))
 	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(context))
 	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule("tests.MulticastUDPClient"))
-except (ImportError, ValueError) as _cause:  # pragma: no branch
+except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional doctests", exc_info=True)
-	del _cause  # skipcq - cleanup any error leaks early
+	# reported, so now just continue with testing
 
 try:
 	from tests import test_extra
