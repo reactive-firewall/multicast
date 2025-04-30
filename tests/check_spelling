@@ -150,6 +150,7 @@ declare -a SPECIFIC_TYPOS=(
 	"specificly:specifically"  # from #205
 	"belone:belong"  # from #373
 	"subbclass:subclass"  # from #379
+	"repostory's:repository's"  # from #384
 )
 
 function cleanup() {
@@ -182,7 +183,7 @@ function report_summary() {
 	case "${EXIT_CODE}" in
 		0) python3 -B .github/tools/cioutput.py -l info -t "CHECK-SPELLING" "OK: Found no detected spelling errors." ;;
 		1) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CHECK-SPELLING" "FAIL: General failure during script execution." >&2 ;;
-		3) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repostory's requirements failed." >&2 ;;
+		3) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repository's requirements failed." >&2 ;;
 		126) python3 -B .github/tools/cioutput.py --level warning --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIPPED" "SKIP: Unable to continue script execution." >&2 ;;
 		*) python3 -B .github/tools/cioutput.py --level critical --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAILED" "FAIL: Detected spelling errors." >&2 ;;
 	esac
