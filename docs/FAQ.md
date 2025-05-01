@@ -142,8 +142,7 @@ finally:
     # clean up some stuff
     if p:
         p.join() # if not already handled don't forget to join the process and other overhead
-    didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
-
+    didWork = (p is not None and int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
 ```
 
 > [!WARNING]

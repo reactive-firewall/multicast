@@ -92,7 +92,7 @@ try:
 	from . import socket  # skipcq: PYL-C0414
 	import ipaddress
 except ImportError as _cause:
-	baton = ImportError(_cause, str("[CWE-758] Module failed completely."))
+	baton = ImportError(_cause, "[CWE-758] Module failed completely.")
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = _cause

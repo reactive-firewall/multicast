@@ -635,7 +635,7 @@ class McastDispatch(mtool):
 			if (sys.stderr.isatty()):
 				print(
 					"WARNING - An error occurred while handling the arguments. Refused.",
-					file=sys.stderr
+					file=sys.stderr,
 				)
 				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {_cause}\n{_cause.args}", file=sys.stderr)
 		return __EXIT_MSG  # noqa

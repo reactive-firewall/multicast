@@ -40,8 +40,8 @@ try:
 	"""
 	try:
 		import context
-	except Exception as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error leaks early
+	except Exception as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error leaks early
 		from . import context
 	if context.__name__ is None:
 		raise ImportError("[CWE-758] Failed to import context") from None

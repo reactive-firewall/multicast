@@ -94,8 +94,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(multicast.__doc__)
 			theResult = True
 		except Exception as _cause:
-			print(str(type(_cause)))
-			print(str(_cause))
+			context.debugtestError(_cause)
 			theResult = False
 		self.assertTrue(theResult)
 
