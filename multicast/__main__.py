@@ -136,7 +136,7 @@ try:
 	from . import sys
 except ImportError as baton:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python")) from baton
+	raise ImportError("[CWE-440] Error Importing Python") from baton
 
 if "multicast.__version__" not in sys.modules:
 	from . import __version__ as __version__  # skipcq: PYL-C0414

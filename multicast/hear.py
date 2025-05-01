@@ -213,7 +213,7 @@ try:
 					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
 		except Exception as _root_cause:  # pragma: no branch
-			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from _root_cause
+			raise ModuleNotFoundError("[CWE-758] Module failed completely.") from _root_cause
 except Exception as _cause:
 	raise ImportError(_cause) from _cause
 

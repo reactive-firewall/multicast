@@ -250,7 +250,7 @@ def validate_ttl(ttl: int) -> bool:
 		return 1 <= ttl_num <= 126
 	except (ValueError, TypeError) as _cause:
 		raise ValueError(
-			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
+			f"Invalid TTL value: {ttl}. Must be a positive integer below 127.",
 		) from _cause
 
 
