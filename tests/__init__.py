@@ -191,7 +191,7 @@ try:
 					f"Test module failed to import even the {str(unit_test)} tests."
 				) from None
 		except Exception as _root_cause:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Test module failed completely.")) from _root_cause
+			raise ImportError("[CWE-758] Test module failed completely.") from _root_cause
 except Exception as _cause:  # pragma: no branch
 	_LOGGER.debug(str(type(_cause)))
 	_LOGGER.exception(str(_cause))
