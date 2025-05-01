@@ -45,7 +45,7 @@ __all__ = [
 	"""skt.__module__""",
 	"""skt.__name__""",
 	"""skt.__file__""",  # skipcq: PYL-E0603 -- shadow imports ok
-	"""skt.genSocket""",
+	"""skt.genSocket""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""skt.genSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""genSocket""",  # skipcq: PYL-E0603 -- imports ok
 	"""skt.endSocket""",  # skipcq: PYL-E0603 -- imports ok
