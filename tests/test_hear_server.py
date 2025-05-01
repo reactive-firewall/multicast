@@ -22,17 +22,17 @@ __module__ = "tests"
 try:
 	try:
 		import context
-	except Exception as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except Exception as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		import socket
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as baton:
+	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
 @context.markWithMetaTag("mat", "hear")
@@ -61,8 +61,8 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 			s.connect(("203.0.113.1", 59095))
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
-		except socket.error as e:
-			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from e
+		except socket.error as _cause:
+			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from _cause
 		finally:
 			if s is not None:
 				s.close()
@@ -113,8 +113,8 @@ class McastServerTestSuite(McastHearTestSuite):
 				server.server_close()
 			theResult = (multicast.endSocket(request[1]) is None)
 			self.assertTrue(theResult, "RESOURCE LEAK")
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 		self.assertTrue(theResult, fail_fixture)
 
@@ -138,8 +138,8 @@ class McastServerTestSuite(McastHearTestSuite):
 				# Clean up
 				server.server_close()
 			theResult = (request is None)
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 		self.assertTrue(theResult, fail_fixture)
 
@@ -204,8 +204,8 @@ class HearUDPHandlerTestSuite(McastHearTestSuite):
 			result = handler.handle()
 			# Clean up socket
 			self.assertIsNone(multicast.endSocket(sock), "RESOURCE LEAK")
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 		self.assertIsNone(result, fail_fixture)
 

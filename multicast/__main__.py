@@ -134,9 +134,9 @@ __file__ = "multicast/__main__.py"
 
 try:
 	from . import sys
-except ImportError as impErr:
+except ImportError as baton:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
+	raise ImportError("[CWE-440] Error Importing Python") from baton
 
 if "multicast.__version__" not in sys.modules:
 	from . import __version__ as __version__  # skipcq: PYL-C0414
@@ -596,8 +596,8 @@ class McastDispatch(mtool):
 		if (tool is not None) and (tool in cached_list):
 			try:
 				(_is_done, theResult) = TASK_OPTIONS[tool].__call__([], **kwargs)
-			except Exception as e:  # pragma: no branch
-				theResult = f"CRITICAL - Attempted '[{tool}]: {kwargs}' just failed! :: {e}"  # noqa
+			except Exception as _cause:  # pragma: no branch
+				theResult = f"CRITICAL - Attempted '[{tool}]: {kwargs}' just failed! :: {_cause}"  # noqa
 				_is_done = False
 		return (_is_done, theResult)  # noqa
 
@@ -626,18 +626,18 @@ class McastDispatch(mtool):
 				__EXIT_MSG = (70, _TOOL_MSG)
 				if (sys.stdout.isatty()):  # pragma: no cover
 					print(str(_TOOL_MSG))
-		except Exception as err:  # pragma: no branch
-			exit_code = exceptions.get_exit_code_from_exception(err)
+		except Exception as _cause:  # pragma: no branch
+			exit_code = exceptions.get_exit_code_from_exception(_cause)
 			__EXIT_MSG = (
-				False,
-				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {err}" # noqa
+				1,
+				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {_cause}" # noqa
 			)
 			if (sys.stderr.isatty()):
 				print(
 					"WARNING - An error occurred while handling the arguments. Refused.",
-					file=sys.stderr
+					file=sys.stderr,
 				)
-				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {err}\n{err.args}", file=sys.stderr)
+				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {_cause}\n{_cause.args}", file=sys.stderr)
 		return __EXIT_MSG  # noqa
 
 

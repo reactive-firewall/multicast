@@ -22,11 +22,10 @@ __module__ = "tests"
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import sys

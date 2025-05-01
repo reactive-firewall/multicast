@@ -238,7 +238,7 @@ html_short_title = "Multicast Docs"
 try:
 	from sphinxawesome_theme.postprocess import Icons
 	html_permalinks_icon = Icons.permalinks_icon
-except Exception:
+except Exception:  # pragma: no branch
 	html_permalinks_icon = "<span>#</span>"
 
 # Add any paths that contain custom static files (such as style sheets) here,

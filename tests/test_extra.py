@@ -30,16 +30,16 @@ __module__ = "tests"
 try:
 	try:
 		import context
-	except Exception as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except ImportError as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
 		import docs.utils
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except ImportError as baton:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
 @context.markWithMetaTag("extra", "security")

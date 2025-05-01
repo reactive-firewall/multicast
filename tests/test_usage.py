@@ -48,11 +48,10 @@ __module__ = "tests"
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from collections import namedtuple
@@ -63,8 +62,8 @@ try:
 		from unittest.mock import patch
 		from context import subprocess
 		from context import Process
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as _cause:
+	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
 @context.markWithMetaTag("mat", "say", "hear")
@@ -139,8 +138,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					fail_fixture
 				)
 			theResult = True
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -184,8 +183,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertEqual(int(tst_err_rslt_a), int(2), str(rtn_val_a))
 			self.assertEqual(int(tst_err_rslt_b), int(0), str(rtn_val_b))
 			theResult = (int(tst_err_rslt_b) < int(tst_err_rslt_a))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -216,8 +215,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertEqual(int(tst_err_rslt_c), int(tst_err_rslt_d))
 			self.assertNotEqual(int(tst_err_rslt_d), int(3))
 			theResult = (int(tst_err_rslt_d) == int(tst_err_rslt_c))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -248,8 +247,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertNotEqual(int(tst_err_rslt_f), int(3), "Regression. 3 != 64")
 			self.assertEqual(int(tst_err_rslt_f), int(tst_err_rslt_e))
 			theResult = (int(tst_err_rslt_f) == int(tst_err_rslt_e))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -270,8 +269,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 			self.assertNotEqual(int(tst_err_rslt_f[0]), int(3), "CEP-8 Violation.")
 			self.assertEqual(int(tst_err_rslt_f[0]), int(0), fail_fixture)
 			theResult = (int(tst_err_rslt_f[0]) == int(0))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -286,8 +285,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				(70, (False, None))  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -304,8 +303,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				(0, (True, None)),  # skipcq: PTC-W0020  - This is test-code.
 			)
 			theResult = True
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -319,8 +318,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				multicast.__main__.McastDispatch().doStep(["HELP"])
 			self.assertIsNotNone(rtn_val_h)
 			theResult = True
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -364,17 +363,17 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					tst_fixture_sendDispatch.doStep(["SAY", _fixture_SAY_args])
 				)
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join()
-				raise unittest.SkipTest(sub_fail_fixture) from _cause
+				raise unittest.SkipTest(sub_fail_fixture) from _root_cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) <= int(0))
-		except unittest.SkipTest as invalidTest:
-			raise unittest.SkipTest(sub_fail_fixture) from invalidTest
-		except Exception as err:
-			context.debugtestError(err)
+		except unittest.SkipTest as baton:
+			raise unittest.SkipTest(sub_fail_fixture) from baton
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -420,17 +419,17 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
 				)
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))
-		except unittest.SkipTest as invalidTest:
-			raise unittest.SkipTest("Fuzzing broke SAY fixture.") from invalidTest
-		except Exception as err:
-			context.debugtestError(err)
+		except unittest.SkipTest as baton:
+			raise unittest.SkipTest("Fuzzing broke SAY fixture.") from baton
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.skipTest(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -460,8 +459,8 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					# Verify the message was actually sent
 					theResult = result[0] or False
 					self.assertTrue(theResult)  # Assuming there's a success indicator
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -493,17 +492,17 @@ class MulticastTestSuite(context.BasicUsageTestSuite):
 					(int(0), (True, None)),  # skipcq: PTC-W0020  - This is test-code.
 					sub_fail_fixture
 				)
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join()
-				raise unittest.SkipTest(sub_fail_fixture) from _cause
+				raise unittest.SkipTest(sub_fail_fixture) from _root_cause
 			p.join()
 			self.assertIsNotNone(p.exitcode, fail_fixture)
 			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) <= int(0))
-		except unittest.SkipTest as invalidTest:
-			raise unittest.SkipTest(sub_fail_fixture) from invalidTest
-		except Exception as err:
-			context.debugtestError(err)
+		except unittest.SkipTest as baton:
+			raise unittest.SkipTest(sub_fail_fixture) from baton
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -580,10 +579,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					context.debugUnexpectedOutput(
 						str("usage:"), str(theOutputtxt), self._thepython
 					)
-		except Exception as err:
-			context.debugtestError(err)
-			err = None
-			del err  # skipcq - cleanup any error leaks early
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			del _cause  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
@@ -610,10 +608,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						context.debugUnexpectedOutput(
 							str("usage:"), str(theOutputtxt), self._thepython
 						)
-		except Exception as err:
-			context.debugtestError(err)
-			err = None
-			del err  # skipcq - cleanup any error leaks early
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			del _cause  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("Could Not find usage from multicast CMD --help"))
@@ -638,10 +635,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 				context.debugUnexpectedOutput(
 					str(theExpectedText), str(theOutputtxt), self._thepython
 				)
-		except BaseException as err:
-			context.debugtestError(err)
-			err = None
-			del err  # skipcq - cleanup any error leaks early
+		except BaseException as _cause:
+			context.debugtestError(_cause)
+			del _cause  # skipcq - cleanup any error leaks early
 			theResult = False
 		self.assertTrue(theResult, str("Could Not swap multicast for multicast.__main__"))
 
@@ -660,10 +656,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					theOutputtxt = context.checkPythonCommand(args, stderr=subprocess.STDOUT)
 					context.check_exec_command_has_output(self, args)
 					theResult = (theOutputtxt is not None)
-			except Exception as err:
-				context.debugtestError(err)
-				err = None
-				del err  # skipcq - cleanup any error leaks early
+			except Exception as _cause:
+				context.debugtestError(_cause)
+				del _cause  # skipcq - cleanup any error leaks early
 				theResult = False
 		self.assertTrue(theResult, str("Could Not find version from multicast --version"))
 
@@ -711,10 +706,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					with self.subTest(args=args):
 						if self._validate_help_output(args):
 							theResult = True
-		except Exception as err:
-			context.debugtestError(err)
-			err = None
-			del err  # skipcq - cleanup any error leaks early
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			del _cause  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
@@ -758,10 +752,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						with self.subTest(args=args):
 							if not self._validate_help_output(args):
 								theResult = False
-		except Exception as err:
-			context.debugtestError(err)
-			err = None
-			del err  # skipcq - cleanup any error leaks early
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			del _cause  # skipcq - cleanup any error leaks early
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, str("Could Not find usage from multicast --help"))
@@ -788,10 +781,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					# or simply:
 					self.assertIsNotNone(theOutputtxt)
 					theResult = True
-			except Exception as err:
-				context.debugtestError(err)
-				err = None
-				del err  # skipcq - cleanup any error leaks early
+			except Exception as _cause:
+				context.debugtestError(_cause)
+				del _cause  # skipcq - cleanup any error leaks early
 				theResult = False
 		assert theResult
 
@@ -810,10 +802,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 					context.checkPythonFuzzing(args, stderr=None)
 					# now test it
 					theResult = True
-			except Exception as err:
-				context.debugtestError(err)
-				err = None
-				del err  # skipcq - cleanup any error leaks early
+			except Exception as _cause:
+				context.debugtestError(_cause)
+				del _cause  # skipcq - cleanup any error leaks early
 				theResult = False
 		self.assertTrue(theResult, str("Could Not handle multicast NOOP"))
 
@@ -847,10 +838,9 @@ class BasicIntegrationTestSuite(context.BasicUsageTestSuite):
 						self.assertIn(str("invalid choice:"), str(theOutputtxt))
 						self.assertIn(repr(str(test_case)), str(theOutputtxt))
 						theResult = True
-			except Exception as err:
-				context.debugtestError(err)
-				err = None
-				del err  # skipcq - cleanup any error leaks early
+			except Exception as _cause:
+				context.debugtestError(_cause)
+				del _cause  # skipcq - cleanup any error leaks early
 				theResult = False
 		self.assertTrue(theResult, str("Could Not handle negative inputs"))
 

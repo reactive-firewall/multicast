@@ -33,10 +33,10 @@ try:
 	"""
 	try:
 		import context
-	except ImportError as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except ImportError as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
@@ -47,8 +47,8 @@ try:
 		from context import subprocess
 		from context import Process
 		from context import string
-except Exception as err:
-	raise ImportError(f"[CWE-758] {__file__} Failed to import test context") from err
+except Exception as baton:
+	raise ImportError(f"[CWE-758] {__file__} Failed to import test context") from baton
 
 
 _has_hypothesis: bool = False
@@ -178,15 +178,15 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 				self.assertIsNotNone(
 					multicast.__main__.McastDispatch().doStep(_fixture_SAY_args)
 				)  # preemptive extra retry
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join()
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) <= int(0))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.skipTest(fail_fixture)
 		self.assertTrue(theResult, fail_fixture)
 
@@ -220,10 +220,9 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 					self.assertIn(str("invalid choice:"), str(theOutputtxt))
 					self.assertIn(str(text), str(theOutputtxt))
 					theResult = True
-				except Exception as err:
-					context.debugtestError(err)
-					err = None
-					del err  # skipcq - cleanup any error leaks early
+				except Exception as _cause:
+					context.debugtestError(_cause)
+					del _cause  # skipcq - cleanup any error leaks early
 					theResult = False
 			else:  # pragma: no branch
 				theResult = True  # but this won't have "invalid choice"
@@ -282,16 +281,16 @@ class HypothesisTestSuite(BasicUsageTestSuite):
 						sender(group="224.0.0.1", port=_fixture_port_num, data=["STOP", "Test"])
 						managed_p.join(1)
 					self.assertFalse(managed_p.is_alive())
-				except Exception as _cause:
-					raise unittest.SkipTest(sub_fail_fixture) from _cause
+				except Exception as _root_cause:
+					raise unittest.SkipTest(sub_fail_fixture) from _root_cause
 				self.assertFalse(managed_p.is_alive(), "RESOURCE LEAK")
 				self.assertIsNotNone(managed_p.exitcode)
 				self.assertEqual(int(managed_p.exitcode), int(0))
 				theResult = (int(managed_p.exitcode) <= int(0))
-		except unittest.SkipTest as _skip_not_invalid:
-			raise unittest.SkipTest(fail_fixture) from _skip_not_invalid
-		except Exception as err:
-			context.debugtestError(err)
+		except unittest.SkipTest as baton:
+			raise unittest.SkipTest(fail_fixture) from baton
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)

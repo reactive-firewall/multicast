@@ -1,0 +1,121 @@
+---
+name: 'Checkout and use Build'
+description: 'checks-out the given commit and fetches the build artifact'
+author: 'Mr. Walls'
+branding:
+  icon: 'chevron-down'
+  color: 'blue'
+inputs:
+  sha:
+    description: |
+      The commit to checkout and fetch build artifacts for. When running this action on github.com,
+      the default value is sufficient.
+    required: true
+    default: ${{ github.server_url == 'https://github.com' && github.sha || 'HEAD' }}
+  path:
+    description: |
+      Path to setup. When running this action on github.com, the default value
+      is sufficient.
+    required: true
+    default: ${{ github.server_url == 'https://github.com' && github.workspace || '' }}
+  token:
+    description: |
+      The token used to authenticate when fetching Python distributions from
+      https://github.com/actions/python-versions. When running this action on github.com,
+      the default value is sufficient. When running on GHES, you can pass a personal access
+      token for github.com if you are experiencing rate limiting.
+    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    required: true
+  python-version:
+    description: |
+      The python version to setup. The default is to use the value of the github
+      variable 'PYTHON_DEFAULT'.
+    default: ${{ github.server_url == 'https://github.com' && vars.PYTHON_DEFAULT || '3.12' }}
+    required: true
+outputs:
+  branch-name:
+    description: "The name of the branch that was checked-out"
+    type: string
+    value: ${{ steps.output_branch_name.outputs.branch-name || '' }}
+  sha:
+    description: "The SHA of the commit checked-out"
+    type: string
+    value: ${{ steps.output_sha.outputs.sha || 'HEAD' }}
+  python-version:
+    description: "The python version that was used in the run."
+    value: ${{ steps.cp313.outputs.python-version || '' }}
+  artifact-name:
+    description: "The downloaded artifact-name"
+    type: string
+    value: "multicast-build-${{ steps.output_sha.outputs.sha }}.zip"
+  artifact-files:
+    description: "The downloaded artifact-files"
+    value: ${{ steps.output_artifact_files.outputs.files }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+        path: ${{ inputs.path }}
+        repository: reactive-firewall/multicast
+        token: ${{ inputs.token }}
+    - name: "Checkout Target Commit by SHA"
+      shell: bash
+      run: |
+        printf "%s\n" "::group::target-commit"
+        git checkout --force --detach ${{ inputs.sha }} --
+        printf "%s\n" "::endgroup::"
+      if: ${{ (github.sha != inputs.sha) && success() }}
+    - id: output_branch_name
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: |
+        printf "branch-name=%s\n" $(git name-rev --name-only HEAD | cut -d~ -f1-1) >> "$GITHUB_OUTPUT"
+    - id: output_sha
+      shell: bash
+      run: printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
+    - name: "Setup Python"
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      id: cp313
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: 'pip'  # caching pip dependencies
+      if: ${{ !cancelled() }}
+    - name: "Install Test Dependencies"
+      run: make -j1 -f Makefile test-reqs ;
+    - id: output_artifact_name
+      if: ${{ success() }}
+      shell: bash
+      run: printf "artifact-name=%s\n" multicast-build-${{ steps.output_sha.outputs.sha }}.zip >> "$GITHUB_OUTPUT"
+    - name: "Fetch Build Files"
+      if: ${{ success() }}
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      with:
+        path: ${{ inputs.path }}/dist
+        pattern: multicast-build-${{ steps.output_sha.outputs.sha }}.zip
+        merge-multiple: true
+        repository: reactive-firewall/multicast
+        github-token: ${{ inputs.token }}
+    - name: "Enumerate Fetched Files"
+      id: output_artifact_files
+      env:
+        BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
+        SCRIPT_NAME: ".github/actions/checkout-and-rebuild/action.yml"
+      shell: bash
+      run: |
+        FILES=$(git ls-files -oi --exclude-standard -- ${{ env.BUILD_MATCH_PATTERN }} )
+        if [ -z "$FILES" ]; then
+          printf "::warning file=%s:: %s\n" "${SCRIPT_NAME}" "No Built files found."
+          printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
+        else
+          printf "%s\n" "Built files found:"
+          printf "%s\n" "$FILES"
+          # Replace line breaks with commas for GitHub Action Output
+          FILES="${FILES//$'\n'/ }"
+          printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
+        fi
+      if: ${{ success() }}

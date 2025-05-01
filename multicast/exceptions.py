@@ -196,12 +196,12 @@ try:
 	from . import argparse  # skipcq: PYL-C0414
 	from . import logging  # skipcq: PYL-C0414
 	import functools
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except ImportError as _cause:
+	baton = ImportError(_cause, "[CWE-758] Module failed completely.")
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 module_logger = logging.getLogger(__module__)
@@ -581,8 +581,8 @@ Usage Example:
 		try:
 			# Code that may raise an exception
 			pass
-		except Exception as e:
-			exit_code = get_exit_code_from_exception(e)
+		except Exception as _cause:
+			exit_code = get_exit_code_from_exception(_cause)
 			sys.exit(exit_code)
 	```
 
@@ -760,24 +760,24 @@ def exit_on_exception(func: callable):
 		try:
 			_func_logger = logging.getLogger(func.__name__)
 			return func(*args, **kwargs)
-		except SystemExit as exc:
+		except SystemExit as baton:
 			# Handle SystemExit exceptions, possibly from argparse
-			exit_code = exc.code if isinstance(exc.code, int) else 2
+			exit_code = baton.code if isinstance(baton.code, int) else 2
 			_func_logger.warning(
 				"%s: %s",  # lazy formatting to avoid PYL-W1203
 				EXIT_CODES[exit_code][1],
-				exc,
+				baton,
 			)
-			raise SystemExit(exit_code) from exc
+			raise SystemExit(exit_code) from baton
 			# otherwise sys.exit(exit_code)
-		except BaseException as err:
-			exit_code = get_exit_code_from_exception(err)
+		except BaseException as _cause:
+			exit_code = get_exit_code_from_exception(_cause)
 			_func_logger.warning(
 				"%s: %s",  # lazy formatting to avoid PYL-W1203
 				EXIT_CODES[exit_code][1],
-				err,
+				_cause,
 			)
-			raise SystemExit(exit_code) from err
+			raise SystemExit(exit_code) from _cause
 			# otherwise sys.exit(exit_code)
 
 	return wrapper

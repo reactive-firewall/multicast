@@ -58,7 +58,7 @@ partial_branches =
     # don't complain about sys.modules
     sys.modules
     not in sys.modules:
-    if context.__name__ is None:
+    if not hasattr(context, '__name__') or not context.__name__:
     if 'os' not in sys.modules:
     if 'os.path' not in sys.modules:
     if 'argparse' not in sys.modules:

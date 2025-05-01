@@ -40,11 +40,10 @@ try:
 	"""
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except ImportError as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import sys
@@ -53,8 +52,8 @@ try:
 		import signal
 		import time
 		from context import BasicUsageTestSuite
-except Exception as _cause:  # pragma: no branch
-	raise ImportError("[CWE-758] Failed to import test context") from _cause
+except ImportError as baton:  # pragma: no branch
+	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
 @context.markWithMetaTag("extra", "coverage")
@@ -169,8 +168,8 @@ class TestHearKeyboardInterrupt(BasicUsageTestSuite):
 				theResult = (int(process.returncode) >= int(1))
 			finally:
 				process.kill()
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)

@@ -182,6 +182,7 @@ __name__ = "multicast.hear"  # skipcq: PYL-W0622
 try:
 	import sys
 	if 'multicast' not in sys.modules:
+		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]
@@ -190,8 +191,8 @@ try:
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 	# skipcq
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
+except Exception as _cause:
+	del _cause  # skipcq - cleanup any error leaks early
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
@@ -211,10 +212,10 @@ try:
 				raise ModuleNotFoundError(
 					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
-		except Exception:  # pragma: no branch
-			raise ModuleNotFoundError(str("[CWE-758] Module failed completely.")) from None
-except Exception as err:
-	raise ImportError(err) from err
+		except Exception as _root_cause:  # pragma: no branch
+			raise ModuleNotFoundError("[CWE-758] Module failed completely.") from _root_cause
+except Exception as _cause:  # pragma: no branch
+	raise ImportError(_cause) from _cause
 
 
 module_logger = logging.getLogger(__name__)
@@ -829,15 +830,15 @@ class McastHEAR(multicast.mtool):
 			with McastServer((HOST, PORT), HearUDPHandler) as server:
 				server_initialized = True
 				server.serve_forever()
-		except KeyboardInterrupt as userInterrupt:
+		except KeyboardInterrupt as _cause:
 			try:
 				if server and server.socket:  # pragma: no cover
 					old_sock = server.socket
 					multicast.endSocket(old_sock)
 			finally:
 				raise KeyboardInterrupt(
-					f"HEAR has stopped due to interruption signal (was previously listening on ({HOST}, {PORT}))."
-				) from userInterrupt
+					f"HEAR has stopped due to interruption signal, was previously listening on ({HOST}, {PORT}).",
+				) from _cause
 		finally:
 			_logger.debug(
 				"Finalizing server with port %d from %s.",  # lazy formatting to avoid PYL-W1203

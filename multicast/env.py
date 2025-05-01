@@ -91,12 +91,12 @@ try:
 	from . import logging  # skipcq: PLY-C0414
 	from . import socket  # skipcq: PYL-C0414
 	import ipaddress
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except ImportError as _cause:
+	baton = ImportError(_cause, "[CWE-758] Module failed completely.")
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 module_logger = logging.getLogger(__module__)
@@ -146,8 +146,8 @@ def validate_buffer_size(size: int) -> bool:
 	try:
 		size_num = int(size)
 		return 0 < size_num <= 65507
-	except (ValueError, TypeError) as err:
-		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from err
+	except (ValueError, TypeError) as _cause:
+		raise ValueError(f"Invalid buffer size value: {size}. Must be a positive integer.") from _cause
 
 
 def validate_port(port: int) -> bool:
@@ -186,8 +186,8 @@ def validate_port(port: int) -> bool:
 	try:
 		port_num = int(port)
 		return 49152 <= port_num <= 65535
-	except (ValueError, TypeError) as err:
-		raise ValueError(f"Invalid port value: {port}. Must be an integer.") from err
+	except (ValueError, TypeError) as _cause:  # pragma: no branch
+		raise ValueError(f"Invalid port value: {port}. Must be an integer.") from _cause
 
 
 def validate_multicast_address(addr: str) -> bool:
@@ -213,7 +213,7 @@ def validate_multicast_address(addr: str) -> bool:
 	try:
 		ip = ipaddress.IPv4Address(addr)
 		return ip.is_multicast
-	except (ValueError, AttributeError):
+	except (ValueError, AttributeError):  # pragma: no branch
 		return False
 
 
@@ -248,10 +248,10 @@ def validate_ttl(ttl: int) -> bool:
 	try:
 		ttl_num = int(ttl)
 		return 1 <= ttl_num <= 126
-	except (ValueError, TypeError) as err:
+	except (ValueError, TypeError) as _cause:  # pragma: no branch
 		raise ValueError(
-			f"Invalid TTL value: {ttl}. Must be a positive integer below 127."
-		) from err
+			f"Invalid TTL value: {ttl}. Must be a positive integer below 127.",
+		) from _cause
 
 
 def load_buffer_size() -> int:
@@ -353,7 +353,7 @@ def load_buffer_size() -> int:
 			_MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W1508
 		))
 		module_logger.debug("Done.")
-	except ValueError:
+	except (ValueError, TypeError):  # pragma: no branch
 		warnings.warn(
 			f"Invalid MULTICAST_BUFFER_SIZE value, using default {_MCAST_DEFAULT_BUFFER_SIZE}",
 			stacklevel=2,
@@ -459,7 +459,7 @@ def load_port() -> int:
 	try:
 		port = int(os.getenv("MULTICAST_PORT", _MCAST_DEFAULT_PORT))
 		module_logger.debug("Done.")
-	except ValueError:
+	except (ValueError, TypeError):  # pragma: no branch
 		warnings.warn(
 			f"Invalid MULTICAST_PORT value, using default {_MCAST_DEFAULT_PORT}", stacklevel=2,
 		)
@@ -677,7 +677,7 @@ def load_TTL() -> int:
 	try:
 		ttl = int(os.getenv("MULTICAST_TTL", _MCAST_DEFAULT_TTL))
 		module_logger.debug("Done.")
-	except ValueError:
+	except (ValueError, TypeError):  # pragma: no branch
 		warnings.warn(
 			f"Invalid MULTICAST_TTL value, using default {_MCAST_DEFAULT_TTL}", stacklevel=2,
 		)

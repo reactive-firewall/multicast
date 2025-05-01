@@ -280,7 +280,7 @@ test-mat-doctests: test-reports MANIFEST.in ## Run doctests MAT category (doctes
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category doctests || DO_FAIL="exit 2" ; \
 		$(QUIET)$(WAIT) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_doctests ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
-		$(COVERAGE) report -m --include=* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
@@ -457,7 +457,7 @@ must_be_root:
 user-install: build
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user dist/multicast-*-py3-*.whl
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 

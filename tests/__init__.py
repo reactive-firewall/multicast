@@ -60,8 +60,8 @@ try:
 	from unittest import TestSuite as TestSuite
 	import types
 	from typing import Optional
-except ImportError as baton:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Module failed to import.") from baton
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Module failed to import.") from _cause
 
 try:
 	import logging
@@ -116,23 +116,23 @@ try:
 				self.stream.write(formatted_msg + self.terminator)
 				self.flush()
 
-	except Exception as _cause:  # pragma: no branch
-		raise ImportError("[CWE-909] Could Not Initialize Test Logger") from _cause
+	except Exception as _root_cause:  # pragma: no branch
+		raise ImportError("[CWE-909] Could Not Initialize Test Logger") from _root_cause
 	# Setup logging for testing
 	root = logging.getLogger()
 	root.setLevel(logging.INFO)
 	handler = ColoredStreamHandler()
 	root.addHandler(handler)
-except ImportError as baton:  # pragma: no branch
-	raise ModuleNotFoundError("[CWE-440] Logging failed to initialize.") from baton
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] Logging failed to initialize.") from _cause
 
 try:
 	if 'multicast' not in sys.modules:
 		import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 	else:  # pragma: no branch
 		multicast = sys.modules["multicast"]
-except Exception as err:  # pragma: no branch
-	raise ImportError("[CWE-440] multicast Failed to import.") from err
+except Exception as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] multicast Failed to import.") from _cause
 
 try:
 	_LOGGER = logging.getLogger(__module__)
@@ -144,8 +144,8 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _PARENT_DIR_NAME)))
 	if 'tests' in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(_BASE_NAME, _DIR_NAME)))
-except ImportError as err:  # pragma: no branch
-	raise ImportError("[CWE-440] multicast tests Failed to import.") from err
+except ImportError as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] multicast tests Failed to import.") from _cause
 
 try:
 	from tests import profiling as profiling  # skipcq: PYL-C0414
@@ -190,14 +190,13 @@ try:
 				raise ImportError(
 					f"Test module failed to import even the {str(unit_test)} tests."
 				) from None
-		except Exception as impErr:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Test module failed completely.")) from impErr
-except Exception as badErr:  # pragma: no branch
-	_LOGGER.debug(str(type(badErr)))
-	_LOGGER.exception(str(badErr))
-	_LOGGER.debug(str((badErr.args)))
-	badErr = None
-	del badErr  # skipcq - cleanup any error leaks early
+		except Exception as _root_cause:  # pragma: no branch
+			raise ImportError("[CWE-758] Test module failed completely.") from _root_cause
+except Exception as _cause:  # pragma: no branch
+	_LOGGER.debug(str(type(_cause)))
+	_LOGGER.exception(str(_cause))
+	_LOGGER.debug(str((_cause.args)))
+	del _cause  # skipcq - cleanup any error leaks early
 	exit(0)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
 
 try:
@@ -277,12 +276,12 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 	doc_suite = unittest.TestSuite()
 	try:
 		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
-	except ValueError as e:
+	except ValueError as _cause:
 		# ValueError is raised when no tests are found
 		_LOGGER.warning(
 			"No doctests found in %s: %s",  # lazy formatting to avoid PYL-W1203
 			module.__name__,
-			e,  # log as just warning level, instead of exception (error), but still detailed.
+			_cause,  # log as just warning level, instead of exception (error), but still detailed.
 			exc_info=True,
 		)
 	except Exception:
@@ -356,9 +355,19 @@ except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional debug tests", exc_info=True)
 
 try:
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(__module__))
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule(context))
+	EXTRA_TESTS["coverage"].append(loadDocstringsFromModule("tests.MulticastUDPClient"))
+except Exception:  # pragma: no branch
+	_LOGGER.warning("Error loading optional doctests", exc_info=True)
+	# reported, so now just continue with testing
+
+try:
 	from tests import test_extra
 	depends.insert(11, test_extra)
 	EXTRA_TESTS["security"].append(test_extra.ExtraDocsUtilsTestSuite)
+	import docs.utils
+	EXTRA_TESTS["security"].append(loadDocstringsFromModule(docs.utils))
 except Exception:  # pragma: no branch
 	_LOGGER.warning("Error loading optional extra tests", exc_info=True)
 

@@ -22,18 +22,18 @@ __module__ = "tests"
 try:
 	try:
 		import context
-	except ImportError as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except ImportError as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from unittest.mock import MagicMock
 		from context import Process
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as baton:
+	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
 @context.markWithMetaTag("mat", "hear")
@@ -85,19 +85,19 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 				sender(group=_fixture_mcast_addr, port=_fixture_port_num, ttl=1, data=b'')
 				self.assertIsNotNone(p)
 				self.assertTrue(p.is_alive(), fail_fixture)
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join(3)
 				if p.is_alive():
 					p.terminate()
 					p.close()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join(5)
 			self.assertFalse(p.is_alive(), "RESOURCE LEAK.")
 			self.assertIsNotNone(p.exitcode)
 			self.assertEqual(int(p.exitcode), int(0))
 			theResult = (int(p.exitcode) == int(0))
-		except Exception as err:
-			context.debugtestError(err)
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -143,21 +143,21 @@ class RecvDataProcessingTestSuite(context.BasicUsageTestSuite):
 					sender(group=_fixture_mcast_addr, port=_fixture_port_num, data=["STOP"])
 					p.join(1)
 				self.assertFalse(p.is_alive(), "HEAR ignored STOP")
-			except Exception as _cause:
+			except Exception as _root_cause:
 				p.join(3)
 				if p.is_alive():
 					p.terminate()
 					p.close()
-				raise unittest.SkipTest(fail_fixture) from _cause
+				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join(5)
 			self.assertFalse(p.is_alive(), "RESOURCE LEAK.")
 			self.assertIsNotNone(p.exitcode, "Unexpected None == Exit-Code.")
 			self.assertEqual(int(p.exitcode), int(0), f"Unexpected Exit-Code: {p.exitcode}.")
 			theResult = (int(p.exitcode) >= int(0))
-		except unittest.SkipTest as _skip_not_invalid:
-			raise unittest.SkipTest() from _skip_not_invalid
-		except Exception as err:
-			context.debugtestError(err)
+		except unittest.SkipTest as baton:
+			raise unittest.SkipTest() from baton
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
 		self.assertTrue(theResult, fail_fixture)
@@ -228,8 +228,8 @@ class HearHandleNoneDataTestSuite(context.BasicUsageTestSuite):
 				handler.request = (invalid_data, sock)
 				handler.handle()
 				handler._process.assert_not_called()
-		except Exception as e:
-			self.fail(f"Handler raised an unexpected exception: {e}")
+		except Exception as _cause:
+			self.fail(f"Handler raised an unexpected exception: {_cause}")
 		finally:
 			# Clean up socket
 			multicast.endSocket(sock)

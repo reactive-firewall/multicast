@@ -164,7 +164,7 @@ check_required_commands
 if command -v pip-audit >/dev/null 2>&1; then
 	check_command pip-audit  # optional
 else
-	printf "%s\n" "::notice file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP::pip-audit not found, skipping security checks" ;
+	python3 -B .github/tools/cioutput.py -l info --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIP" "pip-audit not found, skipping security checks"
 fi
 check_command pip-licenses ;
 check_command shlock ;
@@ -216,7 +216,7 @@ function handle_signals() {
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 	else
 		# shellcheck disable=SC2046
-		printf "\t%s\n" "Check PIP Configuration Tests already in progress by "$(head "${LOCK_FILE}") >&2 ;
+		python3 -B .github/tools/cioutput.py -l info --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIP" "Check PIP Configuration Tests already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 	fi
 }
@@ -247,7 +247,7 @@ fi ;
 # Enable auto-fix if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"
-	printf "%s\n" "Auto-fix enabled."
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "Auto-fix enabled."
 fi
 
 # lazy defined functions should be defined now that this is the only script instance.
@@ -258,7 +258,7 @@ function setup_venv() {
 	local temp_dir
 	# relax umask to allow mktemp and venv
 	umask 007
-	printf "::debug::%s\n" "need venv ..." ;
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "need venv ..."
 	# Create a temporary directory for the virtual environment
 	temp_dir=$(mktemp -d)
 	TEMP_DIRS="${TEMP_DIRS} ${temp_dir}" ;
@@ -300,7 +300,7 @@ function install_package() {
 	local pkg="$1"
 	# shellcheck disable=SC2086
 	if ! python3 -m pip install $PIP_COMMON_FLAGS $PIP_ENV_FLAGS "${pkg}"; then
-		printf "::warning file=%s,title=PIP::Failed to install %s\n" "${req_file}" "${pkg}" >&2 ;
+		python3 -B .github/tools/cioutput.py -l warning --file "${req_file}" --title "PIP" "Failed to install ${pkg}" >&2 ;
 		return 6
 	fi
 	return 0
@@ -308,19 +308,19 @@ function install_package() {
 
 # === Utilities ===
 function report_summary() {
-	printf "::group::%s\n" "Results" ;
+	python3 -B .github/tools/cioutput.py --group "Results" ;
 	# Improved reporting based on EXIT_CODE
 	case "${EXIT_CODE}" in
-		0) printf "::notice title=OK::%s\n" "OK: Found no detected requirements errors." ;;
-		1) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CHECK-PIP::%s\n" "FAIL: General failure during script execution." >&2 ;;
-		3) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=CONFIGURATION::%s\n" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
-		4) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SECURITY::%s\n" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
-		5) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=LICENSE::%s\n" "FAIL: pip-licenses detected license issues." >&2 ;;
-		6) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=INSTALL::%s\n" "FAIL: pip install failed." >&2 ;;
-		126) printf "::warning file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIPPED::%s\n" "SKIP: Unable to continue script execution." >&2 ;;
-		*) printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=FAILED::%s\n" "FAIL: Detected requirements errors." >&2 ;;
+		0) python3 -B .github/tools/cioutput.py -l info --file "${SCRIPT_FILE}" --title "OK" "OK: Found no detected requirements errors." ;;
+		1) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CHECK-PIP" "FAIL: General failure during script execution." >&2 ;;
+		3) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "CONFIGURATION" "FAIL: Gathering repostory's requirements failed." >&2 ;;  # git ls-tree command failed
+		4) python3 -B .github/tools/cioutput.py -l critical --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SECURITY" "FAIL: pip-audit detected security vulnerabilities." >&2 ;;
+		5) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "LICENSE" "FAIL: pip-licenses detected license issues." >&2 ;;
+		6) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "INSTALL" "FAIL: pip install failed." >&2 ;;
+		126) python3 -B .github/tools/cioutput.py -l warning --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIPPED" "SKIP: Unable to continue script execution." >&2 ;;
+		*) python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAILED" "FAIL: Detected requirements errors." >&2 ;;
 	esac
-	printf "::endgroup::\n" ;
+	python3 -B .github/tools/cioutput.py --group ;
 }
 
 function navigate_dirs_by_git() {
@@ -328,14 +328,14 @@ function navigate_dirs_by_git() {
 		if [ -z "${_TEST_ROOT_DIR}" ]; then
 			_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 			if [ -z "${_TEST_ROOT_DIR}" ]; then
-				printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: Could not determine repository root" >&2
+				python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "${FUNCNAME:-$0}" "FAIL: Could not determine repository root" >&2
 				EXIT_CODE=40
 				return ${EXIT_CODE}
 			fi
 		fi
-		printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
+		python3 -B .github/tools/cioutput.py --log-level debug -l debug "Found ${_TEST_ROOT_DIR} ..." ;
 	else
-		printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" "FAIL: missing valid repository or source structure" >&2
+		python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "${FUNCNAME:-$0}" "FAIL: missing valid repository or source structure" >&2
 		EXIT_CODE=40
 		return ${EXIT_CODE}
 	fi
@@ -351,7 +351,7 @@ function check_package_licenses() {
 	# move into a venv
 	setup_venv ; SUB_CODE=$? ;
 	wait ;
-	printf "::debug::%s\n" "venv setup ... (${SUB_CODE})" ;
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "venv setup ... (${SUB_CODE})" ;
 	# Install pip-licenses
 	install_package "pip-licenses>=5.0" || SUB_CODE=6 ;
 	wait ;
@@ -359,15 +359,15 @@ function check_package_licenses() {
 	# Install the given Python modules using pip
 	# shellcheck disable=SC2086
 	for pkg in ${packages} ; do
-		printf "::debug::%s\n" "Checking license from package '${pkg}' ..." ;
+		python3 -B .github/tools/cioutput.py --log-level debug -l debug "Checking license from package '${pkg}' ..." ;
 		REQ_SPEC=$(grep -F -- "${pkg}" <(cat <"${_TEST_ROOT_DIR}"/$req_file | sed -E -e '/^[[:space:]]*$/d' | sed -E -e '/^[#]+.*$/d') | grep -m1 -F -- "${pkg}" )
 		ERR_MSG="pip install '${pkg}' failed for $req_file." ;
 		if [[ ("${SUB_CODE}" -eq 0) ]] && install_package "${REQ_SPEC};" 2>/dev/null ;
 		then
-			printf "::debug::%s\n" "Fetched license from package '${pkg}' ..." ;
+			python3 -B .github/tools/cioutput.py --log-level debug -l debug "Fetched license from package '${pkg}' ..." ;
 		else
 			[[ ("${SUB_CODE}" -eq 0) ]] && SUB_CODE=6 && \
-			printf "::warning file=${req_file},line=1,col=1,title=PIP::%s\n" "${ERR_MSG}" >&2
+			python3 -B .github/tools/cioutput.py -l warning --file "${req_file}" --line 1 --col 1 --title "PIP" "${ERR_MSG}" >&2
 		fi
 		unset ERR_MSG 2>/dev/null || : ;
 	done
@@ -386,38 +386,38 @@ navigate_dirs_by_git
 
 if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 
-	printf "::debug::%s\n" "Reading from repository ${_TEST_ROOT_DIR} ..." ;
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "Reading from repository ${_TEST_ROOT_DIR} ..." ;
 	# Get a list of files to check using git ls-tree with filtering (and careful shell globing)
 	FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- "${_TEST_ROOT_DIR}"/test/requirements.txt "${_TEST_ROOT_DIR}"/*-requirements.txt "${_TEST_ROOT_DIR}/requirements.txt" 2>/dev/null) || EXIT_CODE=3 ;
-	[[ ( $EXIT_CODE -eq 0 ) ]] || { printf "%s\n" "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=GIT::Failed to list requirements files using git ls-tree" >&2 ;}
+	[[ ( $EXIT_CODE -eq 0 ) ]] || { python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "GIT" "Failed to list requirements files using git ls-tree" >&2 ;}
 
 	if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
 		# THIS IS THE ACTUAL TEST
-		printf "::debug::%s\n" "Starting checks ..." ;
+		python3 -B .github/tools/cioutput.py --log-level debug -l debug "Starting checks ..." ;
 		# Iterate over files and run checks
 		for req_file in ${FILES_TO_CHECK} ; do
-			printf "::group::Checking %s\n" "${req_file}" ;
+			python3 -B .github/tools/cioutput.py --group "Checking ${req_file}" ;
 			if [[ ( -x $(command -v pip-audit) ) ]] && [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-				printf "::debug::%s\n" "Auditing ${req_file} for security vulnerabilities ..."
+				python3 -B .github/tools/cioutput.py --log-level debug -l debug "Auditing ${req_file} for security vulnerabilities ..."
 				# shellcheck disable=SC2086
 				{ pip-audit $AUDIT_OPTIONS "${req_file}" || EXIT_CODE=4 ;} ; wait ;
 			fi ;
 			if [[ ("${EXIT_CODE}" -eq 0) ]] ; then
-				printf "::debug::%s\n" "Checking licenses in $req_file ..." ;
+				python3 -B .github/tools/cioutput.py --log-level debug -l debug "Checking licenses in $req_file ..." ;
 				# filter for only pkg from requirements file
 				check_package_licenses "$req_file" ; EXIT_CODE=$?
 			else
-				printf "::error file=${req_file},line=${BASH_LINENO:-1},title=REQUIREMENTS::%s\n" "FAIL: Found requirements errors." >&2 ;
+				python3 -B .github/tools/cioutput.py -l error --file "${req_file}" --line 1 --title "REQUIREMENTS" "FAIL: Found requirements errors." >&2 ;
 			fi
-			printf "::endgroup::\n" ;
+			python3 -B .github/tools/cioutput.py --group ;
 		done
 	fi
 
-	printf "::debug::%s\n" "Summary reporting ..." ;
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "Summary reporting ..." ;
 	report_summary
 fi
 
-printf "::debug::%s\n" "Cleaning up ..." ;
+python3 -B .github/tools/cioutput.py --log-level debug -l debug "Cleaning up ..." ;
 cleanup || rm -f "${LOCK_FILE}" 2>/dev/null || : ;
 
 # unset when done
@@ -427,6 +427,6 @@ unset ALLOW_LICENSES 2>/dev/null || : ;
 unset LICENSE_OPTIONS 2>/dev/null || : ;
 
 wait ;
-printf "::debug::%s\n" "Check-pip done." ;
+python3 -B .github/tools/cioutput.py --log-level debug -l debug "Check-pip done." ;
 # Exit with the appropriate code
 exit ${EXIT_CODE:-255} ;

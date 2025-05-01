@@ -47,5 +47,5 @@ examples:
     code: |
       try:
         import os
-      except ImportError as err:  # pragma: no branch
+      except ImportError as _cause:  # pragma: no branch
         raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
