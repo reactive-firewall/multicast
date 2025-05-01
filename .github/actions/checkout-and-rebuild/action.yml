@@ -28,25 +28,22 @@ inputs:
     required: true
   python-version:
     description: |
-      The python version to setup. The default is to use the value of the github
-      variable 'PYTHON_DEFAULT'.
-    default: ${{ github.server_url == 'https://github.com' && vars.PYTHON_DEFAULT || '3.12' }}
+      The python version to setup. The default is to use the value of the environment
+      variable 'PYTHON_VERSION'.
+    default: ${{ github.server_url == 'https://github.com' && env.PYTHON_VERSION || '3.12' }}
     required: true
 outputs:
   branch-name:
     description: "The name of the branch that was checked-out"
-    type: string
     value: ${{ steps.output_branch_name.outputs.branch-name || '' }}
   sha:
     description: "The SHA of the commit checked-out"
-    type: string
     value: ${{ steps.output_sha.outputs.sha || 'HEAD' }}
   python-version:
     description: "The python version that was used in the run."
     value: ${{ steps.cp313.outputs.python-version || '' }}
   artifact-name:
     description: "The downloaded artifact-name"
-    type: string
     value: "multicast-build-${{ steps.output_sha.outputs.sha }}.zip"
   artifact-files:
     description: "The downloaded artifact-files"
@@ -86,6 +83,7 @@ runs:
         cache: 'pip'  # caching pip dependencies
       if: ${{ !cancelled() }}
     - name: "Install Test Dependencies"
+      shell: bash
       run: make -j1 -f Makefile test-reqs ;
     - id: output_artifact_name
       if: ${{ success() }}
