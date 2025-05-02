@@ -68,18 +68,18 @@ jobs:
             echo "head_branch='undefined'" >> "$GITHUB_OUTPUT"  # Default fallback
             echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
-        if: ${{ steps.check.outputs.should_run == 'true') && success() }}
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
           fetch-depth: 0
       - name: Checkout target commit
-        if: ${{ steps.check.outputs.should_run == 'true') && success() }}
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
         run: git checkout ${{ steps.get_sha.outputs.head_sha }}
       - id: get_env
         shell: bash
-        if: ${{ steps.check.outputs.should_run == 'true') && success() }}
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
         run: |
           ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
           if [[ -n "$ID_VALUE" ]]; then
