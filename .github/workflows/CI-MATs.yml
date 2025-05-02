@@ -168,15 +168,53 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     outputs:
-      passedMATs: ${{ steps.check_status.outputs.mats_success }}
-      didBUILD: ${{ needs.check_build.outputs.should_run }}
+      mats_success: ${{ steps.check_status.outputs.mats_success }}
+      mats_sha: ${{ needs.check_build.outputs.sha }}
+      build_success: ${{ steps.check_status.outputs.build_success }}
+      build_trigger_id: ${{ needs.check_build.outputs.trigger_id }}
+      build_sha: ${{ needs.check_build.outputs.sha }}
     steps:
       - id: check_status
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
+            echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :building_construction: Build" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
+              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=true" >> "$GITHUB_OUTPUT"
+            else
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=false" >> "$GITHUB_OUTPUT"
+            fi
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
             exit 0
           else
-            echo "mats_success=false" >> "$GITHUB_OUTPUT"
+            echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> [!CAUTION]" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Unstable - This commit is failed to pass minimal acceptance testing." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :construction: Build" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
+              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=true" >> "$GITHUB_OUTPUT"
+            else
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=false" >> "$GITHUB_OUTPUT"
+            fi
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :red_circle: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "mats_success=false" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
