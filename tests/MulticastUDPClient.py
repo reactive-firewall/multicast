@@ -240,9 +240,9 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		# skipcq: TCV-002
-		if str("grp_addr") in kwargs:  # pragma: no branch
+		if "grp_addr" in kwargs:  # pragma: no branch
 			self._group_addr = kwargs.get("grp_addr", None)  # skipcq: PTC-W0039 - ensure None
-		if str("src_port") in kwargs:  # pragma: no branch
+		if "src_port" in kwargs:  # pragma: no branch
 			self._source_port = kwargs.get("src_port", 0)
 		else:  # pragma: no branch
 			self._source_port = int(
@@ -429,7 +429,7 @@ def main() -> None:  # pragma: no cover
 	tsts_fxr = MCastClient()  # pragma: no cover
 	print(str((HOST, PORT)))  # pragma: no cover
 	tsts_fxr.say(HOST, PORT, sock, data)  # pragma: no cover
-	tsts_fxr.say(HOST, PORT, sock, str("STOP"))  # pragma: no cover
+	tsts_fxr.say(HOST, PORT, sock, "STOP")  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no branch
