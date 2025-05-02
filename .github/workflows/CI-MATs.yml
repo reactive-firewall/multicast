@@ -85,8 +85,8 @@ jobs:
             echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
           echo "branch=$(git name-rev --name-only $(git log -1 --format=%H) | cut -d~ -f1-1)" >> "$GITHUB_OUTPUT"
-          echo "parent_sha=$(git show-ref --heads --hash stable)" >> "$GITHUB_OUTPUT"
-          BRANCH_REF=$(git symbolic-ref HEAD 2>/dev/null || git show-ref $(git name-rev --name-only $(git log -1 --format=%H)) | cut -d\  -f2-2) ;
+          echo "parent_sha=$(git merge-base $(git log -1 --format=%H) refs/remotes/origin/stable)" >> "$GITHUB_OUTPUT"
+          BRANCH_REF=$(head -n1 <(git symbolic-ref HEAD 2>/dev/null || git show-ref $(git name-rev --name-only $(git log -1 --format=%H)) | cut -d\  -f2-2) ) ;
           echo "branch_ref=${BRANCH_REF}" >> "$GITHUB_OUTPUT"
 
   MATS:
