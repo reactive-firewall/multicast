@@ -179,7 +179,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 	"""The source port for the client."""
 
 	# skipcq: TCV-002
-	def __init__(self, *args, **kwargs):  # pragma: no cover
+	def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
 		"""
 		Initialize a MCastClient object with optional group address and source port.
 
@@ -253,7 +253,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 	# skipcq: TCV-002
 	@staticmethod
-	def say(address, port, sock, msg):  # pragma: no cover
+	def say(address: str, port: int, sock: socket.socket, msg: str) -> None:  # pragma: no cover
 		"""
 		Send a message to a specified multicast address and port, then receive and print it.
 
@@ -340,7 +340,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 	__module__ = "tests.MulticastUDPClient.MyUDPHandler"
 
 	# skipcq: TCV-002
-	def handle(self):  # pragma: no cover
+	def handle(self) -> None:  # pragma: no cover
 		"""
 		Handle incoming UDP requests.
 
@@ -397,7 +397,7 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 
 # skipcq: TCV-002
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
 	"""
 	The main test operations.
 
