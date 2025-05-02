@@ -45,7 +45,7 @@ jobs:
         id: build
         run: make -j1 -f Makefile build
       - name: Publish package distributions to PyPI
-        if ${{ success() }}
+        if: ${{ success() }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           skip-existing: true
