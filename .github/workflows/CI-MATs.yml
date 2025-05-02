@@ -45,7 +45,6 @@ jobs:
       parent_sha: ${{ steps.get_env.outputs.parent_sha }}
       branch_ref: ${{ steps.get_env.outputs.branch_ref }}
       trigger_id: ${{ steps.get_env.outputs.trigger_id }}
-      trigger_run_id: ${{ steps.get_env.outputs.trigger_run_id }}
       build_environment: "Testing"
     steps:
       - id: check
@@ -77,16 +76,10 @@ jobs:
       - id: get_env
         run: |
           ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
-          RUN_ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.run_id')
           if [[ -n "$ID_VALUE" ]]; then
             echo "trigger_id=$ID_VALUE" >> "$GITHUB_OUTPUT"
           else
             echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
-          fi
-          if [[ -n "$RUN_ID_VALUE" ]]; then
-            echo "trigger_run_id=$ENV_VALUE" >> "$GITHUB_OUTPUT"
-          else
-            echo "trigger_run_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
           echo "branch=$(git name-rev --name-only HEAD | cut -d~ -f1-1)" >> "$GITHUB_OUTPUT"
           echo "parent_sha=$(git show-ref --heads --hash stable)" >> "$GITHUB_OUTPUT"
@@ -118,13 +111,14 @@ jobs:
       - name: pre-checkout repository for actions
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          persist-credentials: false
           ref: ${{ needs.check_build.outputs.sha }}
           sparse-checkout: '.github/actions/checkout-and-rebuild'
       - name: Checkout repository for MATs with ${{ matrix.python-version }}
         uses: ./.github/actions/checkout-and-rebuild
         with:
           sha: ${{ needs.check_build.outputs.sha }}
-          build-run-id: ${{ needs.check_build.outputs.trigger_run_id }}
+          build-run-id: ${{ needs.check_build.outputs.trigger_id }}
           python-version: ${{ matrix.python-version }}
           path: ${{ github.workspace }}
       - name: Run Tests for python ${{ matrix.python-version }}
