@@ -28,24 +28,24 @@ Usage:
 	python3 -m tests.run_selective --group [mat|extra|fuzzing|performance] [--category CATEGORY]
 """
 
-__module__ = "tests"
+__module__ = "tests"  # pragma: no cover
 
-import sys
-import argparse
-import unittest
-import logging
+import sys  # pragma: no cover
+import argparse  # pragma: no cover
+import unittest  # pragma: no cover
+import logging  # pragma: no cover
 
-if __debug__ and __name__ == "__main__":
+if __debug__ and __name__ == "__main__":  # pragma: no branch
 	logging.getLogger(__module__).debug(
 		"Bootstrapping %s",  # lazy formatting to avoid PYL-W1203
 		__file__,
 	)
 
-from tests import get_test_suite
-from tests import TEST_GROUPS
+from tests import get_test_suite  # pragma: no cover
+from tests import TEST_GROUPS  # pragma: no cover
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
 	"""Run selective tests based on specified group and category.
 
 	Parses command line arguments to select the appropriate test suite and executes the tests using
@@ -80,5 +80,5 @@ def main() -> None:
 		sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no branch
 	main()
