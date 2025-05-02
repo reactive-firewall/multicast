@@ -232,7 +232,7 @@ test: just-test
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-mod: test-mat
+test-mats: test-mat
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;

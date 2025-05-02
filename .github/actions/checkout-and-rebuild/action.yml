@@ -12,6 +12,12 @@ inputs:
       the default value is sufficient.
     required: true
     default: ${{ github.server_url == 'https://github.com' && github.sha || 'HEAD' }}
+  build-run-id:
+    description: |
+      The workflow run to fetch build artifacts from. When running this action on github.com,
+      the default value is the calling workflow.
+    required: true
+    default: ${{ github.server_url == 'https://github.com' && github.run_id || '' }}
   path:
     description: |
       Path to setup. When running this action on github.com, the default value
@@ -98,6 +104,7 @@ runs:
         merge-multiple: true
         repository: reactive-firewall/multicast
         github-token: ${{ inputs.token }}
+        run-id: ${{ inputs.build-run-id }}
     - name: "Enumerate Fetched Files"
       id: output_artifact_files
       env:
