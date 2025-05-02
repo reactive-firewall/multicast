@@ -48,7 +48,6 @@ jobs:
       build_environment: "Testing"
     steps:
       - id: check
-        shell: bash
         run: |
           if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
@@ -56,7 +55,6 @@ jobs:
             echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
       - id: get_sha
-        shell: bash
         env:
           BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
           SHA_VALUE: ${{ github.event.workflow_run.head_sha }}
@@ -78,7 +76,6 @@ jobs:
         if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
         run: git checkout ${{ steps.get_sha.outputs.head_sha }}
       - id: get_env
-        shell: bash
         if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
         run: |
           ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
@@ -89,7 +86,8 @@ jobs:
           fi
           echo "branch=$(git name-rev --name-only $(git log -1 --format=%H) | cut -d~ -f1-1)" >> "$GITHUB_OUTPUT"
           echo "parent_sha=$(git show-ref --heads --hash stable)" >> "$GITHUB_OUTPUT"
-          echo "branch_ref=$(git symbolic-ref HEAD 2>/dev/null || git show-ref $(git name-rev --name-only $(git log -1 --format=%H)) | cut -d\  -f2-2)" >> "$GITHUB_OUTPUT"
+          BRANCH_REF=$(git symbolic-ref HEAD 2>/dev/null || git show-ref $(git name-rev --name-only $(git log -1 --format=%H)) | cut -d\  -f2-2) ;
+          echo "branch_ref=${BRANCH_REF}" >> "$GITHUB_OUTPUT"
 
   MATS:
     permissions:
