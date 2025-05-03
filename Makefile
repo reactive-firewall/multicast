@@ -157,7 +157,7 @@ ifeq "$(RMDIR)" ""
 	RMDIR=$(RM)Rd
 endif
 
-.PHONY: all clean test cleanup init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
+.PHONY: all clean test cleanup branding init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
 
 help:
 	$(QUIET)printf "HELP\nHouse-keeping:\n\tmake help - this help text\n\tmake build - packages the module\n\tmake clean - cleans up a bit\n\tmake init - sets up requirements for first time\nInstall/Remove:\n\tmake install - installs the module properly\n\tmake user-install - tries an unprivileged install (may not work for some users)\n\tmake uninstall - uninstalls the module\n\tmake purge - uninstalls the module, and resets most related things\n\t\t(the big exception is init)\nMisc:\n\tmake build-docs - generate documentation (using sphinx)\n\tmake test - run minimal acceptance testing\n\tmake test-style - run some code-style testing\n\tmake test-pytest - run extensive testing (with pytest)\n\n";
@@ -191,14 +191,16 @@ build: init ./setup.py MANIFEST.in
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
-init:
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || :
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
+branding::
 	$(QUIET)$(ECHO) ""
 	$(QUIET)$(ECHO) "      _ _         "
 	$(QUIET)$(ECHO) "     //\/\ulticast"
 	$(QUIET)$(ECHO) "                  "
 	$(QUIET)$(ECHO) ""
+
+init: branding
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build
