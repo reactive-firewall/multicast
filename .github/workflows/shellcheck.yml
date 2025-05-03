@@ -1,0 +1,30 @@
+# .github/workflows/shellcheck.yml
+---
+name: shellcheck
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main", "master", "stable"]
+  pull_request:
+    branches: ["main", "master", "stable", "feature-*", "patch-*", "HOTFIX-*"]
+
+permissions: {}  # Setting default permissions to none for enhanced security
+
+jobs:
+  shellcheck:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      pull-requests: read  # to get PR metadata
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Shellcheck Scan
+        uses: reactive-firewall/shellcheck-scan@89ae54cd2b9d19a34e72712d986ebb21d8521dd3 # v0
+        with:  # optional arguments
+          match: 'tests/check_* **/*.sh'
+          publish-artifacts: true
+        if: ${{ success() }}

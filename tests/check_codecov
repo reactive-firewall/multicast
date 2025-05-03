@@ -62,8 +62,9 @@
 
 ulimit -t 1200
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
+# shellcheck disable=SC2086
 LANG=${LANG:-"en_US"}
-LC_ALL="${LANG:1:5}.utf-8"
+LC_ALL="${LANG:0:5}.utf-8"
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/codecov_test_script_lock"
@@ -82,6 +83,7 @@ EXIT_CODE=0
 function check_command() {
     test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
     local cmd="$1" ;
+    # shellcheck disable=SC2086
     test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells
@@ -105,23 +107,32 @@ else
 fi
 
 function cleanup() {
-	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
-	rm -f ./codecov 2>/dev/null || true ; wait ;
+	# shellcheck disable=SC2317
+	rm -f "${LOCK_FILE}" 2>/dev/null || true ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
+	rm -f ./codecov 2>/dev/null || true ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
 		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		# shellcheck disable=SC2086
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
+		# shellcheck disable=SC2046
+		printf "%s\n" "CodeCov already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		false ;
 		exit 126 ;
 fi
@@ -141,39 +152,41 @@ fi
 # This File  MUST BE GIT-IGNORED
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
+	# shellcheck disable=SC1091
 	source ./codecov_env 2>/dev/null || true ;
 fi
 
 if [[ ( -r ./codecov.yml ) ]] ; then
-	cat codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate 2>/dev/null || EXIT_CODE=6
+	curl -X POST --data-binary @- https://codecov.io/validate <codecov.yml 2>/dev/null || EXIT_CODE=6
 fi
 if [[ ( -r ./.codecov.yml ) ]] ; then
-	cat ./.codecov.yml | curl -X POST --data-binary @- https://codecov.io/validate 2>/dev/null || EXIT_CODE=6
+	curl -X POST --data-binary @- https://codecov.io/validate <./.codecov.yml 2>/dev/null || EXIT_CODE=6
 fi
 
 
 #########################
 # actual Work starts here
 #########################
-curl -fLso codecov https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov ;
+curl -fLso codecov "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov" ;
 for i in 1 256 512 ; do
-	curl -fLso codecov.SHA${i}SUM "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM" ; wait ;
-	curl -fLso codecov.SHA${i}SUM.sig "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM.sig" ; wait ;
+	curl -fLso "codecov.SHA${i}SUM" "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM" ; wait ;
+	curl -fLso "codecov.SHA${i}SUM.sig" "https://uploader.codecov.io/latest/${CI_OS:-linux}/codecov.SHA${i}SUM.sig" ; wait ;
 	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r codecov.SHA${i}SUM ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
-		if [[ ( -r codecov.SHA${i}SUM.sig ) ]] ; then
+	if [[ ( -r "codecov.SHA${i}SUM" ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+		if [[ ( -r "codecov.SHA${i}SUM.sig" ) ]] ; then
 			# configure your CI evironment to trust the key at https://keybase.io/codecovsecurity/pgp_keys.asc
 			# FP: 2703 4E7F DB85 0E0B BC2C 62FF 806B B28A ED77 9869
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpgv codecov.SHA${i}SUM.sig codecov.SHA${i}SUM || ${CI} || EXIT_CODE=126
-			rm -vf codecov.SHA${i}SUM.sig 2>/dev/null ;
+			gpgv "codecov.SHA${i}SUM.sig" "codecov.SHA${i}SUM" || ${CI} || EXIT_CODE=126
+			rm -vf "codecov.SHA${i}SUM.sig" 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing codecov.SHA${i}SUM || EXIT_CODE=126
-		rm -vf codecov.SHA${i}SUM 2>/dev/null ;
+		shasum -a $i -c --ignore-missing "codecov.SHA${i}SUM" || EXIT_CODE=126
+		rm -vf "codecov.SHA${i}SUM" 2>/dev/null ;
 	fi
 done
 
+# shellcheck disable=SC2086
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	chmod -v 751 ./codecov || EXIT_CODE=126
 fi
@@ -188,15 +201,16 @@ elif [[ ( -x $(command -v coverage) ) ]] ; then
 	coverage xml --include=multicast/*,tests/*,setup.py 2>/dev/null || coverage xml 2>/dev/null || true
 fi
 
+# shellcheck disable=SC2086
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./codecov -n "Custom Test Run" -X gcov -F multicast,${CI_OS:-linux}-latest -Z || EXIT_CODE=10 ;
+	./codecov -n "Custom Test Run" -X gcov -F multicast,"${CI_OS:-linux}-latest" -Z || EXIT_CODE=10 ;
 fi
 
 
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
 
 rm -f ./codecov 2>/dev/null > /dev/null || true ; wait ;
-rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
+rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
 
-# goodbye
+# shellcheck disable=SC2086
 exit ${EXIT_CODE:-255} ;

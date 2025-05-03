@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
@@ -28,88 +27,85 @@
 # ..........................................
 # NO ASSOCIATION
 
-
-__module__ = """tests.profiling"""
+__module__ = "tests.profiling"
 """This is pythonrepo testing module Template."""
-
 
 try:
 	import sys
 	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
-except ImportError as err:
-	raise ImportError("[CWE-440] Unable to import sys module.") from err
-
+		raise ModuleNotFoundError(
+			"[CWE-440] OMG! sys.modules is not available or empty.",
+		) from None
+except ImportError as _cause:
+	raise ImportError("[CWE-440] Unable to import sys module.") from _cause
 
 try:
 	if 'os' not in sys.modules:
 		import os
 	else:  # pragma: no branch
-		os = sys.modules["""os"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
+		os = sys.modules["os"]
+except Exception as _cause:  # pragma: no branch
+	baton = ModuleNotFoundError(_cause, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 try:
 	if 'functools' not in sys.modules:
 		import functools
 	else:  # pragma: no branch
-		functools = sys.modules["""functools"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
+		functools = sys.modules["functools"]
+except Exception as _cause:  # pragma: no branch
+	baton = ModuleNotFoundError(_cause, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 try:
 	import time
 	if time.__name__ is None:  # pragma: no branch
 		raise NotImplementedError("[CWE-440] We could not import time. Are we in the speed-force!")
-except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+except Exception as _cause:  # pragma: no branch
+	baton = ImportError(_cause, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 try:
 	if 'cProfile' not in sys.modules:
 		import cProfile
 	else:  # pragma: no branch
-		cProfile = sys.modules["""cProfile"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
+		cProfile = sys.modules["cProfile"]
+except Exception as _cause:  # pragma: no branch
+	baton = ModuleNotFoundError(_cause, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 try:
 	try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
-	except Exception as impErr:  # pragma: no branch
-		raise ImportError(impErr, str("[CWE-758] Profile module failed completely.")) from impErr
-except Exception as badErr:  # pragma: no branch
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	except Exception as _root_cause:  # pragma: no branch
+		raise ImportError(
+			_root_cause, str("[CWE-758] Profile module failed completely."),
+		) from _root_cause
+except Exception as _cause:  # pragma: no branch
+	baton = ImportError(_cause, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
 class timewith():
 	"""Basic timer for do_time_profile."""
 
-	def __init__(self, name=''):
+	def __init__(self, name=""):
 		self.name = name
 		self.start = time.time()
 
@@ -117,13 +113,9 @@ class timewith():
 	def elapsed(self):
 		return time.time() - self.start
 
-	def checkpoint(self, name=''):
+	def checkpoint(self, name=""):
 		print(
-			str("{timer} {checkpoint} took {elapsed} seconds").format(
-				timer=self.name,
-				checkpoint=name,
-				elapsed=self.elapsed,
-			).strip()
+			str(f"{self.name} {name} took {self.elapsed} seconds").strip()
 		)
 
 	def __enter__(self):
@@ -161,7 +153,6 @@ def do_time_profile(func, timer_name="time_profile"):
 		work...took ... seconds
 		>>>
 
-
 	"""
 	@functools.wraps(func)
 	def timer_profile_func(*args, **kwargs):
@@ -172,7 +163,6 @@ def do_time_profile(func, timer_name="time_profile"):
 			theOutput = func(*args, **kwargs)
 			timer.checkpoint(str("Stop Timer"))
 		return theOutput
-
 	return timer_profile_func
 
 
@@ -204,7 +194,6 @@ def do_cprofile(func):
 		<BLANKLINE>
 		<BLANKLINE>
 		>>>
-
 
 	"""
 	@functools.wraps(func)
@@ -266,4 +255,3 @@ if __name__ in '__main__':  # pragma: no cover
 		exitcode = main(sys.argv[1:])
 	finally:
 		exit(exitcode)  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
-

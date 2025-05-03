@@ -22,25 +22,52 @@ import unicodedata
 import socket
 import struct
 import abc
-
+import logging
 
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__version__""", """__prologue__""",
-	"""__doc__""", """exceptions""", """exceptions.CommandExecutionError""",
-	"""exceptions.get_exit_code_from_exception""", """exceptions.exit_on_exception""",
-	"""get_exit_code_from_exception""", """exit_on_exception""", """env""",
-	"""skt""", """skt.__package__""", """skt.__module__""", """skt.__name__""",
-	"""skt.__file__""", """skt.genSocket""", """skt.genSocket.__func__""", """genSocket""",
-	"""skt.endSocket""", """skt.endSocket.__func__""", """endSocket""",
-	"""EXIT_CODES""", """EXCEPTION_EXIT_CODES""",
-	"""_BLANK""", """_MCAST_DEFAULT_PORT""", """_MCAST_DEFAULT_GROUP""",
-	"""_MCAST_DEFAULT_TTL""", """mtool""", """recv""", """send""", """hear""",
-	"""recv.McastRECV""", """send.McastSAY""", """hear.McastHEAR""",
+	"""__package__""",
+	"""__module__""",
+	"""__name__""",
+	"""__version__""",
+	"""__prologue__""",
+	"""__doc__""",
+	"""exceptions""",
+	"""exceptions.CommandExecutionError""",  # skipcq: PYL-E0603 -- imports ok
+	"""exceptions.ShutdownCommandReceived""",  # skipcq: PYL-E0603 -- imports ok
+	"""exceptions.get_exit_code_from_exception""",
+	"""exceptions.exit_on_exception""",
+	"""get_exit_code_from_exception""",
+	"""exit_on_exception""",
+	"""env""",
+	"""skt""",
+	"""skt.__package__""",
+	"""skt.__module__""",
+	"""skt.__name__""",
+	"""skt.__file__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""skt.genSocket""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""skt.genSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""genSocket""",  # skipcq: PYL-E0603 -- imports ok
+	"""skt.endSocket""",  # skipcq: PYL-E0603 -- imports ok
+	"""skt.endSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""endSocket""",  # skipcq: PYL-E0603 -- imports ok
+	"""EXIT_CODES""",
+	"""EXCEPTION_EXIT_CODES""",
+	"""_BLANK""",
+	"""_MCAST_DEFAULT_BUFFER_SIZE""",  # added in version 2.0.6
+	"""_MCAST_DEFAULT_PORT""",
+	"""_MCAST_DEFAULT_GROUP""",
+	"""_MCAST_DEFAULT_TTL""",
+	"""mtool""",
+	"""recv""",
+	"""send""",
+	"""hear""",
+	"""recv.McastRECV""",  # skipcq: PYL-E0603 -- imports ok
+	"""send.McastSAY""",  # skipcq: PYL-E0603 -- imports ok
+	"""hear.McastHEAR""",  # skipcq: PYL-E0603 -- imports ok
 ]
 
-
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -56,8 +83,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -73,8 +99,7 @@ __module__ = """multicast"""
 
 """
 
-
-__name__ = """multicast"""  # skipcq: PYL-W0622
+__name__ = "multicast"  # skipcq: PYL-W0622
 """The name of this program.
 
 	Minimal Acceptance Testing:
@@ -90,10 +115,9 @@ __name__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
 global __version__  # skipcq: PYL-W0604
 
-__version__ = """2.0.4"""
+__version__ = "2.0.8-alpha"
 """The version of this program.
 
 	Minimal Acceptance Testing:
@@ -110,10 +134,8 @@ __version__ = """2.0.4"""
 
 """
 
-
-__prologue__ = str("""Python Multicast library version {version}.""").format(version=__version__)
+__prologue__ = f"Python Multicast library version {__version__}."
 """The one-line description or summary of this program."""
-
 
 __doc__ = __prologue__ + """
 
@@ -137,6 +159,7 @@ Security Considerations:
 
 Attributes:
 	__version__ (str): The version of this package.
+	_MCAST_DEFAULT_BUFFER_SIZE (int): Default buffer size for multicast communication (1316).
 	_MCAST_DEFAULT_PORT (int): Default port for multicast communication (59259).
 	_MCAST_DEFAULT_GROUP (str): Default multicast group address ('224.0.0.1').
 	_MCAST_DEFAULT_TTL (int): Default TTL for multicast packets (1).
@@ -198,6 +221,56 @@ Minimal Acceptance Testing:
 
 """
 
+global _MCAST_DEFAULT_BUFFER_SIZE  # skipcq: PYL-W0604
+
+_MCAST_DEFAULT_BUFFER_SIZE = 1316
+"""
+	Arbitrary buffer size to use by default, though any value below 65507 should work.
+
+	Minimal Testing:
+
+	First set up test fixtures by importing multicast.
+
+		>>> import multicast
+		>>>
+
+	Testcase 0: Multicast should have a default buffer size.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE > int(1)
+		True
+		>>>
+
+	Testcase 1: Multicast should validate buffer size constraints.
+		A: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is initialized.
+		B: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is an int.
+		C: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is RFC-791 & RFC-768 compliant.
+		D: Test that the _MCAST_DEFAULT_BUFFER_SIZE attribute is a smaller than fragment thresholds
+			for typical ethernet MTUs by default.
+
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE is not None
+		True
+		>>> type(multicast._MCAST_DEFAULT_BUFFER_SIZE) is type(1)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE >= int(56)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(65527)
+		True
+		>>>
+		>>> multicast._MCAST_DEFAULT_BUFFER_SIZE <= int(1500)
+		True
+		>>>
+
+
+"""
 
 global _MCAST_DEFAULT_PORT  # skipcq: PYL-W0604
 
@@ -247,7 +320,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 global _MCAST_DEFAULT_GROUP  # skipcq: PYL-W0604
 
-_MCAST_DEFAULT_GROUP = """224.0.0.1"""
+_MCAST_DEFAULT_GROUP = "224.0.0.1"
 """Arbitrary group to use by default, though any mcst grp would work.
 
 	The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
@@ -272,7 +345,6 @@ _MCAST_DEFAULT_GROUP = """224.0.0.1"""
 		>>>
 
 """
-
 
 global _MCAST_DEFAULT_TTL  # skipcq: PYL-W0604
 
@@ -307,7 +379,6 @@ _MCAST_DEFAULT_TTL = int(1)
 
 """
 
-
 global _BLANK  # skipcq: PYL-W0604
 
 _BLANK = str("""""")
@@ -335,41 +406,47 @@ _BLANK = str("""""")
 
 """
 
+if logging.__name__ is not None:  # pragma: no branch
+	logging.getLogger(__module__).addHandler(logging.NullHandler())
+	logging.getLogger(__module__).debug(
+		"Loading %s",  # lazy formatting to avoid PYL-W1203
+		__module__,
+	)
 
 if sys.__name__ is None:
 	raise ModuleNotFoundError(
 		"FAIL: we could not import sys. We're like in the matrix! ABORT."
 	) from None
 
-
 if argparse.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import argparse. ABORT.") from None
-
 
 if unicodedata.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import unicodedata. ABORT.") from None
 
-
 if socket.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import socket. ABORT.") from None
 else:  # pragma: no branch
-	socket.setdefaulttimeout(int(_MCAST_DEFAULT_TTL))
-
+	_tmp_mcast_value = int(_MCAST_DEFAULT_TTL)
+	logging.getLogger(__module__).debug(
+		"Setting default socket timeout to %d",  # lazy formatting to avoid PYL-W1203
+		_tmp_mcast_value,
+	)
+	socket.setdefaulttimeout(_tmp_mcast_value)
+	del _tmp_mcast_value  # skipcq - cleanup any bootstrap/setup leaks early
 
 if struct.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import struct. ABORT.") from None
 
-
 if abc.__name__ is None:
 	raise ModuleNotFoundError("FAIL: we could not import Abstract base class. ABORT.") from None
 
-
-if 'multicast.exceptions' not in sys.modules:
+if "multicast.exceptions" not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import exceptions  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global exceptions  # skipcq: PYL-W0604
-	exceptions = sys.modules["""multicast.exceptions"""]
+	exceptions = sys.modules["multicast.exceptions"]
 
 EXIT_CODES = exceptions.EXIT_CODES
 """See multicast.exceptions.EXIT_CODES."""
@@ -380,34 +457,44 @@ EXCEPTION_EXIT_CODES = exceptions.EXCEPTION_EXIT_CODES
 CommandExecutionError = exceptions.CommandExecutionError
 """See multicast.exceptions.CommandExecutionError Class."""
 
+ShutdownCommandReceived = exceptions.ShutdownCommandReceived
+"""See multicast.exceptions.ShutdownCommandReceived Class."""
+
 get_exit_code_from_exception = exceptions.get_exit_code_from_exception
 """See multicast.exceptions.get_exit_code_from_exception function."""
 
 exit_on_exception = exceptions.exit_on_exception
 """See multicast.exceptions.exit_on_exception function."""
 
-
-if 'multicast.env' not in sys.modules:
+if "multicast.env" not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import env  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global env  # skipcq: PYL-W0604
-	env = sys.modules["""multicast.env"""]
+	env = sys.modules["multicast.env"]
 
 _config = env.load_config()
 
 if _config is None:
 	raise ImportError("FAIL: we could not import environment. ABORT.") from None
 else:
+	logging.getLogger(__module__).debug("Configuring overrides and defaults.")
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
 	_MCAST_DEFAULT_TTL = _config["ttl"]
+	_MCAST_DEFAULT_BUFFER_SIZE = _config["buffer_size"]
 	global _MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_BIND_IP = _config["bind_addr"]
 	global _MCAST_DEFAULT_GROUPS  # skipcq: PYL-W0604
 	_MCAST_DEFAULT_GROUPS = _config["groups"]
-	global _MCAST_DEFAULT_BUFFER  # skipcq: PYL-W0604
-	_MCAST_DEFAULT_BUFFER = _config["buffer_size"]
+	if __debug__:  # pragma: no branch
+		logging.getLogger(__module__).info("Overrides and defaults are configured.")
+		logging.getLogger(__module__).debug("Defaults:")
+		for key, value in _config.items():
+			logging.getLogger(__module__).debug(
+				"\t%s=%s",  # lazy formatting to avoid PYL-W1203
+				key, value,
+			)
 
 del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
@@ -431,16 +518,16 @@ class mtool(abc.ABC):
 
 	"""
 
-	__module__ = """multicast"""
+	__module__ = "multicast"
 
 	__proc__ = None
 
-	__prologue__ = """Add a prologue here."""
+	__prologue__ = "Add a prologue here."
 
-	__epilogue__ = """Add an epilogue here."""
+	__epilogue__ = "Add an epilogue here."
 
 	@classmethod
-	def buildArgs(cls, calling_parser_group):
+	def buildArgs(cls, calling_parser_group: argparse.ArgumentParser) -> argparse.ArgumentParser:
 		"""
 		Will build the argparse parser.
 
@@ -483,6 +570,10 @@ class mtool(abc.ABC):
 
 		"""
 		if calling_parser_group is None:  # pragma: no branch
+			logging.getLogger(__module__).debug(
+				"Building %s arguments.",  # lazy formatting to avoid PYL-W1203
+				__name__,
+			)
 			calling_parser_group = argparse.ArgumentParser(
 				prog=str(cls.__name__ if cls.__proc__ is None else cls.__proc__),
 				description=cls.__prologue__,
@@ -490,29 +581,28 @@ class mtool(abc.ABC):
 				add_help=False
 			)
 			group = calling_parser_group.add_mutually_exclusive_group(required=False)
-			group.add_argument('-h', '--help', action='help')
+			group.add_argument("-h", "--help", action="help")
 			group.add_argument(
-				'-V', '--version',
-				action='version', version=str(
-					"%(prog)s {version}"
-				).format(version=str(__version__))
+				"-v",
+				"--version",
+				action="version",
+				version=f"%(prog)s {__version__}"
 			)
 			calling_parser_group.add_argument(
-				"""--use-std""", dest='is_std', default=False, action='store_true'
+				"--use-std", dest="is_std", default=False, action="store_true",
 			)
 			calling_parser_group.add_argument(
-				"""--daemon""", dest='is_daemon', default=False, action='store_true'
+				"--daemon", dest="is_daemon", default=False, action="store_true",
 			)
 		subparsers = calling_parser_group.add_subparsers(
-			title="Tools", dest='cmd_tool',
-			help=str("""Sub-Commands."""), metavar="CMD"
+			title="Tools", dest="cmd_tool", help="Sub-Commands.", metavar="CMD"
 		)
 		if mtool.__class__.__subclasscheck__(mtool, cls):  # pragma: no branch
 			cls.setupArgs(subparsers)
 		return calling_parser_group
 
 	@classmethod
-	def parseArgs(cls, arguments):
+	def parseArgs(cls, arguments) -> tuple:
 		"""
 		Will attempt to parse the given CLI arguments.
 
@@ -567,7 +657,7 @@ class mtool(abc.ABC):
 		return cls.buildArgs(None).parse_known_args(arguments)
 
 	@classmethod
-	def checkToolArgs(cls, args):
+	def checkToolArgs(cls, args) -> list:
 		"""
 		Will handle the None case for arguments.
 
@@ -629,12 +719,12 @@ class mtool(abc.ABC):
 
 	@classmethod
 	@abc.abstractmethod
-	def setupArgs(cls, parser):  # pragma: no cover
+	def setupArgs(cls, parser) -> None:  # pragma: no cover
 		"""Abstract hook for setting up the tool's arguments."""
 		pass  # skipcq - abstract method
 
 	@abc.abstractmethod
-	def doStep(self, *args, **kwargs):  # pragma: no cover
+	def doStep(self, *args, **kwargs) -> tuple:  # pragma: no cover
 		"""
 		Abstracts the __call__ behavior for sub-classing the tool.
 
@@ -655,51 +745,48 @@ class mtool(abc.ABC):
 		raise NotImplementedError("Subclasses must implement this method.")
 
 
-if 'multicast.skt' not in sys.modules:
+if "multicast.skt" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global skt  # skipcq: PYL-W0604
-	skt = sys.modules["""multicast.skt"""]
-
+	skt = sys.modules["multicast.skt"]
 
 genSocket = skt.genSocket
 """See multicast.skt.genSocket."""
 
-
 endSocket = skt.endSocket
 """See multicast.skt.endSocket."""
 
-
-if 'multicast.recv' not in sys.modules:
+if "multicast.recv" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import recv as recv  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global recv  # skipcq: PYL-W0604
-	recv = sys.modules["""multicast.recv"""]
+	recv = sys.modules["multicast.recv"]
 
-
-if 'multicast.send' not in sys.modules:
+if "multicast.send" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import send as send  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global send  # skipcq: PYL-W0604
-	send = sys.modules["""multicast.send"""]
+	send = sys.modules["multicast.send"]
 
-
-if 'multicast.hear' not in sys.modules:
+if "multicast.hear" not in sys.modules:
+	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 	from . import hear as hear  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global hear  # skipcq: PYL-W0604
-	hear = sys.modules["""multicast.hear"""]
-
+	hear = sys.modules["multicast.hear"]
 
 try:
-	if """multicast.__main__""" in sys.modules:  # pragma: no cover
+	if "multicast.__main__" in sys.modules:  # pragma: no cover
 		global __main__  # skipcq: PYL-W0604
-		__main__ = sys.modules["""multicast.__main__"""]
+		__main__ = sys.modules["multicast.__main__"]
 except Exception:
 	import multicast.__main__ as __main__  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 
-
-if __name__ in u'__main__':
+if __name__ in "__main__":
 	__EXIT_CODE = 2
 	if __main__.main is not None:
 		__EXIT_CODE = __main__.main(sys.argv[1:])

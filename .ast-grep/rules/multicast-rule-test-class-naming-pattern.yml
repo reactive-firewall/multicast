@@ -1,0 +1,25 @@
+# .ast-grep/multicast-rule-test-class-naming-pattern.yml
+id: test-class-naming-pattern
+rule:
+  pattern: |
+    class Test$NAME($$$):$$$?
+      $$$
+      def test_$METHOD_WHEN_$CONDITION(self) -> None:
+        $$$
+      $$$
+language: python
+message: "Test classes should follow [CEP-9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6) naming convention."
+files:
+  - tests{/**/,/}test_[a-z0-9_]*.py
+severity: warning
+examples:
+  - name: Valid test names
+    code: |
+      class TestServer(unittest.TestCase):
+        def test_connect_WHEN_valid_credentials_GIVEN_correct_format(self) -> None:
+          pass
+  - name: Invalid test names
+    code: |
+      class TestServer(unittest.TestCase):
+        def test_something(self) -> None:  # Missing WHEN and GIVEN
+          pass

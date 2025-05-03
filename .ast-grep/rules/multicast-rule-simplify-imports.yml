@@ -1,0 +1,51 @@
+# .ast-grep/multicast-rule-simplify-imports.yml
+---
+id: simplify-imports
+rule:
+  any:
+    - kind: if_statement
+      pattern: |
+        if $CONDITION:
+          import $MODULE
+        else: $$$
+      inside:
+        kind: block
+        inside:
+          kind: try_statement
+          inside:
+            kind: module
+      all:
+        - has:
+            any:
+              - kind: comparison_operator
+                pattern: |
+                  '$MODULE' not in sys.modules
+              - kind: comparison_operator
+                pattern: |
+                  "$MODULE" not in sys.modules
+        - has:
+            kind: block
+            has:
+              kind: import_statement
+message: "Consider simplifying import statement."
+severity: warning
+fix:
+  import $MODULE
+description: Rule for simplifying sys.modules check pattern
+language: python
+examples:
+  - name: Complex import statement
+    code: |
+      try:
+        if 'os' not in sys.modules:
+          import os
+        else:  # pragma: no branch
+          os = sys.modules["os"]
+      except ImportError as err:  # pragma: no branch
+        raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
+  - name: Simplified import statement
+    code: |
+      try:
+        import os
+      except ImportError as _cause:  # pragma: no branch
+        raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err

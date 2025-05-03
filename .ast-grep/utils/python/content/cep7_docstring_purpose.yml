@@ -1,0 +1,14 @@
+# .ast-grep/utils/content.yml
+# CEP-7 content validation utilities
+id: cep7_docstring_purpose
+rule:
+  all:
+    - any:
+      - matches: function_docstring
+      - matches: method_docstring
+      - matches: class_docstring
+    - has:
+        regex: |
+          \b((?:Verify|Verifies|Valid)|(?:Check|Test|Review)|(?:Create|Update|Delete)|(?:Configure|Install|Initialize)|(?:Run|Execute|Build)|(?:Load|Save|Access)|(?:Ensure|Make|Use|Follow|Document|Optimize|Generate|Submit|Yield)).*
+        kind: string_content
+language: python

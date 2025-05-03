@@ -1,0 +1,11 @@
+# .ast-grep/multicast-rule-verify-test-naming.yml
+id: verify-test-naming
+rule:
+  pattern:
+    selector: function_definition
+    context: |
+      def test_$NAME_WHEN_$CONDITION_GIVEN_$INPUT($PARAMS)$RET_TYPE:
+language: python
+message: "[CEP-9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6) Test methods must follow naming convention: test_<what>_WHEN_<condition>_GIVEN_<input>"
+files:
+  - tests{/**/,/}test_[a-z0-9_]*.py

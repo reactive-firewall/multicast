@@ -44,8 +44,8 @@ try:
 			from setuptools.config import read_configuration
 		except Exception:
 			from setuptools.config.setupcfg import read_configuration
-except Exception as err:
-	raise NotImplementedError("""[CWE-440] Not Implemented.""") from err
+except Exception as _cause:
+	raise NotImplementedError("""[CWE-440] Not Implemented.""") from _cause
 
 
 def readFile(filename):
@@ -76,10 +76,10 @@ def readFile(filename):
 			raise ValueError(f"[CWE-706] Access to the file {filename} was not expected.") from None
 		with open(f"./{filename}") as f:
 			theResult = f.read()
-	except Exception as err:
+	except Exception as _cause:
 		theResult = str(
 			"""See https://github.com/reactive-firewall/multicast/{fn}\n{e}"""
-		).format(fn=filename, e=str(err))
+		).format(fn=filename, e=str(_cause))
 	return str(theResult)
 
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
 			str("""Operating System :: POSIX"""),
 			str("""Operating System :: MacOS :: MacOS X"""),
 			str("""Operating System :: POSIX :: Linux"""),
-			str("""License :: OSI Approved :: MIT License"""),
+			# PEP-639 removed str("""License :: OSI Approved :: MIT License"""),
 			str("""Programming Language :: Python :: 3"""),
 			str("""Programming Language :: Python :: 3 :: Only"""),
 			str("""Programming Language :: Python :: 3.13"""),
@@ -153,8 +153,11 @@ if __name__ == '__main__':
 			str("""Topic :: Software Development :: Libraries :: Python Modules"""),
 			str("""Topic :: System :: Networking""")
 		]
-	except Exception as e:
-		print(f"Warning: Error occurred while setting class_tags: {e}")
+	except Exception as _cause:
+		warnings.warn(
+			f"Error occurred while setting class_tags: {_cause}",
+			stacklevel=2,
+		)
 		class_tags = ["Development Status :: 5 - Production/Stable"]
 	# finally the setup
 	setup(

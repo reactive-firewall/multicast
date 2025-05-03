@@ -1,0 +1,15 @@
+# .ast-grep/utils/structure.yml
+# Documentation structure utilities
+id: class_docstring
+rule:
+  all:
+    - matches: docstring_pattern
+      inside:
+        kind: expression_statement
+        inside:
+          matches: block_with_docstring
+          kind: block
+          inside:
+            kind: class_definition
+    - kind: string
+language: python

@@ -1,0 +1,19 @@
+# .ast-grep/utils/docstring_pattern.yml
+id: docstring_pattern
+rule:
+  any:
+    - pattern:
+        selector: string
+        context: |
+          """$DOC"""
+    - pattern:
+        selector: string
+        context: |
+          '''$DOC'''
+  has:
+    matches: py_string_literal
+    kind: string_content
+  inside:
+    kind: expression_statement
+  kind: string
+language: python

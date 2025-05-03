@@ -1,0 +1,19 @@
+# .ast-grep/utils/test.yml
+# Test-specific utilities
+id: cep7_docstring_tests
+rule:
+  all:
+    - any:
+      - matches: function_docstring
+      - matches: method_docstring
+    - has:
+        all:
+          - regex: |
+              .*Testing:.+
+          - regex: |
+              \s+>>>\s+\S+.*?
+          - regex: |
+              \s*(?:True|False|\d+|None|\[.*?\]|\{.*?\}|".*?"|'.*?'|\S+)
+        kind: string_content
+    - kind: string
+language: python

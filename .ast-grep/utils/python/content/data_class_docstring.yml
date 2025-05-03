@@ -1,0 +1,27 @@
+# .ast-grep/utils/python/content/data_class_docstring.yml
+# CEP-7 content validation utilities
+id: data_class_docstring
+rule:
+  all:
+    - matches: class_docstring
+    - any:
+        - pattern: |
+            """$DOC"""
+        - pattern: |
+            '''$DOC'''
+      inside:
+        kind: expression_statement
+        inside:
+          kind: block
+          has:
+            kind: expression_statement
+            all:
+              - has:
+                  kind: identifier
+              - not:
+                  has:
+                    kind: function_definition
+          inside:
+            kind: class_definition
+    - kind: string
+language: python

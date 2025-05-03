@@ -1,0 +1,13 @@
+#.ast-grep/multicast-rule-exception-handling-pattern.yml
+id: exception-handling-pattern
+rule:
+  pattern:
+    selector: try_statement
+    context: |
+      try:
+        $$$
+      except $ERR_TYPE as $ERR:
+        raise CommandExecutionError(str($ERR))
+language: python
+message: "Ensure proper exception handling for $ERR_TYPE with CommandExecutionError"
+severity: warning

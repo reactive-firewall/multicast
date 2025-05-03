@@ -1,0 +1,29 @@
+# .ast-grep/multicast-rule-validate-method-docstring.yml
+id: validate-method-docstring
+rule:
+  pattern:
+    selector: string
+    context: |
+      """$DOC"""
+  inside:
+    kind: expression_statement
+    inside:
+      kind: block
+      inside:
+        pattern:
+          selector: function_definition
+          context: |
+            def $NAME($PARAMS)$RET_TYPE:$$$
+              """$DOC"""
+  kind: string
+  all:
+    - any:
+        - matches: function_docstring
+        - matches: method_docstring
+    - not:
+        matches: cep7_docstring_tests
+language: python
+message: "[CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20#f-doctests) $NAME must have docstring with testing doctests."
+files:
+  - multicast{/**/,/}*.py
+severity: warning

@@ -80,7 +80,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-__module__ = """tests"""
+__module__ = "tests"
 """This is a testing related stand-alone utilities module.
 
 This module provides test fixtures and utilities for testing multicast communication.
@@ -103,81 +103,27 @@ Example:
 
 """
 
-
-__name__ = """tests.MulticastUDPClient"""  # skipcq: PYL-W0622
-
+__name__ = "tests.MulticastUDPClient"  # skipcq: PYL-W0622
 
 try:
 	import sys
 	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
-		raise ModuleNotFoundError("[CWE-440] OMG! sys.modules is not available or empty.") from None
-except ImportError as err:
-	raise ImportError("[CWE-440] Unable to import sys module.") from err
-
-
-try:
-	if 'os' not in sys.modules:
-		import os
-	else:  # pragma: no branch
-		os = sys.modules["""os"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+		raise ModuleNotFoundError(
+			"[CWE-440] OMG! sys.modules is not available or empty."
+		) from None
+except ImportError as _cause:  # pragma: no branch
+	raise ImportError("[CWE-440] Unable to import sys module.") from _cause
 
 try:
-	if 'functools' not in sys.modules:
-		import functools
-	else:  # pragma: no branch
-		functools = sys.modules["""functools"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
+	import socket
+	import socketserver
+except ImportError as _cause:  # pragma: no branch
+	raise ImportError("[CWE-758] Test module failed completely.") from _cause
 
 try:
-	if 'socket' not in sys.modules:
-		import socket
-	else:  # pragma: no branch
-		socket = sys.modules["""socket"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
-
-try:
-	if 'socketserver' not in sys.modules:
-		import socketserver
-	else:  # pragma: no branch
-		socketserver = sys.modules["""socketserver"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
-
-
-try:
-	if 'random' not in sys.modules:
-		import random
-	else:  # pragma: no branch
-		random = sys.modules["""random"""]
-except Exception as badErr:  # pragma: no branch
-	baton = ModuleNotFoundError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton from badErr
+	import random
+except ImportError as _cause:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-758] Test module failed to randomize.") from _cause
 
 
 class MCastClient(object):  # skipcq: PYL-R0205
@@ -224,7 +170,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 	"""
 
-	__module__ = """tests.MulticastUDPClient.MCastClient"""
+	__module__ = "tests.MulticastUDPClient.MCastClient"
 
 	_group_addr = None
 	"""The multicast group address."""
@@ -233,7 +179,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 	"""The source port for the client."""
 
 	# skipcq: TCV-002
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwargs) -> None:  # pragma: no cover
 		"""
 		Initialize a MCastClient object with optional group address and source port.
 
@@ -294,25 +240,20 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		# skipcq: TCV-002
-		if str("""grp_addr""") in kwargs:
-			self._group_addr = kwargs.get("""grp_addr""", None)  # skipcq: PTC-W0039 - ensure None
-		if str("""src_port""") in kwargs:
-			self._source_port = kwargs.get("""src_port""", 0)
-		else:
+		if "grp_addr" in kwargs:  # pragma: no branch
+			self._group_addr = kwargs.get("grp_addr", None)  # skipcq: PTC-W0039 - ensure None
+		if "src_port" in kwargs:  # pragma: no branch
+			self._source_port = kwargs.get("src_port", 0)
+		else:  # pragma: no branch
 			self._source_port = int(
 				50000 + (
-					int(
-						random.SystemRandom().randbytes(
-							int(60000).__sizeof__()
-						).hex(),
-						16
-					) % 9999
+					int(random.SystemRandom().randbytes(int(60000).__sizeof__()).hex(), 16) % 9999
 				)
 			)
 
 	# skipcq: TCV-002
 	@staticmethod
-	def say(address, port, sock, msg):
+	def say(address: str, port: int, sock: socket.socket, msg: str) -> None:  # pragma: no cover
 		"""
 		Send a message to a specified multicast address and port, then receive and print it.
 
@@ -365,9 +306,9 @@ class MCastClient(object):  # skipcq: PYL-R0205
 
 		"""
 		# skipcq: TCV-002
-		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))
-		received = str(sock.recv(1024), "utf-8")
-		sp = " " * 4
+		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))  # pragma: no cover
+		received = str(sock.recv(1024), "utf-8")  # pragma: no cover
+		sp = " " * 4  # pragma: no cover
 		if (sys.stdout.isatty()):  # pragma: no cover
 			print(f"Sent: {sp}{msg}")  # skipcq: PYL-C0209  -  must remain compatible
 			print(f"Received: {received}")  # skipcq: PYL-C0209  -  must remain compatible
@@ -396,10 +337,10 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 	"""
 
-	__module__ = """tests.MulticastUDPClient.MyUDPHandler"""
+	__module__ = "tests.MulticastUDPClient.MyUDPHandler"
 
 	# skipcq: TCV-002
-	def handle(self):
+	def handle(self) -> None:  # pragma: no cover
 		"""
 		Handle incoming UDP requests.
 
@@ -448,15 +389,15 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
 		"""
 		# skipcq: TCV-002
-		data = self.request[0].strip()
-		sock = self.request[1]
-		print(f"{self.client_address[0]} wrote: ")
-		print(data)
-		sock.sendto(data.upper(), self.client_address)
+		data = self.request[0].strip()  # pragma: no cover
+		sock = self.request[1]  # pragma: no cover
+		print(f"{self.client_address[0]} wrote: ")  # pragma: no cover
+		print(data)  # pragma: no cover
+		sock.sendto(data.upper(), self.client_address)  # pragma: no cover
 
 
 # skipcq: TCV-002
-def main():
+def main() -> None:  # pragma: no cover
 	"""
 	The main test operations.
 
@@ -482,16 +423,16 @@ def main():
 
 	"""
 	# skipcq: TCV-002
-	HOST, PORT = "224.0.0.1", 59991
-	data = "TEST This is a test"
-	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-	tsts_fxr = MCastClient()
-	print(str((HOST, PORT)))
-	tsts_fxr.say(HOST, PORT, sock, data)
-	tsts_fxr.say(HOST, PORT, sock, str("""STOP"""))
+	HOST, PORT = "224.0.0.1", 59991  # pragma: no cover
+	data = "TEST This is a test"  # pragma: no cover
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # pragma: no cover
+	tsts_fxr = MCastClient()  # pragma: no cover
+	print(str((HOST, PORT)))  # pragma: no cover
+	tsts_fxr.say(HOST, PORT, sock, data)  # pragma: no cover
+	tsts_fxr.say(HOST, PORT, sock, "STOP")  # pragma: no cover
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no branch
 	main()  # skipcq: TCV-002
 	# skipcq: PYL-R1722
 	exit(0)  # skipcq: PYL-R1722 -- intentionally allow overwriteing exit for testing.

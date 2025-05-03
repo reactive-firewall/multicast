@@ -1,0 +1,18 @@
+# .ast-grep/multicast-rule-require-test-cleanup.yml
+id: require-test-cleanup
+language: python
+rule:
+  all:
+    - pattern:
+        selector: class_definition
+        context: |
+          class $TEST_CLASS(unittest.TestCase):
+            $BODY
+      inside:
+        kind: module
+    - not:
+        regex: def tearDown\(
+message: "Test classes must include tearDown method for cleanup."
+severity: "warning"
+files:
+  - tests{/**/,/}test_[a-z0-9_]*.py

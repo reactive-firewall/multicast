@@ -103,8 +103,7 @@ Minimal Acceptance Testing:
 
 """
 
-
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -127,8 +126,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -148,12 +146,10 @@ __module__ = """multicast"""
 
 """
 
-
-__file__ = """multicast/recv.py"""
+__file__ = "multicast/recv.py"
 """The file of this component."""
 
-
-__name__ = """multicast.recv"""  # skipcq: PYL-W0622
+__name__ = "multicast.recv"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -175,42 +171,136 @@ __name__ = """multicast.recv"""  # skipcq: PYL-W0622
 
 try:
 	import sys
+	import warnings
 	if 'multicast' not in sys.modules:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
+except Exception as _cause:
+	del _cause  # skipcq - cleanup any error leaks early
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
-
 try:
+	from multicast import logging
 	from multicast import argparse as _argparse
 	from multicast import unicodedata as _unicodedata
 	from multicast import socket as _socket
 	from multicast import struct as _struct
-	depends = [
-		_unicodedata, _socket, _struct, _argparse
-	]
+	depends = [_unicodedata, _socket, _struct, _argparse]
 	for unit in depends:
 		if unit.__name__ is None:  # pragma: no branch
-			baton = ModuleNotFoundError(
-				str("[CWE-440] module failed to import {}.").format(str(unit))
+			_root_cause = ModuleNotFoundError(
+				f"[CWE-440] module failed to import {str(unit)}.",
 			)  # pragma: no cover
-			baton.module = unit  # pragma: no cover
-			raise baton from None  # pragma: no cover
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+			_root_cause.module = unit  # pragma: no cover
+			raise _root_cause from None  # pragma: no cover
+except Exception as _cause:  # pragma: no branch
+	baton = ImportError(_cause, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
-def joinstep(groups, port, iface=None, bind_group=None, isock=None):
+module_logger = logging.getLogger(__name__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
+
+
+_w_prefix: str = "Unusual call to multicast.joinstep with no groups."
+
+
+_w_example_code: str = """
+sock = multicast.genSocket() if isock is None else isock
+sock.bind((multicast._MCAST_DEFAULT_GROUP, port))
+
+"""
+
+
+_w_advice: str = "...".join([
+	"Consider using",
+	_w_example_code,
+	"instead, for improved performance. Otherwise specify the multicast bind group.",
+])
+
+
+_w_empty_join_warning: str = "\n".join([
+	_w_prefix,
+	_w_advice,
+])
+
+
+_w_unspec_bind: str = "\n".join([
+	"Lazy call to multicast.joinstep with unspecified bind group.",
+	f"Will bind to {multicast._MCAST_DEFAULT_BIND_IP}.",  # skipcq: PYL-W0212 - module ok
+	"Tip: Pass a value for bind_group to suppress this message",
+	"(such as 'bind_group=multicast._MCAST_DEFAULT_BIND_IP')",
+])
+
+
+_w_non_multicast = f"{_w_prefix}\nJust use socket.Socket.bind(...) for non-multicast networking."
+
+
+def _validate_join_args(groups=None, port=None, iface=None, bind_group=None, isock=None) -> tuple:
+	"""Validates joinstep arguments.
+
+	This is a helper function and should NOT be called directly.
+
+	Args:
+		groups (list): List of multicast group addresses to join.
+		port (int): Port number to bind the socket to.
+		iface (str, optional): Network interface to use.
+		bind_group (str, optional): Specific group address to bind to.
+		isock (socket.socket, optional): Existing socket to configure.
+
+	Note:
+		All warning messages are only emitted when __debug__ is True
+		(i.e., when Python is not running with -O or -OO).
+
+	Returns:
+		A tuple of (groups, port, iface, bind_group, isock) after normalization.
+	"""
+	if not groups:
+		groups = []
+		if __debug__:  # pragma: no branch
+			if not bind_group:
+				warnings.warn(
+					_w_empty_join_warning,
+					category=SyntaxWarning,
+					stacklevel=3,
+				)
+			else:
+				if multicast.env.validate_multicast_address(bind_group):
+					groups = [bind_group]
+				else:
+					warnings.warn(
+						_w_non_multicast,
+						category=SyntaxWarning,
+						stacklevel=3,
+					)
+		else:
+			if multicast.env.validate_multicast_address(bind_group):
+				groups = [bind_group]
+	else:
+		if __debug__ and not bind_group:  # pragma: no branch
+			# skipcq: PYL-W0212
+			if (len(groups) == 1) and (
+				groups[0] != multicast._MCAST_DEFAULT_BIND_IP  # skipcq: PYL-W0212 - module ok
+			):
+				warnings.warn(
+					_w_unspec_bind,
+					category=ResourceWarning,
+					stacklevel=3,
+				)
+	return (groups, port, iface, bind_group, isock)
+
+
+def joinstep(groups, port, iface=None, bind_group=None, isock=None) -> _socket.socket:
 	"""
 	Join multicast groups to prepare for receiving messages.
 
@@ -240,6 +330,12 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		>>>
 
 	Testcase 1: Stability testing.
+		A: Verify the multicast.recv module is properly initialized.
+		B: Verify the joinstep function exists and has the expected type.
+		C: Test socket creation with no groups (default behavior).
+		D: Test socket creation with a specified multicast group.
+		E: Test socket creation with a multicast group and binding to that group.
+		F: Test socket creation using an existing socket handle.
 
 		>>> import multicast
 		>>>
@@ -250,33 +346,46 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 		False
 		>>> type(multicast.recv.joinstep)
 		<class 'function'>
-		>>> multicast.recv.joinstep(None, 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
-		<socket.socket...>
+		>>> tst_sk = multicast.recv.joinstep(None, 59991)
+		>>> tst_sk #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket...laddr=...>
+		>>> multicast.endSocket(tst_sk)
+		>>> tst_sk #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> tst_fxtr = multicast._MCAST_DEFAULT_GROUP
-		>>> multicast.recv.joinstep([tst_fxtr], 59991) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> tst_sk_2 = multicast.recv.joinstep([tst_fxtr], 59991)
+		>>> tst_sk_2 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
-		>>> multicast.recv.joinstep(
+		>>> multicast.endSocket(tst_sk_2)
+		>>> tst_sk_2 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
+		>>> tst_sk_3 = multicast.recv.joinstep(
 		... 		[tst_fxtr], 59991, None, tst_fxtr
 		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		>>> tst_sk_3 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
+		>>> multicast.endSocket(tst_sk_3)
+		>>> tst_sk_3 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> sk_fxtr = multicast.genSocket()
-		>>> multicast.recv.joinstep(
+		>>> tst_sk_4 = multicast.recv.joinstep(
 		... 		[tst_fxtr], 59991, None, tst_fxtr, sk_fxtr
-		... ) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		... )
+		>>> tst_sk_4 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
 		<socket.socket...>
+		>>> multicast.endSocket(tst_sk_4)
+		>>> tst_sk_4 #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+		<socket.socket [closed]...>
 		>>> sk_fxtr.close()
 		>>>
 
 
 	"""
-	if not groups:
-		groups = []
-	if isock is None:
-		sock = multicast.genSocket()
-	else:
-		sock = isock.dup()
+	groups, _, _, bind_group, _ = _validate_join_args(groups=groups, bind_group=bind_group)
+	sock = multicast.genSocket() if isock is None else isock.dup()
 	try:
-		sock.bind(('224.0.0.1' if bind_group is None else bind_group, port))
+		# skipcq: PYL-W0212
+		sock.bind((multicast._MCAST_DEFAULT_BIND_IP if bind_group is None else bind_group, port))
 		for group in groups:
 			mreq = _struct.pack(
 				'4sl' if iface is None else '4s4s',
@@ -284,22 +393,27 @@ def joinstep(groups, port, iface=None, bind_group=None, isock=None):
 				_socket.INADDR_ANY if iface is None else _socket.inet_aton(iface)
 			)
 			sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_ADD_MEMBERSHIP, mreq)
-	except Exception as err:  # pragma: no branch
-		raise OSError("[CWE-440] Socket operation failed.") from err  # pragma: no cover
+	except Exception as _cause:  # pragma: no branch
+		raise OSError("[CWE-440] Socket operation failed.") from _cause  # pragma: no cover
 	return sock
 
 
-def tryrecv(msgbuffer, chunk, sock):
+def tryrecv(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Attempt to receive data on the given socket and decode it into the message buffer.
 
 	Will try to listen on the given socket directly into the given chunk for decoding.
 	If the read into the chunk results in content, the chunk will be decoded and appended
-	to the caller-instantiated `msgbuffer`, which is a collection of strings (or None).
+	to the caller-instantiated `msgbuffer`, which is a collection of utf8 strings (or None).
 	After decoding, `chunk` is zeroed for memory efficiency and security. Either way the
 	message buffer will be returned.
 
 	Tries to receive data without blocking and appends it to the message buffer.
+
+	Individual chunk sizes are controlled by the module attribute `_MCAST_DEFAULT_BUFFER_SIZE` set
+	at module's load-time. It is possible to override the buffer size via the environment variable
+	"MULTICAST_BUFFER_SIZE" if available at load-time. However changing the value is not recommended
+	unless absolutely needed, and can be done on the sender side too.
 
 	Args:
 		msgbuffer (list or None): Caller-instantiated collection to store received messages.
@@ -366,14 +480,14 @@ def tryrecv(msgbuffer, chunk, sock):
 			>>>
 
 	"""
-	chunk = sock.recv(1316)
+	chunk = sock.recv(multicast._MCAST_DEFAULT_BUFFER_SIZE)  # skipcq: PYL-W0212 - module ok
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
 		chunk = None  # pragma: no cover
 	return msgbuffer
 
 
-def recvstep(msgbuffer, chunk, sock):
+def recvstep(msgbuffer: list, chunk: bytes, sock: _socket.socket) -> str:
 	"""
 	Receive messages continuously until interrupted.
 
@@ -391,13 +505,12 @@ def recvstep(msgbuffer, chunk, sock):
 		msgbuffer = tryrecv(msgbuffer, chunk, sock)
 	except KeyboardInterrupt:  # pragma: no branch
 		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
-			print(str("""User Interrupted"""))
+			module_logger.warning("User Interrupted")
 	except OSError:  # pragma: no branch
-		if (sys.stdout.isatty()):  # pragma: no cover
-			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
+		module_logger.debug("[CWE-440] Nothing happened. There seems to have been an OS error.")
 	finally:
-		sock = multicast.endSocket(sock)
+		if sock:  # pragma: no branch
+			sock = multicast.endSocket(sock)
 	if not (chunk is None):  # pragma: no branch
 		msgbuffer += str(chunk, encoding='utf8')  # pragma: no cover
 		chunk = None  # pragma: no cover
@@ -447,18 +560,18 @@ class McastRECV(multicast.mtool):
 
 	"""
 
-	__module__ = """multicast.recv"""
+	__module__ = "multicast.recv"
 
-	__name__ = """multicast.recv.McastRECV"""
+	__name__ = "multicast.recv.McastRECV"
 
-	__proc__ = """RECV"""
+	__proc__ = "RECV"
 
 	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
 		this module/instance, but it is also possible to bind to group which
 		is added by some other programs (like another python program instance of this)
 	"""
 
-	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
+	__prologue__ = "Python Multicast Receiver. Primitives for a listener for multicast data."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -521,12 +634,20 @@ class McastRECV(multicast.mtool):
 
 
 		"""
+		module_logger.debug(
+			"Joining %s on port %d using %s as %s",  # lazy formatting to avoid PYL-W1203
+			str(groups), port, str(iface), bind_group,
+		)
 		sock = joinstep(groups, port, iface, bind_group, None)
+		module_logger.debug("Opened %s", sock)  # lazy formatting to avoid PYL-W1203
 		msgbuffer = str(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		chunk = None
+		module_logger.debug("Ready.")
 		msgbuffer = recvstep(msgbuffer, chunk, sock)
 		# about 969 bytes in base64 encoded as chars
+		module_logger.debug("Closing.")
 		multicast.endSocket(sock)
+		module_logger.debug("Done.")
 		return msgbuffer
 
 	def doStep(self, *args, **kwargs):
@@ -543,17 +664,25 @@ class McastRECV(multicast.mtool):
 		Returns:
 			tuple: A tuple containing received data and a status indicator.
 		"""
+		module_logger.debug("RECV")
 		response = self._hearstep(
-			kwargs.get("groups", [multicast._MCAST_DEFAULT_GROUP]),  # skipcq: PYL-W0212 - module ok
+			kwargs.get(
+				"groups",
+				[multicast._MCAST_DEFAULT_GROUP]  # skipcq: PYL-W0212 - module ok
+			),
 			kwargs.get("port", multicast._MCAST_DEFAULT_PORT),  # skipcq: PYL-W0212 - module ok
 			kwargs.get("iface", None),  # skipcq: PTC-W0039 - ensure None by default
 			kwargs.get("group", multicast._MCAST_DEFAULT_GROUP),  # skipcq: PYL-W0212 - module ok
 		)
 		_is_std = kwargs.get("is_std", False)
 		if (sys.stdout.isatty() or _is_std) and (len(response) > 0):  # pragma: no cover
+			module_logger.debug("Will Print to Console.")
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 			print(str(response))
 			print(multicast._BLANK)  # skipcq: PYL-W0212 - module ok
 		_result = (len(response) > 0) is True
+		if _result:
+			module_logger.info("Success")
+		else:
+			module_logger.debug("Nothing Received.")
 		return (_result, None if not _result else response)  # skipcq: PTC-W0020  - intended
-

@@ -17,17 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
@@ -39,43 +37,48 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import setup or test context") from _cause
 
 
-class TestParseRequirements(BasicUsageTestSuite):
+@context.markWithMetaTag("mat", "build")
+class ParseRequirementsTestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_install_requires"""
+	__module__ = "tests.test_install_requires"
 
 	requirements_file = None
 	"""stores the temporary requirements file path for testing"""
 
-	def setUp(self):
-		super(TestParseRequirements, self).setUp()
+	def setUp(self) -> None:
+		super(ParseRequirementsTestSuite, self).setUp()
 		# Create a temporary requirements file for testing
-		self.requirements_file = """test_requirements.txt"""
+		self.requirements_file = "test_requirements.txt"
 
-	def tearDown(self):
+	def tearDown(self) -> None:
 		"""Clean up the temporary requirements file"""
 		try:
 			if os.path.exists(self.requirements_file):
 				os.remove(self.requirements_file)
 		finally:
-			super(TestParseRequirements, self).tearDown()
+			super(ParseRequirementsTestSuite, self).tearDown()
 
-	def write_requirements(self, content):
+	def write_requirements(self, content: str) -> None:
 		with open(self.requirements_file, 'w') as f:
 			f.write(content)
 
-	def test_simple_version_constraint(self):
+	def test_simple_version_constraint(self) -> None:
 		"""Test parsing a simple version constraint."""
-		self.write_requirements("""package>=1.0\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		self.write_requirements("package>=1.0\n")
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
+		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_multiple_version_constraints(self):
+	def test_multiple_version_constraints(self) -> None:
 		"""Test parsing multiple version constraints."""
-		self.write_requirements("""package>=1.0,!=1.5,<2.0\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		self.write_requirements("package>=1.0,!=1.5,<2.0\n")
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
+		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_comments_and_empty_lines(self):
+	def test_comments_and_empty_lines(self) -> None:
 		"""Test handling comments and empty lines."""
 		content = str(
 			"""
@@ -85,10 +88,12 @@ class TestParseRequirements(BasicUsageTestSuite):
 			"""
 		)
 		self.write_requirements(content)
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
-		self.assertEqual(install_requires, ["""package>=1.0"""])
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
+		self.assertEqual(install_requires, ["package>=1.0"])
 
-	def test_options_and_urls_ignored(self):
+	def test_options_and_urls_ignored(self) -> None:
 		"""Test that options and URLs are ignored."""
 		content = str(
 			"""
@@ -98,22 +103,26 @@ class TestParseRequirements(BasicUsageTestSuite):
 			"""
 		)
 		self.write_requirements(content)
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, [])
 
-	def test_malformed_lines(self):
+	def test_malformed_lines(self) -> None:
 		"""Test handling of malformed requirement lines."""
-		self.write_requirements("""bad_package==\n""")
-		install_requires = parse_requirements_for_install_requires(readFile(self.requirements_file))
+		self.write_requirements("bad_package==\n")
+		install_requires = parse_requirements_for_install_requires(
+			readFile(self.requirements_file)
+		)
 		self.assertEqual(install_requires, [])
 
-	def test_nonexistent_requirements_file(self):
+	def test_nonexistent_requirements_file(self) -> None:
 		"""Test behavior when requirements file does not exist."""
-		_test_fixture = """nonexistent.txt"""
+		_test_fixture = "nonexistent.txt"
 		install_requires = parse_requirements_for_install_requires(readFile(_test_fixture))
 		self.assertEqual(install_requires, [])
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

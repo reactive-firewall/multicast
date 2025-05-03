@@ -1,0 +1,39 @@
+# .ast-grep/rules/multicast-rule-server-implementation-pattern-dostep.yml
+id: multicast-rule-server-implementation-pattern-dostep
+rule:
+  kind: block
+  pattern: |
+    $BLOCK
+  inside:
+    matches: multicast-mtool-subclass
+  not:
+    has:
+      matches: multicast-mtool-subclass-function-dostep
+language: python
+message: "Verify $MCASTNAME implementation follows standard pattern."
+fix: |
+    $BLOCK
+
+    def doStep(self, *args, **kwargs) -> tuple:
+    	"""
+    	Abstracts the __call__ behavior for sub-classing the tool.
+
+    	This method should be overridden by subclasses to implement the specific functionality
+    	of each multicast tool. It accepts variable positional and keyword arguments as needed
+    	by the specific implementation.
+
+    	Args:
+    		*args: Variable length argument list.
+    		**kwargs: Arbitrary keyword arguments.
+
+    	Returns:
+    		tuple: A tuple containing a status indicator and a result.
+
+    	Raises:
+    		NotImplementedError: If the subclass does not implement this method.
+    	"""
+    	raise NotImplementedError("Subclasses must implement this method.")
+
+severity: error
+files:
+  - multicast{/**/,/}*.py

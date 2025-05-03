@@ -64,23 +64,26 @@ ulimit -t 600
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
 umask 137
 
-LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
+# tests/check_cc_lines.sh
+readonly SCRIPT_FILE="${0##*/}"
+LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.copyright-lines-shell"
 EXIT_CODE=1
 
 # Function to check if a command exists.
 
 # USAGE:
-#  ~$ check_command CMD
+#	~$ check_command CMD
 # Arguments:
-# CMD (Required) -- Name of the command to check
+#	CMD (Required) -- Name of the command to check
 # Results:
-#    exits 64 -- missing required argument
-#    exits 126 -- check complete and has failed, can not find given command.
-#    returns successful -- check complete and command found to be executable.
+#	exits 64 -- missing required argument
+#	exits 126 -- check complete and has failed, can not find given command.
+#	returns successful -- check complete and command found to be executable.
 function check_command() {
-    test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
-    local cmd="$1" ;
-    test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+	test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
+	local cmd="$1" ;
+	# shellcheck disable=SC2086
+	test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
 }  # end check_command()
 # propagate/export function to sub-shells
 export -f check_command
@@ -93,27 +96,39 @@ check_command grep ;
 check_command curl ;
 check_command find ;
 check_command git ;
+check_command sort ;
+check_command tail ;
+check_command python3 ;
 check_command shlock ;
 
-
+# USAGE:
+#	~$ cleanup
+# Arguments:
+#	N/A
+# Results:
+#	returns -- once cleanup has been done on a best-effort case.
 function cleanup() {
-	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
-	hash -d shlock 2>/dev/null > /dev/null || true ;
+	# shellcheck disable=SC2317
+	rm -f "${LOCK_FILE}" 2>/dev/null || : ;
+	# shellcheck disable=SC2317
+	wait ;
+	# shellcheck disable=SC2317
+	hash -d shlock 2>/dev/null > /dev/null || : ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		EXIT_CODE=0
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		printf "%s\n" "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
-		false ;
+		# shellcheck disable=SC2046
+		python3 -B .github/tools/cioutput.py -l info --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "SKIP" "Check for Copyright lines already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		exit 126 ;
 fi
 
@@ -126,31 +141,35 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 	fi
 else
-	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+	python3 -B .github/tools/cioutput.py -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} --title "FAIL" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi
 
 _TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
 
-for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
+# Get a list of files to check using git ls-tree with filtering
+FILES_TO_CHECK=$(git ls-tree -r --full-tree --name-only HEAD -- *.md *.py *.txt **/*.md **/*.txt **/*.py 2>/dev/null || EXIT_CODE=3)
+
+for _TEST_DOC in $FILES_TO_CHECK ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
-		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
+		python3 -B .github/tools/cioutput.py -l warning --file "${_TEST_DOC}" --title "SKIP" "SKIP: ${_TEST_DOC} is disclaimed." ;
 		EXIT_CODE=126;
 	else
 		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || : ;) -le 0) ]] ; then
-			printf "%s\n" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
+			python3 -B .github/tools/cioutput.py -l error --file "${_TEST_DOC}" --title "COPYRIGHT" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
 			EXIT_CODE=127
 		fi
 		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
-			printf "%s\n" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
+			python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "COPYRIGHT" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
 		fi
-		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt ${_TEST_YEAR}) ]] ; then
-			printf "%s\n" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
+		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt "${_TEST_YEAR}") ]] ; then
+			python3 -B .github/tools/cioutput.py -l warning --file "${_TEST_DOC}" --title "DATE" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
 		fi
+		# shellcheck disable=SC2086
 		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
 			case "$EXIT_CODE" in
 				0|126) true ;;
-				*) printf "%s\n" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
+				*) python3 -B .github/tools/cioutput.py -l info --file "${_TEST_DOC}" --title "SKIP" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
 			esac
 		fi
 	fi
@@ -160,7 +179,7 @@ unset _TEST_ROOT_DIR 2>/dev/null || true ;
 unset _TEST_DOC 2>/dev/null || true ;
 unset _TEST_YEAR 2>/dev/null || true ;
 
-rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
+cleanup || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait ;
 
-# goodbye
+# shellcheck disable=SC2086
 exit ${EXIT_CODE:-255} ;

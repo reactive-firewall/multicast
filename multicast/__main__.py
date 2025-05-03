@@ -75,78 +75,109 @@ Minimal Acceptance Testing:
 
 """
 
-
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__doc__""",
-	"""McastNope""", """McastRecvHearDispatch""", """McastDispatch""", """main""",
+	"""McastNope""",
+	"""McastRecvHearDispatch""",
+	"""McastDispatch""",
+	"""main""",
 	"""TASK_OPTIONS""",
 ]
 
+__package__ = "multicast"  # skipcq: PYL-W0622
+"""
+The package of this component.
 
-__package__ = """multicast"""  # skipcq: PYL-W0622
+Minimal Acceptance Testing:
 
+	First set up test fixtures by importing multicast.
 
-__module__ = """multicast.__main__"""  # skipcq: PYL-W0622
+	Testcase 0: Multicast should be importable.
 
+		>>> import multicast
+		>>>
 
-__file__ = """multicast/__main__.py"""
+	Testcase 1: __main__ should be automatically imported.
 
+		>>> multicast.__main__.__package__ is not None
+		True
+		>>>
+		>>> multicast.__main__.__package__ == multicast.__package__
+		True
+		>>>
+
+"""
+
+__module__ = "multicast.__main__"  # skipcq: PYL-W0622
+"""
+The module of this component.
+
+Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+	Testcase 0: Multicast should be importable.
+
+		>>> import multicast
+		>>>
+
+	Testcase 1: __main__ should be automatically imported.
+
+		>>> multicast.__main__.__module__ is not None
+		True
+		>>>
+
+"""
+
+__file__ = "multicast/__main__.py"
+"""The file of this component."""
 
 try:
 	from . import sys
-except ImportError as impErr:
+except ImportError as baton:
 	# Throw more relevant Error
-	raise ImportError(str("[CWE-440] Error Importing Python")) from impErr
+	raise ImportError("[CWE-440] Error Importing Python") from baton
 
-
-if 'multicast.__version__' not in sys.modules:
+if "multicast.__version__" not in sys.modules:
 	from . import __version__ as __version__  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	__version__ = sys.modules["""multicast.__version__"""]
+	__version__ = sys.modules["multicast.__version__"]
 
-
-if 'multicast._MCAST_DEFAULT_PORT' not in sys.modules:
+if "multicast._MCAST_DEFAULT_PORT" not in sys.modules:
 	from . import _MCAST_DEFAULT_PORT as _MCAST_DEFAULT_PORT  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	_MCAST_DEFAULT_PORT = sys.modules["""multicast._MCAST_DEFAULT_PORT"""]
+	_MCAST_DEFAULT_PORT = sys.modules["multicast._MCAST_DEFAULT_PORT"]
 
-
-if 'multicast._MCAST_DEFAULT_GROUP' not in sys.modules:
+if "multicast._MCAST_DEFAULT_GROUP" not in sys.modules:
 	from . import _MCAST_DEFAULT_GROUP as _MCAST_DEFAULT_GROUP  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	_MCAST_DEFAULT_GROUP = sys.modules["""multicast._MCAST_DEFAULT_GROUP"""]
+	_MCAST_DEFAULT_GROUP = sys.modules["multicast._MCAST_DEFAULT_GROUP"]
 
-
-if 'multicast.exceptions' not in sys.modules:
+if "multicast.exceptions" not in sys.modules:
 	# pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 	from . import exceptions as exceptions  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	exceptions = sys.modules["""multicast.exceptions"""]
+	exceptions = sys.modules["multicast.exceptions"]
 
-
-if 'multicast.mtool' not in sys.modules:
+if "multicast.mtool" not in sys.modules:
 	from . import mtool as mtool  # skipcq: PYL-C0414
 else:  # pragma: no branch
-	mtool = sys.modules["""multicast.mtool"""]
+	mtool = sys.modules["multicast.mtool"]
 
-
-if 'multicast.recv' not in sys.modules:
+if "multicast.recv" not in sys.modules:
 	from . import recv as recv  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	recv = sys.modules["""multicast.recv"""]
+	recv = sys.modules["multicast.recv"]
 
-
-if 'multicast.send' not in sys.modules:
+if "multicast.send" not in sys.modules:
 	from . import send as send  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	send = sys.modules["""multicast.send"""]
+	send = sys.modules["multicast.send"]
 
-
-if 'multicast.hear' not in sys.modules:
+if "multicast.hear" not in sys.modules:
 	from . import hear as hear  # pylint: disable=useless-import-alias  -  skipcq: PYL-C0414
 else:  # pragma: no branch
-	hear = sys.modules["""multicast.hear"""]
+	hear = sys.modules["multicast.hear"]
 
 
 class McastNope(mtool):
@@ -204,13 +235,13 @@ class McastNope(mtool):
 
 	"""
 
-	__module__ = """multicast.__main__"""
+	__module__ = "multicast.__main__"
 
-	__name__ = """multicast.__main__.McastNope"""
+	__name__ = "multicast.__main__.McastNope"
 
-	__proc__ = """NOOP"""  # NOT "Nope" rather "NoOp"
+	__proc__ = "NOOP"  # NOT "Nope" rather "NoOp"
 
-	__prologue__ = """No Operation."""
+	__prologue__ = "No Operation."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -346,18 +377,18 @@ class McastRecvHearDispatch(mtool):
 
 	"""
 
-	__module__ = """multicast.__main__"""
+	__module__ = "multicast.__main__"
 
-	__name__ = """multicast.__main__.McastRecvHearDispatch"""
+	__name__ = "multicast.__main__.McastRecvHearDispatch"
 
-	__proc__ = """HEAR"""
+	__proc__ = "HEAR"
 
 	__epilogue__ = """Generally speaking you want to bind to one of the groups you joined in
 		this module/instance, but it is also possible to bind to group which
 		is added by some other programs (like another python program instance of this)
 	"""
 
-	__prologue__ = """Python Multicast Receiver. Primitives for a listener for multicast data."""
+	__prologue__ = "Python Multicast Receiver. Primitives for a listener for multicast data."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -445,39 +476,34 @@ class McastRecvHearDispatch(mtool):
 		"""
 		if parser is not None:  # pragma: no branch
 			parser.add_argument(
-				"""--port""",
-				type=int, default=_MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
+				"--port",
+				type=int,
+				default=_MCAST_DEFAULT_PORT,  # skipcq: PYL-W0212 - module ok
 			)
-			__tmp_help = """local interface to use for listening to multicast data; """
-			__tmp_help += """if unspecified, any one interface may be chosen."""
-			parser.add_argument(
-				"""--iface""", default=None,
-				help=str(__tmp_help)
-			)
-			__tmp_help = """multicast group (ip address) to bind-to for the udp socket; """
-			__tmp_help += """should be one of the multicast groups joined globally """
-			__tmp_help += """(not necessarily joined in this python program) """
-			__tmp_help += """in the interface specified by --iface. """
+			__tmp_help = "local interface to use for listening to multicast data; "
+			__tmp_help += "if unspecified, any one interface may be chosen."
+			parser.add_argument("--iface", default=None, help=__tmp_help)
+			__tmp_help = "multicast group (ip address) to bind-to for the udp socket; "
+			__tmp_help += "should be one of the multicast groups joined globally "
+			__tmp_help += "(not necessarily joined in this python program) "
+			__tmp_help += "in the interface specified by --iface. "
 			__tmp_help += f"If unspecified, bind-to {_MCAST_DEFAULT_GROUP} "
-			__tmp_help += """(all addresses (all multicast addresses) of that interface)"""
+			__tmp_help += "(all addresses (all multicast addresses) of that interface)"
 			parser.add_argument(
-				"""--group""",
+				"--group",
 				default=_MCAST_DEFAULT_GROUP,  # skipcq: PYL-W0212 - module ok
-				help=str(__tmp_help)
+				help=__tmp_help,
 			)
-			__tmp_help = """multicast groups (ip addresses) to join globally; """
-			__tmp_help += """should be one of the multicast groups joined globally """
-			__tmp_help += """by the interface specified by --iface. """
-			__tmp_help += """If unspecified, or supplied an empty list, the default """
-			__tmp_help += """implementation will join """
+			__tmp_help = "multicast groups (ip addresses) to join globally; "
+			__tmp_help += "should be one of the multicast groups joined globally "
+			__tmp_help += "by the interface specified by --iface. "
+			__tmp_help += "If unspecified, or supplied an empty list, the default "
+			__tmp_help += "implementation will join "
 			__tmp_help += f"{_MCAST_DEFAULT_GROUP} (all addresses (all multicast addresses) "
-			__tmp_help += """of that interface) instead of not joining. NOTE: If you really need """
-			__tmp_help += """to NOT join the multicast group you should instead use the sockets """
-			__tmp_help += """module directly, as this module does not support such a use-case."""
-			parser.add_argument(
-				"""--groups""", default=[], nargs='*',
-				help=str(__tmp_help)
-			)
+			__tmp_help += "of that interface) instead of not joining. NOTE: If you really need "
+			__tmp_help += "to NOT join the multicast group you should instead use the sockets "
+			__tmp_help += "module directly, as this module does not support such a use-case."
+			parser.add_argument("--groups", default=[], nargs="*", help=__tmp_help)
 
 	@staticmethod
 	def _help_daemon_dispatch(*args, **kwargs):
@@ -529,12 +555,11 @@ class McastRecvHearDispatch(mtool):
 
 # More boiler-plate-code
 
-
 TASK_OPTIONS = {
-	"""NOOP""": McastNope(),
-	"""RECV""": McastRecvHearDispatch(),
-	"""SAY""": send.McastSAY(),
-	"""HEAR""": McastRecvHearDispatch(),
+	"NOOP": McastNope(),
+	"RECV": McastRecvHearDispatch(),
+	"SAY": send.McastSAY(),
+	"HEAR": McastRecvHearDispatch(),
 }
 """The callable function tasks of this program. will add."""
 
@@ -549,13 +574,11 @@ class McastDispatch(mtool):
 
 	"""
 
-	__proc__ = """multicast"""
+	__proc__ = "multicast"
 
-	__prologue__ = """The Main Entrypoint."""
+	__prologue__ = "The Main Entrypoint."
 
-	__epilogue__ = str(
-		"""When called from the command line the __main__ component handles the CLI dispatch."""
-	)
+	__epilogue__ = "Called from the command line, the __main__ component handles the CLI dispatch."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -573,12 +596,8 @@ class McastDispatch(mtool):
 		if (tool is not None) and (tool in cached_list):
 			try:
 				(_is_done, theResult) = TASK_OPTIONS[tool].__call__([], **kwargs)
-			except Exception as e:  # pragma: no branch
-				theResult = str(
-					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {errs}"""
-				).format(
-					t=tool, args=kwargs, errs=e
-				)
+			except Exception as _cause:  # pragma: no branch
+				theResult = f"CRITICAL - Attempted '[{tool}]: {kwargs}' just failed! :: {_cause}"  # noqa
 				_is_done = False
 		return (_is_done, theResult)  # noqa
 
@@ -599,7 +618,7 @@ class McastDispatch(mtool):
 		try:
 			(argz, _) = type(self).parseArgs(*args)
 			service_cmd = argz.cmd_tool
-			argz.__dict__.__delitem__("""cmd_tool""")
+			argz.__dict__.__delitem__("cmd_tool")
 			_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
 			if _TOOL_MSG[0]:
 				__EXIT_MSG = (0, _TOOL_MSG)
@@ -607,24 +626,18 @@ class McastDispatch(mtool):
 				__EXIT_MSG = (70, _TOOL_MSG)
 				if (sys.stdout.isatty()):  # pragma: no cover
 					print(str(_TOOL_MSG))
-		except Exception as err:  # pragma: no branch
-			exit_code = exceptions.get_exit_code_from_exception(err)
+		except Exception as _cause:  # pragma: no branch
+			exit_code = exceptions.get_exit_code_from_exception(_cause)
 			__EXIT_MSG = (
-				False, str(
-					"""CRITICAL - Attempted '[{t}]: {args}' just failed! :: {code} {errs}"""
-				).format(
-					t=__name__, args=args, code=exit_code, errs=err
-				)
+				1,
+				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {_cause}" # noqa
 			)
 			if (sys.stderr.isatty()):
 				print(
 					"WARNING - An error occurred while handling the arguments. Refused.",
-					file=sys.stderr
+					file=sys.stderr,
 				)
-				print(
-					f"{exceptions.EXIT_CODES[exit_code][1]}: {err}\n{err.args}",
-					file=sys.stderr
-				)
+				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {_cause}\n{_cause.args}", file=sys.stderr)
 		return __EXIT_MSG  # noqa
 
 
@@ -744,5 +757,5 @@ if __name__ in '__main__':
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):
-		__EXIT_CODE = main([str(__name__), """-h"""])
+		__EXIT_CODE = main([__name__, "-h"])
 	exit(__EXIT_CODE[0])  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing

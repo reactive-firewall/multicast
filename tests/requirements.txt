@@ -28,7 +28,7 @@
 # setuptools - MIT license
 setuptools>=75.0
 # virtualenv - MIT license
-virtualenv>=20.0
+virtualenv>=20.26.6
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 # tox - MIT license
@@ -53,6 +53,8 @@ pep8>=1.0
 pytest>=7.0, !=8.1.0
 # pytest-checkdocs - MIT license
 pytest-checkdocs>=1.2.5
+# pytest-doctestplus - BSD license
+pytest-doctestplus>=1.4.0
 # pytest-cov - MIT license
 pytest-cov>=3.0.0
 # pytest-enabler - MIT license

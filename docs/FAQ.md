@@ -79,8 +79,8 @@ import random  # for random port
 
 # set up some stuff
 _fixture_PORT_arg = int(random.SystemRandom().randint(49152, 65535))
-_fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_BIND_arg = """224.0.0.1"""
+_fixture_mcast_GRP_arg = "224.0.0.1"  # only use dotted notation for multicast group addresses
+_fixture_host_BIND_arg = "224.0.0.1"
 
 # spawn a listening proc
 
@@ -107,15 +107,15 @@ inputHandler()
 from multiprocessing import Process as Process
 
 _fixture_HEAR_kwargs = {
-        """is_daemon""": True,
-        """port""": _fixture_PORT_arg,
-        """group""": _fixture_host_BIND_arg
+        "is_daemon": True,
+        "port": _fixture_PORT_arg,
+        "group": _fixture_host_BIND_arg
     }
 p = Process(
     target=multicast.hear.McastHEAR().doStep,
     name="HEAR", kwargs=_fixture_HEAR_kwargs
 )
-p.daemon = _fixture_HEAR_kwargs["""is_daemon"""]
+p.daemon = _fixture_HEAR_kwargs["is_daemon"]
 p.start()
 
 # ... use CTL+C (or signal 2) to shutdown the server 'p'
@@ -128,21 +128,22 @@ _and elsewhere (like another function or even module) for the sender:_
 # assuming already did 'import multicast as multicast'
 
 _fixture_SAY_args = [
-    """--port""", _fixture_PORT_arg,
-    """--group""", _fixture_mcast_GRP_arg,
-    """--message""", """'test message'"""
+    "--port", _fixture_PORT_arg,
+    "--group", _fixture_mcast_GRP_arg,
+    "--message", "'test message'"
 ]
 try:
     multicast.__main__.McastDispatch().doStep(["SAY", _fixture_SAY_args])
     # Hint: use a loop to repeat or different arguments to vary message.
-except Exception:
+except Exception as baton:
     p.join()
-    raise RuntimeError("multicast seems to have failed.")
-
-# clean up some stuff
-p.join() # if not already handled don't forget to join the process and other overhead
-didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
-
+    raise RuntimeError("multicast seems to have failed.") from baton  # re-raise
+finally:
+    # clean up some stuff
+    if p:
+        p.join() # if not already handled don't forget to join the process and other overhead
+    # hint: if you use a loop and need to know the exit code
+    didWork = (p is not None and int(p.exitcode) <= int(0))  # e.g. check for success
 ```
 
 > [!WARNING]
@@ -199,9 +200,9 @@ From the
 [documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
 
-While developers and network admistrators must consider other factors in the real world deployment,
+While developers and network administrators must consider other factors in real-world deployments,
 it is fair to say any free port in the dynamic or "ephemeral" port range of `49152`-`65535` should
-work so far as this Multicast module is concerned.
+work as far as this Multicast module is concerned.
 
 * For `SAY` the port refers to the destination port.
 * for `RECV` and `HEAR` the port refers to the port to listen on.
@@ -231,7 +232,8 @@ work so far as this Multicast module is concerned.
 * Typically, the documentation will be automatically built by CI/CD and posted to the official
   documentation site.
 
-* However if one still wishes to manually build the documentation, there is a make target for this:
+* However, if one still wishes to build the documentation manually, there is a `make` target
+  specifically for this:
 
   ```bash
   make build-docs
@@ -243,7 +245,8 @@ work so far as this Multicast module is concerned.
   to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
 
   ```bash
-  export DOCS_BUILD_REF=$(${GIT:-git} rev-parse --verify HEAD)
+  # shellcheck disable=SC2155
+  export DOCS_BUILD_REF=$("${GIT:-git}" rev-parse --verify HEAD)
   make build-docs  # or your own documentation build command
   ```
 

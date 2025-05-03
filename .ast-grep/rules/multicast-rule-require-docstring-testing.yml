@@ -1,0 +1,45 @@
+# .ast-grep/multicast-rule-require-docstring-testing.yml
+id: require-docstring-testing
+rule:
+  kind: class_definition
+  inside:
+    kind: module
+  has:
+    kind: block
+    has:
+      kind: expression_statement
+      has:
+        pattern: |
+          """$DOCSTRING"""
+        kind: string
+        has:
+          kind: string_content
+          not:
+            pattern: |
+              .*(Minimal Acceptance |Meta-)Testing:.*
+language: python
+message: "Class must include docstring with testing examples"
+files:
+  - tests{/**/,/}test_[a-z0-9_]*.py
+severity: hint
+description: |
+  Ensures that Python classes include proper docstrings with testing examples.
+  This rule helps maintain consistent documentation and testing practices.
+examples:
+  - name: Valid class with testing examples
+    code: |
+      class MyClass:
+          """
+          My class description.
+
+          Testing:
+              >>> obj = MyClass()
+              >>> obj.method()
+              True
+          """
+  - name: Invalid class without testing examples
+    code: |
+      class MyClass:
+          """
+          My class description.
+          """

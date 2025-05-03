@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Third-party Acknowledgement:
 # ..........................................
 # Some code (less than 10%) was modified/derived from:
@@ -67,8 +66,7 @@ Minimal Acceptance Testing:
 
 """
 
-
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -91,8 +89,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
-__module__ = """multicast"""
+__module__ = "multicast"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -112,12 +109,10 @@ __module__ = """multicast"""
 
 """
 
-
-__file__ = """multicast/send.py"""
+__file__ = "multicast/send.py"
 """The file of this component."""
 
-
-__name__ = """multicast.send"""  # skipcq: PYL-W0622 - Ensures the correct name value.
+__name__ = "multicast.send"  # skipcq: PYL-W0622 - Ensures the correct name value.
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -139,36 +134,41 @@ __name__ = """multicast.send"""  # skipcq: PYL-W0622 - Ensures the correct name 
 
 try:
 	import sys
-	if 'multicast' not in sys.modules:
+	if "multicast" not in sys.modules:
 		# skipcq
 		from . import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-C0414
 	else:  # pragma: no branch
-		multicast = sys.modules["""multicast"""]
+		multicast = sys.modules["multicast"]
 	_BLANK = multicast._BLANK  # skipcq: PYL-W0212 - module ok
-except Exception as importErr:
-	del importErr  # skipcq - cleanup any error leaks early
+except Exception as _cause:
+	del _cause  # skipcq - cleanup any error leaks early
 	# skipcq
 	import multicast as multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 
-
 try:
+	import logging
 	from multicast import argparse as _argparse  # skipcq: PYL-C0414
 	from multicast import unicodedata as _unicodedata  # skipcq: PYL-C0414
 	from multicast import socket as _socket  # skipcq: PYL-C0414
 	from multicast import struct as _struct  # skipcq: PYL-C0414
-	depends = [
-		_unicodedata, _socket, _struct, _argparse
-	]
+	depends = [_unicodedata, _socket, _struct, _argparse]
 	for unit in depends:
 		try:
 			if unit.__name__ is None:  # pragma: no branch
 				raise ImportError(
-					str("[CWE-440] module failed to import {}.").format(str(unit))
+					f"[CWE-440] module failed to import {str(unit)}."
 				) from None
 		except Exception as _cause:  # pragma: no branch
-			raise ImportError(str("[CWE-758] Module failed completely.")) from _cause
-except Exception as err:
-	raise ImportError(err) from err
+			raise ImportError("[CWE-758] Module failed completely.") from _cause
+except Exception as baton:  # pragma: no branch
+	raise ImportError(baton) from baton
+
+
+module_logger = logging.getLogger(__name__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__name__,
+)
 
 
 class McastSAY(multicast.mtool):
@@ -208,13 +208,13 @@ class McastSAY(multicast.mtool):
 
 	"""
 
-	__module__ = """multicast.send"""
+	__module__ = "multicast.send"
 
-	__name__ = """multicast.send.McastSAY"""
+	__name__ = "multicast.send.McastSAY"
 
-	__proc__ = """SAY"""
+	__proc__ = "SAY"
 
-	__prologue__ = """Python Multicast Broadcaster."""
+	__prologue__ = "Python Multicast Broadcaster."
 
 	@classmethod
 	def setupArgs(cls, parser):
@@ -284,22 +284,33 @@ class McastSAY(multicast.mtool):
 
 		"""
 		if parser is not None:  # pragma: no branch
+			if __debug__:
+				module_logger.debug(
+					"Adding %s arguments.",  # lazy formatting to avoid PYL-W1203
+					__name__,
+				)
 			parser.add_argument(
-				"""--port""", type=int,
+				"--port",
+				type=int,
 				default=multicast._MCAST_DEFAULT_PORT  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
-				"""--group""",
+				"--group",
 				default=multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 			)
 			parser.add_argument(
-				"""--groups""", required=False, nargs='*',
-				dest="""groups""",
-				help="""multicast groups (ip addrs) to listen to join."""
+				"--groups",
+				required=False,
+				nargs="*",
+				dest="groups",
+				help="multicast groups (ip addrs) to listen to join."
 			)
 			parser.add_argument(
-				"""-m""", """--message""", nargs='+', dest="""data""",
-				default=str("""PING from {name}: group: {group}, port: {port}""")
+				"-m",
+				"--message",
+				nargs="+",
+				dest="data",
+				default="PING from {name}: group: {group}, port: {port}",
 			)
 
 	@staticmethod
@@ -320,11 +331,38 @@ class McastSAY(multicast.mtool):
 		"""
 		_success = False
 		sock = multicast.genSocket()
+		if __debug__:
+				module_logger.info(
+					"Preparing to send %d",  # lazy formatting to avoid PYL-W1203
+					len(data),
+				)
 		try:
-			sock.sendto(data.encode('utf8'), (group, port))
+			if __debug__ and module_logger.isEnabledFor(logging.DEBUG):  # pragma: no branch
+				module_logger.debug("Encoding.")
+				_payload = data.encode('utf8')
+				module_logger.debug(
+					"Encoded %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
+				module_logger.debug(
+					"Sending %s to (%s, %d).",  # lazy formatting to avoid PYL-W1203
+					_payload, group, port,
+				)
+				sock.sendto(_payload, (group, port))
+				module_logger.debug(
+					"Sent %d.",  # lazy formatting to avoid PYL-W1203
+					len(_payload),
+				)
+			else:
+				sock.sendto(data.encode('utf8'), (group, port))
 			_success = True
 		finally:
 			multicast.endSocket(sock)
+		if __debug__:  # pragma: no branch
+			if _success:
+				module_logger.info("Finished sending. Reporting success.")
+			else:  # pragma: no branch
+				module_logger.warning("Failed to send. Reporting failure.")
 		return _success
 
 	def doStep(self, *args, **kwargs):
@@ -344,29 +382,49 @@ class McastSAY(multicast.mtool):
 		Returns:
 			tuple: A tuple containing a status indicator and optional error message.
 		"""
+		_logger = logging.getLogger(McastSAY.__name__)
+		_logger.debug(McastSAY.__proc__)
 		group = kwargs.get(
-			"group", multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
+			"group",
+			multicast._MCAST_DEFAULT_GROUP  # skipcq: PYL-W0212 - module ok
 		)
 		port = kwargs.get("port", multicast._MCAST_DEFAULT_PORT)  # skipcq: PYL-W0212 - module ok
 		data = kwargs.get("data")
 		_result = False
-		if data == ['-']:
+		if data == ["-"]:
+			_logger.debug("Reading from stdin")
 			_result = True
 			# Read from stdin in chunks
 			while True:
 				try:
-					chunk = sys.stdin.read(1316)  # Read 1316 bytes at a time - matches read size
-				except IOError as e:
-					print(f"Error reading from stdin: {e}", file=sys.stderr)
+					# Read configured amount of bytes at a time - matches read size by default
+					# skipcq: PYL-W0212
+					chunk = sys.stdin.read(
+						multicast._MCAST_DEFAULT_BUFFER_SIZE,  # skipcq: PYL-W0212 - module ok
+					)
+				except OSError:
+					_logger.exception("[CWE-228] Error reading from stdin.")
 					break
 				if not chunk:
 					break
 				_result = _result and self._sayStep(group, port, chunk)
+			_logger.debug("Finished reading stdin.")
 		elif isinstance(data, list):
 			# Join multiple arguments into a single string
-			message = str(""" """).join(data)
+			message = " ".join(data)
 			_result = self._sayStep(group, port, message)
 		else:
 			message = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			_result = self._sayStep(group, port, message)
+		if __debug__:  # pragma: no branch
+			if _result:
+				module_logger.debug(
+					"SEND result was %s. Reporting success.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
+			else:
+				module_logger.debug(
+					"SEND result was %s. Reporting failure.",  # lazy formatting to avoid PYL-W1203
+					_result,
+				)
 		return (_result, None)  # skipcq: PTC-W0020  - intended

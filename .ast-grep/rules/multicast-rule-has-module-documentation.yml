@@ -1,0 +1,10 @@
+# .ast-grep/multicast-rule-has-module-documentation.yml
+id: check-has-module-documentation
+rule:
+  kind: module
+  not:
+    has:
+      matches: module_docstring
+language: python
+message: "Module docstring must be present and well formatted."
+severity: warning

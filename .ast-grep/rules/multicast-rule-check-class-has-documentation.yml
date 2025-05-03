@@ -1,0 +1,41 @@
+# .ast-grep/multicast-rule-check-class-has-documentation.yml
+id: check-has-class-documentation
+rule:
+  pattern:
+    selector: class_definition
+    context: |
+      class $CLASS_NAME($$$)$$$:$$$
+        $BODY
+  not:
+    has:
+      matches: block_with_docstring
+      kind: block
+  kind: class_definition
+language: python
+message: "Class definitions must have documentation. However $CLASS_NAME is missing a docstring."
+severity: warning
+description: |
+  This rule ensures that all class definitions include proper documentation strings.
+  The documentation must be a triple-quoted string (''' or """) immediately after
+  the class definition.
+examples:
+  - name: Valid class documentation examples
+    code: |
+      class MyClass:
+        """
+        A class that demonstrates proper documentation.
+
+        Attributes:
+          attr1: Description of first attribute
+          attr2: Description of second attribute
+        Methods:
+          method1: Description of first method
+          method2: Description of second method
+
+        Testing:
+          >>> obj = MyClass()
+          >>> obj.method1()
+          True
+
+       """
+       pass

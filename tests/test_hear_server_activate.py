@@ -17,26 +17,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
-
+__module__ = "tests"
 
 try:
 	try:
 		import context
-	except Exception as _:  # pragma: no branch
-		del _  # skipcq - cleanup any error vars early
+	except Exception as _cause:  # pragma: no branch
+		del _cause  # skipcq - cleanup any error vars early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ModuleNotFoundError("[CWE-758] Failed to import context") from None
 	else:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		import threading
 		import socket
-except Exception as err:
-	raise ImportError("[CWE-758] Failed to import test context") from err
+except Exception as baton:
+	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
+@context.markWithMetaTag("mat", "hear")
 class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 	"""Test suite for verifying multicast server activation functionality.
 
@@ -44,9 +44,9 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 	of the multicast server, including socket setup and cleanup procedures.
 	"""
 
-	__module__ = """tests.test_hear_server_activate"""
+	__module__ = "tests.test_hear_server_activate"
 
-	__name__ = """tests.test_hear_server_activate.McastServerActivateTestSuite"""
+	__name__ = "tests.test_hear_server_activate.McastServerActivateTestSuite"
 
 	def test_server_activate(self):
 		"""
@@ -65,11 +65,14 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 		# Define a simple request handler
 		class SimpleHandler:
+
 			def handle(self):
 				pass  # Handler logic is not the focus here
+
 		# Create an instance of McastServer
 		server_address = (MCAST_GROUP, 0)  # Bind to any available port
 		server = multicast.hear.McastServer(server_address, SimpleHandler)
+
 		# Start the server in a separate thread
 
 		def run_server():
@@ -96,4 +99,3 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 if __name__ == '__main__':
 	unittest.main()
-

@@ -1,6 +1,7 @@
 ---
 name: CI-MATs
-# Continuous Integration workflow for Minimal Acceptance Tests (MATs).
+description: "Continuous Integration workflow for Minimal Acceptance Tests (MATs)."
+run-name: Minimal Acceptance Tests
 #
 # This workflow runs after successful completion of CI-BUILD to ensure
 # that the codebase meets minimal acceptance criteria.
@@ -38,28 +39,61 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
-      build_environment: ${{ steps.get_env.outputs.environment }}
+      head_branch: ${{ steps.get_sha.outputs.head_branch }}
+      sha: ${{ steps.get_sha.outputs.head_sha }}
+      branch_name: ${{ steps.get_env.outputs.branch }}
+      parent_sha: ${{ steps.get_env.outputs.parent_sha }}
+      branch_ref: ${{ steps.get_env.outputs.branch_ref }}
+      trigger_id: ${{ steps.get_env.outputs.trigger_id }}
+      build_environment: "Testing"
     steps:
       - id: check
         run: |
           if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
-      - id: get_env
+      - id: get_sha
+        env:
+          BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
+          SHA_VALUE: ${{ github.event.workflow_run.head_sha }}
         run: |
-          ENV_VALUE=$(gh api "${{ github.event.workflow_run.artifacts_url }}" --jq '.environment')
-          if [[ -n "$ENV_VALUE" ]]; then
-            echo "environment=$ENV_VALUE" >> $GITHUB_OUTPUT
+          if [[ -n "$BRANCH_VALUE" ]]; then
+            echo "head_branch=$BRANCH_VALUE" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$SHA_VALUE" >> "$GITHUB_OUTPUT"
           else
-            echo "environment=Experimenting" >> $GITHUB_OUTPUT  # Default fallback
+            echo "head_branch='undefined'" >> "$GITHUB_OUTPUT"  # Default fallback
+            echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Checkout target commit
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
+        run: git checkout ${{ steps.get_sha.outputs.head_sha }}
+      - id: get_env
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
+        run: |
+          ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
+          if [[ -n "$ID_VALUE" ]]; then
+            echo "trigger_id=$ID_VALUE" >> "$GITHUB_OUTPUT"
+          else
+            echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
+          fi
+          echo "branch=$(git name-rev --name-only $(git log -1 --format=%H) | cut -d~ -f1-1)" >> "$GITHUB_OUTPUT"
+          echo "parent_sha=$(git merge-base $(git log -1 --format=%H) refs/remotes/origin/stable)" >> "$GITHUB_OUTPUT"
+          BRANCH_REF=$(head -n1 <(git symbolic-ref HEAD 2>/dev/null || git show-ref $(git name-rev --name-only $(git log -1 --format=%H)) | cut -d\  -f2-2) ) ;
+          echo "branch_ref=${BRANCH_REF}" >> "$GITHUB_OUTPUT"
 
   MATS:
     permissions:
       actions: read
       contents: read
+      pull-requests: read
       statuses: write
     needs: check_build
     if: ${{ !cancelled() && (needs.check_build.outputs.should_run == 'true') }}
@@ -71,38 +105,56 @@ jobs:
     timeout-minutes: 8
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     outputs:
       mats_status: ${{ steps.tests.outcome }}
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
     steps:
-      - name: Checkout repository
+      - name: pre-checkout repository for actions
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+          ref: ${{ needs.check_build.outputs.sha }}
+          sparse-checkout: '.github/actions/checkout-and-rebuild'
+      - name: Checkout repository for MATs with ${{ matrix.python-version }}
+        id: fetch-build
+        uses: ./.github/actions/checkout-and-rebuild
         with:
+          sha: ${{ needs.check_build.outputs.sha }}
+          build-run-id: ${{ needs.check_build.outputs.trigger_id }}
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies for ${{ matrix.python-version }}
+          path: ${{ github.workspace }}
+      - name: Summarize MATs for python ${{ matrix.python-version }}
+        id: summarize-fetch-build-success
+        env:
+          BUILD_ARTIFACT_NAME: ${{ steps.fetch-build.outputs.artifact-name }}
+          BUILD_ARTIFACT_FILES: ${{ steps.fetch-build.outputs.artifact-files }}
         run: |
-          pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.1";
-          pip install -r ./requirements.txt ;
-          pip install -r ./tests/requirements.txt || true ;
-          pip install --upgrade -r ./docs/requirements.txt || true ;
-      - name: Pre-Clean
-        id: clean
-        run: make -j1 -f Makefile clean || true ;
+          echo "- [x] BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" > "$GITHUB_STEP_SUMMARY"
+          echo "    * Including building the files ${BUILD_ARTIFACT_FILES}" >> "$GITHUB_STEP_SUMMARY"
+          echo "    * Including producing the build artifact ${BUILD_ARTIFACT_NAME}" >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ success() }}
+      - name: Summarize MATs for python ${{ matrix.python-version }} (FAILED)
+        id: summarize-fetch-build-failure
+        run: |
+          echo "- [ ] ~BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}~" > "$GITHUB_STEP_SUMMARY"
+        if: ${{ failure() }}
       - name: Run Tests for python ${{ matrix.python-version }}
         id: tests
-        run: make -j1 -f Makefile test ;
-      - name: Summerize MATs for python ${{ matrix.python-version }}
-        id: sumerize-mats
+        run: make -j1 -f Makefile test-mats ;
+        if: ${{ !cancelled() }}
+      - name: Summarize MATs for python ${{ matrix.python-version }}
+        id: summarize-mats-success
         run: |
-          echo "- MATS works on python version ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
+      - name: Summarize MATs for python ${{ matrix.python-version }} (FAILED)
+        id: summarize-mats-failure
+        run: |
+          echo "- [ ] ~MATS succeeded with python version ${{ matrix.python-version }}~" >> "$GITHUB_STEP_SUMMARY"
+        if: ${{ failure() }}
       - name: Post-Clean
         id: post
         run: make -j1 -f Makefile clean || true ;
@@ -111,17 +163,58 @@ jobs:
   MATS_STATUS:
     permissions:
       actions: read
+      pull-requests: read
     needs: [check_build, MATS]
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     outputs:
-      passedMATs: ${{ steps.check_status.outputs.mats_success }}
-      didBUILD: ${{ needs.check_build.outputs.should_run }}
+      mats_success: ${{ steps.check_status.outputs.mats_success }}
+      mats_sha: ${{ needs.check_build.outputs.sha }}
+      build_success: ${{ steps.check_status.outputs.build_success }}
+      build_trigger_id: ${{ needs.check_build.outputs.trigger_id }}
+      build_sha: ${{ needs.check_build.outputs.sha }}
     steps:
       - id: check_status
         run: |
-          if [[ "${{ needs.MATS.result }}" == "success" ]]; then
-            echo "mats_success=true" >> $GITHUB_OUTPUT
+          if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
+            echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :building_construction: Build" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
+              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=true" >> "$GITHUB_OUTPUT"
+            else
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=false" >> "$GITHUB_OUTPUT"
+            fi
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "mats_success=true" >> "$GITHUB_OUTPUT"
+            exit 0
           else
-            echo "mats_success=false" >> $GITHUB_OUTPUT
+            echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> [!CAUTION]" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Unstable - This commit is failed to pass minimal acceptance testing." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :construction: Build" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
+              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=true" >> "$GITHUB_OUTPUT"
+            else
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "build_success=false" >> "$GITHUB_OUTPUT"
+            fi
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :red_circle: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "mats_success=false" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi

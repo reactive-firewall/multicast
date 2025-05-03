@@ -1,0 +1,13 @@
+# .ast-grep/utils/YAML/gha/job-body.yml
+# Utilities for enforcing structure in GitHub Actions job bodies
+id: gha_job_body
+rule:
+  pattern:
+    context: |
+      $JOB_BODY
+    severity: hint
+  inside:
+    kind: block_mapping_pair
+    matches: gha_job_definition
+  kind: block_node
+language: YAML

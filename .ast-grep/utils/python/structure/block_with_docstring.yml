@@ -1,0 +1,12 @@
+# .ast-grep/utils/structure.yml
+# Documentation structure utilities
+id: block_with_docstring
+rule:
+  all:
+    - has:
+        matches: block_docstring
+        stopBy: neighbor
+    - kind: block
+      pattern: |
+          $$$
+language: python

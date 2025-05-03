@@ -1,0 +1,41 @@
+# .ast-grep/multicast-rule-require-doctests-in-docstrings.yml
+---
+id: require-doctests-in-docstrings
+rule:
+  all:
+    - matches: block_docstring
+    - not:
+        has:
+          matches: cep7_docstring_tests
+language: python
+message: "[CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20#2-docstring-style) Documentation must include proper doctests."
+severity: warning
+description: |
+  Ensures that Python docstrings are comprehensive with doctests as advocated by CEP-7.
+  [CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20)
+  This rule helps maintain consistent test coverage.
+examples:
+  - name: Valid docstring with sections examples
+    code: |
+      """
+      Test description
+
+      >>> indented test code
+      Test Result
+
+      """
+  - name: Invalid docstring without doctests examples
+    code: |
+      """
+      Possible Test description.
+      No actual doctest
+      """
+  - name: Invalid docstring with invalid doctest examples
+    code: |
+      """
+      Test description
+
+      >>> unindented test code
+      Test Result
+
+      """

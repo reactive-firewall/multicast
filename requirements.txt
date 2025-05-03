@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #python
+# logging - builtin - PSF license
 # time - builtin - PSF license
 # re - builtin - PSF license?
 # subprocess - PSF license
@@ -27,7 +28,7 @@
 # setuptools - MIT license
 setuptools>=75.0
 # virtualenv - MIT license
-#virtualenv>=15.0.1
+#virtualenv>=20.26.6
 # pip - MIT license
 pip>=24.3.1
 # build - MIT license

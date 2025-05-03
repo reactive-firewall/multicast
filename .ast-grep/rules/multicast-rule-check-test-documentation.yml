@@ -1,0 +1,62 @@
+# .ast-grep/multicast-rule-check-test-documentation.yml
+---
+id: check-test-documentation
+rule:
+  all:
+    - any:
+        - matches: data_class_docstring
+        - matches: function_docstring
+        - matches: method_docstring
+    - not:
+        all:
+          - matches: cep7_docstring_purpose
+          - matches: cep7_docstring_arguments
+          - any:
+              - matches: data_class_docstring
+              - matches: cep7_docstring_returns
+language: python
+message: "[CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20#2-docstring-style) Documentation must include purpose, args, and returns sections."
+severity: hint
+description: |
+  Ensures that Python docstrings are comprehensive with multiple sections as advocated by CEP-7.
+  [CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20#2-docstring-style)
+  This rule helps maintain consistent documentation and style.
+examples:
+  - name: Valid docstring with sections examples
+    code: |
+      def something():
+        """
+        Demonstrate with imperative.
+
+        Describes the subject after a oneline gap as per PEP-257 and PEP-8 style.
+        No line gap is needed for additional documentation.
+
+        Args:
+          arg (arg type) -- indented argument detail
+
+        Returns:
+          Good documentation.
+
+        Raises:
+          TypeError: if arg is not an `arg type`
+
+        Testing:
+
+          1. Numbered Test description.
+
+          >>> indented test code
+          Test Result followed by blank lines
+
+        """
+  - name: Invalid docstring without sections examples
+    code: |
+      def something():
+        """
+        Terse descriptive phrase. Second sentence on same line.
+        No gap before next line.
+
+        Test description
+
+        >>> unindented test code
+        Test Result with no following space
+        """

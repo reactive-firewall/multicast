@@ -35,16 +35,15 @@ Meta Testing:
 
 """
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import sys
@@ -56,11 +55,12 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-class TestPEP517Build(BasicUsageTestSuite):
+@context.markWithMetaTag("mat", "build")
+class BuildPEP517TestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_build"""
+	__module__ = "tests.test_build"
 
-	def test_build_with_pep517(self):
+	def test_build_works_WHEN_supporting_pep517(self) -> None:
 		"""
 		Test building the package using PEP 517 standards.
 
@@ -74,23 +74,21 @@ class TestPEP517Build(BasicUsageTestSuite):
 		"""
 		# Arguments need to clean
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'clean', '--all'
+			f"{str(sys.executable)} -m coverage run", "-p", "setup.py", "clean", "--all",
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running clean"), str(theBuildtxt))
+		self.assertIn("running clean", str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'-m', 'build', '--sdist', '--wheel'
+			f"{str(sys.executable)} -m coverage run", "-p", "-m", "build", "--sdist", "--wheel",
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn(str("running build"), str(theBuildtxt))
-		self.assertIn(str("""Successfully built"""), str(theBuildtxt))
+		self.assertIn("running build", str(theBuildtxt))
+		self.assertIn("Successfully built", str(theBuildtxt))
 		# Verify that the dist directory contains the expected files
-		dist_dir = os.path.join(os.getcwd(), 'dist')
+		dist_dir = os.path.join(os.getcwd(), "dist")
 		pkg_version = str(self._should_get_package_version_WHEN_valid())
 		dist_files = sorted(os.listdir(dist_dir), reverse=True)
 		expected_files = [
@@ -99,11 +97,12 @@ class TestPEP517Build(BasicUsageTestSuite):
 		]
 		for expected_file in expected_files:
 			self.assertIn(
-				expected_file, dist_files,
-				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}"
+				expected_file,
+				dist_files,
+				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}",
 			)
 
 
 # leave this part
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

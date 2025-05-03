@@ -78,6 +78,7 @@ clean:
 	@-unlink $(SRCDIR)/tests 2>/dev/null || true
 	@-unlink $(SRCDIR)/LICENSE.md 2>/dev/null || true
 	@-unlink $(SRCDIR)/"$(PROJECT_DOC_SRC_DIR)" 2>/dev/null || true
+	@-rm -r -f .coverage* 2>/dev/null || true
 
 html: init
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

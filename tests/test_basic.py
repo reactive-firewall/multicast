@@ -17,16 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import sys
@@ -35,6 +34,7 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
+@context.markWithMetaTag("mat", "basic")
 class BasicTestSuite(context.BasicUsageTestSuite):
 	"""
 	A test suite containing basic test cases for the multicast module.
@@ -62,13 +62,14 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 	platforms.
 	"""
 
-	__module__ = """tests.test_basic"""
+	__module__ = "tests.test_basic"
 
-	@unittest.skipUnless(True, "Insanitty Test. Good luck debugging.")
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self):
-		"""Insanitty Test 1: Because it only matters if we're not mad as hatters."""
+		"""Insanity Test 1: Because it only matters if we're not mad as hatters."""
 		assert True
 
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
 	def test_Does_Pass_WHEN_Meta_Test(self):
 		"""Insanity Test 2: for unittests assertion."""
 		self.assertTrue(True)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
@@ -76,6 +77,12 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
 		self.test_absolute_truth_and_meaning()
 		self.test_None_WHEN_Nothing()
+
+	@unittest.skipUnless(__debug__, "Insanity Test. Good luck debugging.")
+	def test_None_WHEN_Nothing(self):
+		"""Insanity Test 3: indirect call for unittests assertion."""
+		self.assertIsNone(None)  # skipcq: PYL-W1503 - obviously this is an Insanity Test!
+		# define new tests below
 
 	def test_Does_Pass_WHEN_Using_Import_From_Syntax(self):
 		"""Test case 0: importing multicast."""
@@ -86,9 +93,8 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(multicast.__module__)
 			self.assertIsNotNone(multicast.__doc__)
 			theResult = True
-		except Exception as impErr:
-			print(str(type(impErr)))
-			print(str(impErr))
+		except Exception as _cause:
+			context.debugtestError(_cause)
 			theResult = False
 		self.assertTrue(theResult)
 
@@ -109,7 +115,7 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 		self.assertTrue(theResult)
 
 	def test_IsNone_WHEN_given_corner_case_input(self):
-		"""Example Test case for bad input directly into function."""
+		"""Test case 2: Example for bad input directly into function."""
 		theResult = False
 		try:
 			from .context import multicast
@@ -121,17 +127,12 @@ class BasicTestSuite(context.BasicUsageTestSuite):
 				(_ignored_code, test_fixture) = tst_dispatch.useTool(tst_in)
 				self.assertIsNone(
 					test_fixture,
-					str("""multicast.McastDispatch().useTool({}) == ERROR""").format(str(tst_in))
+					f"multicast.McastDispatch().useTool({str(tst_in)}) == ERROR"
 				)
 			theResult = True
 		except Exception:
 			theResult = False
 		self.assertTrue(theResult)
-
-	def test_None_WHEN_Nothing(self):
-		"""Try adding new tests."""
-		self.assertIsNone(None)
-		# define new tests below
 
 	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")
 	def test_Skip_UNLESS_linux_only(self):

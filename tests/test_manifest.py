@@ -17,17 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-__module__ = """tests"""
+__module__ = "tests"
 
 try:
 	try:
 		import context
-	except Exception as ImportErr:  # pragma: no branch
-		ImportErr = None
-		del ImportErr  # skipcq - cleanup any error leaks early
+	except Exception as _root_cause:  # pragma: no branch
+		del _root_cause  # skipcq - cleanup any error leaks early
 		from . import context
-	if context.__name__ is None:
+	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import context") from None
 	else:
 		from context import unittest
@@ -40,16 +38,16 @@ except Exception as _cause:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from _cause
 
 
-class TestManifestInclusion(BasicUsageTestSuite):
+@context.markWithMetaTag("mat", "build")
+class ManifestInclusionTestSuite(BasicUsageTestSuite):
 
-	__module__ = """tests.test_manifest"""
+	__module__ = "tests.test_manifest"
 
 	def setUp(self):
-		super(TestManifestInclusion, self).setUp()
+		super(ManifestInclusionTestSuite, self).setUp()
 		# Arguments need to build
 		clean_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'clean', '--all'
+			f"{str(sys.executable)} -m coverage run", "setup.py", "clean", "--all"
 		]
 		# Clean previous builds
 		theCleantxt = context.checkPythonCommand(clean_arguments, stderr=subprocess.STDOUT)
@@ -70,8 +68,10 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		"""
 		# Arguments need to build
 		build_arguments = [
-			str("{} -m coverage run").format(sys.executable),
-			'setup.py', 'sdist', '--formats=gztar'
+			f"{str(sys.executable)} -m coverage run",
+			'setup.py',
+			'sdist',
+			'--formats=gztar',
 		]
 		# Build the source distribution
 		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
@@ -93,26 +93,27 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		the sdist and checking if the required files are present in the tar archive.
 		"""
 		members, pkg_version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(pkg_version)
+		package_prefix = str("multicast-{}").format(pkg_version)
 		expected_files = [
-			str("""{}/README.md""").format(package_prefix),
-			str("""{}/LICENSE.md""").format(package_prefix),
-			str("""{}/requirements.txt""").format(package_prefix),
-			str("""{}/setup.py""").format(package_prefix),
-			str("""{}/MANIFEST.in""").format(package_prefix),
-			str("""{}/setup.cfg""").format(package_prefix),
-			str("""{}/multicast/__init__.py""").format(package_prefix),
-			str("""{}/multicast/__main__.py""").format(package_prefix),
-			str("""{}/multicast/skt.py""").format(package_prefix),
-			str("""{}/multicast/recv.py""").format(package_prefix),
-			str("""{}/multicast/send.py""").format(package_prefix),
-			str("""{}/multicast/hear.py""").format(package_prefix),
+			str("{}/README.md").format(package_prefix),
+			str("{}/LICENSE.md").format(package_prefix),
+			str("{}/requirements.txt").format(package_prefix),
+			str("{}/setup.py").format(package_prefix),
+			str("{}/MANIFEST.in").format(package_prefix),
+			str("{}/setup.cfg").format(package_prefix),
+			str("{}/multicast/__init__.py").format(package_prefix),
+			str("{}/multicast/__main__.py").format(package_prefix),
+			str("{}/multicast/skt.py").format(package_prefix),
+			str("{}/multicast/recv.py").format(package_prefix),
+			str("{}/multicast/send.py").format(package_prefix),
+			str("{}/multicast/hear.py").format(package_prefix),
 			# Include other important files and directories
 		]
 		for expected_file in expected_files:
 			self.assertIn(
-				expected_file, members,
-				str("""Missing {expected} in sdist.""").format(expected=expected_file)
+				expected_file,
+				members,
+				f"Missing {str(expected_file)} in sdist."
 			)
 
 	def test_sdist_excludes_unwanted_files(self):
@@ -122,17 +123,18 @@ class TestManifestInclusion(BasicUsageTestSuite):
 		by building the sdist and verifying that these files are absent from the tar archive.
 		"""
 		members, pkg_version = self._build_sdist_and_get_members()
-		package_prefix = str("""multicast-{}""").format(pkg_version)
+		package_prefix = str("multicast-{}").format(pkg_version)
 		unwanted_files = [
-			str("""{}/.gitignore""").format(package_prefix),
-			str("""{}/.github/""").format(package_prefix),
-			str("""{}/tests/""").format(package_prefix),
+			str("{}/.gitignore").format(package_prefix),
+			str("{}/.github/").format(package_prefix),
+			str("{}/tests/").format(package_prefix),
 			# Exclude other files or directories as specified in MANIFEST.in
 		]
 		for unwanted_file in unwanted_files:
 			self.assertNotIn(
-				unwanted_file, members,
-				str("""Unwanted file {reject} found in sdist.""").format(reject=unwanted_file)
+				unwanted_file,
+				members,
+				f"Unwanted file {str(unwanted_file)} found in sdist."
 			)
 
 

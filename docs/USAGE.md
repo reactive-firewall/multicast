@@ -13,8 +13,8 @@ from multiprocessing import Process
 # set up some stuff
 _fixture_PORT_arg = int(59595)
 # Valid multicast addresses range from 224.0.0.0 to 239.255.255.255
-_fixture_mcast_GRP_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
-_fixture_host_BIND_arg = """224.0.0.1"""  # only use dotted notation for multicast group addresses
+_fixture_mcast_GRP_arg = "224.0.0.1"  # only use dotted notation for multicast group addresses
+_fixture_host_BIND_arg = "224.0.0.1"  # only use dotted notation for multicast group addresses
 _fixture_host_IFACE_arg = None # Initial value representing no specific interface
 _fixture_HEAR_args = [
     "--port", _fixture_PORT_arg,
@@ -38,7 +38,7 @@ def print_loop_stub(func, iterations=5):
 @print_loop_stub
 def inputHandle():
     test_RCEV = multicast.recv.McastRECV()
-    buffer_string = str("""""")
+    buffer_string = str()
     (didWork, result) = test_RCEV.doStep(
         groups=[_fixture_mcast_GRP_arg],
         port=_fixture_PORT_arg,
@@ -69,20 +69,21 @@ _and elsewhere (like another function or even module) for the sender:_
 # assuming already did 'import multicast'
 
 _fixture_SAY_args = [
-    """--port""", _fixture_PORT_arg,
-    """--group""", _fixture_mcast_GRP_arg,
-    """--message""", """'test message'"""
+    "--port", _fixture_PORT_arg,
+    "--group", _fixture_mcast_GRP_arg,
+    "--message", "'test message'"
 ]
 try:
     multicast.__main__.McastDispatch().doStep("SAY", _fixture_SAY_args)
     # Hint: use a loop to repeat or different arguments to vary message.
-except Exception:
+except multicast.exceptions.CommandExecutionError as baton:
     p.join()
-    raise RuntimeError("Multicast operation failed.")
-
-# clean up some stuff
-p.join() # if not already handled don't forget to join the process and other overhead
-didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
+    raise RuntimeError("Multicast operation failed.") from baton
+finally:
+    # clean up some stuff
+    if p:
+        p.join() # if not already handled don't forget to join the process and other overhead
+    didWork = (int(p.exitcode) <= int(0)) # if you use a loop and need to know the exit code
 
 ```
 

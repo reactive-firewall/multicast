@@ -1,0 +1,13 @@
+# .ast-grep/utils/python/content/multicast-mtool-subclass-implementation.yml
+id: multicast-mtool-subclass-implementation
+rule:
+  kind: block
+  pattern: |
+    $BLOCK
+  inside:
+    matches: multicast-mtool-subclass
+  has:
+    any:
+      - matches: multicast-mtool-subclass-function-dostep
+      - matches: multicast-mtool-subclass-function-setupargs
+language: python

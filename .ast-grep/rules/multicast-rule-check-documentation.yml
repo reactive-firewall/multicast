@@ -1,0 +1,14 @@
+# .ast-grep/multicast-rule-check-test-documentation.yml
+id: check-has-documentation
+rule:
+  pattern:
+    selector: function_definition
+    context: |
+      def $FUNC_NAME($PARAMS)$RET_TYPE:$$$
+        $BODY
+  kind: function_definition
+  not:
+    matches: function_docstring
+language: python
+message: "Functions should have documentation. However, $FUNC_NAME is missing a docstring."
+severity: warning

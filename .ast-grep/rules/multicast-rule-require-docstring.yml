@@ -1,0 +1,25 @@
+# .ast-grep/multicast-rule-require-docstring.yml
+id: check-has-docstring-documentation
+rule:
+  not:
+    has:
+      matches: block_with_docstring
+      kind: block
+  any:
+    - kind: class_definition
+      pattern:
+        selector: class_definition
+        context: |
+          class $NAME($PARAMS):$$$
+            $$$
+            $CLASS_BODY
+    - kind: function_definition
+      pattern:
+        selector: function_definition
+        context: |
+          def $NAME($PARAMS)$RET_TYPE:$$$
+            $$$
+            $FUNC_BODY
+language: python
+message: "$NAME must have documentation, add docstring."
+severity: warning

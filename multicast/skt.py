@@ -9,26 +9,13 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/multicast/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
-# Third-party Acknowledgement:
-# ..........................................
-# Some code (namely: run, and parseArgs) was modified/derived from:
-# https://stackoverflow.com/a/52791404
-# Copyright (c) 2019, "pterodragon" (https://stackoverflow.com/users/5256940/pterodragon)
-# which was under CC-by-sa-4 license.
-# see https://creativecommons.org/licenses/by-sa/4.0/ for details
-# The components in parseArgs, run, and main are thus also under
-# CC-by-sa-4 https://creativecommons.org/licenses/by-sa/4.0/
-# ..........................................
-# NO ASSOCIATION
 
 """Socket utility functions for multicast communication.
 
@@ -83,8 +70,7 @@ Testcase 2: SKT utils should be detailed with some metadata.
 
 """
 
-
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
 
 	Minimal Acceptance Testing:
@@ -107,8 +93,7 @@ __package__ = """multicast"""  # skipcq: PYL-W0622
 
 """
 
-
-__module__ = """multicast.skt"""
+__module__ = "multicast.skt"
 """The module of this program.
 
 	Minimal Acceptance Testing:
@@ -128,12 +113,10 @@ __module__ = """multicast.skt"""
 
 """
 
-
-__file__ = """multicast/skt.py"""
+__file__ = "multicast/skt.py"
 """The file of this component."""
 
-
-__name__ = """multicast.skt"""  # skipcq: PYL-W0622
+__name__ = "multicast.skt"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -153,20 +136,27 @@ __name__ = """multicast.skt"""  # skipcq: PYL-W0622
 
 """
 
-
 try:
+	from . import logging
 	from . import socket as _socket  # skipcq: PYL-C0414
 	from . import struct as _struct  # noqa
 	from . import _MCAST_DEFAULT_TTL as _MCAST_DEFAULT_TTL  # skipcq: PYL-C0414
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except Exception as _cause:
+	baton = ImportError(_cause, "[CWE-758] Module failed completely.")
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
 
 
-def genSocket():
+module_logger = logging.getLogger(__module__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
+
+
+def genSocket() -> _socket.socket:
 	"""
 	Create and configure a multicast socket.
 

@@ -124,8 +124,7 @@ Minimal Acceptance Testing:
 
 """
 
-
-__package__ = """multicast"""  # skipcq: PYL-W0622
+__package__ = "multicast"  # skipcq: PYL-W0622
 """
 The package of this program.
 
@@ -149,8 +148,7 @@ Minimal Acceptance Testing:
 
 """
 
-
-__module__ = """multicast.exceptions"""
+__module__ = "multicast.exceptions"
 """
 The module of this program.
 
@@ -171,12 +169,10 @@ Minimal Acceptance Testing:
 
 """
 
-
-__file__ = """multicast/exceptions.py"""
+__file__ = "multicast/exceptions.py"
 """The file of this component."""
 
-
-__name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
+__name__ = "multicast.exceptions"  # skipcq: PYL-W0622
 """The name of this component.
 
 	Minimal Acceptance Testing:
@@ -188,7 +184,7 @@ __name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
 		>>> import multicast
 		>>>
 
-	Testcase 1: Recv should be automatically imported.
+	Testcase 1: Exceptions should be automatically imported.
 
 		>>> multicast.exceptions.__name__ is not None
 		True
@@ -196,17 +192,27 @@ __name__ = """multicast.exceptions"""  # skipcq: PYL-W0622
 
 """
 
-
 try:
-	from . import sys  # skipcq: PYL-C0414
 	from . import argparse  # skipcq: PYL-C0414
+	from . import logging  # skipcq: PYL-C0414
 	import functools
-except Exception as err:
-	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+except ImportError as _cause:
+	baton = ImportError(_cause, "[CWE-758] Module failed completely.")
 	baton.module = __module__
 	baton.path = __file__
-	baton.__cause__ = err
-	raise baton from err
+	baton.__cause__ = _cause
+	raise baton from _cause
+
+
+module_logger = logging.getLogger(__module__)
+module_logger.debug(
+	"Loading %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
+module_logger.debug(
+	"Initializing %s exceptions.",  # lazy formatting to avoid PYL-W1203
+	__package__,
+)
 
 
 class CommandExecutionError(RuntimeError):
@@ -236,11 +242,11 @@ class CommandExecutionError(RuntimeError):
 			1
 	"""
 
-	__module__ = """multicast.exceptions"""
+	__module__ = "multicast.exceptions"
 
-	__name__ = """multicast.exceptions.CommandExecutionError"""
+	__name__ = "multicast.exceptions.CommandExecutionError"
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwargs) -> None:
 		"""
 		Initialize CommandExecutionError with a message and exit code.
 
@@ -306,7 +312,9 @@ class CommandExecutionError(RuntimeError):
 		super().__init__(*args, **kwargs)
 		if cause is not None:
 			self.__cause__ = cause
-		self.message = args[0] if args else kwargs.get("message", "An error occurred")
+		msg = args[0] if args else kwargs.get("message", "An error occurred")
+		self.message = msg if msg else "An error occurred"
+		del msg  # skipcq: PTC-W0043
 		self.exit_code = exit_code
 
 
@@ -336,15 +344,15 @@ class ShutdownCommandReceived(RuntimeError):
 			'Custom shutdown message.'
 	"""
 
-	__module__ = """multicast.exceptions"""
+	__module__ = "multicast.exceptions"
 
-	__name__ = """multicast.exceptions.ShutdownCommandReceived"""
+	__name__ = "multicast.exceptions.ShutdownCommandReceived"
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self, *args, **kwargs) -> None:
 		"""
 		Initialize the ShutdownCommandReceived exception.
 
-		The ShutdownComandRecived exception is used by the default handler
+		The ShutdownCommandReceived exception is used by the default handler
 		for the HEAR servers, to instruct the HEAR server to shutdown gracefully.
 
 		Parameters:
@@ -436,6 +444,94 @@ class ShutdownCommandReceived(RuntimeError):
 		self.exit_code = 143  # Use SIGTERM exit code for graceful shutdown
 
 
+module_logger.debug("Initialized exceptions.")
+module_logger.debug("Initializing error message strings.")
+# Error message constants
+EXIT_CODE_RANGE_ERROR = "Exit code must be an integer between 0 and 255"
+module_logger.debug("Initialized message strings.")
+
+
+def validate_exit_code(code) -> None:
+	"""
+	Validate that an exit code is within the valid range (0-255).
+
+	This function ensures that exit codes provided to system functions
+	are compliant with the POSIX standard range of 0-255. Values outside
+	this range or non-integer values will cause an exception.
+
+	Arguments:
+		code: The exit code value to validate.
+
+	Returns:
+		None: If validation passes, no value is returned.
+
+	Raises:
+		ValueError: If the exit code is not an integer or outside the range 0-255.
+		TypeError: If the provided argument is not a numeric type.
+
+	Testing:
+		Testcase 1: Valid exit codes.
+			A. Test with minimum valid value.
+			B. Test with maximum valid value.
+			C. Test with typical success code.
+			D. Test with typical error code.
+
+			>>> validate_exit_code(0)  # Minimum valid value
+			>>> validate_exit_code(255)  # Maximum valid value
+			>>> validate_exit_code(1)  # Typical error code
+			>>> validate_exit_code(70)  # Internal software error
+
+		Testcase 2: Invalid type for exit code.
+			A. Test with string value.
+			B. Test with None value.
+			C. Test with non-integer numeric value.
+
+			>>> validate_exit_code("1")  # doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			ValueError: Exit code must be an integer between 0 and 255
+			>>> validate_exit_code(None)  # doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			ValueError: Exit code must be an integer between 0 and 255
+			>>> validate_exit_code(True)  # same as validate_exit_code(1)
+			>>> validate_exit_code(1.5)  # doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			ValueError: Exit code must be an integer between 0 and 255
+
+		Testcase 3: Out of range exit codes.
+			A. Test with negative value.
+			B. Test with value exceeding maximum.
+
+			>>> validate_exit_code(-1)  # doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			ValueError: Exit code must be an integer between 0 and 255
+			>>> validate_exit_code(256)  # doctest: +IGNORE_EXCEPTION_DETAIL
+			Traceback (most recent call last):
+			ValueError: Exit code must be an integer between 0 and 255
+
+		Testcase 4: Integration with EXIT_CODES.
+			A. Test with each key in EXIT_CODES.
+			B. Verify all keys in EXIT_CODES are valid.
+
+			>>> all(validate_exit_code(code) is None for code in EXIT_CODES.keys())
+			True
+			>>> # Verify boundary exceptions are properly handled
+			>>> try:
+			...     validate_exit_code(999)
+			...     success = False
+			... except ValueError:
+			...     success = True
+			>>> success
+			True
+	"""
+	module_logger.debug("Validating possible exit code.")
+	if not isinstance(code, int) or code < 0 or code > 255:
+		raise ValueError(EXIT_CODE_RANGE_ERROR)
+	module_logger.debug("Validated possible exit code.")
+
+
+module_logger.debug("Initializing CEP-8 EXIT_CODES")
+
+
 EXIT_CODES = {
 	0: (None, 'Success'),
 	1: (RuntimeError, 'General Error'),
@@ -478,14 +574,15 @@ CEP-8 Compliance:
 
 Usage Example:
 	```python
+		import sys
 		from multicast.exceptions import EXIT_CODES
 		from multicast.exceptions import get_exit_code_from_exception
 
 		try:
 			# Code that may raise an exception
 			pass
-		except Exception as e:
-			exit_code = get_exit_code_from_exception(e)
+		except Exception as _cause:
+			exit_code = get_exit_code_from_exception(_cause)
 			sys.exit(exit_code)
 	```
 
@@ -544,7 +641,10 @@ Minimal Acceptance Testing:
 """
 
 
-def get_exit_code_from_exception(exc):
+module_logger.debug("Initialized EXIT_CODES.")
+
+
+def get_exit_code_from_exception(exc: BaseException) -> int:
 	"""
 	Retrieve the exit code associated with a specific exception.
 
@@ -559,28 +659,49 @@ def get_exit_code_from_exception(exc):
 
 	Testing:
 
-		Testcase 1: Exception with a mapped exit code.
+		Testcase 1: Exception with a direct type match.
+			A. Test with FileNotFoundError which has a specific exit code.
+			B. Verify correct exit code is returned.
 
 			>>> exc = FileNotFoundError('No such file or directory')
 			>>> get_exit_code_from_exception(exc)
 			66
 
-		Testcase 2: Exception without a specific exit code.
+		Testcase 2: Exception with an inherited type match.
+			A. Test with a subclass of ValueError that doesn't have a direct mapping.
+			B. Verify it returns the parent class's exit code.
+
+			>>> class CustomValueError(ValueError): pass
+			>>> exc = CustomValueError('Custom value error')
+			>>> get_exit_code_from_exception(exc)
+			65
+
+		Testcase 3: Exception without any type match.
+			A. Test with a custom exception that doesn't inherit from mapped types.
+			B. Verify it returns the default error code.
 
 			>>> exc = Exception('Generic error')
 			>>> get_exit_code_from_exception(exc)
 			70
 
+		Testcase 4: Security boundary test with invalid input.
+			A. Test with non-exception input.
+			B. Verify type checking.
+
+			>>> get_exit_code_from_exception("not an exception")
+			70
+
 	"""
-	if type(exc) in EXCEPTION_EXIT_CODES:
-		return EXCEPTION_EXIT_CODES[type(exc)]
+	exc_type = type(exc)
+	if exc_type in EXCEPTION_EXIT_CODES:
+		return EXCEPTION_EXIT_CODES[exc_type]
 	for exc_class in EXCEPTION_EXIT_CODES:
 		if isinstance(exc, exc_class):
 			return EXCEPTION_EXIT_CODES[exc_class]
 	return 70  # Default to 'Internal Software Error'
 
 
-def exit_on_exception(func):
+def exit_on_exception(func: callable):
 	"""
 	Decorator that wraps a function to handle exceptions and exit with appropriate exit codes.
 
@@ -632,35 +753,53 @@ def exit_on_exception(func):
 			Traceback (most recent call last):
 			SystemExit...65...
 	"""
+
 	@functools.wraps(func)
 	def wrapper(*args, **kwargs):
+		_func_logger = module_logger
 		try:
+			_func_logger = logging.getLogger(func.__name__)
 			return func(*args, **kwargs)
-		except SystemExit as exc:
+		except SystemExit as baton:
 			# Handle SystemExit exceptions, possibly from argparse
-			exit_code = exc.code if isinstance(exc.code, int) else 2
-			if (sys.stderr.isatty()):
-				print(
-					f"{EXIT_CODES[exit_code][1]}: {exc}",
-					file=sys.stderr
-				)
-			raise SystemExit(exit_code) from exc
+			exit_code = baton.code if isinstance(baton.code, int) else 2
+			_func_logger.warning(
+				"%s: %s",  # lazy formatting to avoid PYL-W1203
+				EXIT_CODES[exit_code][1],
+				baton,
+			)
+			raise SystemExit(exit_code) from baton
 			# otherwise sys.exit(exit_code)
-		except BaseException as err:
-			exit_code = get_exit_code_from_exception(err)
-			if (sys.stderr.isatty()):
-				print(
-					f"{EXIT_CODES[exit_code][1]}: {err}",
-					file=sys.stderr
-				)
-			raise SystemExit(exit_code) from err
+		except BaseException as _cause:
+			exit_code = get_exit_code_from_exception(_cause)
+			_func_logger.warning(
+				"%s: %s",  # lazy formatting to avoid PYL-W1203
+				EXIT_CODES[exit_code][1],
+				_cause,
+			)
+			raise SystemExit(exit_code) from _cause
 			# otherwise sys.exit(exit_code)
+
 	return wrapper
+
+
+module_logger.debug(
+	"Loaded %s",  # lazy formatting to avoid PYL-W1203
+	__module__,
+)
 
 
 # skipcq
 __all__ = [
-	"""__package__""", """__module__""", """__name__""", """__doc__""",  # skipcq: PYL-E0603
-	"""CommandExecutionError""", """EXCEPTION_EXIT_CODES""", """EXIT_CODES""",
-	"""get_exit_code_from_exception""", """exit_on_exception""", """ShutdownCommandReceived"""
+	"""__package__""",
+	"""__module__""",
+	"""__name__""",
+	"""__doc__""",  # skipcq: PYL-E0603
+	"""CommandExecutionError""",
+	"""EXCEPTION_EXIT_CODES""",
+	"""validate_exit_code""",
+	"""EXIT_CODES""",
+	"""get_exit_code_from_exception""",
+	"""exit_on_exception""",
+	"""ShutdownCommandReceived"""
 ]

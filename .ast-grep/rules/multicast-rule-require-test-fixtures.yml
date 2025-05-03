@@ -1,0 +1,18 @@
+# .ast-grep/multicast-rule-require-test-fixtures.yml
+id: require-test-fixtures
+language: python
+rule:
+  all:
+    - pattern:
+        selector: class_definition
+        context: |
+          class $TEST_CLASS(unittest.TestCase):
+            $SETUP
+      inside:
+        kind: module
+    - not:
+        regex: def setUp\(
+message: "Test classes must include setUp method for fixtures"
+severity: warning
+files:
+  - tests{/**/,/}test_[a-z0-9_]*.py

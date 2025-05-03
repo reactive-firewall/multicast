@@ -25,9 +25,9 @@ Examples of unacceptable behavior by participants include:
 * Publishing others' private information, such as a physical or electronic
   address, without explicit permission
 * Unethical, malicious, or other 'Black-hat' hacking activity that harms the
-overall security of the project
+  overall security of the project
 * The use of sexualized language or imagery and unwelcome sexual attention or
-advances
+  advances
 * Trolling, insulting/derogatory comments, and personal or political attacks
 * Public or private harassment
 * Other conduct which could reasonably be considered inappropriate in a

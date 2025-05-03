@@ -1,0 +1,10 @@
+# .ast-grep/utils/structure.yml
+# Documentation structure utilities
+id: module_docstring
+rule:
+  all:
+    - matches: docstring_statement
+      inside:
+        kind: module
+    - kind: expression_statement
+language: python
