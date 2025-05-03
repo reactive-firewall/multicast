@@ -8,15 +8,20 @@ Multicast:
       - multicast/*.py
       - LICENSE
       - LICENSE.md
+      - Logo.svg
       - pyproject.toml
 
 # Add 'Lint' label to any lint file changes
 Linter:
   - changed-files:
     - any-glob-to-any-file:
+      - '.ast-grep/**/*.yml'
       - .yamllint.conf
+      - .bandit.yml
       - .flake8.ini
+      - .coveragerc
       - .deepsource.toml
+      - .markdownlint.yml
       - tests/check_s*
       - tests/check_c*
       - tests/check_pip
@@ -29,6 +34,8 @@ Bash Lang:
       - tests/check_*
       - .github/*.bash
       - .github/*.sh
+      - .github/**/*.bash
+      - .github/**/*.sh
       - .circleci/*.bash
       - '*.bash'
 
@@ -39,10 +46,20 @@ Python Lang:
       - '**/*.py'
       - '*.py'
 
+# Add 'Lang' label to any python file changes
+Make Lang:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.makefile'
+      - '**/*.make'
+      - '**/makefile'
+      - Makefile
+
 Configs:
   - changed-files:
     - any-glob-to-any-file:
       - '*.yml'
+      - '*.yaml'
       - './**/*.yml'
       - './.**/*.yml'
       - '*.ini'
@@ -61,6 +78,7 @@ documentation:
       - './**/*.md'
       - docs/**/*
       - docs/*
+      - README.md
 
 # Add 'test' label
 Testing:
@@ -69,6 +87,7 @@ Testing:
       - tests/*.py
       - tests/requirements.txt
       - tests/check_*
+      - .github/tools/*
       - .github/workflows/*.yml
       - .circleci/*
 
@@ -79,10 +98,11 @@ CI:
       - tests/requirements.txt
       - .travis.yml
       - .appveyor.yml
+      - .github/actions/*/action.yml
       - .github/workflows/*
       - .circleci/*
 
-Github:
+GitHub:
   - changed-files:
     - any-glob-to-any-file:
       - .github/**/*

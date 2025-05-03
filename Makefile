@@ -194,6 +194,11 @@ build: init ./setup.py MANIFEST.in
 init:
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(ECHO) ""
+	$(QUIET)$(ECHO) "      _ _         "
+	$(QUIET)$(ECHO) "     //\/\ulticast"
+	$(QUIET)$(ECHO) "                  "
+	$(QUIET)$(ECHO) ""
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init build
