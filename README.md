@@ -1,6 +1,6 @@
 # Multicast Python Module
 
-![Mcast Logo](Logo.svg)
+![Mcast Logo](https://github.com/reactive-firewall/multicast/blob/stable/Logo.svg)
 
 ## Introduction
 
@@ -47,11 +47,59 @@ applications, making it straightforward to work with multicast sockets.
 
 ## Installation
 
-Install the package using pip:
+Install the package using `pip`:
+
+```bash
+pip install multicast
+```
+
+<details><summary>Other Methods</summary>
+
+There are many ways to install the module besides using `pip`, but unless you have a specific need,
+using `pip` is reccomended for most users.
+
+### PEP-668 and externally-managed-environment installs
+
+Users using Homebrew may require additional flags to use `pip`:
+
+```bash
+python3 -m pip install --use-pep517 --break-system-packages --user 'multicast>=2.0.8'
+```
+
+### Install from Source
+
+*Source builds require development tools including (but not limited to): `git`, and `make`*
+
+```bash
+# clone the multicast source repository
+git clone "https://github.com/reactive-firewall/multicast.git" multicast
+cd multicast
+# switch to the stable branch
+git checkout stable
+# build the multicast module
+make -f Makefile build
+# install the build
+make user-install
+# Optionally check the install
+python3 -m multicast --version
+```
+
+### Developer builds
+
+> [!WARNING]
+> **Development Builds** *(e.g. Cutting-Edge)* are not intended as full-fleged releases, however
+> updates to the Development Builds are more frequent than releases.
+
+### Legacy egg style install 
+
+> [!WARNING]
+> **Egg Style Builds** *(Deprecated)* are not supported after version `2.1` :shrug:
 
 ```bash
 pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 ```
+
+</details>
 
 ## Getting Started
 
@@ -160,4 +208,4 @@ This project is licensed under the MIT License. See the
 [LICENSE.md](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md) file for
 details.
 
-[![License - MIT](https://img.shields.io/github/license/reactive-firewall/multicast.svg?maxAge=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
