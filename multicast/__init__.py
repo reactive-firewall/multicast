@@ -590,6 +590,7 @@ class mtool(abc.ABC):
 			)
 			calling_parser_group.add_argument(
 				"--use-std", dest="is_std", default=False, action="store_true",
+				help="Use interactive command mode. Disabled by default."
 			)
 			calling_parser_group.add_argument(
 				"--daemon", dest="is_daemon", default=False, action="store_true",

@@ -312,6 +312,14 @@ class McastSAY(multicast.mtool):
 				dest="data",
 				default="PING from {name}: group: {group}, port: {port}",
 			)
+			# v2.0.9: Added the --pipe option
+			parser.add_argument(
+				"--pipe",
+				action="store_const",
+				const=["-"],
+				dest="data",
+				help="read message from stdin (equivalent to --message -)"
+			)
 
 	@staticmethod
 	def _sayStep(group, port, data):

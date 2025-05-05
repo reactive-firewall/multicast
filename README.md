@@ -56,7 +56,7 @@ pip install multicast
 <details><summary>Other Methods</summary>
 
 There are many ways to install the module besides using `pip`, but unless you have a specific need,
-using `pip` is reccomended for most users.
+using `pip` is recommended for most users.
 
 ### PEP-668 and externally-managed-environment installs
 
