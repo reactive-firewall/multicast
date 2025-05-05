@@ -305,7 +305,8 @@ class McastSAY(multicast.mtool):
 				dest="groups",
 				help="multicast groups (ip addrs) to listen to join."
 			)
-			parser.add_argument(
+			msgGrp = parser.add_argument_group()
+			msgGrp.add_argument(
 				"-m",
 				"--message",
 				nargs="+",
@@ -313,7 +314,7 @@ class McastSAY(multicast.mtool):
 				default="PING from {name}: group: {group}, port: {port}",
 			)
 			# v2.0.9: Added the --pipe option
-			parser.add_argument(
+			msgGrp.add_argument(
 				"--pipe",
 				action="store_const",
 				const=["-"],
