@@ -42,7 +42,7 @@ jobs:
         shell: bash
     env:
       LANG: "en_US.UTF-8"
-      BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
+      BUILD_MATCH_PATTERN: "${{ vars.BUILD_MATCH_PATTERN }}"
     outputs:
       build_status: ${{ steps.build.outcome }}
     steps:
@@ -160,7 +160,7 @@ jobs:
       - name: Summerize Building
         id: sumerize-py-build
         run: |
-          echo "- [x] Building works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "- [x] Building works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
         shell: bash
       - name: Run Tests
@@ -170,7 +170,7 @@ jobs:
       - name: Summerize Install
         id: sumerize-user-install
         run: |
-          echo "- [x] User Installing works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "- [x] User Installing works on python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() }}
         shell: bash
       - name: Test Info
@@ -197,17 +197,20 @@ jobs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
       build_ref: ${{ steps.check_status.outputs.build_ref }}
       build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
+      build_artifact_filename: ${{ steps.check_status.outputs.build_artifact_filename }}
       environment: ${{ needs.BUILD.environment }}
     steps:
       - id: check_status
         run: |
           if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
-            echo "build_success=true" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_success=true" >> "$GITHUB_OUTPUT"
           else
-            echo "build_success=false" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_success=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
-          echo "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "environment=${{ needs.BUILD.environment }}" >> "$GITHUB_OUTPUT"
       - name: Download All Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:

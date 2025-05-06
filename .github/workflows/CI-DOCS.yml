@@ -15,9 +15,11 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches: ["main", "master", "stable"]
     tags: ["v*"]
+    paths: ["docs/**", ".github/workflows/CI-DOCS.yml", "**/*.md", "README.md", "LICENSE.md"]
   pull_request:
     types: [opened, reopened, ready_for_review]
     branches: ["feature-*", "patch-*", "HOTFIX-*"]
+    paths: ["docs/**", ".github/workflows/CI-DOCS.yml", "**/*.md", "multicast/*.py"]
   pull_request_target:
     types: [opened, edited, reopened, ready_for_review]
     branches: ["main", "master", "stable"]
@@ -31,7 +33,6 @@ jobs:
       packages: none
       pull-requests: read
       security-events: none
-    environment: ${{ (github.ref == 'refs/heads/stable' || startsWith(github.ref, 'refs/tags/v')) && 'Deployment' || (github.ref == 'refs/heads/master') && 'Testing' || 'Experimenting' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
