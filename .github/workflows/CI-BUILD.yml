@@ -198,19 +198,20 @@ jobs:
       build_ref: ${{ steps.check_status.outputs.build_ref }}
       build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
       build_artifact_filename: ${{ steps.check_status.outputs.build_artifact_filename }}
-      environment: ${{ needs.BUILD.environment }}
+      environment: ${{ steps.check_status.outputs.build_environment }}
     steps:
       - id: check_status
         run: |
           if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
-            printf "%s\n" "build_success=true" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_success=true" > "BUILD-info.txt"
           else
-            printf "%s\n" "build_success=false" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_success=false" >> "BUILD-info.txt"
           fi
-          printf "%s\n" "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
-          printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "$GITHUB_OUTPUT"
-          printf "%s\n" "environment=${{ needs.BUILD.environment }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_ref=${{ github.ref }}" >> "BUILD-info.txt"
+          printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "BUILD-info.txt"
+          printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "BUILD-info.txt"
+          printf "%s\n" "build_environment=${ENVIRONMENT}" >> "BUILD-info.txt"
+          cat <"BUILD-info.txt" >> "$GITHUB_OUTPUT"
       - name: Download All Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -218,3 +219,12 @@ jobs:
           pattern: multicast-build-${{ github.sha }}.zip
           merge-multiple: true
       - run: ls -R dist
+      - name: Upload build summary
+        id: upload
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          path: "BUILD-info.txt"
+          name: multicast-info-${{ github.sha }}.txt.zip
+          compression-level: 3
+          overwrite: true
