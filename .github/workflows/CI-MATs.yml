@@ -73,10 +73,12 @@ jobs:
           merge-multiple: true
           github-token: ${{ env.GH_TOKEN }}
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
-      - name: "check fetch PoC"
-        run: ls -laR "BUILD-info.txt"
       - name: "move into place"
-        run: cp -vf "BUILD-info.txt/**/BUILD-info.txt" ./"multicast-info.txt"
+        run: |
+          cp -vf "BUILD-info.txt/BUILD-info.txt" ./"multicast-info.txt" ;
+          wait ;
+          rmdir -vf ./"BUILD-info.txt"
+          mv -vf ./"multicast-info.txt" ./BUILD-info.txt
       - id: get_sha
         env:
           BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
