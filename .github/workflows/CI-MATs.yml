@@ -77,7 +77,7 @@ jobs:
         run: |
           cp -vf "BUILD-info.txt/BUILD-info.txt" ./"multicast-info.txt" ;
           wait ;
-          rmdir -vf ./"BUILD-info.txt"
+          rmdir -v ./"BUILD-info.txt"
           mv -vf ./"multicast-info.txt" ./BUILD-info.txt
       - id: get_sha
         env:
