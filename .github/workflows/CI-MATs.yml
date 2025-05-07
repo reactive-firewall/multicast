@@ -70,10 +70,13 @@ jobs:
           path: "BUILD-info.txt"
           pattern: multicast-info-*.txt
           repository: reactive-firewall/multicast
+          merge-multiple: true
           github-token: ${{ env.GH_TOKEN }}
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       - name: "check fetch PoC"
         run: ls -laR "BUILD-info.txt"
+      - name: "move into place"
+        run: cp -vf "BUILD-info.txt/**/BUILD-info.txt" ./"multicast-info.txt"
       - id: get_sha
         env:
           BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
