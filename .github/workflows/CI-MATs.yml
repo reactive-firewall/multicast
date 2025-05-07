@@ -75,7 +75,7 @@ jobs:
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       - name: "move into place"
         run: |
-          cp -vf "BUILD-info.txt/BUILD-info.txt" ./"multicast-info.txt" ;
+          mv -vf "BUILD-info.txt/BUILD-info.txt" ./"multicast-info.txt" ;
           wait ;
           rmdir -v ./"BUILD-info.txt"
           mv -vf ./"multicast-info.txt" ./BUILD-info.txt
