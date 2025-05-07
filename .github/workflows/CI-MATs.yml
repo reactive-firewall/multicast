@@ -70,7 +70,7 @@ jobs:
           path: "BUILD-info.txt"
           pattern: multicast-info-*.txt
           repository: reactive-firewall/multicast
-          github-token: ${{ envs.GH_TOKEN }}
+          github-token: ${{ env.GH_TOKEN }}
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       - name: "check fetch PoC"
         run: ls -laR "BUILD-info.txt"
