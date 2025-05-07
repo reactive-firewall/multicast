@@ -37,6 +37,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
+      trigger_id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       mats_environment: ${{ steps.get_env.outputs.environment }}
     steps:
       - id: check
@@ -45,6 +46,15 @@ jobs:
             echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - id: get_trigger_id
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
+        run: |
+          ID_VALUE=$(gh api "${{ github.event.workflow_run.url }}" --jq '.id')
+          if [[ -n "$ID_VALUE" ]]; then
+            echo "trigger_id=$ID_VALUE" >> "$GITHUB_OUTPUT"
+          else
+            echo "trigger_id=null" >> "$GITHUB_OUTPUT"  # Default fallback
           fi
       - id: get_env
         run: |

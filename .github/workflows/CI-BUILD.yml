@@ -227,7 +227,7 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: ${{ github.workspace }}/dist
-          pattern: multicast-build-${{ github.sha }}.zip
+          pattern: multicast-build-${{ github.sha }}
           merge-multiple: true
       - run: ls -R dist
       - name: Upload build summary
