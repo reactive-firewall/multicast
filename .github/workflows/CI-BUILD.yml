@@ -45,6 +45,9 @@ jobs:
       BUILD_MATCH_PATTERN: "${{ vars.BUILD_MATCH_PATTERN }}"
     outputs:
       build_status: ${{ steps.build.outcome }}
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+      artifact-url: ${{ steps.upload.outputs.artifact-url }}
+      artifact-digest: ${{ steps.upload.outputs.artifact-digest }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -102,7 +105,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
-    environment: ${{ needs.BUILD.environment }}
     defaults:
       run:
         shell: bash
@@ -191,13 +193,16 @@ jobs:
       pull-requests: read
     needs: [BUILD, BOOTSTRAP]
     runs-on: ubuntu-latest
-    environment: ${{ needs.BUILD.environment }}
+    environment: ${{ needs.BUILD.envs.ENVIRONMENT }}
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
       build_ref: ${{ steps.check_status.outputs.build_ref }}
       build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
-      build_artifact_filename: ${{ steps.check_status.outputs.build_artifact_filename }}
+      build-artifact-filename: ${{ steps.check_status.outputs.build_artifact_filename }}
+      build-artifact-id: ${{ needs.BUILD.outputs.artifact-id }}
+      build-artifact-url: ${{ needs.BUILD.outputs.artifact-url }}
+      build-artifact-digest: ${{ needs.BUILD.outputs.artifact-digest }}
       environment: ${{ steps.check_status.outputs.build_environment }}
     steps:
       - id: check_status
@@ -207,10 +212,16 @@ jobs:
           else
             printf "%s\n" "build_success=false" >> "BUILD-info.txt"
           fi
+          printf "%s\n" "build_url=${{ github.api_url }}" >> "BUILD-info.txt"
           printf "%s\n" "build_ref=${{ github.ref }}" >> "BUILD-info.txt"
+          printf "%s\n" "build_sha=${{ github.sha }}" >> "BUILD-info.txt"
           printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "BUILD-info.txt"
           printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "BUILD-info.txt"
+          printf "%s\n" "build_artifact_url=${{ needs.BUILD.outputs.artifact-url }}" >> "BUILD-info.txt"
+          printf "%s\n" "build_artifact_id=${{ needs.BUILD.outputs.artifact-id }}" >> "BUILD-info.txt"
+          printf "%s\n" "build_artifact_digest=${{ needs.BUILD.outputs.artifact-digest }}" >> "BUILD-info.txt"
           printf "%s\n" "build_environment=${ENVIRONMENT}" >> "BUILD-info.txt"
+          printf "%s\n" "build_id=${{ github.run_id }}" >> "BUILD-info.txt"
           cat <"BUILD-info.txt" >> "$GITHUB_OUTPUT"
       - name: Download All Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -220,11 +231,11 @@ jobs:
           merge-multiple: true
       - run: ls -R dist
       - name: Upload build summary
-        id: upload
+        id: upload-build-info
         if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           path: "BUILD-info.txt"
-          name: multicast-info-${{ github.sha }}.txt.zip
+          name: multicast-info-${{ github.sha }}.txt
           compression-level: 3
           overwrite: true
