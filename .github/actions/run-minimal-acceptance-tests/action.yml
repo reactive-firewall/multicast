@@ -66,12 +66,12 @@ runs:
       shell: bash
       run: |
         if [[ -z $PYTHON_VERSION_INPUT ]]; then
-          printf "python-version=%s\n" "${PYTHON_VERSION}" >> "$GITHUB_OUTPUT"
+          printf "python-version=%s\n" "${PYTHON_VERSION_INPUT}" >> "$GITHUB_OUTPUT"
+          PYTHON_VERSION=${PYTHON_VERSION_INPUT}
         else
           printf "python-version=%s\n" "${PYTHON_VERSION}" >> "$GITHUB_OUTPUT"
         fi
         printf "%s\n" "PYTHON_VERSION=${PYTHON_VERSION}" >> "$GITHUB_ENV"
-        printf "%s\n" "PYTHON=$(command -vp python${PYTHON_VERSION})" >> "$GITHUB_ENV"
     - name: "Prepare Artifact Name"
       id: output_artifact_name
       if: ${{ !cancelled() }}
