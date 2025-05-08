@@ -143,6 +143,9 @@ runs:
       if: ${{ success() }}
     - name: Summarize Build (FAILED)
       id: summarize-fetch-build-failure
+      env:
+        BUILD_ID: ${{ inputs.build-run-id }}
+        BUILD_SHA: ${{ steps.output_sha.outputs.sha }}
       run: |
-        echo "- [ ] ~BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "$GITHUB_STEP_SUMMARY"
+        echo "- [ ] ~BUILD ${BUILD_ID} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "$GITHUB_STEP_SUMMARY"
       if: ${{ failure() }}
