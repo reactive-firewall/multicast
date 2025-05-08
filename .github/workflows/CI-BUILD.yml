@@ -208,21 +208,21 @@ jobs:
       - id: check_status
         run: |
           if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
-            printf "%s\n" "build_success=true" > "BUILD-info.txt"
+            printf "%s\n" "build_success=true" >> "$GITHUB_OUTPUT"
           else
-            printf "%s\n" "build_success=false" >> "BUILD-info.txt"
+            printf "%s\n" "build_success=false" >> "$GITHUB_OUTPUT"
           fi
-          printf "%s\n" "build_url=${{ github.api_url }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_ref=${{ github.ref }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_sha=${{ github.sha }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "BUILD-info.txt"
-          printf "%s\n" "build_artifact_url=${{ needs.BUILD.outputs.artifact-url }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_artifact_id=${{ needs.BUILD.outputs.artifact-id }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_artifact_digest=${{ needs.BUILD.outputs.artifact-digest }}" >> "BUILD-info.txt"
-          printf "%s\n" "build_environment=${ENVIRONMENT}" >> "BUILD-info.txt"
-          printf "%s\n" "build_id=${{ github.run_id }}" >> "BUILD-info.txt"
-          cat <"BUILD-info.txt" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_url=${{ github.api_url }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_ref=${{ github.ref }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_ref_name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_artifact_filename=multicast-build-${{ github.sha }}.zip" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_artifact_url=${{ needs.BUILD.outputs.artifact-url }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_artifact_id=${{ needs.BUILD.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_artifact_digest=${{ needs.BUILD.outputs.artifact-digest }}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "build_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          cat <"$GITHUB_OUTPUT" >> "BUILD-info.txt"
       - name: Download All Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -236,6 +236,8 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           path: "BUILD-info.txt"
-          name: multicast-info-${{ github.sha }}.txt
+          name: multicast-info-${{ github.sha }}
+          if-no-files-found: error
           compression-level: 3
+          retention-days: 2
           overwrite: true

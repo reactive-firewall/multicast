@@ -39,13 +39,21 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
-      head_branch: ${{ steps.get_sha.outputs.head_branch }}
-      sha: ${{ steps.get_sha.outputs.head_sha }}
+      sha: ${{ steps.load_build_info.outputs.build_sha }}
       branch_name: ${{ steps.get_env.outputs.branch }}
       parent_sha: ${{ steps.get_env.outputs.parent_sha }}
       branch_ref: ${{ steps.get_env.outputs.branch_ref }}
       trigger_id: ${{ steps.get_trigger_id.outputs.trigger_id }}
-      build_environment: "Testing"
+      build_id: ${{ steps.load_build_info.outputs.build_id }}
+      build_url: ${{ steps.load_build_info.outputs.build_url }}
+      build_ref: ${{ steps.load_build_info.outputs.build_ref }}
+      build_ref_name: ${{ steps.load_build_info.outputs.build_ref_name }}
+      build_sha: ${{ steps.load_build_info.outputs.build_sha }}
+      build_artifact_filename: ${{ steps.load_build_info.outputs.build_artifact_filename }}
+      build_artifact_url: ${{ steps.load_build_info.outputs.build_artifact_url }}
+      build_artifact_id: ${{ steps.load_build_info.outputs.build_artifact_id }}
+      build_artifact_digest: ${{ steps.load_build_info.outputs.build_artifact_digest }}
+      build_environment: ${{ steps.load_build_info.outputs.build_environment }}
     steps:
       - id: check
         run: |
@@ -68,38 +76,29 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: "BUILD-info.txt"
-          pattern: multicast-info-*.txt
+          pattern: multicast-info-*
           repository: reactive-firewall/multicast
           merge-multiple: true
           github-token: ${{ env.GH_TOKEN }}
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       - name: "move into place"
+        id: load_build_info
         run: |
           mv -vf "BUILD-info.txt/BUILD-info.txt" ./"multicast-info.txt" ;
           wait ;
           rmdir -v ./"BUILD-info.txt"
           mv -vf ./"multicast-info.txt" ./BUILD-info.txt
-      - id: get_sha
-        env:
-          BRANCH_VALUE: ${{ github.event.workflow_run.head_branch }}
-          SHA_VALUE: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          if [[ -n "$BRANCH_VALUE" ]]; then
-            echo "head_branch=$BRANCH_VALUE" >> "$GITHUB_OUTPUT"
-            echo "head_sha=$SHA_VALUE" >> "$GITHUB_OUTPUT"
-          else
-            echo "head_branch='undefined'" >> "$GITHUB_OUTPUT"  # Default fallback
-            echo "head_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"  # Default fallback
-          fi
+          cat <"BUILD-info.txt" >> "$GITHUB_OUTPUT"
         if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+          ref: ${{ steps.load_build_info.outputs.build_sha }}
           fetch-depth: 0
       - name: Checkout target commit
         if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
-        run: git checkout ${{ steps.get_sha.outputs.head_sha }}
+        run: git checkout ${{ steps.load_build_info.outputs.build_sha }}
       - id: get_env
         if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
         run: |
