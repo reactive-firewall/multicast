@@ -144,21 +144,6 @@ jobs:
           build-run-id: ${{ needs.check_build.outputs.trigger_id }}
           python-version: ${{ matrix.python-version }}
           path: ${{ github.workspace }}
-      - name: Summarize MATs for python ${{ matrix.python-version }}
-        id: summarize-fetch-build-success
-        env:
-          BUILD_ARTIFACT_NAME: ${{ steps.fetch-build.outputs.artifact-name }}
-          BUILD_ARTIFACT_FILES: ${{ steps.fetch-build.outputs.artifact-files }}
-        run: |
-          echo "- [x] BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" > "$GITHUB_STEP_SUMMARY"
-          echo "    * Including building the files ${BUILD_ARTIFACT_FILES}" >> "$GITHUB_STEP_SUMMARY"
-          echo "    * Including producing the build artifact ${BUILD_ARTIFACT_NAME}" >> "$GITHUB_STEP_SUMMARY"
-        if: ${{ success() }}
-      - name: Summarize MATs for python ${{ matrix.python-version }} (FAILED)
-        id: summarize-fetch-build-failure
-        run: |
-          echo "- [ ] ~BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}~" > "$GITHUB_STEP_SUMMARY"
-        if: ${{ failure() }}
       - name: Run Tests for python ${{ matrix.python-version }}
         id: tests
         run: make -j1 -f Makefile test-mats ;
@@ -233,6 +218,6 @@ jobs:
             echo "## :red_circle: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
-            echo "mats_success=false" >> "$GITHUB_STEP_SUMMARY"
+            echo "mats_success=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
