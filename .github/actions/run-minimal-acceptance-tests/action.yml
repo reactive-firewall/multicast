@@ -145,7 +145,7 @@ runs:
         printf "%s\n" "::endgroup::"
     - name: "Evaluate MATs"
       id: mats_outcome
-      if: ${{ !canceled() }}
+      if: ${{ !cancelled() }}
       shell: bash
       run: |
         if [[ "${{ steps.mats_build.outcome }}" == "success" ]] ; then
