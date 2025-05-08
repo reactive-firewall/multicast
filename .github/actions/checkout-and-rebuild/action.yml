@@ -3,7 +3,7 @@ name: 'Checkout and use Build'
 description: 'checks-out the given commit and fetches the build artifact'
 author: 'Mr. Walls'
 branding:
-  icon: 'chevron-down'
+  icon: 'download-cloud'
   color: 'blue'
 inputs:
   sha:
@@ -90,7 +90,10 @@ runs:
       if: ${{ !cancelled() }}
     - name: "Install Test Dependencies"
       shell: bash
-      run: make -j1 -f Makefile test-reqs ;
+      run: |
+        printf "%s\n" "::group::prep-test-reqs"
+        make -j1 -f Makefile test-reqs || exit 1
+        printf "%s\n" "::endgroup::"
     - id: output_artifact_name
       if: ${{ success() }}
       shell: bash
@@ -121,7 +124,7 @@ runs:
         else
           printf "%s\n" "Built files found:"
           printf "%s\n" "$FILES"
-          # Replace line breaks with commas for GitHub Action Output
+          # Replace line breaks with spaces for GitHub Action Output
           FILES="${FILES//$'\n'/ }"
           printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           exit 0
@@ -135,12 +138,12 @@ runs:
       shell: bash
       run: |
         echo "- [x] BUILD \`${BUILD_ID}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" > "$GITHUB_STEP_SUMMARY"
-        if [[ ( -d dist ) ]] ; then \
-        for BLD_FILE in ${BUILD_ARTIFACT_FILES} ; do\
-        printf "%s\n" "    * Including building the file \`${BLD_FILE}\`" >> "$GITHUB_STEP_SUMMARY" ;\
-        done ;\
-        printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_SHA}#artifacts)" >> "$GITHUB_STEP_SUMMARY" ;\
-        fi ;
+        if [[ ( -d dist ) ]] ; then
+          for BLD_FILE in ${BUILD_ARTIFACT_FILES} ; do
+            printf "%s\n" "    * Including building the file \`${BLD_FILE}\`" >> "$GITHUB_STEP_SUMMARY"
+          done
+          printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_SHA}#artifacts)" >> "$GITHUB_STEP_SUMMARY"
+        fi
       if: ${{ success() }}
     - name: "Summarize Build (FAILED)"
       id: summarize-fetch-build-failure

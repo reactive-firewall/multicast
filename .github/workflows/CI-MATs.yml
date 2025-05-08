@@ -146,24 +146,16 @@ jobs:
           path: ${{ github.workspace }}
       - name: Run Tests for python ${{ matrix.python-version }}
         id: tests
-        run: make -j1 -f Makefile test-mats ;
-        if: ${{ !cancelled() }}
-      - name: Summarize MATs for python ${{ matrix.python-version }}
-        id: summarize-mats-success
-        run: |
-          echo "- [x] MATS succeeded with python version ${{ matrix.python-version }}" >> "$GITHUB_STEP_SUMMARY"
-        if: ${{ success() }}
-      - name: Summarize MATs for python ${{ matrix.python-version }} (FAILED)
-        id: summarize-mats-failure
-        run: |
-          echo "- [ ] ~MATS succeeded with python version ${{ matrix.python-version }}~" >> "$GITHUB_STEP_SUMMARY"
-        if: ${{ failure() }}
+        uses: ./.github/actions/run-minimal-acceptance-tests
+        with:
+          sha: ${{ needs.check_build.outputs.sha }}
+          python-version: ${{ matrix.python-version }}
       - name: Post-Clean
         id: post
         run: make -j1 -f Makefile clean || true ;
         if: ${{ always() }}
 
-  MATS_STATUS:
+  MATs_SUMMARY:
     permissions:
       actions: read
       pull-requests: read
@@ -171,13 +163,20 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     outputs:
-      mats_success: ${{ steps.check_status.outputs.mats_success }}
+      mats_success: ${{ steps.report_status.outputs.mats_success }}
       mats_sha: ${{ needs.check_build.outputs.sha }}
-      build_success: ${{ steps.check_status.outputs.build_success }}
+      build_success: ${{ steps.report_status.outputs.build_success }}
       build_trigger_id: ${{ needs.check_build.outputs.trigger_id }}
       build_sha: ${{ needs.check_build.outputs.sha }}
     steps:
-      - id: check_status
+      - name: Download All Artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: ${{ github.workspace }}/MATS
+          pattern: multicast-mats-${{ needs.check_build.outputs.sha }}-part-*
+          merge-multiple: true
+      - run: ls -R MATS
+      - id: report_status
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
             echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
@@ -221,3 +220,60 @@ jobs:
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
+
+  MATS_STATUS:
+    permissions:
+      actions: read
+      pull-requests: read
+    needs: [check_build, MATS]
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    outputs:
+      mats_success: ${{ steps.check_status.outputs.mats_success }}
+      mats_sha: ${{ needs.check_build.outputs.sha }}
+      build_success: ${{ steps.check_status.outputs.build_success }}
+      build_trigger_id: ${{ needs.check_build.outputs.trigger_id }}
+      build_sha: ${{ needs.check_build.outputs.sha }}
+    steps:
+      - id: check_status
+        run: |
+          if [[ "${{ needs.check_build.result }}" == "success" ]]; then
+            printf "%s\n" "build_success=${{ needs.check_build.outputs.should_run }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "parent_sha=${{ needs.check_build.outputs.parent_sha }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_url=${{ needs.check_build.outputs.build_url }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_ref=${{ needs.check_build.outputs.build_ref }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_sha=${{ needs.check_build.outputs.build_sha }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_ref_name=${{ needs.check_build.outputs.build_ref_name }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_artifact_filename=${{ needs.check_build.outputs.build_artifact_filename }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_artifact_url=${{ needs.check_build.outputs.build_artifact_url }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_artifact_id=${{ needs.check_build.outputs.build_artifact_id }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_artifact_digest=${{ needs.check_build.outputs.build_artifact_digest }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_environment=${{ needs.check_build.outputs.build_environment }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_id=${{ needs.check_build.outputs.build_id }}" >> "$GITHUB_OUTPUT"
+            cat <"$GITHUB_OUTPUT" >> "BUILD-info.txt"
+          else
+            printf "%s\n" "build_success=false" >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "${{ needs.MATS.result }}" == "success" && "${{ needs.check_build.result }}" == "success" ]]; then
+            printf "%s\n" "mats_success=true" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_url=${{ github.api_url }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_ref=${{ needs.check_build.outputs.build_ref }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_sha=${{ needs.check_build.outputs.sha }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_ref_name=${{ needs.check_build.outputs.branch_ref }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_environment=${{ needs.check_build.outputs.build_environment }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "mats_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          else
+            printf "%s\n" "mats_success=false" >> "$GITHUB_OUTPUT"
+          fi
+          cat <"$GITHUB_OUTPUT" >> "multicast-info.txt"
+      - name: Upload build summary
+        id: upload-build-info
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          path: "multicast-info.txt"
+          name: multicast-info-${{ github.sha }}
+          if-no-files-found: error
+          compression-level: 3
+          retention-days: 2
+          overwrite: true
