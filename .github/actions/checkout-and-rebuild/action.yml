@@ -126,12 +126,13 @@ runs:
           printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           exit 0
         fi
-    - name: Summarize Build
+    - name: "Summarize Build"
       id: summarize-fetch-build-success
       env:
         BUILD_ID: ${{ inputs.build-run-id }}
         BUILD_SHA: ${{ steps.output_sha.outputs.sha }}
         BUILD_ARTIFACT_FILES: ${{ steps.output_artifact_files.outputs.files }}
+      shell: bash
       run: |
         echo "- [x] BUILD \`${BUILD_ID}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" > "$GITHUB_STEP_SUMMARY"
         if [[ ( -d dist ) ]] ; then \
@@ -141,11 +142,12 @@ runs:
         printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_SHA}#artifacts)" >> "$GITHUB_STEP_SUMMARY" ;\
         fi ;
       if: ${{ success() }}
-    - name: Summarize Build (FAILED)
+    - name: "Summarize Build (FAILED)"
       id: summarize-fetch-build-failure
       env:
         BUILD_ID: ${{ inputs.build-run-id }}
         BUILD_SHA: ${{ steps.output_sha.outputs.sha }}
+      shell: bash
       run: |
         echo "- [ ] ~BUILD ${BUILD_ID} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "$GITHUB_STEP_SUMMARY"
       if: ${{ failure() }}
