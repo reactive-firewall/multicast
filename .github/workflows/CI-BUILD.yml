@@ -250,21 +250,16 @@ jobs:
           BUILD_ARTIFACT_FILES: ${{ steps.output_artifact_files.outputs.files }}
         shell: bash
         run: |
-          printf "%s\n" "## :building_construction: Build" > "$GITHUB_STEP_SUMMARY"
-          printf "%s\n" ":ballot_box_with_check: BUILD \`${BUILD_ID}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "## :building_construction: Build" > "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
+          printf "%s\n" ":ballot_box_with_check: BUILD \`${BUILD_ID}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
           if [[ ( -d dist ) ]] ; then
             for BLD_FILE in ${BUILD_ARTIFACT_FILES} ; do
-              printf "%s\n" "    * Including building the file \`${BLD_FILE}\`" >> "$GITHUB_STEP_SUMMARY"
+              printf "%s\n" "    * Including building the file \`${BLD_FILE}\`" >> "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
             done
-            printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_ID}#artifacts)" >> "$GITHUB_STEP_SUMMARY"
+            printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_ID}#artifacts)" >> "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
           fi
-          cat <"$GITHUB_STEP_SUMMARY" >> "BUILD_COMMENT_BODY_${BODY_SHA}.md"
+          cat <"${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ success() && (github.repository == 'reactive-firewall/multicast') }}
-      - name: "Build commit comment"
-        id: mats_commit_comment
-        uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
-        with:
-          body-path: 'BUILD_COMMENT_BODY_${{ github.sha }}.md'
       - name: "Summarize Build (FAILED)"
         id: summarize-build-failure
         env:
@@ -272,6 +267,13 @@ jobs:
           BUILD_SHA: ${{ github.sha }}
         shell: bash
         run: |
-          printf "%s\n" "## :construction: Build" > "$GITHUB_STEP_SUMMARY"
-          printf "%s\n" ":x: ~BUILD ${BUILD_ID} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "## :construction: Build" > "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
+          printf "%s\n" ":x: ~BUILD ${BUILD_ID} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md"
+          cat <"${{ github.workspace }}/BUILD_COMMENT_BODY_${BODY_SHA}.md" >> "$GITHUB_STEP_SUMMARY"
         if: ${{ failure() && (github.repository == 'reactive-firewall/multicast') }}
+      - name: "Build commit comment"
+        if: ${{ success() && (github.repository == 'reactive-firewall/multicast') }}
+        id: mats_commit_comment
+        uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
+        with:
+          body-path: '${{ github.workspace }}/BUILD_COMMENT_BODY_${{ github.sha }}.md'
