@@ -66,7 +66,7 @@ jobs:
         run: |
           git clone --depth 1 --branch main https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
-          EXPECTED_SHA="69ffff7be08967c6f9c3b0f536014dd97d257af1" # v0.2.2+18
+          EXPECTED_SHA="e11578c51935b2d95ecc1bee292b6a5aa93ae054" # v0.2.2+20
           ACTUAL_SHA=$(git rev-parse HEAD)
           if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
             ERR_MSG_STUB="Checkmake repository hash verification failed."
