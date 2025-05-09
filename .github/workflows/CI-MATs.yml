@@ -187,8 +187,6 @@ jobs:
           mv -vf "MATS/test-reports" ./"test-reports" || : ;
         if: ${{ (needs.check_build.outputs.should_run == 'true') && success() }}
       - id: report_status
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
             echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
@@ -213,9 +211,6 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
-            MATS_COMMENT_BODY=$(cat <"$GITHUB_STEP_SUMMARY");
-            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body="${MATS_COMMENT_BODY}" ;
-            exit 0
           else
             echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -245,10 +240,16 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
-            MATS_COMMENT_BODY=$(cat <"$GITHUB_STEP_SUMMARY");
-            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body="${MATS_COMMENT_BODY}" ;
-            exit 1
           fi
+          cat <"$GITHUB_STEP_SUMMARY" >> "MATS_COMMENT_BODY_${{ needs.check_build.outputs.sha }}.md"
+      - name: "MATs commit comment"
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        id: mats_commit_comment
+        uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
+        with:
+          sha: ${{ needs.check_build.outputs.sha }}
+          token: ${{ github.token }}
+          body-path: 'MATS_COMMENT_BODY_${{ needs.check_build.outputs.sha }}.md'
 
   MATS_STATUS:
     permissions:
