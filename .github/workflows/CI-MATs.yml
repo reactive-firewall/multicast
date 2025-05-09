@@ -125,7 +125,7 @@ jobs:
       matrix:
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     outputs:
-      mats_status: ${{ steps.tests.outcome }}
+      mats_status: ${{ steps.tests.outputs.mats_status }}
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
@@ -179,7 +179,7 @@ jobs:
         shell: bash
         run: |
           mv -vf "MATS/test-reports" ./"test-reports" || : ;
-        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
+        if: ${{ (steps.check_build.outputs.should_run == 'true') && success() }}
       - id: report_status
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
@@ -188,7 +188,8 @@ jobs:
             echo "## :building_construction: Build" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
-              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              BUILD_SHA="${{ needs.check_build.outputs.sha }}"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}]((https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "$GITHUB_STEP_SUMMARY"
               echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
               echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
