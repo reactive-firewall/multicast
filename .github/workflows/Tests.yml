@@ -508,7 +508,7 @@ jobs:
       security-events: none
     environment: ${{ needs.check_mats.outputs.mats_environment }}
     if: ${{ !cancelled() && success() }}
-    needs: [COVERAGE, STYLE]
+    needs: [check_mats, COVERAGE, STYLE]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -595,7 +595,7 @@ jobs:
       security-events: none
     environment: ${{ needs.check_mats.outputs.mats_environment }}
     if: ${{ !cancelled() && (needs.check_mats.outputs.mats_environment == 'Testing' || needs.check_mats.outputs.mats_environment == 'Deployment') }}
-    needs: [COVERAGE, STYLE]
+    needs: [check_mats, COVERAGE, STYLE]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -660,7 +660,7 @@ jobs:
       security-events: none
     if: ${{ success() && needs.check_mats.outputs.should_run == 'true' }}
     environment: ${{ needs.check_mats.outputs.mats_environment }}
-    needs: [STYLE, COVERAGE, INTEGRATION]
+    needs: [check_mats, STYLE, COVERAGE, INTEGRATION]
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
