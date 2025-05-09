@@ -175,7 +175,11 @@ jobs:
           path: ${{ github.workspace }}/MATS
           pattern: multicast-mats-${{ needs.check_build.outputs.sha }}-part-*
           merge-multiple: true
-      - run: ls -R MATS
+      - name: "move into place"
+        shell: bash
+        run: |
+          mv -vf "MATS/test-reports" ./"test-reports" || : ;
+        if: ${{ (steps.check.outputs.should_run == 'true') && success() }}
       - id: report_status
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
@@ -193,9 +197,12 @@ jobs:
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
-            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
-            echo " :ballot_box_with_check: MATS succeeded with python version ${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
             exit 0
           else
@@ -217,6 +224,15 @@ jobs:
             echo "## :red_circle: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
