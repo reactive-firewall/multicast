@@ -211,7 +211,8 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
-            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body=$(cat <"$GITHUB_STEP_SUMMARY") ;
+            MATS_COMMENT_BODY=$(cat <"$GITHUB_STEP_SUMMARY");
+            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body="${MATS_COMMENT_BODY}" ;
             exit 0
           else
             echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
@@ -242,7 +243,8 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
-            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body=$(cat <"$GITHUB_STEP_SUMMARY") ;
+            MATS_COMMENT_BODY=$(cat <"$GITHUB_STEP_SUMMARY");
+            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body="${MATS_COMMENT_BODY}" ;
             exit 1
           fi
 
