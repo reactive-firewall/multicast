@@ -57,7 +57,9 @@ runs:
     - name: "Calculate Commit SHA"
       id: output_sha
       shell: bash
-      run: printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
+      run: |
+        printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
+        printf "BUILD_SHA=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_ENV"
     - name: "Setup Python"
       id: output_python
       if: ${{ !cancelled() }}
@@ -189,10 +191,10 @@ runs:
       shell: bash
       run: |
         if [[ "${{ steps.mats_outcome.outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * :ballot_box_with_check: MATS succeeded with python version ${PYTHON_VERSION}" > "$MATS_STEP_SUMMARY"
+          printf "%s\n" "  * :ballot_box_with_check: MATS succeeded with python version ${PYTHON_VERSION} for [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" > "$MATS_STEP_SUMMARY"
           printf "%s\n" " :ballot_box_with_check: MATS succeeded with python version ${PYTHON_VERSION}" >> "$GITHUB_STEP_SUMMARY"
         else
-          printf "%s\n" "  * :x: ~MATS succeeded with python version ${PYTHON_VERSION}~" > "$MATS_STEP_SUMMARY"
+          printf "%s\n" "  * :x: ~MATS succeeded with python version ${PYTHON_VERSION} for ${BUILD_SHA}~" > "$MATS_STEP_SUMMARY"
           printf "%s\n" " :x: ~MATS succeeded with python version ${PYTHON_VERSION}~" >> "$GITHUB_STEP_SUMMARY"
         fi
         if [[ "${{ steps.mats_build.outcome }}" == "success" ]] ; then
