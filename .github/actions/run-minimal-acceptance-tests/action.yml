@@ -252,7 +252,8 @@ runs:
           printf "%s\n" "MATs files found:"
           printf "%s\n" "$FILES"
           mkdir MATS || :
-          printf "%s\n" "$FILES" | xargs -L1 -I{} cp -f "{}" "MATS/{}" || :
+          mkdir MATS/test-reports || :
+          printf "%s\n" "$FILES" | xargs -I{} cp -f "{}" "MATS/{}" || :
           # Replace line breaks with spaces for GitHub Action Output
           FILES="${FILES//$'\n'/ }"
           printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
