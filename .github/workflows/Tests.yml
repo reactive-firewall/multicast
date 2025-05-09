@@ -48,7 +48,13 @@ jobs:
       build_artifact_id: ${{ steps.load_build_info.outputs.build_artifact_id }}
       build_artifact_digest: ${{ steps.load_build_info.outputs.build_artifact_digest }}
       build_environment: ${{ steps.load_build_info.outputs.build_environment }}
-      mats_environment: ${{ steps.load_build_info.outputs.build_environment }}
+      mats_environment: ${{ steps.load_build_info.outputs.mats_environment }}
+      mats_id: ${{ steps.load_build_info.outputs.mats_id }}
+      mats_url: ${{ steps.load_build_info.outputs.mats_url }}
+      mats_ref: ${{ steps.load_build_info.outputs.mats_ref }}
+      mats_ref_name: ${{ steps.load_build_info.outputs.mats_ref_name }}
+      mats_sha: ${{ steps.load_build_info.outputs.mats_sha }}
+      mats_success: ${{ steps.load_build_info.outputs.mats_success }}
     steps:
       - id: check
         run: |

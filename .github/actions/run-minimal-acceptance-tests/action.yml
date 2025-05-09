@@ -282,4 +282,5 @@ runs:
       if: ${{ failure() }}
       shell: bash
       run: |
-        rm -fRd ./MATs 2>/dev/null || :
+        rm -fRd ./MATs 2>/dev/null
+        exit 1

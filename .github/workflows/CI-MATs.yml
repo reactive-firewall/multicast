@@ -126,6 +126,12 @@ jobs:
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
     outputs:
       mats_status: ${{ steps.tests.outputs.mats_status }}
+      python-version: ${{ steps.tests.outputs.python-version }}
+      artifact-id: ${{ steps.tests.outputs.artifact-id }}
+      artifact-name: ${{ steps.tests.outputs.artifact-name }}
+      artifact-url: ${{ steps.tests.outputs.artifact-url }}
+      artifact-digest: ${{ steps.tests.outputs.artifact-digest }}
+      artifact-files: ${{ steps.tests.outputs.artifact-files }}
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
@@ -161,7 +167,7 @@ jobs:
       pull-requests: read
     needs: [check_build, MATS]
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (needs.check_build.outputs.should_run == 'true') && (needs.MATS.outputs.mats_status != 'cancelled') }}
     outputs:
       mats_success: ${{ steps.report_status.outputs.mats_success }}
       mats_sha: ${{ needs.check_build.outputs.sha }}
@@ -189,7 +195,7 @@ jobs:
             echo "" >> "$GITHUB_STEP_SUMMARY"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
               BUILD_SHA="${{ needs.check_build.outputs.sha }}"
-              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}]((https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "$GITHUB_STEP_SUMMARY"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "$GITHUB_STEP_SUMMARY"
               echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
               echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
@@ -205,6 +211,7 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
+            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body=$(cat <"$GITHUB_STEP_SUMMARY") ;
             exit 0
           else
             echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
@@ -215,7 +222,7 @@ jobs:
             echo "## :construction: Build" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
-              echo " :ballot_box_with_check: BUILD ${{ needs.check_build.outputs.trigger_id }} succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
               echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
               echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
@@ -235,6 +242,7 @@ jobs:
             cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
+            gh api repos/reactive-firewall/multicast/commits/${BUILD_SHA}/comments -f body=$(cat <"$GITHUB_STEP_SUMMARY") ;
             exit 1
           fi
 
@@ -244,7 +252,8 @@ jobs:
       pull-requests: read
     needs: [check_build, MATS]
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (needs.check_build.outputs.should_run == 'true') && (needs.MATS.outputs.mats_status != 'cancelled') }}
+    environment: ${{ needs.check_build.outputs.build_environment }}
     outputs:
       mats_success: ${{ steps.check_status.outputs.mats_success }}
       mats_sha: ${{ needs.check_build.outputs.sha }}
@@ -289,7 +298,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           path: "multicast-info.txt"
-          name: multicast-info-${{ github.sha }}
+          name: multicast-info-${{ needs.check_build.outputs.sha }}
           if-no-files-found: error
           compression-level: 3
           retention-days: 2
