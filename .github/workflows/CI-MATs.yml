@@ -179,7 +179,7 @@ jobs:
         shell: bash
         run: |
           mv -vf "MATS/test-reports" ./"test-reports" || : ;
-        if: ${{ (steps.check_build.outputs.should_run == 'true') && success() }}
+        if: ${{ (needs.check_build.outputs.should_run == 'true') && success() }}
       - id: report_status
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
@@ -198,11 +198,11 @@ jobs:
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
             exit 0
@@ -228,11 +228,11 @@ jobs:
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}" >> "$GITHUB_STEP_SUMMARY"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
             exit 1
