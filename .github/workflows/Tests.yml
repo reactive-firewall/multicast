@@ -120,20 +120,20 @@ jobs:
       COV_CORE_CONFIG: ./.coveragerc
       COV_CORE_DATAFILE: ./coverage.xml
     steps:
-      - name: pre-checkout repository for actions
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
-          ref: ${{ needs.check_mats.outputs.build_sha }}
-          sparse-checkout: '.github/actions/checkout-and-rebuild'
-      - name: Checkout repository for MATs with ${{ matrix.python-version }}
-        id: fetch-build
-        uses: ./.github/actions/checkout-and-rebuild
-        with:
-          sha: ${{ needs.check_mats.outputs.build_sha }}
-          build-run-id: ${{ needs.check_mats.outputs.build_id }}
-          python-version: ${{ matrix.python-version }}
-          path: ${{ github.workspace }}
+    - name: pre-checkout repository for actions
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
+        ref: ${{ needs.check_mats.outputs.build_sha }}
+        sparse-checkout: '.github/actions/checkout-and-rebuild'
+    - name: Checkout repository for MATs with ${{ matrix.python-version }}
+      id: fetch-build
+      uses: ./.github/actions/checkout-and-rebuild
+      with:
+        sha: ${{ needs.check_mats.outputs.build_sha }}
+        build-run-id: ${{ needs.check_mats.outputs.build_id }}
+        python-version: ${{ matrix.python-version }}
+        path: ${{ github.workspace }}
     - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
       uses: ./.github/actions/upgrade-windows-pip
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
