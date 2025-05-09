@@ -248,6 +248,7 @@ jobs:
           BUILD_ID: ${{ github.run_id }}
           BUILD_SHA: ${{ github.sha }}
           BUILD_ARTIFACT_FILES: ${{ steps.output_artifact_files.outputs.files }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           printf "%s\n" "## :building_construction: Build" > "$GITHUB_STEP_SUMMARY"
@@ -266,6 +267,7 @@ jobs:
         env:
           BUILD_ID: ${{ github.run_id }}
           BUILD_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           printf "%s\n" "## :construction: Build" > "$GITHUB_STEP_SUMMARY"

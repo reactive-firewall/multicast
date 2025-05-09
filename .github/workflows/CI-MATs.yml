@@ -187,6 +187,8 @@ jobs:
           mv -vf "MATS/test-reports" ./"test-reports" || : ;
         if: ${{ (needs.check_build.outputs.should_run == 'true') && success() }}
       - id: report_status
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
             echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
