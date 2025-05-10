@@ -67,8 +67,34 @@ __all__ = [
 	"""hear.McastHEAR""",  # skipcq: PYL-E0603 -- imports ok
 ]
 
+__path__ = [__file__[0:-12]]
+"""The sequence of strings enumerating the locations where the package’s submodules will be found.
+
+	The `__path__` attribute, like many dunder attributes, is associated with the implementation
+	of Python language features. When utilizing this module as an imported module or a
+	command-line interface (CLI) tool, the `__path__` attribute can be safely disregarded.
+
+	Minimal Acceptance Testing:
+
+	First set up test fixtures by importing multicast.
+
+		>>> import multicast as _multicast
+		>>>
+
+		>>> _multicast.__path__ is not None
+		True
+		>>>
+
+"""
+
 __package__ = "multicast"  # skipcq: PYL-W0622
 """The package of this program.
+
+	The `__package__` attribute, like many dunder attributes, was associated with the implementation
+	of Python language features. When utilizing this module as an imported module or a
+	command-line interface (CLI) tool, the `__package__` attribute can be safely disregarded.
+	Within the context of this module, `__package__` serves as a convenient constant that holds
+	the name of the package.
 
 	Minimal Acceptance Testing:
 
@@ -81,10 +107,31 @@ __package__ = "multicast"  # skipcq: PYL-W0622
 		True
 		>>>
 
+	Testcase 0: multicast.__package__ should be the string "multicast".
+		A: Test that the __package__ attribute is initialized.
+		B: Test that the __package__ attribute is a string.
+		C: Test that the __package__ attribute has a value of "multicast".
+
+		>>> _multicast.__package__ is not None
+		True
+		>>> type(_multicast.__package__) == type(str())
+		True
+		>>> type(_multicast.__package__)
+		<class 'str'>
+		>>> _multicast.__package__
+		"multicast"
+		>>>
+
 """
 
 __module__ = "multicast"
 """The module of this program.
+
+	The `__module__` attribute, like many dunder attributes, is associated with the implementation
+	of Python language features. When utilizing this module as an imported module or a
+	command-line interface (CLI) tool, the `__module__` attribute can be safely disregarded.
+	Within the context of this module, `__module__` serves as a convenient constant that holds
+	the name of the module.
 
 	Minimal Acceptance Testing:
 
@@ -95,6 +142,21 @@ __module__ = "multicast"
 
 		>>> _multicast.__module__ is not None
 		True
+		>>>
+
+	Testcase 0: multicast.__module__ should be the string "multicast".
+		A: Test that the __module__ attribute is initialized.
+		B: Test that the __module__ attribute is a string.
+		C: Test that the __module__ attribute has a value of "multicast".
+
+		>>> _multicast.__module__ is not None
+		True
+		>>> type(_multicast.__module__) == type(str())
+		True
+		>>> type(_multicast.__module__)
+		<class 'str'>
+		>>> _multicast.__module__
+		"multicast"
 		>>>
 
 """
