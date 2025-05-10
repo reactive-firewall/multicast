@@ -248,7 +248,7 @@ jobs:
           BUILD_ID: ${{ github.run_id }}
           BUILD_SHA: ${{ github.sha }}
           BUILD_ARTIFACT_FILES: ${{ steps.output_artifact_files.outputs.files }}
-          BUILD_COMMENT_BODY: '${{ github.workspace }}/BUILD_COMMENT_BODY_${{ github.sha }}.md'
+          BUILD_COMMENT_BODY: '${{ github.workspace }}/Build-Summary-Artifact.txt'
         shell: bash
         run: |
           printf "%s\n" "## :building_construction: Build" > "${BUILD_COMMENT_BODY}"
@@ -260,28 +260,52 @@ jobs:
             printf "%s\n" "    * Including producing the build artifact [multicast-build-${BUILD_SHA}](https://github.com/reactive-firewall/multicast/actions/runs/${BUILD_ID}#artifacts)" >> "${BUILD_COMMENT_BODY}"
           fi
           cat <"${BUILD_COMMENT_BODY}" >> "$GITHUB_STEP_SUMMARY"
-          ls -lap "${BUILD_COMMENT_BODY}"
-          cat <"${BUILD_COMMENT_BODY}"
         if: ${{ success() && (github.repository == 'reactive-firewall/multicast') }}
       - name: "Summarize Build (FAILED)"
         id: summarize-build-failure
         env:
           BUILD_ID: ${{ github.run_id }}
           BUILD_SHA: ${{ github.sha }}
-          BUILD_COMMENT_BODY: '${{ github.workspace }}/BUILD_COMMENT_BODY_${{ github.sha }}.md'
+          BUILD_COMMENT_BODY: '${{ github.workspace }}/Build-Summary-Artifact.txt'
         shell: bash
         run: |
           printf "%s\n" "## :construction: Build" > "${BUILD_COMMENT_BODY}"
           printf "%s\n" ":x: ~BUILD ${BUILD_ID} succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})~" > "${BUILD_COMMENT_BODY}"
           cat <"${BUILD_COMMENT_BODY}" >> "$GITHUB_STEP_SUMMARY"
-          ls -lap "${BUILD_COMMENT_BODY}"
-          cat <"${BUILD_COMMENT_BODY}"
         if: ${{ failure() && (github.repository == 'reactive-firewall/multicast') }}
-      - name: "Build commit comment"
+      - name: Upload build summary
+        id: upload-build-summary
         if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
-        id: build_commit_comment
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          path: ./Build-Summary-Artifact.txt
+          name: BUILD-COMMENT-BODY-${{ github.sha }}
+          if-no-files-found: error
+          compression-level: 3
+          retention-days: 2
+          overwrite: true
+
+  BUILD_SUMMARY:
+    permissions:
+      actions: read
+      contents: write
+    needs: [BUILD, BUILD_STATUS]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.BUILD_STATUS.outputs.environment }}
+    if: ${{ !cancelled() }}
+    steps:
+      - name: "Download Status Summary Artifact"
+        id: download-build-summary
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: BUILD-COMMENT-BODY-${{ github.sha }}
+          github-token: ${{ github.token }}
+      - name: "Build commit comment"
+        id: build-commit-comment
+        if: ${{ success() && (github.repository == 'reactive-firewall/multicast') }}
         uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
         with:
           sha: ${{ github.sha }}
           token: ${{ github.token }}
-          body-path: '${{ github.workspace }}/BUILD_COMMENT_BODY_${{ github.sha }}.md'
+          body-path: '${{ steps.download-build-summary.outputs.download-path }}/Build-Summary-Artifact.txt'
