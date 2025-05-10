@@ -197,12 +197,11 @@ jobs:
             echo "## :building_construction: Build" >> "${MATS_COMMENT_BODY}"
             echo "" >> "${MATS_COMMENT_BODY}"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
-              BUILD_SHA="${{ needs.check_build.outputs.sha }}"
               echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "${MATS_COMMENT_BODY}"
-              echo "build_success=true" >> "${MATS_COMMENT_BODY}"
+              echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
               echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "${MATS_COMMENT_BODY}"
-              echo "build_success=false" >> "${MATS_COMMENT_BODY}"
+              echo "build_success=false" >> "$GITHUB_OUTPUT"
             fi
             echo "" >> "${MATS_COMMENT_BODY}"
             echo "## :1234: Minimal Acceptance Testing" >> "${MATS_COMMENT_BODY}"
@@ -223,7 +222,7 @@ jobs:
             echo "## :construction: Build" >> "${MATS_COMMENT_BODY}"
             echo "" >> "${MATS_COMMENT_BODY}"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
-              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "${MATS_COMMENT_BODY}"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "${MATS_COMMENT_BODY}"
               echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
               echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "${MATS_COMMENT_BODY}"

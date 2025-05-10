@@ -35,6 +35,30 @@ outputs:
   mats_status:
     description: "The outcome of evaluating the MATs steps"
     value: ${{ steps.mats_outcome.outcome || 'cancelled' }}
+  mats_build_status:
+    description: "The outcome of the MATs Build Group"
+    value: ${{ steps.mats_build.outcome || 'cancelled' }}
+  mats_bootstrap_status:
+    description: "The outcome of the MATs Bootstrap Group"
+    value: ${{ steps.mats_bootstrap.outcome || 'cancelled' }}
+  mats_basic_status:
+    description: "The outcome of the MATs Basic Group"
+    value: ${{ steps.mats_basic.outcome || 'cancelled' }}
+  mats_say_status:
+    description: "The outcome of the MATs SAY Group"
+    value: ${{ steps.mats_say.outcome || 'cancelled' }}
+  mats_hear_status:
+    description: "The outcome of the MATs HEAR Group"
+    value: ${{ steps.mats_hear.outcome || 'cancelled' }}
+  mats_usage_status:
+    description: "The outcome of the MATs Usage Group"
+    value: ${{ steps.mats_usage.outcome || 'cancelled' }}
+  mats_coverage_status:
+    description: "The outcome of the MATs Coverage Group"
+    value: ${{ steps.mats_coverage.outcome || 'cancelled' }}
+  mats_doctests_status:
+    description: "The outcome of the MATs DocTests Group"
+    value: ${{ steps.mats_doctests.outcome || 'cancelled' }}
   artifact-name:
     description: "The uploaded artifact-name"
     value: ${{ steps.output_artifact_name.outputs.artifact-name }}
@@ -191,11 +215,11 @@ runs:
       shell: bash
       run: |
         if [[ "${{ steps.mats_outcome.outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * :ballot_box_with_check: MATS succeeded with python version ${PYTHON_VERSION} for [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" > "$MATS_STEP_SUMMARY"
-          printf "%s\n" " :ballot_box_with_check: MATS succeeded with python version ${PYTHON_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "  * :ballot_box_with_check: MATS succeeded with python version \`${PYTHON_VERSION}\` for [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" > "$MATS_STEP_SUMMARY"
+          printf "%s\n" " :ballot_box_with_check: MATS succeeded with python version \`${PYTHON_VERSION}\`" >> "$GITHUB_STEP_SUMMARY"
         else
-          printf "%s\n" "  * :x: ~MATS succeeded with python version ${PYTHON_VERSION} for ${BUILD_SHA}~" > "$MATS_STEP_SUMMARY"
-          printf "%s\n" " :x: ~MATS succeeded with python version ${PYTHON_VERSION}~" >> "$GITHUB_STEP_SUMMARY"
+          printf "%s\n" "  * :x: ~MATS succeeded with python version \`${PYTHON_VERSION}\` for \`${BUILD_SHA}\`~" > "$MATS_STEP_SUMMARY"
+          printf "%s\n" " :x: ~MATS succeeded with python version \`${PYTHON_VERSION}\`~" >> "$GITHUB_STEP_SUMMARY"
         fi
         if [[ "${{ steps.mats_build.outcome }}" == "success" ]] ; then
           printf "%s\n" "    * :ballot_box_with_check: Minimal Build Testing succeeded" >> "$MATS_STEP_SUMMARY"
