@@ -187,69 +187,75 @@ jobs:
           mv -vf "MATS/test-reports" ./"test-reports" || : ;
         if: ${{ (needs.check_build.outputs.should_run == 'true') && success() }}
       - id: report_status
+        env:
+          BUILD_SHA: ${{ needs.check_build.outputs.build_sha }}
+          MATS_COMMENT_BODY: '${{ github.workspace }}/MATs-Summary-Artifact.txt'
         run: |
           if [[ "${{ needs.MATS.outputs.mats_status }}" == "success" ]]; then
-            echo "# :green_circle: Automated Code Checks Passed" > "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## :building_construction: Build" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "# :green_circle: Automated Code Checks Passed" > "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo "## :building_construction: Build" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
               BUILD_SHA="${{ needs.check_build.outputs.sha }}"
-              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "$GITHUB_STEP_SUMMARY"
-              echo "build_success=true" >> "$GITHUB_OUTPUT"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "${MATS_COMMENT_BODY}"
+              echo "build_success=true" >> "${MATS_COMMENT_BODY}"
             else
-              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
-              echo "build_success=false" >> "$GITHUB_OUTPUT"
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "${MATS_COMMENT_BODY}"
+              echo "build_success=false" >> "${MATS_COMMENT_BODY}"
             fi
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo "## :1234: Minimal Acceptance Testing" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
             echo "mats_success=true" >> "$GITHUB_OUTPUT"
           else
-            echo "# Unstable Commit" > "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "> [!CAUTION]" >> "$GITHUB_STEP_SUMMARY"
-            echo "> Unstable - This commit is failed to pass minimal acceptance testing." >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## :construction: Build" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "# Unstable Commit" > "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo "> [!CAUTION]" >> "${MATS_COMMENT_BODY}"
+            echo "> Unstable - This commit is failed to pass minimal acceptance testing." >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo "## :construction: Build" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
             if [[ "${{ needs.check_build.outputs.should_run }}" == "true" ]]; then
-              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+              echo " :ballot_box_with_check: BUILD \`${{ needs.check_build.outputs.trigger_id }}\` succeeded with commit ${{ needs.check_build.outputs.sha }}" >> "${MATS_COMMENT_BODY}"
               echo "build_success=true" >> "$GITHUB_OUTPUT"
             else
-              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "$GITHUB_STEP_SUMMARY"
+              echo " :x: BUILD ${{ needs.check_build.outputs.trigger_id }} failed" >> "${MATS_COMMENT_BODY}"
               echo "build_success=false" >> "$GITHUB_OUTPUT"
             fi
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## :red_circle: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "## :1234: Minimal Acceptance Testing" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## :red_circle: Minimal Acceptance Testing" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo " :x: MATs ${{ github.run_id }} failed with commit ${{ needs.check_build.outputs.sha }}" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            echo "## :1234: Minimal Acceptance Testing" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_OLD_MIN }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_DEFAULT }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
+            cat <./MATS/"MATs-Summary-Artifact-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "${MATS_COMMENT_BODY}"
+            echo "" >> "${MATS_COMMENT_BODY}"
             echo "mats_success=false" >> "$GITHUB_OUTPUT"
           fi
-          cat <"$GITHUB_STEP_SUMMARY" >> "MATS_COMMENT_BODY_${{ needs.check_build.outputs.sha }}.md"
-      - name: "MATs commit comment"
+          cat <"${MATS_COMMENT_BODY}" >> "$GITHUB_STEP_SUMMARY"
+      - name: "Upload MATs summary"
+        id: upload-mats-summary
         if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
-        id: mats_commit_comment
-        uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          sha: ${{ needs.check_build.outputs.sha }}
-          token: ${{ github.token }}
-          body-path: 'MATS_COMMENT_BODY_${{ needs.check_build.outputs.sha }}.md'
+          path: ./MATs-Summary-Artifact.txt
+          name: MATS-COMMENT-BODY-${{ needs.check_build.outputs.sha }}
+          if-no-files-found: error
+          compression-level: 3
+          retention-days: 2
+          overwrite: true
 
   MATS_STATUS:
     permissions:
@@ -308,3 +314,27 @@ jobs:
           compression-level: 3
           retention-days: 2
           overwrite: true
+
+  MATs_REPORT:
+    permissions:
+      actions: read
+      contents: write
+    needs: [check_build, MATs_SUMMARY]
+    runs-on: ubuntu-latest
+    if: ${{ !cancelled() }}
+    steps:
+      - name: "Download Status Summary Artifact"
+        id: download-mats-summary
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: MATS-COMMENT-BODY-${{ needs.check_build.outputs.sha }}
+          github-token: ${{ github.token }}
+      - name: "MATs commit comment"
+        id: mats-commit-comment
+        if: ${{ success() && (github.repository == 'reactive-firewall/multicast') }}
+        uses: peter-evans/commit-comment@5a6f8285b8f2e8376e41fe1b563db48e6cf78c09 # v3.0.0
+        with:
+          sha: ${{ needs.check_build.outputs.sha }}
+          token: ${{ github.token }}
+          body-path: '${{ steps.download-mats-summary.outputs.download-path }}/MATs-Summary-Artifact.txt'
