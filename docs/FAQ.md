@@ -233,7 +233,7 @@ work as far as this Multicast module is concerned.
   documentation site.
 
 * However, if one still wishes to build the documentation manually, there is a `make` target
-  specifically for this:
+  specifically for building from source:
 
   ```bash
   make build-docs
@@ -245,6 +245,8 @@ work as far as this Multicast module is concerned.
   to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
 
   ```bash
+  # git clone ...
+  # git checkout <specific commit>
   # shellcheck disable=SC2155
   export DOCS_BUILD_REF=$("${GIT:-git}" rev-parse --verify HEAD)
   make build-docs  # or your own documentation build command
