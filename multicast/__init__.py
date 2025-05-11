@@ -461,7 +461,7 @@ _MCAST_DEFAULT_PORT = 59259
 	A Value of "59259" is chosen as a default multicast port as per RFC-6335
 	on the rational that this memorable port will be treated as a user-allocated
 	(caveat: senders should match the intended listener's port)
-	
+
 	> [!IMPORTANT]
 	> Multicast is not actually port-aware, and port filtering is instead
 	> handled at the protocol layer (eg. UDP) instead, and may not behave
