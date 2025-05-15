@@ -1,7 +1,7 @@
 ---
 name: CI-BUILD
 description: "Continuous Integration workflow for building, the project."
-run-name: Build ${{ github.ref_name }} by @${{ github.actor }}
+run-name: Build ${{ github.ref_name }}
 #
 # Jobs included:
 # - BUILD: Ensures the project compiles correctly
@@ -33,8 +33,6 @@ jobs:
       statuses: write
       packages: none
       pull-requests: read
-      id-token: write
-      attestations: write
       security-events: none
     if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
     runs-on: ubuntu-latest
@@ -44,7 +42,7 @@ jobs:
         shell: bash
     env:
       LANG: "en_US.UTF-8"
-      GIT_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
+      BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
     outputs:
       build_status: ${{ steps.build.outcome }}
     steps:
@@ -71,30 +69,27 @@ jobs:
         id: buildfiles
         shell: bash
         run: |
-          FILES=$(git ls-files -oi --exclude-standard -- ${{ env.GIT_MATCH_PATTERN }} )
+          FILES=$(git ls-files -oi --exclude-standard -- ${{ env.BUILD_MATCH_PATTERN }} )
           if [ -z "$FILES" ]; then
             printf "%s\n" "::warning file=.github/workflows/CI-BUILD.yml:: No Built files found."
             printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
           else
             printf "%s\n" "Built files found:"
             printf "%s\n" "$FILES"
-            # Replace line breaks with spaces for GitHub Action Output
+            # Replace line breaks with commas for GitHub Action Output
             FILES="${FILES//$'\n'/ }"
             printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
           fi
         if: ${{ success() }}
       - name: Upload build artifact
         id: upload
+        if: ${{ !cancelled() && (steps.buildfiles.outputs.files != '') && (github.repository == 'reactive-firewall/multicast') }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          path: ${{ steps.buildfiles.outputs.files }}
+          path: dist
           name: multicast-build-${{ github.sha }}.zip
-      - name: Generate artifact attestation
-        if: ${{ !cancelled() && steps.buildfiles.outputs.files != '' && (github.repository == 'reactive-firewall/multicast') }}
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: multicast-build-${{ github.sha }}.zip
-          subject-digest: sha256:${{ steps.upload.outputs.artifact-digest }}
+          compression-level: 3
+          overwrite: true
 
   BOOTSTRAP:
     permissions:
@@ -195,11 +190,13 @@ jobs:
       pull-requests: read
     needs: [BUILD, BOOTSTRAP]
     runs-on: ubuntu-latest
+    environment: ${{ needs.BUILD.environment }}
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}
       build_ref: ${{ steps.check_status.outputs.build_ref }}
       build_ref_name: ${{ steps.check_status.outputs.build_ref_name }}
+      environment: ${{ needs.BUILD.environment }}
     steps:
       - id: check_status
         run: |
@@ -213,6 +210,7 @@ jobs:
       - name: Download All Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: dist
-          pattern: multicast-${{ github.sha }}
+          path: ${{ github.workspace }}/dist
+          pattern: multicast-build-${{ github.sha }}.zip
+          merge-multiple: true
       - run: ls -R dist
