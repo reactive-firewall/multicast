@@ -82,8 +82,8 @@ runs:
       id: output_sha
       shell: bash
       run: |
-        printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
-        printf "BUILD_SHA=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_ENV"
+        printf "sha=%s\n" $(git rev-parse --verify '${{ inputs.sha }}') >> "$GITHUB_OUTPUT"
+        printf "BUILD_SHA=%s\n" $(git rev-parse --verify '${{ inputs.sha }}') >> "$GITHUB_ENV"
     - name: "Setup Python"
       id: output_python
       if: ${{ !cancelled() }}
