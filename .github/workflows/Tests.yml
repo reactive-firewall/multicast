@@ -84,6 +84,7 @@ jobs:
           run-id: ${{ steps.get_trigger_id.outputs.trigger_id }}
       - name: "move into place"
         id: load_build_info
+        if: ${{ (github.repository == 'reactive-firewall/multicast') && success() }}
         run: |
           mv -vf "multicast-info.txt/multicast-info.txt" ./"multicast-info-tmp.txt" ;
           wait ;
@@ -137,23 +138,11 @@ jobs:
         build-run-id: ${{ needs.check_mats.outputs.build_id }}
         python-version: ${{ matrix.python-version }}
         path: ${{ github.workspace }}
-    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      env:
-        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
-        chmod +x ./cc-test-reporter 2>/dev/null || true ;
-        ./cc-test-reporter before-build || true ;
-    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      env:
-        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-      run: |
-        (curl https://deepsource.io/cli | sh) || true ;
+    - name: Install coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: fetch-test-tools
+      uses: ./.github/actions/fetch-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -194,7 +183,7 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       env:
         CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
