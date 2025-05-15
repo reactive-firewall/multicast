@@ -3,7 +3,7 @@ name: 'Checkout and use Build'
 description: 'checks-out the given commit and fetches the build artifact'
 author: 'Mr. Walls'
 branding:
-  icon: 'chevron-down'
+  icon: 'download-cloud'
   color: 'blue'
 inputs:
   sha:
@@ -88,25 +88,32 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: 'pip'  # caching pip dependencies
       if: ${{ !cancelled() }}
+    - run: python -m pip install --upgrade pip
+      shell: bash
+      if: ${{ !cancelled() && runner.os == 'Windows' }}
     - name: "Install Test Dependencies"
       shell: bash
-      run: make -j1 -f Makefile test-reqs ;
+      run: |
+        printf "%s\n" "::group::prep-test-reqs"
+        make -j1 -f Makefile test-reqs || exit 1
+        printf "%s\n" "::endgroup::"
     - id: output_artifact_name
       if: ${{ success() }}
       shell: bash
-      run: printf "artifact-name=%s\n" multicast-build-${{ steps.output_sha.outputs.sha }}.zip >> "$GITHUB_OUTPUT"
+      run: printf "artifact-name=%s\n" multicast-build-${{ steps.output_sha.outputs.sha }} >> "$GITHUB_OUTPUT"
     - name: "Fetch Build Files"
       if: ${{ (github.repository == 'reactive-firewall/multicast') && success() }}
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         path: ${{ inputs.path }}/dist
-        pattern: multicast-build-${{ steps.output_sha.outputs.sha }}.zip
+        pattern: multicast-build-${{ steps.output_sha.outputs.sha }}
         merge-multiple: true
         repository: reactive-firewall/multicast
         github-token: ${{ inputs.token }}
         run-id: ${{ inputs.build-run-id }}
     - name: "Enumerate Fetched Files"
       id: output_artifact_files
+      if: ${{ (github.repository == 'reactive-firewall/multicast') && success() }}
       env:
         BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
         SCRIPT_NAME: ".github/actions/checkout-and-rebuild/action.yml"
@@ -116,11 +123,12 @@ runs:
         if [ -z "$FILES" ]; then
           printf "::warning file=%s:: %s\n" "${SCRIPT_NAME}" "No Built files found."
           printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
+          exit 1
         else
           printf "%s\n" "Built files found:"
           printf "%s\n" "$FILES"
-          # Replace line breaks with commas for GitHub Action Output
+          # Replace line breaks with spaces for GitHub Action Output
           FILES="${FILES//$'\n'/ }"
           printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
+          exit 0
         fi
-      if: ${{ success() }}
