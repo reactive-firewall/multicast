@@ -13,7 +13,7 @@ name: CI-TESTS
 #
 # Required Secrets:
 # - CODECOV_TOKEN: For uploading coverage reports to Codecov
-# - CODECLIMATE_TOKEN: For integration with Code Climate
+# - CODECLIMATE_REPO_TOKEN: For integration with Code Climate
 # - CC_TEST_REPORTER_ID: For Code Climate test reporting
 
 on:
@@ -140,11 +140,17 @@ jobs:
         path: ${{ github.workspace }}
     - name: Install coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       id: fetch-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       uses: ./.github/actions/fetch-test-reporter
       with:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Pre-Clean
-      id: clean
+      id: clean-before-coverage
+      if: ${{ !cancelled() }}
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       env:
@@ -186,21 +192,31 @@ jobs:
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       env:
-        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       env:
         DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
       run: |
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
+    - name: Finalize coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: purge-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      uses: ./.github/actions/purge-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Post-Clean
-      id: post
+      id: post-coverage-clean
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
 
   DOCTESTS:
@@ -227,6 +243,12 @@ jobs:
       COVERAGE_RCFILE: ./.coveragerc
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
+      COV_CORE_DATAFILE: ./coverage.xml
+      CI_BRANCH: ${{ needs.check_mats.outputs.mats_ref_name }}
+      CI_COMMIT_SHA: ${{ needs.check_mats.outputs.mats_sha }}
+      BRANCH_NAME: ${{ needs.check_mats.outputs.mats_ref_name }}
+      VCS_BRANCH_NAME: ${{ needs.check_mats.outputs.build_ref_name }}
+      VCS_COMMIT_ID: ${{ needs.check_mats.outputs.build_sha }}
     steps:
     - name: pre-checkout repository for actions
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -242,23 +264,16 @@ jobs:
         build-run-id: ${{ needs.check_mats.outputs.build_id }}
         python-version: ${{ matrix.python-version }}
         path: ${{ github.workspace }}
-    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      env:
-        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ;
-        chmod +x ./cc-test-reporter 2>/dev/null || true ;
-        ./cc-test-reporter before-build || true ;
-    - name: Install deepsource tools for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      shell: bash
-      env:
-        DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
-      run: |
-        (curl https://deepsource.io/cli | sh) || true ;
+    - name: Install coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: fetch-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      uses: ./.github/actions/fetch-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -f Makefile test-mat-doctests ;
     - name: Upload Python ${{ matrix.python-version }} doctest coverage to Codecov
@@ -284,7 +299,7 @@ jobs:
       if: ${{ !cancelled() && runner.os == 'Linux' }}
       shell: bash
       env:
-        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
         ./cc-test-reporter after-build --exit-code 0 || true ;
@@ -295,10 +310,20 @@ jobs:
         DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
       run: |
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
+    - name: Finalize coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: purge-doctest-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      uses: ./.github/actions/purge-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Post-Clean
-      id: post
+      id: post-doctest-clean
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ success() }}
+      if: ${{ !cancelled() }}
 
 
   STYLE:
@@ -317,11 +342,14 @@ jobs:
       run:
         shell: bash
     timeout-minutes: 2
-
     env:
       PYTHON_VERSION: "${{ vars.PYTHON_DEFAULT }}"
       LANG: "en_US.utf-8"
-
+      CI_BRANCH: ${{ needs.check_mats.outputs.mats_ref_name }}
+      CI_COMMIT_SHA: ${{ needs.check_mats.outputs.mats_sha }}
+      BRANCH_NAME: ${{ needs.check_mats.outputs.mats_ref_name }}
+      VCS_BRANCH_NAME: ${{ needs.check_mats.outputs.build_ref_name }}
+      VCS_COMMIT_ID: ${{ needs.check_mats.outputs.build_sha }}
     steps:
     - name: pre-checkout repository for actions
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -338,22 +366,21 @@ jobs:
         path: ${{ github.workspace }}
         python-version: "${{ vars.PYTHON_DEFAULT }}"
     - name: Install dependencies for python Linters
+      if: ${{ success() }}
+      id: doc-deps-for-style
       run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.2.2";
-        pip install --upgrade -r ./requirements.txt ;
-        pip install --upgrade -r ./tests/requirements.txt || true ;
-        pip install --upgrade -r ./docs/requirements.txt || true ;
+        pip install -r ./docs/requirements.txt || true ;
     - name: Pre-Clean
-      id: clean
+      id: clean-up-style
       run: make -j1 -f Makefile clean || true ;
     - name: Testing Style
       id: style
-      run: make -j1 -f Makefile test-style >> $GITHUB_STEP_SUMMARY ;
+      run: make -j1 -f Makefile test-style || exit 1 ;
       shell: bash
     - name: Post-Clean
-      id: post
+      id: post-style-test
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ success() }}
 
 
   INTEGRATION:
@@ -387,7 +414,7 @@ jobs:
       BRANCH_NAME: ${{ needs.check_mats.outputs.mats_ref_name }}
       VCS_BRANCH_NAME: ${{ needs.check_mats.outputs.build_ref_name }}
       VCS_COMMIT_ID: ${{ needs.check_mats.outputs.build_sha }}
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
     - name: pre-checkout repository for actions
@@ -410,19 +437,16 @@ jobs:
         pip install --upgrade -r ./requirements.txt ;
         pip install --upgrade -r ./tests/requirements.txt || true ;
         pip install --upgrade -r ./docs/requirements.txt || true ;
-    - name: Install Darwin code-climate tools for ${{ matrix.python-version }}
-      if: ${{ !cancelled() && runner.os != 'Linux' }}
-      run: |
-        if [ "$OS" == "macos-latest" ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ "$OS" == "macos-latest" ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter before-build || true ; fi
-      shell: bash
-    - name: Install Linux code-climate tools for ${{ matrix.python-version }}
-      if: ${{ !cancelled() && runner.os == 'Linux' }}
-      run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-arm64 > ./cc-test-reporter || true ;
-        chmod +x ./cc-test-reporter 2>/dev/null || true ;
-        ./cc-test-reporter before-build || true ;
+    - name: Install coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: fetch-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      uses: ./.github/actions/fetch-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
@@ -482,6 +506,16 @@ jobs:
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-test-results
         verbose: true
         fail_ci_if_error: false
+    - name: Finalize coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      id: purge-doctest-test-tools
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      uses: ./.github/actions/purge-test-reporter
+      with:
+        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
+        deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
+        coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
+        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
+        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
@@ -526,7 +560,7 @@ jobs:
       BRANCH_NAME: ${{ needs.check_mats.outputs.mats_ref_name }}
       VCS_BRANCH_NAME: ${{ needs.check_mats.outputs.build_ref_name }}
       VCS_COMMIT_ID: ${{ needs.check_mats.outputs.build_sha }}
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
     steps:
     - name: pre-checkout repository for actions
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -661,7 +695,7 @@ jobs:
       OS: 'ubuntu-latest'
       PYTHON_VERSION: "${{ vars.PYTHON_DEFAULT }}"
       LANG: 'en_US.utf-8'
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
+      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

@@ -249,7 +249,7 @@ SCRIPT_FILE="tests/check_pip"
 # Set pip-audit options
 AUDIT_OPTIONS="--progress-spinner off --desc on --requirement"
 # List of Allowed Licenses delimited by semicolon ;
-ALLOW_LICENSES="Public Domain;Apache Software License;Apache-2.0;MIT License;BSD License;Python Software Foundation License;The Unlicense (Unlicense);Mozilla Public License 2.0 (MPL 2.0);"
+ALLOW_LICENSES="Public Domain;CC0 1.0 Universal;Public Domain Dedication; Zero-Clause BSD;Apache Software License;Apache-2.0;MIT License;BSD License;Python Software Foundation License;The Unlicense (Unlicense);Mozilla Public License 2.0 (MPL 2.0);"
 # Set pip-licenses options
 LICENSE_OPTIONS="--from=mixed"
 # Set pip options
@@ -258,13 +258,15 @@ PIP_COMMON_FLAGS="--require-virtualenv --use-pep517 --exists-action s --upgrade 
 if [[ $( \uname -s ) == "*arwin" ]] ; then
 	PIP_ENV_FLAGS="--break-system-packages"
 	LICENSE_OPTIONS="--python python3 ${LICENSE_OPTIONS} --ignore-packages certifi"
-	LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages chardet"
 else
 	PIP_ENV_FLAGS=""
 	LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages chardet"
 fi ;
 # urllib is licensed under MIT, but reports "UNKNOWN"
-LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages urllib3"
+# roman-numerals-py is Public Domain but reports multiple
+# Sphinx is licensed under BSD, but reports "UNKNOWN"
+# typing_extensions is licensed under Python Software Foundation License, but reports "UNKNOWN"
+LICENSE_OPTIONS="${LICENSE_OPTIONS} urllib3 pip setuptools wheel build hypothesis certifi roman-numerals-py Sphinx typing_extensions"
 # Enable auto-fix if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"
