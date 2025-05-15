@@ -102,11 +102,11 @@ I begin with it.
 CLI should work like so:
 
 ```plain
-multicast [-h|--help] [--use-std] [--daemon] (SAY|RECV|HEAR)
+multicast [[-h|--help]|[--version] [--use-std] [--daemon] (SAY|RECV|HEAR)
     [-h|--help]
     [--port PORT]
     [--iface IFACE]
-    [-m MESSAGE|--message MESSAGE]
+    [-m MESSAGE|--message MESSAGE|--pipe]
     [--group BIND_GROUP]
     [--groups [JOIN_MCAST_GROUPS ...]]
 ```
@@ -119,8 +119,9 @@ and echo functions of a 1-to-1 connection.
 The `SAY` command is used to send data messages via multicast datagrams.
 
 * Note: the `--message` flag is expected with the `SAY` command;
-  if not provided, it behaves like `NOOP`.
+  if neither `--pipe` nor `--messages` are provided, `SAY` behaves like `NOOP`.
 * Note: the `--daemon` flag has no effect on the `SAY` command.
+* Note: the `--pipe` option reads message from stdin (added in v2.1.0, equivalent to `--message -`).
 
 ### `RECV`
 
@@ -149,4 +150,4 @@ received multicast datagrams.
 
 #### Copyright (c) 2021-2025, Mr. Walls
 
-[MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

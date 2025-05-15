@@ -233,7 +233,7 @@ work as far as this Multicast module is concerned.
   documentation site.
 
 * However, if one still wishes to build the documentation manually, there is a `make` target
-  specifically for this:
+  specifically for building from source:
 
   ```bash
   make build-docs
@@ -245,6 +245,8 @@ work as far as this Multicast module is concerned.
   to the specific commit you're working on, set the `DOCS_BUILD_REF` environment variable:
 
   ```bash
+  # git clone ...
+  # git checkout <specific commit>
   # shellcheck disable=SC2155
   export DOCS_BUILD_REF=$("${GIT:-git}" rev-parse --verify HEAD)
   make build-docs  # or your own documentation build command
@@ -257,4 +259,4 @@ work as far as this Multicast module is concerned.
 
 #### Copyright (c) 2021-2025, Mr. Walls
 
-[MIT License](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)

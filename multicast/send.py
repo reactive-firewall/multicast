@@ -305,12 +305,21 @@ class McastSAY(multicast.mtool):
 				dest="groups",
 				help="multicast groups (ip addrs) to listen to join."
 			)
-			parser.add_argument(
+			msgGrp = parser.add_argument_group()
+			msgGrp.add_argument(
 				"-m",
 				"--message",
 				nargs="+",
 				dest="data",
 				default="PING from {name}: group: {group}, port: {port}",
+			)
+			# v2.0.9: Added the --pipe option
+			msgGrp.add_argument(
+				"--pipe",
+				action="store_const",
+				const=["-"],
+				dest="data",
+				help="read message from stdin (equivalent to --message -)"
 			)
 
 	@staticmethod
