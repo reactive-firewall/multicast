@@ -11,8 +11,8 @@ applications, making it straightforward to work with multicast sockets.
 ## Features
 
 - **Easy Multicast Communication**: Send and receive messages over multicast networks with
-  simple interfaces.
-- **Command-Line Tools**: Includes command-line utilities for quick multicast operations.
+  simple `Python` interfaces.
+- **Command-Line Tools**: Includes command-line utilities for quick multicast prototyping.
 - **Cross-Python Compatibility**: Designed to work with multiple Python versions.
 - **Support for UDP**: Works with UDP via IPv4 multicast addresses.
 
@@ -53,7 +53,7 @@ Install the package using `pip`:
 pip install multicast
 ```
 
-<details><summary>Other Methods</summary>
+<details><summary>Alternative Methods</summary>
 
 There are many ways to install the module besides using `pip`, but unless you have a specific need,
 using `pip` is recommended for most users.

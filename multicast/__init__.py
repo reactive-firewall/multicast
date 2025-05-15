@@ -273,9 +273,9 @@ ranges as per RFC-6335.
 
 Key Features:
 	- Easy-to-use python interfaces for multicast communication.
-		- transmition via multicast.send
-		- high-level reciving via multicast.hear for building custom multicast services.
-		- low-level reciving via multicast.recv for advanced non-blocking use-cases.
+		- transmission via multicast.send
+		- high-level receiving via multicast.hear for building custom multicast services.
+		- low-level receiving via multicast.recv for advanced non-blocking use-cases.
 	- Command-line tools for quick multicast prototyping.
 	- Support for UDP multicast (currently IPv4 Only) via Python's built-in socket module.
 	- Compliance with RFC-6335 for dynamic/private port ranges.
@@ -398,7 +398,7 @@ _MCAST_DEFAULT_BUFFER_SIZE = 1316
 
 	> [!CAUTION]
 	> This value is NOT related to the actual packet size, the python socket module, and
-	> underlaying OS, firmware and even some hardware will handle all of that. If you need
+	> underlying OS, firmware and even some hardware will handle all of that. If you need
 	> to change buffers you are better off focusing on changing the underlying MTU of the
 	> entire network infrastructure instead (albeit that may not be possible for most users).
 
@@ -712,7 +712,7 @@ class mtool(abc.ABC):
 		>>> _multicast.mtool is not None
 		True
 		>>> type(_multicast.mtool) #doctest: +ELLIPSIS
-		<...multicast.mtool...>
+		<...abc.ABC...>
 		>>> hasattr(_multicast.mtool, "__abstractmethods__")
 		True
 		>>>
@@ -725,6 +725,7 @@ class mtool(abc.ABC):
 		>>> hasattr(_multicast.mtool, "__abstractmethods__")
 		True
 		>>> len(_multicast.mtool.__abstractmethods__) >= int(2)
+		True
 		>>> "doStep" in _multicast.mtool.__abstractmethods__
 		True
 		>>> "setupArgs" in _multicast.mtool.__abstractmethods__
@@ -739,12 +740,13 @@ class mtool(abc.ABC):
 		>>> hasattr(_multicast.mtool, "__abstractmethods__")
 		True
 		>>> len(_multicast.mtool.__abstractmethods__) >= int(2)
+		True
 		>>> "doStep" in _multicast.mtool.__abstractmethods__
 		True
 		>>> "setupArgs" in _multicast.mtool.__abstractmethods__
 		True
 		>>> _test_dir_fixture = dir(_multicast.mtool)
-		>>> _test_dir_fixture is not None:
+		>>> _test_dir_fixture is not None
 		True
 		>>> "buildArgs" in _test_dir_fixture
 		True
