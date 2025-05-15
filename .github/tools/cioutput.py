@@ -3,7 +3,7 @@
 
 # Multicast Python Module
 # ..................................
-# Copyright (c) 2017-2025, Mr. Walls
+# Copyright (c) 2025, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -558,10 +558,8 @@ def configure_output_tool() -> CIOutputTool:
 		help="File path for GitHub Actions annotations"
 	)
 	group = parser.add_argument_group()
-	lineGroup = group.add_argument_group()
-	lineSubGroup = lineGroup.add_mutually_exclusive_group(required=False)
-	colGroup = lineGroup.add_argument_group()
-	colSubGroup = colGroup.add_mutually_exclusive_group(required=False)
+	lineSubGroup = group.add_mutually_exclusive_group(required=False)
+	colSubGroup = group.add_mutually_exclusive_group(required=False)
 	lineSubGroup.add_argument(
 		"--line",
 		dest="line",
@@ -590,13 +588,13 @@ def configure_output_tool() -> CIOutputTool:
 		metavar="START_COL",
 		help="Column number for GitHub Actions annotations"
 	)
-	lineGroup.add_argument(
+	group.add_argument(
 		"--end-line",
 		dest="end_line",
 		type=int,
 		help="End line number for GitHub Actions annotations"
 	)
-	colGroup.add_argument(
+	group.add_argument(
 		"--end-col",
 		dest="end_col",
 		type=int,
