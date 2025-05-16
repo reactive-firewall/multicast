@@ -22,6 +22,7 @@ applications, making it straightforward to work with multicast sockets.
 
 [![CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/master)
 [![CI](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml)
+[![Minimal Acceptance Tests](https://github.com/reactive-firewall/multicast/actions/workflows/CI-MATs.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/multicast/actions/workflows/CI-MATs.yml)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/0h5vuexyty9lbl81/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/master)
 [![Documentation Status](https://readthedocs.org/projects/reactive-firewallmulticast/badge/?version=master)](https://reactive-firewallmulticast.readthedocs.io/en/latest/?badge=master)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/test_coverage)](https://codeclimate.com/github/reactive-firewall/multicast/test_coverage)
@@ -39,7 +40,6 @@ applications, making it straightforward to work with multicast sockets.
 
 ### Stable (Mainstream)
 
-[![Stable CircleCI](https://circleci.com/gh/reactive-firewall/multicast/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/multicast/tree/stable)
 [![Stable CI](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml/badge.svg?branch=stable)](https://github.com/reactive-firewall/multicast/actions/workflows/Tests.yml)
 [![Stable Appveyor](https://ci.appveyor.com/api/projects/status/0h5vuexyty9lbl81/branch/stable?svg=true)](https://ci.appveyor.com/project/reactive-firewall/multicast/branch/stable)
 [![Stable Code Coverage](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/multicast/branch/stable/)

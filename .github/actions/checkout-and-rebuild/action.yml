@@ -63,6 +63,7 @@ runs:
       with:
         persist-credentials: false
         fetch-depth: 0
+        submodules: true
         path: ${{ inputs.path }}
         repository: reactive-firewall/multicast
         token: ${{ inputs.token }}
