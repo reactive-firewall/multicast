@@ -19,12 +19,10 @@
 # re - builtin - PSF license?
 # subprocess - builtin - PSF license
 # sphinx - BSD license
-# typing_extensions - builtin - PSF license
 # socket - builtin - PSF license
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
 # argparse>=1.4.0
-# argparse - builtin - PSF license
 # setuptools - MIT license
 setuptools>=75.0
 # virtualenv - MIT license
