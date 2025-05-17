@@ -262,11 +262,12 @@ else
 	PIP_ENV_FLAGS=""
 	LICENSE_OPTIONS="${LICENSE_OPTIONS} --ignore-packages chardet"
 fi ;
-# urllib is licensed under MIT, but reports "UNKNOWN"
+# urllib3 is licensed under MIT, but reports "UNKNOWN"
 # roman-numerals-py is Public Domain but reports multiple
 # Sphinx is licensed under BSD, but reports "UNKNOWN"
 # typing_extensions is licensed under Python Software Foundation License, but reports "UNKNOWN"
-LICENSE_OPTIONS="${LICENSE_OPTIONS} urllib3 pip setuptools wheel build hypothesis certifi roman-numerals-py Sphinx typing_extensions"
+# pytest-enabler is licensed under MIT, but reports "UNKNOWN"
+LICENSE_OPTIONS="${LICENSE_OPTIONS} urllib3 pip setuptools wheel build hypothesis certifi roman-numerals-py Sphinx typing_extensions pytest-enabler"
 # Enable auto-fix if '--fix' argument is provided
 if [[ "$1" == "--fix" ]]; then
 	AUDIT_OPTIONS="--fix --strict ${AUDIT_OPTIONS}"

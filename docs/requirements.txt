@@ -15,9 +15,11 @@
 # limitations under the License.
 #python
 # time - builtin - PSF license
-# re - builtin - PSF license?
-# subprocess - PSF license
-# argparse - builtin - PSF license
+# typing_extensions - builtin - PSF license
+# re - builtin - PSF license
+# subprocess - builtin - PSF license
+# urllib3 - MIT license
+# roman-numerals-py - Public Domain
 # socket - builtin - PSF license
 # struct - builtin - PSF license
 # argparse - builtin - PSF license

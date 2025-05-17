@@ -154,6 +154,7 @@ declare -a SPECIFIC_TYPOS=(
 	"boundry:boundary"  # from #384
 	"rappidly:rapidly"  # from #392
 	"compleated:completed"  # from #338
+	"compleate:complete"  # from #402
 )
 
 function cleanup() {

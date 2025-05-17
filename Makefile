@@ -171,10 +171,14 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "include HISTORY.md" >>"$@" ;
 	$(QUIET)$(ECHO) "recursive-include . *.txt" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitignore" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .git_skipList" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .gitattributes" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .gitmodules" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .deepsource.toml" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.ini" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.yml" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.yaml" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude .*.conf" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude package.json" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
@@ -203,7 +207,7 @@ init: branding
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-install: init build
+install: init ./dist
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) dist/multicast-*-py3-*.whl
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
@@ -232,6 +236,9 @@ purge-coverage-artifacts: legacy-purge
 purge: purge-coverage-artifacts purge-test-reports
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
+
+./dist: build
+	$(QUIET)$(WAIT) ;
 
 test: just-test
 	$(QUIET)$(DO_FAIL) ;
@@ -461,9 +468,7 @@ must_be_root:
 	$(QUIET)runner=`whoami` ; \
 	if test $$runner != "root" ; then $(ECHO) "You are not root." ; exit 1 ; fi
 
-user-install: build
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || true
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/multicast/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
+user-install: ./dist
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user dist/multicast-*-py3-*.whl
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
