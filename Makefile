@@ -69,10 +69,7 @@ ifeq "$(LINK)" ""
 endif
 
 ifeq "$(PYTHON)" ""
-	ifeq "$(PYTHON_VERSION)" ""
-		PYTHON_VERSION=3
-	endif
-	PY_CMD=$(COMMAND) python$(PYTHON_VERSION)
+	PY_CMD=$(COMMAND) python3
 	ifneq "$(PY_CMD)" ""
 		PY_ARGS=-B
 	else
