@@ -91,7 +91,7 @@ runs:
         PYTHON_VERSION_INPUT: ${{ inputs.python-version }}
       shell: bash
       run: |
-        if [[ -z $PYTHON_VERSION_INPUT ]]; then
+        if [[ -n $PYTHON_VERSION_INPUT ]]; then
           printf "python-version=%s\n" "${PYTHON_VERSION_INPUT}" >> "$GITHUB_OUTPUT"
           PYTHON_VERSION=${PYTHON_VERSION_INPUT}
         else

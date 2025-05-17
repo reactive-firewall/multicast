@@ -217,7 +217,7 @@ jobs:
           BUILD_SHA: ${{ needs.check_mats.outputs.build_sha }}
           DOCUMENTATION_COMMENT_BODY: '${{ github.workspace }}/DOCUMENTATION-Summary-Artifact.txt'
         run: |
-          if [[ "${{ needs.COVERAGE.outputs.coverage_outcome }}" == "success" ]]; then
+          if [[ "${{ needs.DOCS.outputs.docs_outcome }}" == "success" ]]; then
             printf "%s\n\n" "# :book: Documentation Summary" > "${DOCUMENTATION_COMMENT_BODY}"
             printf "%s\n" "  * :ballot_box_with_check: Generating Documentation Passed" >> "${DOCUMENTATION_COMMENT_BODY}"
             printf "%s\n" "documentation_success=true" >> "$GITHUB_OUTPUT"
@@ -268,7 +268,7 @@ jobs:
           check-id: ${{ needs.check_mats.outputs.check_id }}
           title: "Documentation Testing"
           status: 'completed'
-          conclusion: ${{ needs.COVERAGE.outputs.coverage_outcome }}
+          conclusion: ${{ needs.DOCS.outputs.docs_outcome }}
           summary: ${{ steps.report_status.outputs.docs_summary }}
           text: ${{ steps.report_status.outputs.docs_text }}
           sha: ${{ needs.check_mats.outputs.build_sha }}

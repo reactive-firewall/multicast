@@ -389,7 +389,7 @@ jobs:
         SCRIPT_NAME: ".github/actions/run-coverage-tests/action.yml"
       shell: bash
       run: |
-        FILES=$(git ls-files -o --exclude-standard -- ${{ env.MATS_MATCH_PATTERN }} )
+        FILES=$(git ls-files -o --exclude-standard -- ${{ env.COV_MATCH_PATTERN }} )
         if [ -z "$FILES" ]; then
           printf "::warning file=%s:: %s\n" "${SCRIPT_NAME}" "No summary files found."
           printf "%s\n" "files=" >> "$GITHUB_OUTPUT"
@@ -797,7 +797,7 @@ jobs:
         persist-credentials: false
         ref: ${{ needs.check_mats.outputs.build_sha }}
         sparse-checkout: '.github/actions/checkout-and-rebuild'
-    - name: Checkout repository for Style with ${{ matrix.python-version }}
+    - name: "Checkout repository for Style with ${{ vars.PYTHON_DEFAULT }}"
       id: fetch-build
       uses: ./.github/actions/checkout-and-rebuild
       with:
@@ -860,7 +860,7 @@ jobs:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     outputs:
       integration_outcome: ${{ steps.integration_outcome.outcome }}
-      integration_test_outcome: ${{ steps.integration_tests.integration_test_outcome }}
+      integration_test_outcome: ${{ steps.integration_tests.outputs.integration_test_outcome }}
       integration_pytest_outcome: ${{ steps.integration-pytest.outcome }}
       integration_doctest_outcome: ${{ steps.integration-doctests.outcome }}
       integration_function_outcome: ${{ steps.integration-main.outcome }}
@@ -1231,15 +1231,15 @@ jobs:
           TESTS_COMMENT_BODY: '${{ github.workspace }}/Integration-Summary-Artifact.txt'
         run: |
           if [[ "${{ needs.INTEGRATION.outputs.integration_outcome }}" == "success" ]]; then
-            printf "%s\n" "# :open_umbrella: Code Coverage Summary" > "${TESTS_COMMENT_BODY}"
-            printf "%s\n" "coverage_success=true" >> "$GITHUB_OUTPUT"
-            printf "%s\n" "tests_summary=Coverage Tests Passed" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "# :clipboard: Testing Summary" > "${TESTS_COMMENT_BODY}"
+            printf "%s\n" "test_success=true" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "tests_summary=CI Tests Passed" >> "$GITHUB_OUTPUT"
           else
             printf "%s\n\n" "# Known flaws." > "${TESTS_COMMENT_BODY}"
             printf "%s\n" "> [!WARNING]" >> "${TESTS_COMMENT_BODY}"
             printf "%s\n\n" "> This commit has known flaws. Each commit is subject to minimal acceptance testing, and then select commits are subject to extra testing to evaluate release candidates; This commit has been deemed _not ready_ for release." >> "${TESTS_COMMENT_BODY}"
-            printf "%s\n" "coverage_success=false" >> "$GITHUB_OUTPUT"
-            printf "%s\n" "tests_summary=Coverage Tests Unsuccessful" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "test_success=false" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "tests_summary=Some Tests Unsuccessful" >> "$GITHUB_OUTPUT"
           fi
           for OS_TAG in "Linux" "macOS" "Windows" ; do
             for TYPE_TAG in "Integration" ; do
@@ -1273,8 +1273,8 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.check_mats.outputs.build_sha }}
           sparse-checkout: '.github/actions/check-control'
-      - name: "Compleate Tests GitHub Check"
-        id: compleate_tests
+      - name: "Complete Tests GitHub Check"
+        id: complete_tests
         if: ${{ (github.repository == 'reactive-firewall/multicast') && always() }}
         uses: ./.github/actions/check-control
         with:

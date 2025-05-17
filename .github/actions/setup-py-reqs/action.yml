@@ -76,7 +76,7 @@ runs:
         PYTHON_VERSION_INPUT: ${{ inputs.python-version }}
       shell: bash
       run: |
-        if [[ -z $PYTHON_VERSION_INPUT ]]; then
+        if [[ -n $PYTHON_VERSION_INPUT ]]; then
           printf "python-version=%s\n" "${PYTHON_VERSION_INPUT}" >> "$GITHUB_OUTPUT"
           PYTHON_VERSION=${PYTHON_VERSION_INPUT}
         else
@@ -88,8 +88,13 @@ runs:
       if: ${{ !cancelled() }}
       shell: bash
       run: |
-        printf "artifact-name=%s\n" multicast-deps-${{ steps.output_sha.outputs.sha }}-part-$(uuidgen) >> "$GITHUB_OUTPUT"
-        printf "%s\n" "DEPS_STEP_SUMMARY=Dependencies-Summary-Artifact-${PYTHON_VERSION}.txt" >> "$GITHUB_ENV"
+        if [[ ${{ runner.os }} != 'Windows' ]] ; then
+          printf "artifact-name=%s\n" multicast-integration-${BUILD_SHA}-part-$(uuidgen) >> "$GITHUB_OUTPUT"
+        else
+          printf "artifact-name=%s" multicast-integration-${BUILD_SHA}-part- >> "$GITHUB_OUTPUT"
+          printf "%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n" $RANDOM $RANDOM $RANDOM $(($RANDOM & 0x0fff | 0x4000)) $(($RANDOM & 0x3fff | 0x8000)) $RANDOM $RANDOM $RANDOM >> "$GITHUB_OUTPUT"
+        fi
+        printf "%s\n" "DEPS_STEP_SUMMARY=Dependencies-Summary-Artifact-${{ runner.os }}-${PYTHON_VERSION}.txt" >> "$GITHUB_ENV"
     - name: "Install Build Dependencies"
       id: install_build_requirements
       if: ${{ !cancelled() }}
@@ -121,30 +126,42 @@ runs:
       run: |
         if [[ "${{ steps.install_build_requirements.outcome }}" != "failure" ]] ; then
           if [[ ( -r requirements.txt ) ]] ; then
+            # Initialize result as success b/c nothing failed ... yet
             THE_RESULT="success"
           else
+            # Initialize result as skipped b/c nothing could be done without requirements.txt
             THE_RESULT="skipped"
           fi
         else
+          # Initialize result as failure right away
           THE_RESULT="failure"
         fi
         if [[ "${{ steps.install_test_requirements.outcome }}" == "success" && "${THE_RESULT}" == "success" ]] ; then
+          # keep result as success b/c something succeeded and nothing failed ... yet
           THE_RESULT="success"
         else
+          # check for actual failure
           if [[ "${{ steps.install_test_requirements.outcome }}" == "failure" ]] ; then
+             # force result as failure b/c something failed
              THE_RESULT="failure"
           fi
         fi
         if [[ "${{ steps.install_docs_requirements.outcome }}" == "success" && "${THE_RESULT}" == "success" ]] ; then
+          # keep result as success b/c something succeeded and nothing failed ... at all
           THE_RESULT="success"
         else
+          # check for actual failure
           if [[ "${{ steps.install_docs_requirements.outcome }}" == "failure" ]] ; then
+             # force result as failure b/c something failed
              THE_RESULT="failure"
           fi
         fi
+        # hint to help with debugging
+        printf "::debug:: %s\n" "The result of dependency evaluation: ${THE_RESULT}"
         if [[ "${THE_RESULT}" == "success" ]] ; then
           exit 0
         else
+          # exit as failure b/c either a soft-fail (skip/cancelled/etc.) or actual failure
           exit 1
         fi
     - name: "Summarize DEPs"
@@ -191,6 +208,7 @@ runs:
           printf "%s\n" "DEPS summary files found:"
           printf "%s\n" "$FILES"
           mkdir DEPS || :
+          printf "%s\n" "$FILES" | xargs -I{} mv -f "{}" "DEPS/{}" || :
           # Replace line breaks with spaces for GitHub Action Output
           FILES="${FILES//$'\n'/ }"
           printf "%s\n" "files=$FILES" >> "$GITHUB_OUTPUT"
