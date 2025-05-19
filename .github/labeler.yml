@@ -4,7 +4,6 @@
 Multicast:
   - changed-files:
     - any-glob-to-any-file:
-      - 'setup.*'
       - multicast/*.py
       - LICENSE
       - LICENSE.md
@@ -114,3 +113,4 @@ invalid:
     - any-glob-to-any-file:
       - .stickler.yml
       - .hound.yml
+      - setup.py

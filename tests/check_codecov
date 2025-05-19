@@ -194,11 +194,11 @@ fi
 if [[ ( -x $(command -v coverage3) ) ]] ; then
 	coverage3 combine 2>/dev/null || true
 	wait ;
-	coverage3 xml --include=multicast/*,tests/*,setup.py 2>/dev/null || true
+	coverage3 xml --include=multicast/*,tests/* 2>/dev/null || true
 elif [[ ( -x $(command -v coverage) ) ]] ; then
 	coverage combine 2>/dev/null || true
 	wait ;
-	coverage xml --include=multicast/*,tests/*,setup.py 2>/dev/null || coverage xml 2>/dev/null || true
+	coverage xml --include=multicast/*,tests/* 2>/dev/null || coverage xml 2>/dev/null || true
 fi
 
 # shellcheck disable=SC2086

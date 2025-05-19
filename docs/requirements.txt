@@ -15,7 +15,7 @@
 # limitations under the License.
 #python
 # time - builtin - PSF license
-# typing_extensions - builtin - PSF license
+# typing_extensions - builtin? - MIT License
 # re - builtin - PSF license
 # subprocess - builtin - PSF license
 # urllib3 - MIT license
@@ -24,7 +24,7 @@
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
 # setuptools - MIT license
-setuptools>=75.0
+setuptools>=80.4
 # virtualenv - MIT license
 #virtualenv>=15.0.1
 # pgpy - BSD 3-Clause licensed
@@ -32,7 +32,7 @@ setuptools>=75.0
 # tox - MIT license
 #tox>=3.0.0, !=3.16.1
 # wheel - MIT license
-wheel>=0.44
+wheel>=0.45
 # pip - MIT license
 pip>=24.3.1
 # build - MIT license

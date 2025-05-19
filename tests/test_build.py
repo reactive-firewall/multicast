@@ -23,8 +23,8 @@ This module contains test cases that verify the build process, package structure
 and installation requirements of the multicast package.
 
 Classes:
-	TestBuild: Test cases for build verification.
-	TestInstallation: Test cases for installation verification.
+	BuildPEP517TestSuite: Test cases for build verification.
+	BuildPEP621TestSuite: Test cases for metadata verification.
 
 Meta Testing:
 
@@ -65,20 +65,13 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 		Test building the package using PEP 517 standards.
 
 		This test verifies:
-		1. Clean build environment setup
-		2. Successful package build (both sdist and wheel)
+		1. Successful package build (both sdist and wheel)
 		3. Presence of expected distribution files
 
 		References:
 		- PEP 517: https://peps.python.org/pep-0517/
 		"""
 		# Arguments need to clean
-		build_arguments = [
-			f"{str(sys.executable)} -m coverage run", "-p", "setup.py", "clean", "--all",
-		]
-		# Build the source distribution
-		theBuildtxt = context.checkPythonCommand(build_arguments, stderr=subprocess.STDOUT)
-		self.assertIn("running clean", str(theBuildtxt))
 		# Arguments need to build
 		build_arguments = [
 			f"{str(sys.executable)} -m coverage run", "-p", "-m", "build", "--sdist", "--wheel",
@@ -100,6 +93,35 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 				expected_file,
 				dist_files,
 				f"Missing {expected_file} in dist directory. Looking for version {pkg_version}",
+			)
+
+
+@context.markWithMetaTag("mat", "build")
+class BuildPEP621TestSuite(BasicUsageTestSuite):
+
+	__module__ = "tests.test_build"
+
+	def test_has_configs_WHEN_supporting_pep621(self) -> None:
+		"""
+		Test presence of the package config pyproject.toml for using PEP 621 standards.
+
+		This test verifies:
+		1. Presence of expected project config files (pyproject.toml)
+
+		References:
+		- PEP 621: https://peps.python.org/pep-0621/
+		"""
+		# Verify that the project directory contains the expected files
+		project_base_dir = os.path.normpath(os.getcwd())
+		project_files = sorted(os.listdir(project_base_dir), reverse=True)
+		expected_files = [
+			"pyproject.toml",
+		]
+		for expected_file in expected_files:
+			self.assertIn(
+				expected_file,
+				project_files,
+				f"Missing {expected_file} in project directory. See PEP 621.",
 			)
 
 

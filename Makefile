@@ -180,17 +180,19 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "exclude .*.yaml" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .*.conf" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude package.json" >>"$@" ;
+	$(QUIET)$(ECHO) "exclude tests/*.py" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .git" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude codecov_env" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .DS_Store" >>"$@" ;
 	$(QUIET)$(ECHO) "global-exclude .local_pip_cleanup.txt" >>"$@" ;
-	$(QUIET)$(ECHO) "prune .gitattributes" >>"$@" ;
+	$(QUIET)$(ECHO) "global-exclude .gitattributes" >>"$@" ;
 	$(QUIET)$(ECHO) "prune test-reports" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .github" >>"$@" ;
 	$(QUIET)$(ECHO) "prune .circleci" >>"$@" ;
 	$(QUIET)$(ECHO) "prune venv" >>"$@" ;
+	$(QUIET)$(ECHO) "prune docs" >>"$@" ;
 
-build: init ./setup.py MANIFEST.in
+build: init ./pyproject.toml MANIFEST.in
 	$(QUIET)$(PYTHON) -W ignore -m build --installer=pip ./ || $(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
@@ -203,7 +205,7 @@ branding::
 	$(QUIET)$(ECHO) ""
 
 init: branding
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=80.4" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -218,8 +220,6 @@ uninstall:
 	$(QUIET)$(ECHO) "$@: Done."
 
 legacy-purge: clean uninstall
-	$(QUIET)$(PYTHON) -W ignore ./setup.py uninstall 2>$(ERROR_LOG_PATH) || :
-	$(QUIET)$(PYTHON) -W ignore ./setup.py clean 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./build/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./dist/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./.eggs/ 2>$(ERROR_LOG_PATH) || :
@@ -292,7 +292,7 @@ test-mat-doctests: test-reports MANIFEST.in ## Run doctests MAT category (doctes
 		$(ECHO) "Try 'make test-mat-doctests' instead."; \
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category doctests || DO_FAIL="exit 2" ; \
-		$(QUIET)$(WAIT) ; \
+		$(WAIT) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_doctests ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
@@ -304,7 +304,11 @@ test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|us
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) $(COVERAGE_ARGS) -m "mat and $*" tests/ || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $*; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $* || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_$* ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_$*.xml --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -313,7 +317,11 @@ test-extra: ## Run all extra tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) $(COVERAGE_ARGS) -m "extra" tests/ || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_extra ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_extra 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_extra.xml --include=multicast/* --data-file=coverage_extra 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -322,7 +330,11 @@ test-extra-%: ## Run specific extra test category
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "extra and $*" || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra --category $*; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra --category $* || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_$* ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_$*.xml --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -331,7 +343,11 @@ test-fuzzing: ## Run all fuzzing tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "fuzzing" || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group fuzzing; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group fuzzing || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_fuzzing ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_fuzzing 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_fuzzing.xml --include=multicast/* --data-file=coverage_fuzzing 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -340,7 +356,11 @@ test-perf: ## Run all performance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) tests/ --verbose $(COVERAGE_ARGS) -m "performance"; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group performance; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group performance || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_performance ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_performance 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml -o test-reports/coverage_performance.xml --include=multicast/* --data-file=coverage_performance 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -412,7 +432,13 @@ cleanup-multicast: cleanup-py-cache-dirs cleanup-py-caches
 	$(QUIET)$(RM) multicast/__pycache__/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) multicast/*/*.pyc 2>$(ERROR_LOG_PATH) || true
 
-cleanup-multicast-eggs: cleanup-dev-backups cleanup-mac-dir-store
+cleanup-nested-multicast-eggs: cleanup-dev-backups cleanup-mac-dir-store
+	$(QUIET)$(RM) multicast/multicast.egg-info/* 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast/multicast.egg-info 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast/.eggs 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RMDIR) multicast/.eggs/ 2>$(ERROR_LOG_PATH) || true
+
+cleanup-multicast-eggs: cleanup-nested-multicast-eggs cleanup-dev-backups cleanup-mac-dir-store
 	$(QUIET)$(RM) multicast.egg-info/* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) multicast.egg-info 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) .eggs 2>$(ERROR_LOG_PATH) || true

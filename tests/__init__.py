@@ -152,7 +152,7 @@ try:
 	from tests import test_basic
 	from tests import test_exceptions
 	from tests import test_deps
-	from tests import test_install_requires
+	# removed test_install_requires, in v2.0.9a3
 	from tests import test_manifest
 	from tests import test_build
 	from tests import test_usage
@@ -166,7 +166,6 @@ try:
 		profiling,
 		test_basic,
 		test_deps,
-		test_install_requires,
 		test_build,
 		test_manifest,
 		test_usage,
@@ -223,7 +222,7 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 	- The function checks if the `doctest` module is already imported to
 		avoid unnecessary imports.
 	- The `DocTestFinder` is configured with the following options:
-		- `verbose=True`: Enables verbose output for the test discovery.
+		- `verbose=False`: Disables verbose output for the test discovery. (changed in v2.0.9a3)
 		- `recurse=True`: Allows the finder to search for doctests in
 			nested functions and classes.
 		- `exclude_empty=True`: Excludes empty doctests from the results.
@@ -255,7 +254,6 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 
 		>>> import multicast
 		>>> suite = loadDocstringsFromModule(multicast)  #doctest: +ELLIPSIS
-		Finding tests in multicast...
 		>>> if suite:
 		...     print(f"Loaded {len(suite._tests)} doctests from "
 		...         f"{multicast.__name__}")  # doctest: +ELLIPSIS
@@ -272,7 +270,7 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 			doctest = sys.modules["doctest"]
 	except Exception as _cause:  # pragma: no branch
 		raise ImportError("[CWE-440] doctest Failed to import.") from _cause
-	finder = doctest.DocTestFinder(verbose=True, recurse=True, exclude_empty=True)
+	finder = doctest.DocTestFinder(verbose=False, recurse=True, exclude_empty=True)
 	doc_suite = unittest.TestSuite()
 	try:
 		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
@@ -305,7 +303,8 @@ MINIMUM_ACCEPTANCE_TESTS = {
 		# Build and packaging tests
 		test_build.BuildPEP517TestSuite,
 		test_manifest.ManifestInclusionTestSuite,
-		test_install_requires.ParseRequirementsTestSuite,
+		test_build.BuildPEP621TestSuite,  # added in v2.0.9a3
+		# removed test_install_requires.ParseRequirementsTestSuite in v2.0.9a3
 	],
 	"doctests": [
 		# These will be loaded dynamically via DocTestSuite
@@ -348,7 +347,7 @@ EXTRA_TESTS = {
 }
 
 try:
-	from tests import test_recv
+	from tests import test_recv  # added in v2.0.7
 	depends.insert(11, test_recv)
 	EXTRA_TESTS["coverage"].append(test_recv.McastRECVTestSuite)
 except Exception:  # pragma: no branch
@@ -363,7 +362,7 @@ except Exception:  # pragma: no branch
 	# reported, so now just continue with testing
 
 try:
-	from tests import test_extra
+	from tests import test_extra  # added in v2.0.7
 	depends.insert(11, test_extra)
 	EXTRA_TESTS["security"].append(test_extra.ExtraDocsUtilsTestSuite)
 	import docs.utils

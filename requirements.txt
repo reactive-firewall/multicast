@@ -17,22 +17,20 @@
 # logging - builtin - PSF license
 # time - builtin - PSF license
 # re - builtin - PSF license?
-# subprocess - PSF license
-# sphinx - BSD license
-#sphinx>=5.0
 # socket - builtin - PSF license
+# socketserver - builtin - PSF license
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
 # argparse>=1.4.0
 # setuptools - MIT license
-setuptools>=75.0
+setuptools>=80.4
 # virtualenv - MIT license
-#virtualenv>=20.26.6
+# virtualenv>=20.26.6
 # pip - MIT license
 pip>=24.3.1
 # build - MIT license
-build>=1.1.1, !=1.2.2.post1
-# multicast - MIT license
-#-e git+https://github.com/reactive-firewall/multicast.git#egg=multicast
+build>=1.2.1, !=1.2.2.post1
+# multicast - MIT license (MITNFA)
+#-e multicast
 # wheel - MIT license
-wheel>=0.44
+wheel>=0.45

@@ -78,8 +78,6 @@ updates:
         dependency-type: "development"
       - dependency-name: "pytest"
         dependency-type: "direct"
-      - dependency-name: "pytest-checkdocs"
-        dependency-type: "development"
       - dependency-name: "pytest-cov"
         dependency-type: "development"
       - dependency-name: "pytest-enabler"

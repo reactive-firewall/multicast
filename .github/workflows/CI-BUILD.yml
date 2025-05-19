@@ -167,7 +167,7 @@ jobs:
           printf "%s\n%s\n" "::endgroup::" "::group::make-clean"
           make -j1 -f Makefile clean || true ;
           printf "%s\n%s\n" "::endgroup::" "::group::make-build"
-          make -j1 -f Makefile build ;
+          make -j1 -f Makefile build || exit 1 ;
           printf "%s\n" "::endgroup::"
         shell: bash
       - name: Summerize Building
@@ -188,7 +188,7 @@ jobs:
         shell: bash
       - name: Test Info
         id: test-info
-        run: python -m setup --name --version --license || true ;
+        run: python -m multicast --version || true ;
       - name: Post-Clean
         id: post-bootstrap
         run: |

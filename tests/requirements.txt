@@ -15,54 +15,55 @@
 # limitations under the License.
 #python
 # time - builtin - PSF license
-# typing_extensions - builtin - PSF license
 # re - builtin - PSF license?
-# subprocess - builtin - PSF license
+# subprocess - PSF license
 # sphinx - BSD license
+# sphinx>=7.3
 # socket - builtin - PSF license
+# socketserver - builtin - PSF license
 # struct - builtin - PSF license
 # argparse - builtin - PSF license
 # argparse>=1.4.0
+###
+# TESTING ONLY - Do NOT report issues with these optionals on multicast
+###
+# typing_extensions - builtin? - MIT License
 # setuptools - MIT license
-setuptools>=75.0
+setuptools>=80.4
 # virtualenv - MIT license
 virtualenv>=20.26.6
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 # tox - MIT license
 tox>=3.0.0, !=3.16.1
-#py>=1.4.33
-###
-# TESTING ONLY - Do NOT report issues with these optionals on multicast
-###
 # flake8 - MIT license
-flake8>=3.9.2
+flake8>=7.2.0
 # flake8-comprehensions - MIT License
-flake8-comprehensions>=3.10.1
+flake8-comprehensions>=3.16.0
 # hypothesis - MPL2 License (may not be bundled, take care with docker)
 hypothesis>=6.112.2
 # packaging - Apache Software License; BSD License
 packaging>=24.1
 # pyflakes - MIT license
-# pyflakes>=2.5.0
+# pyflakes>=3.3.2
 # pep8 - MIT license
-pep8>=1.0
+pep8>=1.7
 # pytest - MIT license
 pytest>=7.0, !=8.1.0
 # pytest-checkdocs - MIT license
-pytest-checkdocs>=1.2.5
+# pytest-checkdocs>=1.2.5
 # pytest-doctestplus - BSD license
 pytest-doctestplus>=1.4.0
 # pytest-cov - MIT license
-pytest-cov>=3.0.0
+pytest-cov>=6.1.1
 # pytest-enabler - MIT license
 pytest-enabler>=1.0.1
-# pytest-flake8 - BSD license
-pytest-flake8>=1.0.7
+# pytest-flake8 - BSD license - removed from tests in v2.0.9a3
+# pytest-flake8>=1.0.7
 # coverage - Apache 2.0 license
 coverage>=7.2
 # wheel - MIT license
-wheel>=0.44
+wheel>=0.45
 # pip - MIT license
 pip>=24.3.1
 # build - MIT license

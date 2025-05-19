@@ -202,8 +202,8 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 	if [ -z "${_TEST_ROOT_DIR}" ]; then
 		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 	fi
-		python3 -B .github/tools/cioutput.py --log-level debug -l debug "Found ${_TEST_ROOT_DIR} ..." ;
-	else
+	python3 -B .github/tools/cioutput.py --log-level debug -l debug "Found ${_TEST_ROOT_DIR} ..." ;
+else
 	python3 -B .github/tools/cioutput.py --log-level debug -l error --file "${SCRIPT_FILE}" --line ${BASH_LINENO:-0} -t "${FUNCNAME:-$0}" "FAIL: missing valid repository or source structure" >&2
 	EXIT_CODE=40
 fi

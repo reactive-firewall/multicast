@@ -36,7 +36,9 @@ URL_ALLOWED_SCHEMES = frozenset({"https"})
 # URL allowed domain list
 # Enforces:
 # - URLs Must belong to one of these domains
-URL_ALLOWED_NETLOCS = frozenset({"github.com", "readthedocs.com", "docs.python.org"})
+URL_ALLOWED_NETLOCS = frozenset({
+	"github.com", "readthedocs.com", "docs.python.org", "peps.python.org",
+})
 
 
 # Maximum allowed URL length

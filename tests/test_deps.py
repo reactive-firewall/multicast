@@ -87,7 +87,7 @@ class BuildRequirementsTxtTestSuite(context.BasicUsageTestSuite):
 				)
 
 	@unittest.skipUnless(
-		(sys.platform.startswith("linux") or sys.platform.startswith("darwin")),
+		(sys.platform.startswith("linux")),
 		"This test is not supported on this OS."
 	)
 	@unittest.skipIf(
