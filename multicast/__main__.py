@@ -574,21 +574,21 @@ class McastDispatch(mtool):
 
 	"""
 
-	__proc__ = "multicast"
+	__proc__: str = "multicast"
 
-	__prologue__ = "The Main Entrypoint."
+	__prologue__: str = "The Main Entrypoint."
 
-	__epilogue__ = "Called from the command line, the __main__ component handles the CLI dispatch."
+	__epilogue__: str = "Called from the command line, this main component handles the CLI dispatch."
 
 	@classmethod
-	def setupArgs(cls, parser):
+	def setupArgs(cls, parser) -> None:
 		if parser is not None:  # pragma: no branch
 			for sub_tool in sorted(TASK_OPTIONS.keys()):
 				sub_parser = parser.add_parser(sub_tool, help="...")
 				type(TASK_OPTIONS[sub_tool]).setupArgs(sub_parser)
 
 	@staticmethod
-	def useTool(tool, **kwargs):
+	def useTool(tool, **kwargs) -> tuple:
 		"""Will Handle launching the actual task functions."""
 		theResult = None
 		cached_list = sorted(TASK_OPTIONS.keys())
@@ -601,7 +601,7 @@ class McastDispatch(mtool):
 				_is_done = False
 		return (_is_done, theResult)  # noqa
 
-	def doStep(self, *args, **kwargs):
+	def doStep(self, *args, **kwargs) -> tuple:
 		"""
 		Executes the multicast tool based on parsed arguments.
 
@@ -614,21 +614,21 @@ class McastDispatch(mtool):
 		Returns:
 			A tuple containing the exit status and the result of the tool execution.
 		"""
-		__EXIT_MSG = (64, exceptions.EXIT_CODES[64][1])
+		_response: tuple = (64, exceptions.EXIT_CODES[64][1])
 		try:
 			(argz, _) = type(self).parseArgs(*args)
 			service_cmd = argz.cmd_tool
 			argz.__dict__.__delitem__("cmd_tool")
 			_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
 			if _TOOL_MSG[0]:
-				__EXIT_MSG = (0, _TOOL_MSG)
+				_response = (0, _TOOL_MSG)
 			else:
-				__EXIT_MSG = (70, _TOOL_MSG)
+				_response = (70, _TOOL_MSG)
 				if (sys.stdout.isatty()):  # pragma: no cover
 					print(str(_TOOL_MSG))
 		except Exception as _cause:  # pragma: no branch
 			exit_code = exceptions.get_exit_code_from_exception(_cause)
-			__EXIT_MSG = (
+			_response = (
 				1,
 				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {_cause}" # noqa
 			)
@@ -638,21 +638,23 @@ class McastDispatch(mtool):
 					file=sys.stderr,
 				)
 				print(f"{exceptions.EXIT_CODES[exit_code][1]}: {_cause}\n{_cause.args}", file=sys.stderr)
-		return __EXIT_MSG  # noqa
+		return _response  # noqa
 
 
 @exceptions.exit_on_exception
-def main(*argv):
+def main(*argv) -> tuple:
 	"""
 	Do main event stuff.
 
 	Executes the multicast command-line interface, by parsing command-line arguments and dispatching
 	the appropriate multicast operations.
 
-	The main(*args) function in multicast is expected to return a POSIX compatible exit code.
-	Regardless of errors the result as an 'exit code' (int) is returned.
-	The only exception is multicast.__main__.main(*args) which will exit with the underlying
-	return codes.
+	The main(*args) function in multicast is expected to return a POSIX compatible exit code and
+	optional detail message. Regardless of errors the result as an 'exit code' (int) is returned,
+	even if the optional details are not (eg. `tuple(int(exit_code), None)`).
+	The only exception is when the error results in exiting the process, which will exit the
+	python runtime with the underlying return codes, instead of returning directly to the then
+	unreachable caller. See `multicast.exceptions.exit_on_exception` for the mechanisms involved.
 	The expected return codes are as follows:
 		= 0:  Any nominal state (i.e. no errors and possibly success)
 		≥ 1:  Any erroneous state (includes simple failure)
@@ -748,14 +750,91 @@ def main(*argv):
 
 
 	"""
-	dispatch = McastDispatch()
+	dispatch: McastDispatch = McastDispatch()
 	return dispatch(*argv)
 
 
-if __name__ in '__main__':
-	__EXIT_CODE = (1, exceptions.EXIT_CODES[1][1])
+def cli() -> int:
+	"""
+	Do main console script stuff.
+
+	Along with `main()`, `cli()` provides a main entrypoint for console usage of multicast.
+
+	`cli()` just calls `main()` with arguments from `sys.argv` and returns only the exit-code.
+
+	Through calling `multicast.__main__.main(sys.argv[1:])`, `cli()` ...
+	> Executes the multicast command-line interface, by parsing command-line arguments and
+	> dispatching the appropriate multicast operations.
+	>
+	> The main(*args) function in multicast is expected to return a POSIX compatible exit code...
+
+	`cli()` versus `main(*args)`:
+		- The primary difference is the return types, whereas `main(*args)` returns a `tuple`,
+			`cli()` returns only the first element as an `int`.
+		- The secondary difference between `cli()` and `main(*args)` is that `main(*args)` requires
+			arguments to be passed, whereas `cli()` will use `sys.argv` instead.
+
+	__Except__ in the case of errors, the result as an 'exit code' (int) is returned by `cli()`.
+	The expected return codes are the same as those from `main(*args)`.
+
+	Args:
+		None: Uses `sys.argv` instead.
+
+	Returns:
+		int: the underlying exit code int
+
+	Minimal Acceptance Testing:
+
+		First set up test fixtures by importing multicast.
+
+			>>> import multicast
+			>>> multicast.__main__.main is not None
+			True
+			>>>
+
+		Testcase 0: calls to cli should return an int.
+			A: Test that the call to the `cli` function returns an int 0-3.
+
+			>>> tst_argv_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
+			>>> sys.argv = tst_argv_args  # normally arguments are aoutomaticly already in argv
+			>>> test_code = multicast.__main__.cli()
+			>>> test_code is not None
+			True
+			>>> type(test_code) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_code) >= int(0)
+			True
+			>>> int(test_code) < int(4)
+			True
+			>>>
+
+		Testcase 1: main should error with usage.
+			A: Test that the multicast component is initialized.
+			B: Test that the recv component is initialized.
+			C: Test that the main(recv) function is initialized.
+			D: Test that the main(recv) function errors with a usage hint by default.
+
+			>>> multicast.__main__.main is not None
+			True
+			>>> test_code = multicast.__main__.cli() #doctest: +ELLIPSIS
+			usage: multicast [-h | -V] [--use-std] [--daemon] CMD ...
+			multicast...
+			CRITICAL...
+			>>> type(test_code) #doctest: -DONT_ACCEPT_BLANKLINE, +ELLIPSIS
+			<...int...>
+			>>> int(test_code) >= int(0)
+			True
+			>>> int(test_code) < int(4)
+			True
+			>>>
+	"""
+	__EXIT_CODE: tuple = (1, exceptions.EXIT_CODES[1][1])
 	if (sys.argv is not None) and (len(sys.argv) > 1):
 		__EXIT_CODE = main(sys.argv[1:])
 	elif (sys.argv is not None):
 		__EXIT_CODE = main([__name__, "-h"])
-	exit(__EXIT_CODE[0])  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing
+	return __EXIT_CODE[0]
+
+
+if __name__ in '__main__':
+	exit(cli())  # skipcq: PYL-R1722 - intentionally allow overwriteing exit for testing

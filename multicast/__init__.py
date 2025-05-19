@@ -221,7 +221,7 @@ __name__ = "multicast"  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = "2.0.9-alpha-3"
+__version__ = "2.0.9-alpha-4"
 """The version of this program.
 
 	The `__version__` attribute, like many dunder attributes, is associated with the implementation
@@ -1047,6 +1047,6 @@ except Exception:
 
 if __name__ in "__main__":
 	__EXIT_CODE = 2
-	if __main__.main is not None:
-		__EXIT_CODE = __main__.main(sys.argv[1:])
+	if __main__.cli is not None:
+		__EXIT_CODE = __main__.cli()
 	exit(__EXIT_CODE)  # skipcq: PYL-R1722 - intentionally allow coverage and testing to catch exit
