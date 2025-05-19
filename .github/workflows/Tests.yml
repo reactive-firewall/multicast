@@ -1360,6 +1360,13 @@ jobs:
       with:
         sha: ${{ needs.check_mats.outputs.build_sha }}
         python-version: ${{ matrix.python-version }}
+    - name: Setup pip-licenses
+      id: install-pip-tools
+      run: |
+        printf "%s\n" "::group::install-tools"
+        pip install -U "pip-licenses>=5.0.0"
+        printf "%s\n" "::endgroup::"
+      shell: bash
     - name: Pre-Clean
       id: clean-prep
       run: make -j1 -f Makefile clean ;
