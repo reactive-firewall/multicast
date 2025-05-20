@@ -198,7 +198,8 @@ for more information.
 
 ### Next steps
 
-Next-steps and bug-fixes are tracked [Here](https://github.com/users/reactive-firewall/projects/1).
+Next steps and bug fixes are tracked by the
+[Multicast Project Board](https://github.com/users/reactive-firewall/projects/1).
 
 ## License
 
