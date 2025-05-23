@@ -1,19 +1,176 @@
 # CI
 
+Continuous Integration details for the Multicast project.
+
 ## Service providers
 
 ***
 
-Continuous integration testing is handled by GitHub Actions and the generous CircleCI service.
+Continuous integration testing for the Multicast project is handled by
+[GitHub Actions](https://github.com/reactive-firewall/multicast/actions) and the
+generous [CircleCI service](https://app.circleci.com/pipelines/github/reactive-firewall/multicast).
 
+[GitHub Actions Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS&tab=runner)
+**CircleCI**
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/test-matrix/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/test-matrix/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
+
+Many additional services are used for enhancing CI/CD with additional metrics, insights, and
+automated analysis.
+
 [![DeepSource](https://app.deepsource.com/gh/reactive-firewall/multicast.svg/?label=active+issues&show_trend=true&token=SZUDMH7AtX399xLmONFAkiD6)](https://app.deepsource.com/gh/reactive-firewall/multicast/)
 [![CodeCov](https://codecov.io/gh/reactive-firewall/multicast/graphs/sunburst.svg)](https://codecov.io/gh/reactive-firewall/multicast)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9458/badge)](https://app.deepsource.com/report/3f7c11ca-c203-44ec-9e01-126078f11660)
-[GHA Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/reactive-firewall/multicast?utm_source=oss&utm_medium=github&utm_campaign=reactive-firewall%2Fmulticast&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/reactive-firewall/multicast.svg)](https://isitmaintained.com/project/reactive-firewall/multicast "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/reactive-firewall/multicast.svg)](https://isitmaintained.com/project/reactive-firewall/multicast "Percentage of issues still open")
+
+## Testing in CI/CD
+
+***
+
+### Acceptance Testing with GitHub Actions
+
+#### How on-`workflow_run` triggers propagate
+
+```mermaid
+graph TD;
+    PUSH-EVENT-->CI-Build.yml;
+    CI-Build.yml-->multicast-build-*;
+    CI-Build.yml-->BUILD-info.txt;
+    CI-Build.yml-->Build-Summary-Artifact.txt;
+    multicast-build-*-->CI-MATs.yml;
+    BUILD-info.txt-->CI-MATs.yml;
+    CI-MATs.yml-->multicast-info-*;
+    CI-MATs.yml-->MATs-Summary-Artifact.txt;
+    multicast-build-*-->CI-Tests.yml;
+    multicast-info-*-->CI-Tests.yml;
+    CI-Tests.yml-->COVERAGE;
+    CI-Tests.yml-->\*-Test-Report-\*-*;
+    CI-Tests.yml-->Integration-Summary-Artifact.txt;
+    multicast-build-*-->CI-DOCS.yml;
+    multicast-info-*-->CI-DOCS.yml;
+    CI-DOCS.yml-->Multicast-Documentation-*-ALL;
+    CI-DOCS.yml-->DOCUMENTATION-Summary-Artifact.txt;
+```
+
+1. **PUSH-EVENT**: This event triggers the entire Acceptance Testing CI/CD workflow.
+1. [CI-Build.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-BUILD.yml): The main configuration file for the build process, which generates several artifacts:
+   1. multicast-build-`{{ sha }}`: The built package artifact.
+   1. BUILD-info.txt: Contains essential details about the build execution, including:
+      1. Build Run ID: A unique identifier for the build run.
+      1. Build Artifact's ID/URL/Name/Digest: Information about the generated artifact, such as its identifier, location, name, and digest for verification.
+      1. Git Commit Info: Details about the commit associated with the build, including the SHA, reference, and branch.
+   1. Build-Summary-Artifact.txt (BUILD-COMMENT-BODY-`{{ sha }}`): A summary of the build process, highlighting key outcomes and metrics.
+1. [CI-MATs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml): A configuration file that processes the build artifacts to create:
+   1. multicast-info.txt (multicast-info-`{{ build_sha }}`): Contains all the information from the "Build-Info.txt" along with additional details about the "CI-MATs.yml" workflow run, including:
+      1. MATs Workflow Run ID: A unique identifier for the MATs workflow run.
+      1. Conclusion Statuses: The outcomes of the Minimal Acceptance Tests.
+   1. MATs-Summary-Artifact.txt (MATS-COMMENT-BODY-`{{ build_sha }}`): A summary of the Minimal Acceptance Tests conducted.
+1. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml): A configuration file for executing tests, which processes the build artifacts to create:
+   1. Coverage reports: Uploading various coverage reports for the tests executed to multiple services for analysis (eg. codecov.io, codeclimate.com, app.deepsource.io, etc.).
+   1. Test-Results-Artifacts (`{{ test-group }}`-Test-Report-`{{ matrix.os }}`-`{{ matrix.python-version }}`): Contains the results of the tests grouped by `coverage|doctests|integration`, `os` and `python-version`.
+   1. Integration-Summary-Artifact.txt (INTEGRATION-COMMENT-BODY-`{{ build_sha }}`): A summary of the test results.
+1. [CI-DOCs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml): A configuration file for generating documentation, which produces:
+   1. Documentation-Artifact.zip (Multicast-Documentation-`{{ build_sha }}`-ALL): A zip file containing the generated documentation.
+   1. DOCUMENTATION-Summary-Artifact.txt (DOCUMENTATION-COMMENT-BODY-`{{ build_sha }}`): A summary of the documentation results.
+
+In summary, as the diagram illustrates, a GitHub Actions CI/CD workflow begins with a push event, leading to the building of artifacts, the execution of Minimal Acceptance Tests, and the generation of test reports. The workflow includes passing detailed information about the build process, such as the build run ID, artifact details, and associated git commit information, as well as comprehensive details about the Minimal Acceptance Tests, including the MATs workflow run ID and conclusion statuses, ensuring thorough traceability and accountability throughout the CI/CD pipeline.
+
+### Acceptance Testing with CircleCI
+
+While the comprehensive results from the exstensive GHA pipeline offers a detailed look at the
+state of the codebase, the process can take upwards of 30 minutes to compleate. The Multicast
+Project also utilizes the much faster CircleCI offering to provide pass or fail status much earlier
+in CI/CD. While the underlying tests are the same for both GHA and CircleCI, they are only tested
+in a single environment on CircleCI, and typicly perform faster.
+
+```mermaid
+graph TD;
+    PUSH-EVENT-->config.yml;
+    config.yml-->build;
+    config.yml-->test;
+    config.yml-->lint;
+    config.yml-->pytest;
+    build-->lint;
+    build-->test;
+    test-->pytest;
+
+    build-->GH-Checks;
+    test-->GH-Checks;
+    lint-->GH-Checks;
+    pytest-->GH-Checks;
+    pytest-->Test-Results;
+    Test-Results-->CircleCI-Metrics;
+```
+
+1. **PUSH-EVENT**: This event triggers the entire Acceptance Testing CI/CD workflow.
+1. [config.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml): The sole configuration file for the CircleCI jobs:
+   1. build: Tests that the build process works without critical error, (albeit these quick builds are ephemral and not attested)
+   1. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details are discarded, only the logs remain for a while on CircleCI)
+   1. lint: Selectivly lints (See Linting for details) the multicast python source (eg. `multicast/*.py`), failing on any linter flagged issues or passing on none.
+   1. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run, unittests via the `pytest` testing framework.
+      1. **Test-Results**: the produced test results. See [Collect Tests with CircleCI](https://circleci.com/docs/collect-test-data/#pytest) for more.
+1. **GH-Checks**: Each CI/CD job will report back a GitHub Check run result.
+
+In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push event, leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks, indicating the status of each job. Additionally, the output from pytest generates some Test Results, which are then used to produce CircleCI Metrics.
+
+### How Integrations are triggered from Testing in CI/CD
+
+#### Key integrations
+
+There are many integrations with various service providers used in the Multicast Project's CI/CD pipeline.
+
+```mermaid
+graph TD;
+    PUSH-EVENT-->CI-Build.yml;
+    CI-Build.yml-->multicast-build-*;
+    CI-Build.yml-->BUILD-info.txt;
+    CI-Build.yml-->Build-Summary-Artifact.txt;
+    multicast-build-*-->CI-MATs.yml;
+    BUILD-info.txt-->CI-MATs.yml;
+    CI-MATs.yml-->multicast-info-*;
+    CI-MATs.yml-->MATs-Summary-Artifact.txt;
+    multicast-build-*-->CI-Tests.yml;
+    multicast-info-*-->CI-Tests.yml;
+    CI-Tests.yml-->COVERAGE;
+    CI-Tests.yml-->\*-Test-Report-\*-*;
+    CI-Tests.yml-->Integration-Summary-Artifact.txt;
+    multicast-build-*-->CI-DOCS.yml;
+    multicast-info-*-->CI-DOCS.yml;
+    CI-DOCS.yml-->Multicast-Documentation-*-ALL;
+    CI-DOCS.yml-->DOCUMENTATION-Summary-Artifact.txt;
+
+    multicast-build-*-->Attestations;
+    CI-Build.yml-->GH-Checks;
+    CI-MATs.yml-->GH-Checks;
+    CI-Tests.yml-->GH-Checks;
+    MATs-Summary-Artifact.txt-->Comments;
+    Integration-Summary-Artifact.txt-->Comments;
+    DOCUMENTATION-Summary-Artifact.txt-->Comments;
+    COVERAGE-->CodeCov;
+    COVERAGE-->CodeClimate;
+    COVERAGE-->DeepSource;
+    COVERAGE-->Coveralls;
+    GH-Checks-->PR;
+    CodeCov-->PR;
+    DeepSource-->PR;
+
+    PUSH-EVENT-->config.yml;
+    config.yml-->build;
+    config.yml-->test;
+    config.yml-->lint;
+    config.yml-->pytest;
+    build-->lint;
+    build-->test;
+    test-->pytest;
+
+    build-->GH-Checks;
+    test-->GH-Checks;
+    lint-->GH-Checks;
+    pytest-->GH-Checks;
+    pytest-->Test-Results;
+    Test-Results-->CircleCI-Metrics;
+```
 
 ## Configurable CI Variables
 
@@ -66,8 +223,9 @@ jobs:
 ***
 
 > [!IMPORTANT]
-> Testing is initiated with the bash command: `make test-pytest` or just `make test`
-> and can be reset before and after with: `make clean` and `make purge`
+> Testing is intended for CI but can also be initiated manually (eg. in your local environment)
+> with the bash command: `make test-mats` or just `make test` and can be reset before and
+> after with: `make clean` and `make purge`.
 
 You can find all the testing code in the aptly named `tests/` directory.
 
@@ -135,7 +293,7 @@ gitGraph:
 The Multicast project uses CI/CD to ensure all files, including code, configurations, and
 documentation, are linted before publishing releases. This is automatically triggered by
 pull requests during the project's release workflow, namely before merging anything to the
-branch `master`.
+branch `master`, and again before releasing to `stable`.
 
 #### Linting Badges
 
@@ -157,7 +315,7 @@ make clean ; # cleans up for next test
 ```
 
 > [!TIP]
-> Use PEP8 to check python code style? Great! Try this:
+> Want to check multicast python code style? Great! Try this:
 
 ```bash
 make clean ; # cleans up from any previous tests hopefully
