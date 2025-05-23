@@ -20,9 +20,20 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
+Dependencies NOT included.
+
 ***
 
 ## Included Licenses and additional Acknowledgments included with package
+
+### Third-Party Dependencies
+
+### Files: `requirements.txt`, `docs/requirements.txt`, `tests/requirements.txt`
+
+***
+The individual dependencies are owned by their respective copyright holders.
+_NO ASSOCIATION._
+***
 
 ### Files in `tests/`: `profiling.py`, `test_basic.py`, `test_usage.py` and parts of `context.py`
 
