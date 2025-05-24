@@ -70,6 +70,8 @@ python3 -m pip install --use-pep517 --break-system-packages --user 'multicast>=2
 
 *Source builds require development tools including (but not limited to): `git`, and `make`*
 
+#### Stable builds (Release Candidates)
+
 ```bash
 # clone the multicast source repository
 git clone "https://github.com/reactive-firewall/multicast.git" multicast
@@ -84,16 +86,30 @@ make user-install
 python3 -m multicast --version
 ```
 
-### Developer builds
+#### Developer builds
 
 > [!WARNING]
 > **Development Builds** *(e.g. Cutting-Edge)* are not intended as full-fleged releases, however
 > updates to the Development Builds are more frequent than releases.
 
+```bash
+# clone the multicast source repository
+git clone "https://github.com/reactive-firewall/multicast.git" multicast
+cd multicast
+# switch to the default "master" branch
+git checkout master
+# build the multicast module
+make -f Makefile build
+# install the build
+make user-install
+# Optionally check the install
+python3 -m multicast --version
+```
+
 ### Legacy egg style install
 
 > [!WARNING]
-> **Egg Style Builds** *(Deprecated)* are not supported after version `2.1` :shrug:
+> **Egg Style Builds** *(Deprecated)* are not supported since version `2.1` :shrug:
 
 ```bash
 pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
@@ -132,15 +148,31 @@ print('Received:', message)
 
 ### Listening for Multicast Messages
 
+* Depending on what needs to be done with recieved data each case will be a bit different.
+
 ```python3
+# setup console logging as example
+import logging
+multicast_logging_sink = logging.getLogger()
+handler = logging.StreamHandler()
+multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
+handler = logging.StreamHandler()  # example trivial log handler
+multicast_logging_sink.addHandler(handler)
+
+# import multicast
 from multicast import hear
 
 # Create a multicast listener
 listener = hear.McastHEAR()
 
-# Listen for messages indefinitely
+# Listen for messages indefinitely (use control+C to stop)
 listener(group='224.0.0.1', port=59259, ttl=1)
 ```
+
+> [!TIP]
+> While this trivial example just scratches the surface, the `multicast.hear` module provides an
+> extendable implementation of the default handler for customizing the listening behavior well
+> beyond just logging.
 
 ## Command-Line Usage
 
@@ -188,12 +220,12 @@ assessing and mitigating risks in your implementations and use of `multicast`.
 ## Documentation
 
 For more detailed documentation and advanced usage, please refer to the
-[official documentation](https://reactive-firewallmulticast.readthedocs.io/en/master/).
+[documentation](https://reactive-firewallmulticast.readthedocs.io/en/master/).
 
 ## Contributing
 
 Contributions are welcome! Please read the
-[contributing guidelines](https://github.com/reactive-firewall/multicast/blob/stable/.github/CONTRIBUTING)
+[contributing guidelines](https://github.com/reactive-firewall/multicast/tree/stable/.github/CONTRIBUTING)
 for more information.
 
 ### Next steps
@@ -205,8 +237,8 @@ Next steps and bug fixes are tracked by the
 
 ### Copyright (c) 2021-2025, Mr. Walls
 
-This project is licensed under the MIT License. See the
-[LICENSE.md](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md) file for
+The Multicast Python Module is licensed under the MIT License. See the
+[LICENSE.md](https://github.com/reactive-firewall/multicast/tree/stable/LICENSE.md) file for
 details.
 
 [![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
