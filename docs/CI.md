@@ -172,6 +172,58 @@ graph TD;
     Test-Results-->CircleCI-Metrics;
 ```
 
+***
+
+## Linting in CI/CD
+
+### TL;DR Context of Linting
+
+> From Wikipedia, the free encyclopedia
+>
+> [Lint](https://en.wikipedia.org/wiki/Lint_(software)) is the computer science term for a static code analysis tool used to flag programming errors, bugs, stylistic errors and suspicious constructs.[[4]](https://en.wikipedia.org/wiki/Lint_(software)#cite_note-4) The term originates from a Unix utility that examined C language source code.[[1]](https://en.wikipedia.org/wiki/Lint_(software)#cite_note-BellLabs-1) A program which performs this function is also known as a "linter".
+
+In the constantly evolving ecosystem of software development, where code quality and maintainability matter, the role of linters has become increasingly common practice. So it should be no surprise that various linters are used in the Multicast project's CI/CD workflows. By incorporating the linting directly into the CI/CD workflows, this automation alleviates the load on developers to manually check much of the code style and formatting across various languages, including Python, YAML, Makefile, Bash, and Markdown.
+
+Some of Multicast Project styles and conventions are quite specific (eg. custom locking conventions of [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not yet automated. However, by leveraging linters, we not only ensure a level of maintainability but also foster a collaborative environment where developers can focus on writing effective code rather than getting bogged down by stylistic concerns.
+
+### Linting Design Overview
+
+#### Linting phases
+
+The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows the following phases:
+
+  * **initialization** - Bootstraps environment and any initial setup automatically
+  * **clone** - git clone the Multicast Git Repository and any submodules needed
+  * **Linting** - performs the actual linting on the resulting clone
+  * **Post-processing** (optional) - any post-processing of the resulting linting results
+  * **Reporting** - report any results and/or linting status
+
+> [!IMPORTANT]
+> This overview does not address the complexities of CI/CD timing, concurrency, or the various combinations of linter workflows that run simultaneously. Each linter workflow is separately triggered (eg. push versus PR, etc.) and thus _logicly_ disjoint (See CI/CD Triggering for details). Each linter workflow varies in its exact implementation of the afore mentioned phases.
+
+Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the order of phases are sequential per single linter.
+
+```mermaid
+sequenceDiagram
+    participant Repo as Repository
+
+    create participant GA as GitHub Actions
+    Repo->>GA: Trigger
+    GA-->>GA: Initialization
+    GA->>GA: Clone
+    create participant SC as Linter
+    GA->>SC: Linting
+    opt: Optional
+        SC->>SC: Post-processing
+    end
+    destroy SC
+    SC-->>GA: Scan Results
+    destroy GA
+    GA->>Repo: Reporting
+```
+
+***
+
 ## Configurable CI Variables
 
 This section documents environment variables used across CI workflows to ensure consistency and
