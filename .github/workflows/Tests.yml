@@ -242,7 +242,7 @@ jobs:
       if: ${{ !cancelled() }}
       uses: ./.github/actions/test-reporter-upload
       with:
-        sha: ${{ needs.check_mats.outputs.build_sha }}
+        tests-outcome: ${{ steps.coverage_tests.outcome }}
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
@@ -511,7 +511,7 @@ jobs:
       if: ${{ !cancelled() }}
       uses: ./.github/actions/test-reporter-upload
       with:
-        sha: ${{ needs.check_mats.outputs.build_sha }}
+        tests-outcome: ${{ steps.doctests-main.outcome }}
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
