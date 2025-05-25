@@ -78,7 +78,7 @@ integrity.
 ### 3.3 Large PR Handling
 
 * 3.3.A Less is More
-  * PRs with more than 100 changed files should be split into smaller PRs when possible.
+  * PRs with more than 99 changed files should be split into smaller PRs when possible.
   * When splitting is not feasible, PR authors must provide a summary highlighting the most
     critical changes for human reviewers.
 
@@ -116,8 +116,14 @@ integrity.
   * The project implements a dual-approval system to help prevent single points of failure.
   * AI approvals are tracked separately from human approvals in the review process. Humans
     must be responsible for the actual merge of pull-requests.
-  * Every user (e.g., AI, or human) must have a distinct code-signing identity (see 4.1.B).
+  * Every user (e.g., AI or human) must have a distinct code-signing identity (see 4.1.B).
   * Only human controlled identities may merge branches, or commit to the default branch directly.
+
+> [!NOTE]
+> Historicly @dependabot (a simple bot, not a LLM-based AI) had been allowed to merge to the
+> default branch; this policy considers such actions in the past to now be violations of § 4.3.A
+> because the code-signing identity was not controlled by a human. Fortunately these changes had
+> been limited to improving supply-chain security and required approval from the project admin.
 
 ## 5. Implementation and Compliance
 
