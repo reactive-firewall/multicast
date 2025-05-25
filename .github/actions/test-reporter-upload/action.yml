@@ -230,24 +230,14 @@ runs:
       shell: bash
       run: |
         if [[ "${OS}" != "unknown" ]] ; then
-          if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codecov }}" == "true" ]] ; then
-            THE_RESULT="success"
-          fi ;
-          if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codeclimate }}" == "true" ]] ; then
-            THE_RESULT="success"
-          fi ;
-          if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_coveralls }}" == "true" ]] ; then
-            THE_RESULT="success"
-          fi ;
-          if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_deepsource }}" == "true" ]] ; then
+          if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codecov }}" == "true" ]] || \
+             [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codeclimate }}" == "true" ]] || \
+             [[ "${{ steps.output_upload_tools.outputs.can_upload_to_coveralls }}" == "true" ]] || \
+             [[ "${{ steps.output_upload_tools.outputs.can_upload_to_deepsource }}" == "true" ]] ; then
             THE_RESULT="success"
           else
-            if [[ "${THE_RESULT}" == "success" ]] ; then
-              THE_RESULT="success"
-            else
-              THE_RESULT="failure"
-            fi
-          fi ;
+            THE_RESULT="failure"
+          fi
         else
           THE_RESULT="skipped"
         fi
