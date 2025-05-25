@@ -46,7 +46,7 @@
 ### 2.2 Prohibited AI Roles :no_entry_sign:
 
 * 2.2.A Sole Developer:
-  * AI (especially LLM bassed AI) is not well suited for innovation; No vibe-coding - the direction
+  * AI (especially LLM based AI) is not well suited for innovation; No vibe-coding - the direction
     and development of the project CANNOT meaningfully come from AI.
 * 2.2.B Sole Approver:
   * AI approval alone is insufficient for merging any PR.
@@ -56,7 +56,7 @@
 
 * 2.2.C Security Gatekeeper:
   * AI cannot be the only mechanism for security validation
-* 2.2.D Unrestricted Auto-Merge:
+* 2.2.D Merge Commit Author:
   * AI cannot trigger auto-merge without human verification
 
 ## 3. PR Review Process
@@ -136,7 +136,7 @@
   * Only human controlled identities may merge branches, or commit to the default branch directly.
 
 > [!NOTE]
-> Historicly @dependabot (a simple bot, not a LLM-based AI) had been allowed to merge to the
+> Historically @dependabot (a simple bot, not a LLM-based AI) had been allowed to merge to the
 > default branch; this policy considers such actions in the past to now be violations of § 4.3.A
 > because the code-signing identity was not controlled by a human. Fortunately these changes had
 > been limited to improving supply-chain security and required approval from the project admin.

@@ -155,6 +155,9 @@ declare -a SPECIFIC_TYPOS=(
 	"rappidly:rapidly"  # from #392
 	"compleated:completed"  # from #338
 	"compleate:complete"  # from #402
+
+	"bassed:based"  # from #415
+	"Historicly:Historically"  # from #415
 )
 
 function cleanup() {
