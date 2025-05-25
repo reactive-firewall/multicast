@@ -2,7 +2,10 @@
 
 ## 1. Purpose and Scope
 
-This policy governs the use of AI tools, particularly CodeRabbitAI, GH Copilot, and Codecov-ai-reviewer, within the Multicast project's development workflow. It establishes guidelines for responsible AI integration while maintaining the project's security, quality, and integrity.
+This policy governs the use of AI tools, particularly CodeRabbitAI, GH Copilot, and
+Codecov-ai-reviewer, within the Multicast project's development workflow. It establishes
+guidelines for responsible AI integration while maintaining the project's security, quality, and
+integrity.
 
 ## 2. AI Role Definitions
 
@@ -11,7 +14,8 @@ This policy governs the use of AI tools, particularly CodeRabbitAI, GH Copilot, 
  * 2.1.A Assistive Code Review:
    * AI may provide feedback on code quality, style compliance, and potential issues
  * 2.1.B Assistive Project-Management Delegation:
-   * AI may provide feedback when requested on GHI (GitHub issues), as well as open new, or comment on existing, GHI, to track suggested improvements to the project content.
+   * AI may provide feedback when requested on GHI (GitHub issues), as well as open new, or comment
+     on existing, GHI, to track suggested improvements to the project content.
  * 2.1.C Documentation Improvement:
    * AI may suggest improvements to documentation clarity and completeness
  * 2.1.D Test Coverage Analysis:
@@ -19,12 +23,14 @@ This policy governs the use of AI tools, particularly CodeRabbitAI, GH Copilot, 
 Code Generation Assistance: AI may suggest code implementations when requested
 
 > [!CAUTION]
-> However, AI may **NOT** apply changes, nor code suggestions, by themselves, to any protected branch (That is reserved for qualified human contributors).
+> However, AI may **NOT** apply changes, nor code suggestions, by themselves, to any protected
+> branch (That is reserved for qualified human contributors).
 
 ### 2.2 Prohibited AI Roles :no_entry_sign:
 
  * 2.2.A Sole Developer:
-   * AI (especially LLM type AI) is not well suited for innovation; No vibe-coding, the direction and development of the project CAN-NOT meaningfully come from AI.
+   * AI (especially LLM type AI) is not well suited for innovation; No vibe-coding, the direction
+     and development of the project CAN-NOT meaningfully come from AI.
  * 2.2.B Sole Approver:
    * AI approval alone is insufficient for merging any PR.
   
@@ -43,14 +49,17 @@ Code Generation Assistance: AI may suggest code implementations when requested
    * All PRs MUST receive at least one human review from an authorized maintainer
  * 3.1.B Verify or Resolve
    * Human reviews must verify (or conversely reject) the AI's suggestions.
-   * Discussions are encouraged in both cases, as Humans and AI alike, may later consider relevant project content in future reviews.
+   * Discussions are encouraged in both cases, as Humans and AI alike, may later consider relevant
+     project content in future reviews.
  * 3.1.C Very Large PRs
    * For PRs exceeding 99 changed files, at least two human reviews are recommended.
 > [!NOTE]
 > Currently there is only one core maintainer. Hoping to change this.
 
  * 3.1.D Review Conventions and Instructions
-   * The project's code review conventions are currently enumerated in the living document: [CEP-4](https://gist.github.com/reactive-firewall/cc041f10aad1d43a5ef15f50a6bbd5a5) (convention enhancement proposal no.4)
+   * The project's code review conventions are currently enumerated in the living document:
+     [CEP-4](https://gist.github.com/reactive-firewall/cc041f10aad1d43a5ef15f50a6bbd5a5)
+     (convention enhancement proposal no.4)
 
 ## 3.2 AI Review Requirements
 
@@ -59,23 +68,28 @@ Code Generation Assistance: AI may suggest code implementations when requested
  * 3.2.A AI Review Purpose
    * AI reviews are supplementary and do not replace human review
  * 3.2.B AI Troubleshooting
-   * When AI review is triggered but fails (e.g., due to throttling), the PR must be marked as requiring additional attention
+   * When AI review is triggered but fails (e.g., due to throttling), the PR must be marked as
+     requiring additional attention
    * AI approval comments should not be used to bypass branch protection rules
 
 ### 3.3 Large PR Handling
 
    * 3.3.A Less is More
      * PRs with more than 100 changed files should be split into smaller PRs when possible
-When splitting is not feasible, PR authors must provide a summary highlighting the most critical changes for human reviewers
+When splitting is not feasible, PR authors must provide a summary highlighting the most critical
+changes for human reviewers.
 
 ## 4. Security Considerations
 
 ### 4.1 Verification and Validation
 
  * 4.1.A Review Line-by-Line
-    * Absolutely, NO "Vibe-coding" is acceptable for this project. ALL AI-suggestions MUST be understood by at least one core maintainer (same as all other reviewed code needs to be)
+    * Absolutely, NO "Vibe-coding" is acceptable for this project. ALL AI-suggestions MUST be
+      understood by at least one core maintainer (same as all other reviewed code needs to be)
 > [!TIP]
-> > Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the code so that this comment isn't needed?" Improve the code and then document it to make it even clearer.
+> > Good code is its own best documentation. As you're about to add a comment, ask yourself,
+> > "How can I improve the code so that this comment isn't needed?" Improve the code and then
+> > document it to make it even clearer.
 > - Steve McConnell
 
    * All AI-suggested code changes must be verified by a human maintainer (see 3.1.B).
@@ -98,7 +112,7 @@ When splitting is not feasible, PR authors must provide a summary highlighting t
     * The project implements a dual-approval system to help prevent single points of failure.
     * AI approvals are tracked separately from human approvals in the review process. Humans
 must be responsible for the actual merge of pull-requests.
-    * Every user (eg. AI, or human) must have a distinct code-signing identity (see 4.1.B).
+    * Every user (e.g. AI, or human) must have a distinct code-signing identity (see 4.1.B).
     * Only human controlled identities may merge branches, or commit to the default branch directly.
 
 ## 5. Implementation and Compliance
@@ -129,7 +143,7 @@ must be responsible for the actual merge of pull-requests.
 
 ## 6. Exceptions
 
-## 6.1 Exceptions to this policy require:
+## 6.1 Exceptions to this policy require
 
  * 6.1.A Documented justification
  * 6.1.B Approval from at least two core maintainers
@@ -138,7 +152,7 @@ must be responsible for the actual merge of pull-requests.
 
 ## 7. Policy Review
 
-### 7.1 This policy will be reviewed:
+### 7.1 This policy will be reviewed
 
  * 7.1.A After any security incident involving AI tools
  * 7.1.B When significant changes to project AI integration are proposed
