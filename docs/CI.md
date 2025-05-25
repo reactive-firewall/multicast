@@ -2,7 +2,7 @@
 
 Continuous Integration details for the Multicast project.
 
-## Service providers
+## CI Service providers
 
 ***
 
@@ -11,6 +11,7 @@ Continuous integration testing for the Multicast project is handled by
 generous [CircleCI service](https://app.circleci.com/pipelines/github/reactive-firewall/multicast).
 
 [GitHub Actions Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS&tab=runner)
+
 **CircleCI**
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/test-matrix/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/test-matrix/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
 
@@ -78,11 +79,13 @@ In summary, as the diagram illustrates, a GitHub Actions CI/CD workflow begins w
 
 ### Acceptance Testing with CircleCI
 
-While the comprehensive results from the exstensive GHA pipeline offers a detailed look at the
-state of the codebase, the process can take upwards of 30 minutes to compleate. The Multicast
+While the comprehensive results from the extensive GHA pipeline offers a detailed look at the
+state of the codebase, the process can take upwards of 30 minutes to complete. The Multicast
 Project also utilizes the much faster CircleCI offering to provide pass or fail status much earlier
 in CI/CD. While the underlying tests are the same for both GHA and CircleCI, they are only tested
-in a single environment on CircleCI, and typicly perform faster.
+in a single environment on CircleCI, and typically perform faster.
+
+#### How CircleCI on-`push` triggers propagate
 
 ```mermaid
 graph TD;
@@ -104,58 +107,128 @@ graph TD;
 ```
 
 1. **PUSH-EVENT**: This event triggers the entire Acceptance Testing CI/CD workflow.
-1. [config.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml): The sole configuration file for the CircleCI jobs:
-   1. build: Tests that the build process works without critical error, (albeit these quick builds are ephemral and not attested)
-   1. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details are discarded, only the logs remain for a while on CircleCI)
-   1. lint: Selectivly lints (See Linting for details) the multicast python source (eg. `multicast/*.py`), failing on any linter flagged issues or passing on none.
-   1. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run, unittests via the `pytest` testing framework.
-      1. **Test-Results**: the produced test results. See [Collect Tests with CircleCI](https://circleci.com/docs/collect-test-data/#pytest) for more.
+1. [config.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml): The
+  sole configuration file for the CircleCI jobs:
+   1. build: Tests that the build process works without critical error, (albeit these quick builds
+     are ephemeral and not attested)
+   1. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details
+     are discarded, only the logs remain for a while on CircleCI)
+   1. lint: Selectively lints (See Linting for details) the multicast python source (eg.
+     `multicast/*.py`), failing on any linter flagged issues or passing on none.
+   1. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run,
+     unittests via the `pytest` testing framework.
+      1. **Test-Results**: the produced test results. See
+        [Collect Tests with CircleCI](https://circleci.com/docs/collect-test-data/#pytest) for more.
 1. **GH-Checks**: Each CI/CD job will report back a GitHub Check run result.
 
-In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push event, leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks, indicating the status of each job. Additionally, the output from pytest generates some Test Results, which are then used to produce CircleCI Metrics.
+In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push event,
+leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks, indicating the
+status of each job. Additionally, the output from pytest generates some Test Results, which are then
+used to produce CircleCI Metrics.
 
 ### How Integrations are triggered from Testing in CI/CD
 
 #### Key integrations
 
-There are many integrations with various service providers used in the Multicast Project's CI/CD pipeline.
+There are many integrations with various service providers used in the Multicast Project's CI/CD
+pipeline.
 
 ```mermaid
 graph TD;
+    PUSH-EVENT["PUSH EVENT"];
     PUSH-EVENT-->CI-Build.yml;
-    CI-Build.yml-->multicast-build-*;
-    CI-Build.yml-->BUILD-info.txt;
-    CI-Build.yml-->Build-Summary-Artifact.txt;
+    PUSH-EVENT-->config.yml;
+
+    subgraph GHA
+    multicast-build-*@{ shape: card };
+    BUILD-info.txt@{ shape: card };
+    Build-Summary-Artifact.txt@{ shape: card };
+    CI-Build.yml-->multicast-build-* & BUILD-info.txt & Build-Summary-Artifact.txt;
     multicast-build-*-->CI-MATs.yml;
     BUILD-info.txt-->CI-MATs.yml;
-    CI-MATs.yml-->multicast-info-*;
-    CI-MATs.yml-->MATs-Summary-Artifact.txt;
-    multicast-build-*-->CI-Tests.yml;
-    multicast-info-*-->CI-Tests.yml;
-    CI-Tests.yml-->COVERAGE;
-    CI-Tests.yml-->\*-Test-Report-\*-*;
+    multicast-info-*@{ shape: card };
+    MATs-Summary-Artifact.txt@{ shape: card };
+    CI-MATs.yml-->multicast-info-* & MATs-Summary-Artifact.txt;
+    multicast-build-*-->CI-Tests.yml & CI-DOCS.yml;
+    multicast-info-*-->CI-Tests.yml & CI-DOCS.yml;
+    DOCUMENTATION-Summary-Artifact.txt@{ shape: card };
+    Integration-Summary-Artifact.txt@{ shape: card };
+    Multicast-Documentation-*-ALL@{ shape: card };
+    \*-Test-Report-\*-*@{ shape: card };
     CI-Tests.yml-->Integration-Summary-Artifact.txt;
-    multicast-build-*-->CI-DOCS.yml;
-    multicast-info-*-->CI-DOCS.yml;
-    CI-DOCS.yml-->Multicast-Documentation-*-ALL;
-    CI-DOCS.yml-->DOCUMENTATION-Summary-Artifact.txt;
+    CI-DOCS.yml-->DOCUMENTATION-Summary-Artifact.txt & Multicast-Documentation-*-ALL;
+    CI-Tests.yml-->\*-Test-Report-\*-* & COVERAGE;
+    PUSH-EVENT-->markdown-lint.yml & yaml-lint.yml;
+    PUSH-EVENT-->bandit.yml & codeql-analysis.yml & flake8.yml & makefile-lint.yml;
+    PUSH-EVENT-->shellcheck.yml;
+    end
 
+    subgraph "Github Attestations"
     multicast-build-*-->Attestations;
-    CI-Build.yml-->GH-Checks;
-    CI-MATs.yml-->GH-Checks;
-    CI-Tests.yml-->GH-Checks;
+    end
+
+    subgraph "Github Commit Comments"
     MATs-Summary-Artifact.txt-->Comments;
     Integration-Summary-Artifact.txt-->Comments;
     DOCUMENTATION-Summary-Artifact.txt-->Comments;
-    COVERAGE-->CodeCov;
-    COVERAGE-->CodeClimate;
-    COVERAGE-->DeepSource;
-    COVERAGE-->Coveralls;
-    GH-Checks-->PR;
-    CodeCov-->PR;
-    DeepSource-->PR;
+    end
 
-    PUSH-EVENT-->config.yml;
+    subgraph "3rd-Party Integrations"
+
+    subgraph "CodeClimate service"
+    CodeClimate-->CodeClimate-Metrics;
+    end
+
+    subgraph "CodeCov service"
+    CodeCov-->CodeCov-Metrics;
+    end
+
+    subgraph "DeepSource service"
+    DeepSource-->DeepSource-Metrics;
+    end
+
+    subgraph "Coveralls service"
+    Coveralls-->Coveralls-Metrics;
+    end
+
+    COVERAGE-->CodeClimate & CodeCov & DeepSource & Coveralls;
+
+    subgraph "GHA Marketplace"
+    bandit.yml--oPython-Bandit-Scan;
+    codeql-analysis.yml--ocodeql-action;
+    flake8.yml--oflake8-cq;
+
+    shellcheck.yml--oshellcheck-scan;
+    end
+
+    end
+
+    subgraph "Github Checks"
+    CI-Build.yml-->GH-Checks;
+    CI-MATs.yml-->GH-Checks;
+    CI-Tests.yml-->GH-Checks;
+    CI-DOCS.yml-->GH-Checks;
+    markdown-lint.yml-->GH-Checks;
+    makefile-lint.yml-->GH-Checks;
+    yaml-lint.yml-->GH-Checks;
+    bandit.yml-->GH-Checks;
+    codeql-analysis.yml-->GH-Checks;
+    flake8.yml-->GH-Checks;
+    shellcheck.yml-->GH-Checks;
+
+    CodeCov-->GH-Checks;
+    CodeClimate-->GH-Checks;
+    DeepSource-->GH-Checks;
+    end
+
+    subgraph "GitHub Code Scanning"
+    Python-Bandit-Scan-->GH-Code-Scanning;
+    codeql-action-->GH-Code-Scanning;
+    flake8-cq-->GH-Code-Scanning;
+    shellcheck-scan-->GH-Code-Scanning;
+    end
+
+    subgraph CircleCI
     config.yml-->build;
     config.yml-->test;
     config.yml-->lint;
@@ -169,7 +242,17 @@ graph TD;
     lint-->GH-Checks;
     pytest-->GH-Checks;
     pytest-->Test-Results;
+
     Test-Results-->CircleCI-Metrics;
+    end
+
+    subgraph PR
+    PRC["GitHub Pull-Request Comments"]
+    GH-Checks-->PRC;
+    GH-Code-Scanning-->PRC;
+    CodeCov-->PRC;
+    DeepSource-->PRC;
+    end
 ```
 
 ***
@@ -182,26 +265,52 @@ graph TD;
 >
 > [Lint](https://en.wikipedia.org/wiki/Lint_(software)) is the computer science term for a static code analysis tool used to flag programming errors, bugs, stylistic errors and suspicious constructs.[[4]](https://en.wikipedia.org/wiki/Lint_(software)#cite_note-4) The term originates from a Unix utility that examined C language source code.[[1]](https://en.wikipedia.org/wiki/Lint_(software)#cite_note-BellLabs-1) A program which performs this function is also known as a "linter".
 
-In the constantly evolving ecosystem of software development, where code quality and maintainability matter, the role of linters has become increasingly common practice. So it should be no surprise that various linters are used in the Multicast project's CI/CD workflows. By incorporating the linting directly into the CI/CD workflows, this automation alleviates the load on developers to manually check much of the code style and formatting across various languages, including Python, YAML, Makefile, Bash, and Markdown.
+In the constantly evolving ecosystem of software development, where code quality and
+maintainability matter, the role of linters has become increasingly common practice. So it should
+be no surprise that various linters are used in the Multicast project's CI/CD workflows. By
+incorporating the linting directly into the CI/CD workflows, this automation alleviates the load
+on developers to manually check much of the code style and formatting across various languages,
+including [Python](docs/Testing.md#Python), [YAML](docs/Testing.md#YAML),
+[Makefile](docs/Testing.md#Makefile), [Bash](docs/Testing.md#Bash), and
+[Markdown](docs/Testing.md#Markdown).
 
-Some of Multicast Project styles and conventions are quite specific (eg. custom locking conventions of [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not yet automated. However, by leveraging linters, we not only ensure a level of maintainability but also foster a collaborative environment where developers can focus on writing effective code rather than getting bogged down by stylistic concerns.
+Some of Multicast Project styles and conventions are quite specific (eg. custom locking conventions
+of [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not
+yet automated. However, by leveraging linters, we not only ensure a level of maintainability but
+also foster a collaborative environment where developers can focus on writing effective code rather
+than getting bogged down by stylistic concerns.
 
 ### Linting Design Overview
 
+Most of the linting in CI/CD is performed by GitHub workflows with the exception of a minimal
+`Flake-8` scan for python source-code performed via CircleCI by the aptly named `Lint` job. All of
+the linter reporting (eg. anything more than pass/fail status) is from the GitHub linter workflows.
+There are two noteworthy forms of feedback from the various linting automation,
+[code-scanning reports](https://docs.github.com/en/code-security/code-scanning), and
+[GitHub Anotated Messages](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-a-debug-message).
+All linting workflows failures result in alerts that can be reviewed with the relevant
+[PR via GitHub's UI](https://docs.github.com/en/code-security/code-scanning/managing-code-scanning-alerts/triaging-code-scanning-alerts-in-pull-requests#code-scanning-results-check-failures),
+albeit with different levels of details per linter workflow and target branch.
+
 #### Linting phases
 
-The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows the following phases:
+The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows these
+same phases:
 
-  * **initialization** - Bootstraps environment and any initial setup automatically
-  * **clone** - git clone the Multicast Git Repository and any submodules needed
+  * **Initialization** - Bootstraps environment and any initial setup automatically
+  * **Clone** - git clone the Multicast Git Repository and any submodules needed
   * **Linting** - performs the actual linting on the resulting clone
   * **Post-processing** (optional) - any post-processing of the resulting linting results
   * **Reporting** - report any results and/or linting status
 
 > [!IMPORTANT]
-> This overview does not address the complexities of CI/CD timing, concurrency, or the various combinations of linter workflows that run simultaneously. Each linter workflow is separately triggered (eg. push versus PR, etc.) and thus _logicly_ disjoint (See CI/CD Triggering for details). Each linter workflow varies in its exact implementation of the afore mentioned phases.
+> This overview does not address the complexities of CI/CD timing, concurrency, or the various
+> combinations of linter workflows that run simultaneously. Each linter workflow is separately
+> triggered (eg. push versus PR, etc.) and thus _logicly_ disjoint (See CI/CD Triggering for
+> details). Each linter workflow varies in its exact implementation of the afore mentioned phases.
 
-Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the order of phases are sequential per single linter.
+Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the order
+of phases are sequential per single CI/CD linter workflow.
 
 ```mermaid
 sequenceDiagram
@@ -220,6 +329,108 @@ sequenceDiagram
     SC-->>GA: Scan Results
     destroy GA
     GA->>Repo: Reporting
+```
+
+#### Linting Workflows
+
+##### Bandit
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [Python-Bandit-Scan](https://github.com/reactive-firewall/python-bandit-scan?tab=License-1-ov-file) |
+| **Workflow** | [bandit.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/bandit.yml) |
+| **Language** | `Python` |
+| **Category** | Security Linter |
+| **Badge** | [![Bandit](https://github.com/reactive-firewall/multicast/actions/workflows/bandit.yml/badge.svg?event=pull_request)](https://github.com/reactive-firewall/multicast/actions/workflows/bandit.yml) |
+
+##### CodeQL
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [GitHub's CodeQL Analysis](https://github.com/github/codeql-action/?tab=readme-ov-file) |
+| **Workflow** | [codeql-analysis.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/codeql-analysis.yml) |
+| **Languages** | `Python`, `Javascript` _(github actions)_ |
+| **Category** | Security Linter |
+| **Badge** | [![CodeQL](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml/badge.svg?event=pull_request)](https://github.com/reactive-firewall/multicast/actions/workflows/codeql-analysis.yml) |
+
+##### Flake-8
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [flake8-cq](https://github.com/reactive-firewall/flake8-cq?tab=readme-ov-file) |
+| **Workflow** | [flake8.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/flake8.yml) |
+| **Language** | `Python` |
+| **Category** | Style Linter |
+| **Badge** | [![Flake8 Analysis](https://github.com/reactive-firewall/multicast/actions/workflows/flake8.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/flake8.yml) |
+
+##### Checkmake
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [checkmake](https://github.com/mrtazz/checkmake?tab=readme-ov-file) |
+| **Workflow** | [makefile-lint.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/makefile-lint.yml) |
+| **Language** | `Makefile` |
+| **Category** | Style Linter |
+| **Badge** | [![Makefile Lint](https://github.com/reactive-firewall/multicast/actions/workflows/makefile-lint.yml/badge.svg?event=pull_request)](https://github.com/reactive-firewall/multicast/actions/workflows/makefile-lint.yml) |
+
+##### MarkdownLintCLI
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [MarkdownLint](https://github.com/DavidAnson/markdownlint?tab=readme-ov-file) |
+| **Workflow** | [markdown-lint.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/markdown-lint.yml) |
+| **Language** | `Markdown` |
+| **Category** | Format Linter |
+| **Badge** | [![Markdown Lint](https://github.com/reactive-firewall/multicast/actions/workflows/markdown-lint.yml/badge.svg?event=pull_request)](https://github.com/reactive-firewall/multicast/actions/workflows/markdown-lint.yml) |
+
+##### Shellcheck-Scan
+
+> [!CAUTION]
+> Shellcheck-Scan is intended ONLY for use in CI on GitHub Actions, because it is under different
+> restrictions, please see its
+> [License](https://github.com/reactive-firewall/shellcheck-scan/blob/master/LICENSE) for details.
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [Shellcheck-Scan](https://github.com/reactive-firewall/shellcheck-scan?tab=GPL-3.0-1-ov-file) |
+| **Workflow** | [shellcheck.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/shellcheck.yml) |
+| **Languages** | `Bash`, `sh` |
+| **Category** | Format Linter |
+| **Badge** | [![shellcheck](https://github.com/reactive-firewall/multicast/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/reactive-firewall/multicast/actions/workflows/shellcheck.yml) |
+
+##### YAMLLint
+
+| _Property_ | _Value_ |
+|--------|--------|
+| **Linter** | [YAMLLint](https://github.com/ibiqlik/action-yamllint?tab=MIT-1-ov-file) |
+| **Workflow** | [yaml-lint.yml](https://github.com/reactive-firewall/multicast/tree/master/.github/workflows/yaml-lint.yml) |
+| **Languages** | `YAML` |
+| **Category** | Format Linter |
+| **Badge** | [![YAML Lint](https://github.com/reactive-firewall/multicast/actions/workflows/yaml-lint.yml/badge.svg?event=pull_request)](https://github.com/reactive-firewall/multicast/actions/workflows/yaml-lint.yml) |
+
+#### How linting is triggered in CI/CD
+
+Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the various
+linters are all run independently per CI/CD linter workflow.
+
+```mermaid
+graph TD;
+    PUSH-EVENT-->bandit.yml;
+    PUSH-EVENT-->codeql-analysis.yml;
+    PUSH-EVENT-->flake8.yml;
+    PUSH-EVENT-->makefile-lint.yml;
+    PUSH-EVENT-->shellcheck.yml;
+    PUSH-EVENT-->markdown-lint.yml;
+    PUSH-EVENT-->yaml-lint.yml;
+    flake8.yml--oflake8-cq;
+    shellcheck.yml--oshellcheck-scan;
+    bandit.yml-->Python-Bandit-Scan;
+    codeql-analysis.yml-->codeql-action;
+    flake8-cq-->GH-Code-Scanning;
+    shellcheck-scan-->GH-Code-Scanning;
+    Python-Bandit-Scan-->GH-Code-Scanning;
+    codeql-action-->GH-Code-Scanning;
+    makefile-lint.yml;
 ```
 
 ***
