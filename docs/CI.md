@@ -25,6 +25,35 @@ automated analysis.
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/reactive-firewall/multicast.svg)](https://isitmaintained.com/project/reactive-firewall/multicast "Average time to resolve an issue")
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/reactive-firewall/multicast.svg)](https://isitmaintained.com/project/reactive-firewall/multicast "Percentage of issues still open")
 
+## Triggering CI/CD
+
+### GitHub Actions
+
+| Triggers | Workflows |
+|--------|--------|
+| `push` | [`.github/workflows/bandit.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/bandit.yml), [`.github/workflows/CI-BUILD.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-BUILD.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/makefile-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/makefile-lint.yml), [`.github/workflows/markdown-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/markdown-lint.yml), [`.github/workflows/shellcheck.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/shellcheck.yml), [`.github/workflows/yaml-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/yaml-lint.yml) |
+| `workflow_run` | [`.github/workflows/CI-MATs.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml), [`.github/workflows/CI-DOCS.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml), [`.github/workflows/Tests.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml) |
+| `pull_request` | [`.github/workflows/bandit.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/bandit.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/makefile-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/makefile-lint.yml), [`.github/workflows/markdown-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/markdown-lint.yml), [`.github/workflows/shellcheck.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/shellcheck.yml), [`.github/workflows/yaml-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/yaml-lint.yml) |
+| `pull_request_target` | [`.github/workflows/Labeler.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Labeler.yml) |
+| `schedule` | [`.github/dependabot.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/dependabot.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/scorecard.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/scorecard.yml) |
+| `release` | [`.github/workflows/CD-PyPi.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CD-PyPi.yml) |
+
+### CircleCI Pipelines
+
+| Triggers | Pipelines |
+|--------|--------|
+| `push` (_via a webhook_) | [`.circleci/config.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml) |
+
+### Appveyor Jobs
+
+> [!CAUTION]
+> The Appveyor integration is still experimental, as the multicast module is not currently able to
+> support running on windows.
+
+| Triggers | Jobs |
+|--------|--------|
+| `pull_request` (_via a webhook_) | [`.appveyor.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.appveyor.yml) |
+
 ## Testing in CI/CD
 
 ***
