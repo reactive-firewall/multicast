@@ -31,7 +31,7 @@ integrity.
 
 * 2.2.A Sole Developer:
   * AI (especially LLM type AI) is not well suited for innovation; No vibe-coding, the direction
-    and development of the project CAN-NOT meaningfully come from AI.
+    and development of the project CANNOT meaningfully come from AI.
 * 2.2.B Sole Approver:
   * AI approval alone is insufficient for merging any PR.
 
