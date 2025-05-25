@@ -89,7 +89,7 @@ python3 -m multicast --version
 #### Developer builds
 
 > [!WARNING]
-> **Development Builds** *(e.g. Cutting-Edge)* are not intended as full-fleged releases, however
+> **Development Builds** *(e.g., Cutting-Edge)* are not intended as full-fleged releases, however
 > updates to the Development Builds are more frequent than releases.
 
 ```bash
