@@ -271,13 +271,13 @@ runs:
         fi
     - name: check codecov config
       id: check-codecov-config
-      if ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
+      if: ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
       shell: bash
       run: |
         ${{ github.workspace }}/tests/check_codecov || exit 1
-    - name:  Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} coverage to Codecov
+    - name: Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} coverage to Codecov
       id: coverage-codecov-upload
-      if ${{ success() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
+      if: ${{ success() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
       uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
       with:
         token: ${{ secrets.codecov-token }}
@@ -291,7 +291,7 @@ runs:
         fail_ci_if_error: false
     - name: Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} Artifact
       id: coverage-reports-upload
-      if ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') }}
+      if: ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: Test-Report-${{ steps.output_os.outputs.os }}-${{ steps.output_python.outputs.python-version }}-${{ steps.output_sha.outputs.sha }}
