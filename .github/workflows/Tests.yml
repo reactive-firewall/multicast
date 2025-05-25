@@ -246,7 +246,6 @@ jobs:
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
-        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
       secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
@@ -296,7 +295,7 @@ jobs:
         else
           THE_RESULT="failure"
         fi
-        if [[ "${{ steps.steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
+        if [[ "${{ steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
           THE_RESULT="success"
         else
           THE_RESULT="failure"
@@ -353,10 +352,10 @@ jobs:
             printf "%s\n" "  * :black_square_button: Uploading unit-tests coverage report to CodeCov was skipped" >> "$COV_STEP_SUMMARY"
           fi
         fi
-        if [[ "${{ steps.steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" == "success" ]] ; then
+        if [[ "${{ steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" == "success" ]] ; then
           printf "%s\n" "  * :arrow_up: Uploading unit-tests coverage report to codeclimate succeeded" >> "$COV_STEP_SUMMARY"
         else
-          if [[ "${{ steps.steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" == "failed" ]] ; then
+          if [[ "${{ steps.upload-test-tools.outputs.coverage_codeclimate_upload_outcome }}" == "failed" ]] ; then
             printf "%s\n" "  * :no_entry: Uploading unit-tests coverage report to codeclimate failed" >> "$COV_STEP_SUMMARY"
           else
             printf "%s\n" "  * :black_square_button: Uploading unit-tests coverage report to codeclimate was skipped" >> "$COV_STEP_SUMMARY"
@@ -516,7 +515,6 @@ jobs:
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
-        token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
       secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}

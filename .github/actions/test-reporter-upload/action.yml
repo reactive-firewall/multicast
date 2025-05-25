@@ -40,14 +40,6 @@ inputs:
       - Linux
       - Windows
     required: true
-  token:
-    description: |
-      The token used to authenticate when performing GitHub API operations.
-      When running this action on github.com, the default value is sufficient. When running on
-      GHES, you can pass a personal access token for github.com if you are experiencing
-      rate limiting.
-    default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-    required: true
 secrets:
   codeclimate-token:
     description: |
@@ -102,8 +94,8 @@ runs:
       id: output_sha
       shell: bash
       run: |
-        printf "sha=%s\n" $(git rev-parse --verify '${{ inputs.sha }}') >> "$GITHUB_OUTPUT"
-        printf "BUILD_SHA=%s\n" $(git rev-parse --verify '${{ inputs.sha }}') >> "$GITHUB_ENV"
+        printf "sha=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_OUTPUT"
+        printf "BUILD_SHA=%s\n" $(git rev-parse --verify HEAD) >> "$GITHUB_ENV"
     - name: "Identify Python Version"
       id: output_python
       if: ${{ !cancelled() }}
@@ -129,7 +121,7 @@ runs:
           printf "os=%s\n" "${OS_INPUT}" >> "$GITHUB_OUTPUT"
           OS=${OS_INPUT}
         else
-          printf "os=%s\n" "${OS:-'unknown'}" >> "$GITHUB_OUTPUT"
+          printf "os=%s\n" "${OS:-unknown}" >> "$GITHUB_OUTPUT"
         fi
         printf "%s\n" "OS=${OS}" >> "$GITHUB_ENV"
     - name: "Prepare Artifact Name"
@@ -171,7 +163,7 @@ runs:
             if [[ -x "${BINDIR:-${LOCALBIN}}/deepsource" ]] ; then
               printf "can_upload_to_deepsource=true\n" >> "$GITHUB_OUTPUT"
               printf "::debug::%s\n" "Found ${BINDIR:-${LOCALBIN}}/deepsource"
-              printf "deepsource_executable=${BINDIR:-${LOCALBIN}}/deepsource\n" >> "$GITHUB_OUTPUT"
+              printf "deepsource_executable=%s\n" "${BINDIR:-${LOCALBIN}}/deepsource" >> "$GITHUB_OUTPUT"
             else
               printf "::warning, title='Missing tool':: %s\n" "Can't find deepsource tool."
               printf "can_upload_to_deepsource=false\n" >> "$GITHUB_OUTPUT"
@@ -181,7 +173,7 @@ runs:
             if [[ -x $(command -v coveralls) ]] ; then
               printf "can_upload_to_coveralls=true\n" >> "$GITHUB_OUTPUT"
               printf "::debug::%s %s\n" "Found" $(command -v coveralls)
-              printf "coveralls_executable=%s\n" $(command -v coveralls)" >> "$GITHUB_OUTPUT"
+              printf "coveralls_executable=%s\n" $(command -v coveralls) >> "$GITHUB_OUTPUT"
             else
               printf "::warning, title='Missing tool':: %s\n" "Can't find coveralls tool."
               printf "can_upload_to_coveralls=false\n" >> "$GITHUB_OUTPUT"
@@ -224,7 +216,7 @@ runs:
             rm -f coverage_codecov 2>/dev/null || true ; wait ;
             printf "\n\n" >> "${GITHUB_STEP_SUMMARY}"
           fi
-          if [[ -d "${{ github.workspace }}/test-reports/coverage.xml" ]] ; then
+          if [[ -f "${{ github.workspace }}/test-reports/coverage.xml" ]] ; then
             printf "can_upload_to_codecov=true\n" >> "$GITHUB_OUTPUT"
           else
             printf "can_upload_to_codecov=false\n" >> "$GITHUB_OUTPUT"
@@ -308,7 +300,7 @@ runs:
         CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.codeclimate-token || '' }}
         CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && secrets.cc-test-reporter-id || '' }}
       run: |
-        if [[ "${{ input.tests-outcome }}" == "success" ]] ; then
+        if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
           ./cc-test-reporter after-build --exit-code 0 || exit 1 ;
         else
           ./cc-test-reporter after-build --exit-code 1 || exit 1 ;
@@ -330,7 +322,7 @@ runs:
         COVERALLS_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.coveralls-token || '' }}
         COVERALLS_TOOL: ${{ steps.output_upload_tools.outputs.coveralls_executable }}
       run: |
-        if [[ "${{ input.tests-outcome }}" == "success" ]] ; then
+        if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
           ${COVERALLS_TOOL} report test-reports/coverage.xml --base-path="${{ github.workspace }}" --format=python --service-job-id=${{ github.run_id }} --parallel --job-flag='${{ steps.output_os.outputs.os }}-${{ steps.output_python.outputs.python-version }}' --build-number=${{ inputs.job_code }} || exit 1 ;
         else
           ${COVERALLS_TOOL} report test-reports/coverage.xml --base-path="${{ github.workspace }}" --allow-empty --format=python --service-job-id=${{ github.run_id }} --parallel --job-flag='${{ steps.output_os.outputs.os }}-${{ steps.output_python.outputs.python-version }}' --build-number=${{ inputs.job_code }} || exit 1 ;
@@ -341,7 +333,7 @@ runs:
       shell: bash
       run: |
         if [[ "${{ steps.output_can_upload.outputs.can_upload }}" == "true" ]] ; then
-          if [[ "${{ input.tests-outcome }}" == "success" ]] ; then
+          if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
             THE_RESULT="success"
           else
             THE_RESULT="neutral"
