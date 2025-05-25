@@ -651,7 +651,7 @@ def main(*argv) -> tuple:
 
 	The main(*args) function in multicast is expected to return a POSIX compatible exit code and
 	optional detail message. Regardless of errors the result as an 'exit code' (int) is returned,
-	even if the optional details are not (e.g. `tuple(int(exit_code), None)`).
+	even if the optional details are not (e.g., `tuple(int(exit_code), None)`).
 	The only exception is when the error results in exiting the process, which will exit the
 	python runtime with the underlying return codes, instead of returning directly to the then
 	unreachable caller. See `multicast.exceptions.exit_on_exception` for the mechanisms involved.

@@ -55,6 +55,7 @@ integrity.
     project content in future reviews.
 * 3.1.C Very Large PRs
   * For PRs exceeding 99 changed files, at least two human reviews are recommended.
+
 > [!NOTE]
 > Currently there is only one core maintainer. Hoping to change this.
 
@@ -88,11 +89,12 @@ integrity.
 * 4.1.A Review Line-by-Line
   * Absolutely, NO "Vibe-coding" is acceptable for this project. ALL AI-suggestions MUST be
     understood by at least one core maintainer (same as all other reviewed code needs to be).
+
 > [!TIP]
 > > Good code is its own best documentation. As you're about to add a comment, ask yourself,
 > > "How can I improve the code so that this comment isn't needed?" Improve the code and then
 > > document it to make it even clearer.
-> - Steve McConnell
+> ~ Steve McConnell
 
   * All AI-suggested code changes must be verified by a human maintainer (see 3.1.B).
 * 4.1.B Signed Commits
@@ -114,7 +116,7 @@ integrity.
   * The project implements a dual-approval system to help prevent single points of failure.
   * AI approvals are tracked separately from human approvals in the review process. Humans
     must be responsible for the actual merge of pull-requests.
-  * Every user (e.g. AI, or human) must have a distinct code-signing identity (see 4.1.B).
+  * Every user (e.g., AI, or human) must have a distinct code-signing identity (see 4.1.B).
   * Only human controlled identities may merge branches, or commit to the default branch directly.
 
 ## 5. Implementation and Compliance
