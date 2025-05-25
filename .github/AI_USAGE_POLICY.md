@@ -2,7 +2,7 @@
 
 ## 1. Purpose and Scope
 
-### 1.1 Rational :bookmark:
+### 1.1 Rationale :bookmark:
 
 > [!IMPORTANT]
 > This policy governs the use of AI tools, particularly CodeRabbitAI, GH Copilot, and
