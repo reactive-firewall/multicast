@@ -94,6 +94,7 @@ apidocs/index
 /FAQ
 /Environment_Configuration
 /CI
+/Testing
 /Exception_Guide
 /LICENSE
 ```
