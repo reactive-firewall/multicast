@@ -10,11 +10,11 @@ applications, making it straightforward to work with multicast sockets.
 
 ## Features
 
-- **Easy Multicast Communication**: Send and receive messages over multicast networks with
+* **Easy Multicast Communication**: Send and receive messages over multicast networks with
   simple `Python` interfaces.
-- **Command-Line Tools**: Includes command-line utilities for quick multicast prototyping.
-- **Cross-Python Compatibility**: Designed to work with multiple Python versions.
-- **Support for UDP**: Works with UDP via IPv4 multicast addresses.
+* **Command-Line Tools**: Includes command-line utilities for quick multicast prototyping.
+* **Cross-Python Compatibility**: Designed to work with multiple Python versions.
+* **Support for UDP**: Works with UDP via IPv4 multicast addresses.
 
 ## Status
 
@@ -178,19 +178,19 @@ listener(group='224.0.0.1', port=59259, ttl=1)
 
 The `multicast` package provides command-line tools for multicast communication prototyping.
 
-- Read the [Usage](docs/USAGE.md) for details.
+* Read the [Usage](docs/USAGE.md) for details.
 
 ## FAQ
 
-- Read the [FAQ](docs/FAQ.md) for common answers.
+* Read the [FAQ](docs/FAQ.md) for common answers.
 
 ## Default Settings
 
-- **Multicast Group Address**: `224.0.0.1` (link-local multicast as per
+* **Multicast Group Address**: `224.0.0.1` (link-local multicast as per
   [RFC 5771](https://tools.ietf.org/html/rfc5771))
-- **Default Port**: `59259` (within the dynamic/private port range defined by
+* **Default Port**: `59259` (within the dynamic/private port range defined by
   [RFC 6335](https://tools.ietf.org/html/rfc6335))
-- **Time-to-Live (TTL)**: `1` (as recommended by
+* **Time-to-Live (TTL)**: `1` (as recommended by
   [RFC 1112 Section 6.1](https://tools.ietf.org/html/rfc1112#section-6.1)
   ; messages do not leave the local network)
 
@@ -199,16 +199,16 @@ The `multicast` package provides command-line tools for multicast communication 
 In the realm of network communication, security is paramount. When using multicast communication,
 be vigilant about potential vulnerabilities:
 
-- **Data Sanitization**: Always sanitize incoming data to prevent injection attacks
+* **Data Sanitization**: Always sanitize incoming data to prevent injection attacks
   ([CWE-20](https://cwe.mitre.org/data/definitions/20.html),
   [CWE-74](https://cwe.mitre.org/data/definitions/74.html)).
 
-- **Network Scope**: Be mindful of the TTL settings to limit message propagation to the intended
+* **Network Scope**: Be mindful of the TTL settings to limit message propagation to the intended
   network segment. Inappropriate TTL values might expose your multicast traffic beyond the local
   network, potentially leading to information disclosure
   ([CWE-200](https://cwe.mitre.org/data/definitions/200.html)).
 
-- **Validation and Error Handling**: Implement robust validation and error handling to prevent
+* **Validation and Error Handling**: Implement robust validation and error handling to prevent
   misuse or disruption of multicast services.
   ([CWE-351](https://cwe.mitre.org/data/definitions/351.html)).
 
