@@ -30,9 +30,9 @@ Dependencies NOT included.
 
 Multicast project testing code is under an MIT license like the Multicast module; However
 the project's Testing can use tools which are split between multiple licenses (but not be bundled).
-While all of the sourcecode is open-source, using some of the project test code is only possible
-in an environment where additional, restrictions apply, due to third party licencing which is
-incompatable if it were to be included with the rest of the project.
+While all of the source code is open-source, using some of the project testing is only possible
+in an environment where additional, restrictions apply, due to third party licensing which is
+incompatible if it were to be included with the rest of the project.
 
 ### Files: `requirements.txt`, `docs/requirements.txt`, `tests/requirements.txt`
 
