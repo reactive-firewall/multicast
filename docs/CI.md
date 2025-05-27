@@ -10,11 +10,13 @@ Continuous integration testing for the Multicast project is handled by
 [GitHub Actions](https://github.com/reactive-firewall/multicast/actions) and the
 generous [CircleCI service](https://app.circleci.com/pipelines/github/reactive-firewall/multicast).
 
-**GitHub Actions**
+### CI/CD Metrics
+
+#### GitHub Actions
 
 [GitHub Actions Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS&tab=runner)
 
-**CircleCI**
+#### CircleCI
 
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/test-matrix/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/test-matrix/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
 
@@ -89,39 +91,40 @@ graph TD;
 ```
 
 1. **PUSH-EVENT**: This event triggers the entire Acceptance Testing CI/CD workflow.
-1. [CI-Build.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-BUILD.yml):
+2. [CI-Build.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-BUILD.yml):
 The main configuration file for the build process, which generates several artifacts:
-  1. multicast-build-`{{ sha }}`: The built package artifact.
-  1. BUILD-info.txt: Contains essential details about the build execution, including:
-    1. Build Run ID: A unique identifier for the build run.
-    1. Build Artifact's ID/URL/Name/Digest: Information about the generated artifact, such as its
+  A. multicast-build-`{{ sha }}`: The built package artifact.
+  B. BUILD-info.txt: Contains essential details about the build execution, including:
+    i. Build Run ID: A unique identifier for the build run.
+    ii. Build Artifact's ID/URL/Name/Digest: Information about the generated artifact, such as its
     identifier, location, name, and digest for verification.
-    1. Git Commit Info: Details about the commit associated with the build, including the SHA,
+    iii. Git Commit Info: Details about the commit associated with the build, including the SHA,
     reference, and branch.
-  1. Build-Summary-Artifact.txt (BUILD-COMMENT-BODY-`{{ sha }}`): A summary of the build process,
+  C. Build-Summary-Artifact.txt (BUILD-COMMENT-BODY-`{{ sha }}`): A summary of the build process,
   highlighting key outcomes and metrics.
-1. [CI-MATs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml):
+3. [CI-MATs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml):
 A configuration file that processes the build artifacts to create:
-  1. multicast-info.txt (multicast-info-`{{ build_sha }}`): Contains all the information from the
+  A. multicast-info.txt (multicast-info-`{{ build_sha }}`): Contains all the information from the
   "Build-Info.txt" along with additional details about the "CI-MATs.yml" workflow run, including:
-    1. MATs Workflow Run ID: A unique identifier for the MATs workflow run.
-    1. Conclusion Statuses: The outcomes of the Minimal Acceptance Tests.
-  1. MATs-Summary-Artifact.txt (MATS-COMMENT-BODY-`{{ build_sha }}`): A summary of the Minimal
+    i. MATs Workflow Run ID: A unique identifier for the MATs workflow run.
+    ii. Conclusion Statuses: The outcomes of the Minimal Acceptance Tests.
+  B. MATs-Summary-Artifact.txt (MATS-COMMENT-BODY-`{{ build_sha }}`): A summary of the Minimal
   Acceptance Tests conducted.
-1. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml):
+4. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml):
 A configuration file for executing tests, which processes the build artifacts to create:
-  1. Coverage reports: Uploading various coverage reports for the tests executed to multiple
+  A. Coverage reports: Uploading various coverage reports for the tests executed to multiple
   services for analysis (eg. codecov.io, codeclimate.com, app.deepsource.io, etc.).
-  1. Test-Results-Artifacts (`{{ test-group }}`-Test-Report-`{{ matrix.os }}`-`{{ matrix.python-version }}`):
+  B. Test-Results-Artifacts
+  (`{{ test-group }}`-Test-Report-`{{ matrix.os }}`-`{{ matrix.python-version }}`):
   Contains the results of the tests grouped by `coverage|doctests|integration`, `os` and
   `python-version`.
-  1. Integration-Summary-Artifact.txt (INTEGRATION-COMMENT-BODY-`{{ build_sha }}`): A summary of
+  C. Integration-Summary-Artifact.txt (INTEGRATION-COMMENT-BODY-`{{ build_sha }}`): A summary of
   the test results.
-1. [CI-DOCs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml):
+5. [CI-DOCs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml):
 A configuration file for generating documentation, which produces:
-  1. Documentation-Artifact.zip (Multicast-Documentation-`{{ build_sha }}`-ALL): A zip file
+  A. Documentation-Artifact.zip (Multicast-Documentation-`{{ build_sha }}`-ALL): A zip file
   containing the generated documentation.
-  1. DOCUMENTATION-Summary-Artifact.txt (DOCUMENTATION-COMMENT-BODY-`{{ build_sha }}`): A summary
+  B. DOCUMENTATION-Summary-Artifact.txt (DOCUMENTATION-COMMENT-BODY-`{{ build_sha }}`): A summary
   of the documentation results.
 
 In summary, as the diagram illustrates, a GitHub Actions CI/CD workflow begins with a push event,
@@ -162,19 +165,19 @@ graph TD;
 ```
 
 1. **PUSH-EVENT**: This event triggers the entire Acceptance Testing CI/CD workflow.
-1. [config.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml): The
+2. [config.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.circleci/config.yml): The
 sole configuration file for the CircleCI jobs:
-  1. build: Tests that the build process works without critical error, (albeit these quick builds
+  A. build: Tests that the build process works without critical error, (albeit these quick builds
   are ephemeral and not attested)
-  1. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details
+  B. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details
   are discarded, only the logs remain for a while on CircleCI)
-  1. lint: Selectively lints (See Linting for details) the multicast python source (eg.
+  C. lint: Selectively lints (See Linting for details) the multicast python source (eg.
   `multicast/*.py`), failing on any linter flagged issues or passing on none.
-  1. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run,
+  D. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run,
   unittests via the `pytest` testing framework.
-    1. **Test-Results**: the produced test results. See
+    i. **Test-Results**: the produced test results. See
     [Collect Tests with CircleCI](https://circleci.com/docs/collect-test-data/#pytest) for more.
-1. **GH-Checks**: Each CI/CD job will report back a GitHub Check run result.
+3. **GH-Checks**: Each CI/CD job will report back a GitHub Check run result.
 
 In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push event,
 leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks, indicating the
