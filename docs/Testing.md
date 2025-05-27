@@ -25,7 +25,7 @@ Details about the Multicast project's own testing.
 
 > [!IMPORTANT]
 > Multicast project testing is intended for CI/CD but can also be initiated
-> manually (eg. in your local environment) with the bash command: `make test-mats` or
+> manually (e.g., in your local environment) with the bash command: `make test-mats` or
 > just `make test` and can be reset before and after with: `make clean` and `make purge`.
 
 You can find all the testing code in the aptly named `tests/` directory.
@@ -35,11 +35,11 @@ You can find all the testing code in the aptly named `tests/` directory.
   actual pair of processes to test that `SAY` and `HEAR` indeed work together.
 
 You can find additional custom testing automation tooling in the aptly named `tools/` directory
-inside the `.github` directory (eg. `.github/tools`).
+inside the `.github` directory (e.g., `.github/tools`).
 
-* Unit-testing is primarily done with the `unittest` framework.
-* Functional testing is done via additional checks, including an end-to-end check invoking an
-  actual pair of processes to test that `SAY` and `HEAR` indeed work together.
+* The custom scripts for handling various tasks in CI/CD are also located in `.github/tools`
+  * Also see [CI Documentation](CI.md)
+  * Also see [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)
 
 ## Test Groups
 
@@ -63,7 +63,7 @@ Multicast project to be considered acceptable.
 
 1. Clone a [development build](https://github.com/reactive-firewall/multicast/tree/patch-readme-docs?tab=readme-ov-file#developer-builds)
 
-1. Invoke the MATs test target.
+2. Invoke the MATs test target.
 
 ```bash
 make test-mats
@@ -71,7 +71,7 @@ make test-mats
 
 #### Categories
 
-Currently MATs are comprised of the test categories `bootstrap`, `basic`, `build`, `doctests`,
+Currently, MATs are comprised of the test categories `bootstrap`, `basic`, `build`, `doctests`,
 `say`, `hear`, and `usage`.
 
 | Category | Criteria | _TestSuites_ |
@@ -97,7 +97,7 @@ Currently MATs are comprised of the test categories `bootstrap`, `basic`, `build
 #### The Test Runner
 
 The test runner is an often obscure part of the Multicast project testing process, albeit an
-important part. In, general a test runner is exactly what it sounds like, the component responsible
+important part. In general, a test runner is what it sounds like; the component responsible
 for running the various tests during the act of testing.
 
 > [!IMPORTANT]
@@ -233,7 +233,7 @@ are present.
 > To effectively leverage the source code for performing fuzzing, you must install a licensed
 > copy of the hypothesis python module.
 
-There is a separate test group for optional fuzz testing aptly named `fuzzing`. Currently the
+There is a separate test group for optional fuzz testing aptly named `fuzzing`. Currently, the
 `fuzzing` test group contains only one category named `slow`.
 
 | Category | Criteria | _TestSuites_ |
@@ -276,7 +276,7 @@ The Multicast project uses CI/CD to ensure constant and comprehensive testing. `
 `extra` group's context is referring to "extra test coverage".
 
 > [!TIP]
-> Contributors who are unsure of how to categorize their new test code, may fall-back to the
+> Contributors who are unsure of how to categorize their new test code, may fall back to the
 > `coverage` category, so not to get bogged down before code review, where the categorization
 > can better be discussed.
 
@@ -304,7 +304,7 @@ See implementation for more details.
 
 #### Logging and Coverage testing
 
-By default logging from the `multicast` module is ignored (there is a [default NULLHandeler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast%20path%3Amulticast%2F*.py%20%22addHandler(logging.NullHandler())%22&type=code)
+By default, logging from the `multicast` module is ignored (there is a [default NULLHandeler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast%20path%3Amulticast%2F*.py%20%22addHandler(logging.NullHandler())%22&type=code)
 ). The test-runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py)
 inserts its own [special log handler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast+path%3Atests%2F*.py+ColoredStreamHandler)
 during testing to assist in debugging. Code coverage is only collected when invoking tests via the

@@ -37,7 +37,7 @@ URL_ALLOWED_SCHEMES = frozenset({"https"})
 # Enforces:
 # - URLs Must belong to one of these domains
 URL_ALLOWED_NETLOCS = frozenset({
-	"github.com", "readthedocs.com", "docs.python.org", "peps.python.org",
+	"github.com", "gist.github.com", "readthedocs.com", "docs.python.org", "peps.python.org",
 })
 
 
