@@ -24,15 +24,15 @@ Dependencies NOT included.
 
 ***
 
-## Included Licenses and additional Acknowledgments included with package
+## Excluded Licenses, not included with package
 
 ### Third-Party Dependencies
 
-Multicast project testing code is under an MIT license like the Multicast module; However
-the project's Testing can use tools which are split between multiple licenses (but not be bundled).
-While all of the source code is open-source, using some of the project testing is only possible
-in an environment where additional, restrictions apply, due to third party licensing which is
-incompatible if it were to be included with the rest of the project.
+Multicast project testing code is under an MIT license like the Multicast module; however
+the project's Testing can use tools which are split between multiple licenses (but may not be
+bundled). While all of the source code is open-source, using some of the project testing is only
+possible in an environment where additional restrictions apply, due to third-party licensing which
+is incompatible if it were to be included with the rest of the project as a whole.
 
 ### Files: `requirements.txt`, `docs/requirements.txt`, `tests/requirements.txt`
 
@@ -49,6 +49,8 @@ their environments accordingly.
 The individual dependencies are owned by their respective copyright holders.
 _NO ASSOCIATION._
 ***
+
+## Included Licenses and additional Acknowledgments included with package
 
 ### Files in `tests/`: `profiling.py`, `test_basic.py`, `test_usage.py` and parts of `context.py`
 

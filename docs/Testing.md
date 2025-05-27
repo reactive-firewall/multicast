@@ -5,10 +5,10 @@ Details about the Multicast project's own testing.
 ***
 
 > [!CAUTION]
-> Multicast project testing code is under an MIT license like the Multicast module; However
+> Multicast project testing code is under an MIT license like the Multicast module; however
 > the project's Testing can use tools which are split between multiple licenses.
-> While all of the source-code is open-source, using some of the project test code is only possible
-> in an environment where additional, restrictions apply, due to third party licensing which is
+> While all the source-code is open-source, using some of the project test code is only possible
+> in an environment where additional restrictions apply, due to third-party licensing which is
 > incompatible if it were to be included with the rest of the project.
 >
 > Certain Continuous Integration/Continuous Deployment (CI/CD) tools may require GNU licensed
@@ -96,7 +96,7 @@ Currently, MATs are comprised of the test categories `bootstrap`, `basic`, `buil
 
 #### The Test Runner
 
-The test runner is an often obscure part of the Multicast project testing process, albeit an
+The test runner is an obscure part of the Multicast project testing process, albeit an
 important part. In general, a test runner is what it sounds like; the component responsible
 for running the various tests during the act of testing.
 
@@ -174,7 +174,7 @@ gitGraph:
 
 ##### Test-Driven Contributors
 
-During the development cycle new features will also need testing, (this is mentioned in detail
+During the development cycle new features will also need testing (this is mentioned in detail
 by the [Contributing Guidelines](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CONTRIBUTING.md).
 This is where the otherwise undocumented Selective Test Runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py),
 comes into play. While the test runner is used by much of the project automation to run all kinds
@@ -232,7 +232,7 @@ are present.
 
 > [!IMPORTANT]
 > To effectively leverage the source code for performing fuzzing, you must install a licensed
-> copy of the hypothesis python module.
+> copy of the 'hypothesis' Python module.
 
 There is a separate test group for optional fuzz testing aptly named `fuzzing`. Currently, the
 `fuzzing` test group contains only one category named `slow`.
@@ -250,7 +250,7 @@ The Multicast Project includes some hooks for automating future performance test
 
 There is a separate test group intended for future performance testing aptly named `performance`.
 Currently, the `performance` test group contains only empty categories named `scalability`,
-`multi_sender` and `multi_receiver`.
+`multi_sender`, and `multi_receiver`.
 
 | Category | _Intended_ Criteria | _TestSuites_ |
 |----------|---------------------|--------------|
