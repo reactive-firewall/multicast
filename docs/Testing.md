@@ -248,7 +248,7 @@ The Multicast Project includes some hooks for automating future performance test
 > Current performance testing is ad-hoc and focused on gathering more profiling data.
 
 There is a separate test group intended for future performance testing aptly named `performance`.
-Currently the `performance` test group contains only empty categories named `scalability`,
+Currently, the `performance` test group contains only empty categories named `scalability`,
 `multi_sender` and `multi_receiver`.
 
 | Category | _Intended_ Criteria | _TestSuites_ |
@@ -304,7 +304,7 @@ See implementation for more details.
 
 #### Logging and Coverage testing
 
-By default, logging from the `multicast` module is ignored (there is a [default NULLHandeler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast%20path%3Amulticast%2F*.py%20%22addHandler(logging.NullHandler())%22&type=code)
+By default, logging from the `multicast` module is ignored (there is a [default NullHandler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast%20path%3Amulticast%2F*.py%20%22addHandler(logging.NullHandler())%22&type=code)
 ). The test-runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py)
 inserts its own [special log handler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast+path%3Atests%2F*.py+ColoredStreamHandler)
 during testing to assist in debugging. Code coverage is only collected when invoking tests via the
