@@ -330,7 +330,7 @@ including [Python](docs/Testing.md#Python), [YAML](docs/Testing.md#YAML),
 [Makefile](docs/Testing.md#Makefile), [Bash](docs/Testing.md#Bash), and
 [Markdown](docs/Testing.md#Markdown).
 
-Some of Multicast project styles and conventions are quite specific (e.g., custom locking
+Some of the Multicast project styles and conventions are quite specific (e.g., custom locking
 conventions of
 [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not
 yet automated. However, by leveraging linters, we not only ensure a level of maintainability but
