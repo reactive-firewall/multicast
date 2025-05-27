@@ -12,13 +12,15 @@ generous [CircleCI service](https://app.circleci.com/pipelines/github/reactive-f
 
 ### CI/CD Metrics
 
-#### GitHub Actions
+#### GitHub
 
 [GitHub Actions Metrics](https://github.com/reactive-firewall/multicast/actions/metrics/performance?dateRangeType=DATE_RANGE_TYPE_LAST_90_DAYS&tab=runner)
 
 #### CircleCI
 
 [![CircleCI](https://dl.circleci.com/insights-snapshot/gh/reactive-firewall/multicast/master/test-matrix/badge.svg?window=30d)](https://app.circleci.com/insights/github/reactive-firewall/multicast/workflows/test-matrix/overview?branch=master&reporting-window=last-90-days&insights-snapshot=true)
+
+#### Other Metrics
 
 Many additional services are used for enhancing CI/CD with additional metrics, insights, and
 automated analysis.
@@ -350,7 +352,6 @@ albeit with different levels of details per linter workflow and target branch.
 
 The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows these
 same phases:
-
   * **Initialization** - Bootstraps environment and any initial setup automatically
   * **Clone** - git clone the Multicast Git Repository and any submodules needed
   * **Linting** - performs the actual linting on the resulting clone
