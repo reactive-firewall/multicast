@@ -139,13 +139,13 @@ pipeline.
 
 ### Acceptance Testing with CircleCI
 
-While the comprehensive results from the extensive GHA pipeline offers a detailed look at the
+While the comprehensive results from the extensive GHA pipeline offer a detailed look at the
 state of the codebase, the process can take upwards of 30 minutes to complete. The Multicast
 Project also utilizes the much faster CircleCI offering to provide pass or fail status much earlier
 in CI/CD. While the underlying tests are the same for both GHA and CircleCI, they are only tested
 in a single environment on CircleCI, and typically perform faster.
 
-#### How CircleCI on-`push` triggers propagate
+#### How `push` triggers propagate on CircleCI
 
 ```mermaid
 graph TD;
@@ -173,7 +173,7 @@ sole configuration file for the CircleCI jobs:
   are ephemeral and not attested)
   B. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details
   are discarded, only the logs remain for a while on CircleCI)
-  C. lint: Selectively lints (See Linting for details) the multicast python source (eg.
+  C. lint: Selectively lints (See Linting for details) the multicast python source (eg.,
   `multicast/*.py`), failing on any linter flagged issues or passing on none.
   D. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run,
   unittests via the `pytest` testing framework.
@@ -181,10 +181,10 @@ sole configuration file for the CircleCI jobs:
     [Collect Tests with CircleCI](https://circleci.com/docs/collect-test-data/#pytest) for more.
 3. **GH-Checks**: Each CI/CD job will report back a GitHub Check run result.
 
-In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push event,
-leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks, indicating the
-status of each job. Additionally, the output from pytest generates some Test Results, which are
-then used to produce CircleCI Metrics.
+In summary, as the diagram illustrates, a CircleCI pipeline CI/CD workflow begins with a push
+event, leading to the build, test, lint, and pytest jobs reporting back to GitHub Checks,
+indicating the status of each job. Additionally, the output from pytest generates some Test
+Results, which are then used to produce CircleCI Metrics.
 
 ### How Integrations are triggered from Testing in CI/CD
 
