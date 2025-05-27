@@ -87,7 +87,8 @@ Currently MATs are comprised of the test categories `bootstrap`, `basic`, `build
 ### Advanced Testing
 
 > [!NOTE]
-> # TL;DR - Contributor Focused
+>
+> #### TL;DR - Contributor Focused
 >
 > The rest of this document is focused on topics that are intended only for those who wish to
 > contribute (_or perhaps those few readers who are driven by an insatiable thirst for knowledge,
@@ -287,20 +288,19 @@ pull requests during the project's release workflow, namely before merging anyth
 branch `master`, and again before releasing to `stable`.
 
 > [!WARNING]
-Locally, linting is limited as many linters are copyleft restricted and can never be bundled with
-the rest of the MIT licensed code.
+> Locally, linting is limited as many linters are copyleft restricted and can never be bundled with
+> the rest of the MIT licensed code.
 
-> [!NOTE]
-> See implementation for details.
+See implementation for more details.
 
 > [!TIP]
 > Want to check multicast python code style? Great! Try this:
-
-```bash
-make clean ; # cleans up from any previous tests hopefully
-make test-style ; # runs the project's tests for style
-make clean ; # cleans up for next test
-```
+>
+> ```bash
+> make clean ; # cleans up from any previous tests hopefully
+> make test-style ; # runs the project's tests for style
+> make clean ; # cleans up for next test
+> ```
 
 #### Logging and Coverage testing
 
