@@ -2,7 +2,7 @@
 
 Continuous Integration details for the Multicast project.
 
-## CI Service providers
+## CI Service Providers
 
 ***
 
@@ -57,7 +57,7 @@ automated analysis.
 
 > [!CAUTION]
 > The Appveyor integration is still experimental, as the multicast module is not currently able to
-> support running on windows.
+> support running on Windows.
 
 | Triggers | Jobs |
 |--------|--------|
@@ -115,7 +115,7 @@ A configuration file that processes the build artifacts to create:
 4. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml):
 A configuration file for executing tests, which processes the build artifacts to create:
   A. Coverage reports: Uploading various coverage reports for the tests executed to multiple
-  services for analysis (eg. codecov.io, codeclimate.com, app.deepsource.io, etc.).
+  services for analysis (e.g., codecov.io, codeclimate.com, app.deepsource.io, etc.).
   B. Test-Results-Artifacts
   (`{{ test-group }}`-Test-Report-`{{ matrix.os }}`-`{{ matrix.python-version }}`):
   Contains the results of the tests grouped by `coverage|doctests|integration`, `os` and
@@ -190,7 +190,7 @@ then used to produce CircleCI Metrics.
 
 #### Key integrations
 
-There are many integrations with various service providers used in the Multicast Project's CI/CD
+There are many integrations with various service providers used in the Multicast project's CI/CD
 pipeline.
 
 ```mermaid
@@ -330,8 +330,9 @@ including [Python](docs/Testing.md#Python), [YAML](docs/Testing.md#YAML),
 [Makefile](docs/Testing.md#Makefile), [Bash](docs/Testing.md#Bash), and
 [Markdown](docs/Testing.md#Markdown).
 
-Some of Multicast Project styles and conventions are quite specific (eg. custom locking conventions
-of [CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not
+Some of Multicast project styles and conventions are quite specific (e.g., custom locking
+conventions of
+[CEP-5](https://gist.github.com/reactive-firewall/3d2bd3cf37f87974df6f7bee31a05a89)), and not
 yet automated. However, by leveraging linters, we not only ensure a level of maintainability but
 also foster a collaborative environment where developers can focus on writing effective code rather
 than getting bogged down by stylistic concerns.
@@ -340,8 +341,8 @@ than getting bogged down by stylistic concerns.
 
 Most of the linting in CI/CD is performed by GitHub workflows with the exception of a minimal
 `Flake-8` scan for python source-code performed via CircleCI by the aptly named `Lint` job. All of
-the linter reporting (eg. anything more than pass/fail status) is from the GitHub linter workflows.
-There are two noteworthy forms of feedback from the various linting automation,
+the linter reporting (e.g., anything more than pass/fail status) is from the GitHub linter
+workflows. There are two noteworthy forms of feedback from the various linting automation,
 [code-scanning reports](https://docs.github.com/en/code-security/code-scanning), and
 [GitHub Anotated Messages](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-a-debug-message).
 All linting workflows failures result in alerts that can be reviewed with the relevant
@@ -350,7 +351,7 @@ albeit with different levels of details per linter workflow and target branch.
 
 #### Linting phases
 
-The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows these
+The generalized design of linter workflows in the Multicast project CI/CD pipeline follows these
 same phases:
 
 * **Initialization** - Bootstraps environment and any initial setup automatically
@@ -362,11 +363,11 @@ same phases:
 > [!IMPORTANT]
 > This overview does not address the complexities of CI/CD timing, concurrency, or the various
 > combinations of linter workflows that run simultaneously. Each linter workflow is separately
-> triggered (eg. push versus PR, etc.) and thus _logicly_ disjoint (See CI/CD Triggering for
+> triggered (e.g., push versus PR, etc.) and thus _logically_ disjoint (See CI/CD Triggering for
 > details). Each linter workflow varies in its exact implementation of the afore mentioned phases.
 
-Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the order
-of phases are sequential per single CI/CD linter workflow.
+Logically (e.g., ignoring complexities of concurrency and trigger conditionals, etc.) the order
+of phases is sequential per single CI/CD linter workflow.
 
 ```mermaid
 sequenceDiagram
@@ -466,7 +467,7 @@ sequenceDiagram
 
 #### How linting is triggered in CI/CD
 
-Logically (eg. ignoring complexities of concurrency and trigger conditionals, etc.) the various
+Logically (e.g., ignoring complexities of concurrency and trigger conditionals, etc.) the various
 linters are all run independently per CI/CD linter workflow.
 
 ```mermaid
