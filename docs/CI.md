@@ -352,11 +352,12 @@ albeit with different levels of details per linter workflow and target branch.
 
 The generalized design of linter workflows in the Multicast Project CI/CD pipeline follows these
 same phases:
-  * **Initialization** - Bootstraps environment and any initial setup automatically
-  * **Clone** - git clone the Multicast Git Repository and any submodules needed
-  * **Linting** - performs the actual linting on the resulting clone
-  * **Post-processing** (optional) - any post-processing of the resulting linting results
-  * **Reporting** - report any results and/or linting status
+
+* **Initialization** - Bootstraps environment and any initial setup automatically
+* **Clone** - git clone the Multicast Git Repository and any submodules needed
+* **Linting** - performs the actual linting on the resulting clone
+* **Post-processing** (optional) - any post-processing of the resulting linting results
+* **Reporting** - report any results and/or linting status
 
 > [!IMPORTANT]
 > This overview does not address the complexities of CI/CD timing, concurrency, or the various
