@@ -176,7 +176,7 @@ gitGraph:
 
 During the development cycle new features will also need testing, (this is mentioned in detail
 by the [Contributing Guidelines](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CONTRIBUTING.md).
-This is where the other-wise undocumented Selective Test Runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py),
+This is where the otherwise undocumented Selective Test Runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py),
 comes into play. While the test runner is used by much of the project automation to run all kinds
 of tests, it is the most powerful when used to skip tests to save time iteratively developing a
 new feature.
@@ -193,7 +193,8 @@ methods are unsuited:
   * checking more than just the new tests, until the new tests are passing, is inefficient.
 
 These and similar cases can benefit from the improved granularity of targeted testing provided by
-the selective test runner. Of-course eventually the process leads back to the normal CI/CD testing.
+the selective test runner. Of course, eventually the process leads back to the normal CI/CD
+testing.
 
 ```mermaid
 sequenceDiagram
@@ -309,11 +310,11 @@ By default, logging from the `multicast` module is ignored (there is a [default 
 inserts its own [special log handler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast+path%3Atests%2F*.py+ColoredStreamHandler)
 during testing to assist in debugging. Code coverage is only collected when invoking tests via the
 [`Makefile`](https://github.com/reactive-firewall/multicast/tree/HEAD/Makefile) targets that
-support it (and of-course only if already installed).
+support it (and of course, only if already installed).
 
 > [!TIP]
-> Code coverage can leave a lot of artifacts after testing, so it is a good idea to run the
-> `make clean` target when finished with each test run to blow-away such coverage artifacts.
+> Code coverage can leave numerous artifacts after testing, so it is a good idea to run the
+> `make clean` target when finished with each test run to blow away such coverage artifacts.
 
 Here is how `multicast` module logging and code coverage collection are integrated into the
 whole testing process.
@@ -395,24 +396,20 @@ sequenceDiagram
 
 #### As a Dependency, Testing
 
-> [!TIP]
-> In a rush to get this module working? Then try using this in your own test workflow
-
-```bash
-#cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
-make clean ; # cleans up from any previous tests hopefully
-make test ; # runs the tests
-make clean ; # cleans up for next test
-```
+The test code for CI/CD is not included with the built Python module `multicast`. Currently, there
+is no plan to change this. The Python module `tests` does not need to be installed, so there is
+no practical use for including it in build artifacts. Also see relevant "AS-IS" disclaimers in
+[`LICENSE.md`](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md).
 
 > [!TIP]
-> Want to check multicast python code style? Great! Try this:
-
-```bash
-make clean ; # cleans up from any previous tests hopefully
-make test-style ; # runs the project's tests for style
-make clean ; # cleans up for next test
-```
+> In a rush to test this module in your own environment? Then you might try this:
+>
+> ```bash
+> #cd /MY-AWESOME-DEV-PATH/multicast || git clone ...
+> make clean ; # cleans up from any previous tests hopefully
+> make test ; # runs the tests
+> make clean ; # cleans up for next test
+> ```
 
 ***
 
