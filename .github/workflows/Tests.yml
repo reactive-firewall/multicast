@@ -203,7 +203,6 @@ jobs:
       uses: ./.github/actions/fetch-test-reporter
       with:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -260,7 +259,6 @@ jobs:
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -272,7 +270,6 @@ jobs:
       uses: ./.github/actions/purge-test-reporter
       with:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -482,7 +479,6 @@ jobs:
       uses: ./.github/actions/fetch-test-reporter
       with:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -519,7 +515,6 @@ jobs:
         os: ${{ runner.os }}
         python-version: ${{ matrix.python-version }}
         job_code: ${{ needs.check_mats.outputs.tests_id }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -531,7 +526,6 @@ jobs:
       uses: ./.github/actions/purge-test-reporter
       with:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
-      secrets:
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
         codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
@@ -839,8 +833,6 @@ jobs:
       BRANCH_NAME: ${{ needs.check_mats.outputs.mats_ref_name }}
       VCS_BRANCH_NAME: ${{ needs.check_mats.outputs.build_ref_name }}
       VCS_COMMIT_ID: ${{ needs.check_mats.outputs.build_sha }}
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     outputs:
       integration_outcome: ${{ steps.integration_outcome.outcome }}
       integration_test_outcome: ${{ steps.integration_tests.outputs.integration_test_outcome }}

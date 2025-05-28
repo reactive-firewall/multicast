@@ -40,7 +40,6 @@ inputs:
       - Linux
       - Windows
     required: true
-secrets:
   codeclimate-token:
     description: |
       The token used to authenticate when performing codeclimate API operations.
@@ -262,7 +261,7 @@ runs:
       if: ${{ success() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
       uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
       with:
-        token: ${{ secrets.codecov-token }}
+        token: ${{ inputs.codecov-token }}
         job_code: ${{ inputs.job_code || '' }}
         override_commit: ${{ steps.output_sha.outputs.sha }}
         files: ./coverage.xml,./test-reports/coverage.xml
@@ -287,8 +286,8 @@ runs:
       id: coverage-codeclimate-upload
       shell: bash
       env:
-        CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.codeclimate-token || '' }}
-        CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && secrets.cc-test-reporter-id || '' }}
+        CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.codeclimate-token || '' }}
+        CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && inputs.cc-test-reporter-id || '' }}
       run: |
         if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
           ./cc-test-reporter after-build --exit-code 0 || exit 1 ;
@@ -300,7 +299,7 @@ runs:
       id: coverage-deepsource-upload
       shell: bash
       env:
-        DEEPSOURCE_DSN: ${{ github.server_url == 'https://github.com' && secrets.deepsource-dsn || '' }}
+        DEEPSOURCE_DSN: ${{ github.server_url == 'https://github.com' && inputs.deepsource-dsn || '' }}
         DEEPSOURCE_TOOL: ${{ steps.output_upload_tools.outputs.deepsource_executable }}
       run: |
         ${DEEPSOURCE_TOOL} report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null
@@ -309,7 +308,7 @@ runs:
       id: coverage-coveralls-upload
       shell: bash
       env:
-        COVERALLS_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.coveralls-token || '' }}
+        COVERALLS_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.coveralls-token || '' }}
         COVERALLS_TOOL: ${{ steps.output_upload_tools.outputs.coveralls_executable }}
       run: |
         if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
