@@ -116,9 +116,9 @@ runs:
         fi
         printf "%s\n" "PYTHON_VERSION=${PYTHON_VERSION}" >> "$GITHUB_ENV"
         if [[ -z $PYTHON_VERSION ]] ; then
-          printf "::debug::%s\n" "Found Python version ${PYTHON_VERSION}"
-        else
           printf "::debug::%s\n" "Missing Python version"
+        else
+          printf "::debug::%s\n" "Found Python version ${PYTHON_VERSION}"
         fi
     - name: "Identify Operating System"
       id: output_os
@@ -134,10 +134,10 @@ runs:
           printf "os=%s\n" "${OS:-unknown}" >> "$GITHUB_OUTPUT"
         fi
         if [[ -z $OS ]] ; then
-          printf "::debug::%s\n" "Identified ${OS}"
-        else
           printf "::error file=.github/actions/test-reporter-upload/action.yml::%s\n" "Invalid OS"
           exit 1
+        else
+          printf "::debug::%s\n" "Identified ${OS}"
         fi
         printf "%s\n" "OS=${OS}" >> "$GITHUB_ENV"
     - name: "Prepare Artifact Name"
