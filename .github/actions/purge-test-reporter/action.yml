@@ -14,6 +14,7 @@ inputs:
       rate limiting.
     default: ${{ github.server_url == 'https://github.com' && github.token || '' }}
     required: true
+secrets:
   codeclimate-token:
     description: |
       The token used to authenticate when performing codeclimate API operations.
@@ -70,10 +71,10 @@ runs:
       if: ${{ !cancelled() && (steps.output_can_purge.outputs.can_purge == 'true') && (runner.os != 'Windows') && (github.repository == 'reactive-firewall/multicast') }}
       shell: bash
       env:
-        CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.codeclimate-token || '' }}
-        CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && inputs.cc-test-reporter-id || '' }}
-        COVERALLS_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.coveralls-token || '' }}
-        DEEPSOURCE_DSN: ${{ github.server_url == 'https://github.com' && inputs.deepsource-dsn || '' }}
+        CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.codeclimate-token || '' }}
+        CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && secrets.cc-test-reporter-id || '' }}
+        COVERALLS_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && secrets.coveralls-token || '' }}
+        DEEPSOURCE_DSN: ${{ github.server_url == 'https://github.com' && secrets.deepsource-dsn || '' }}
       run: |
         ${{ github.workspace }}/.github/tools/fetch-test-reporter/purge-test-reporter || exit $?
     - name: "Evaluate Fetch Task"
