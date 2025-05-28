@@ -464,7 +464,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 	> [!IMPORTANT]
 	> Multicast is not actually port-aware, and port filtering is instead
-	> handled at the protocol layer (eg. UDP) instead, and may not behave
+	> handled at the protocol layer (e.g., UDP) instead, and may not behave
 	> as expected for some real-world setups.
 
 	Minimal Testing:
