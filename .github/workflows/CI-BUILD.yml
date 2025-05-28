@@ -67,6 +67,18 @@ jobs:
       - name: Pre-Clean
         id: clean
         run: make -j1 -f Makefile purge 2>/dev/null || true
+      - name: "License"
+        id: show-build-license
+        shell: bash
+        if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+        run: |
+          if [[ -r LICENSE.md ]] ; then
+            printf "\n\n"
+            cat <LICENSE.md ;
+            printf "\n\n"
+          else
+            printf "%s\n" "::warning title=UNLICENSED:: This is an UNLICENSED Build"
+          fi
       - name: Test Build
         id: build
         run: make -j1 -f Makefile build

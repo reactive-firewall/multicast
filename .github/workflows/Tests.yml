@@ -746,6 +746,23 @@ jobs:
           token: ${{ github.token }}
           body-path: '${{ steps.download-coverage-summary.outputs.download-path }}/COVERAGE-Summary-Artifact.txt'
 
+  COVERALLS_SIGNAL_DONE:
+    permissions:
+      actions: read
+      contents: read
+    needs: [check_mats, COVERAGE, DOCTESTS]
+    if: ${{ always() && (needs.check_mats.outputs.should_run == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Signal Coveralls Finished
+      uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
+      with:
+        build-number: ${{ needs.check_mats.outputs.tests_id }}
+        parallel-finished: true
+        git-commit: ${{ needs.check_mats.outputs.build_sha }}
+        allow-empty: true
+        fail-on-error: false
+
   STYLE:
     permissions:
       actions: read
