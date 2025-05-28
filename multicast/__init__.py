@@ -221,7 +221,7 @@ __name__ = "multicast"  # skipcq: PYL-W0622
 
 global __version__  # skipcq: PYL-W0604
 
-__version__ = "2.0.9-alpha-4"
+__version__ = "2.0.9-alpha-5"
 """The version of this program.
 
 	The `__version__` attribute, like many dunder attributes, is associated with the implementation
@@ -464,7 +464,7 @@ _MCAST_DEFAULT_PORT = 59259
 
 	> [!IMPORTANT]
 	> Multicast is not actually port-aware, and port filtering is instead
-	> handled at the protocol layer (eg. UDP) instead, and may not behave
+	> handled at the protocol layer (e.g., UDP) instead, and may not behave
 	> as expected for some real-world setups.
 
 	Minimal Testing:

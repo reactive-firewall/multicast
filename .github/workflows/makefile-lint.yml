@@ -63,10 +63,10 @@ jobs:
         env:
           BUILDER_NAME: "makefile-lint"
           BUILDER_EMAIL: "no-reply@localhost"
+          EXPECTED_SHA: "${{ vars.CHECKMAKE_EXPECTED_SHA }}"
         run: |
           git clone --depth 1 --branch main https://github.com/mrtazz/checkmake.git checkmake
           cd checkmake
-          EXPECTED_SHA="880668e0015d47e9b84ec5edfec4bf67b4228ea4" # v0.2.2+21
           ACTUAL_SHA=$(git rev-parse HEAD)
           if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
             ERR_MSG_STUB="Checkmake repository hash verification failed."

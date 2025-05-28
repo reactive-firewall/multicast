@@ -13,6 +13,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+###
+# Attention:
+# Please be aware that the testing code associated with the Multicast project is subject to
+# multiple licenses and is not unified under the same license as the Multicast module itself,
+# which is licensed under MIT. While all multicast testing source code is open-source,
+# the use of certain testing components may require specific conditions to be met in your
+# environment.
+###
+# Key Points to Note:
+###
+# Multiple Licenses: The project is divided among various licenses. Some testing code,
+# particularly the extra tests, may only function correctly in environments that include additional
+# dependencies with their own licensing restrictions.
+# Dependency Requirements:
+# The hypothesis module, which is necessary for some of the extra test code, is licensed under the
+# MPL2 License.
+# Certain Continuous Integration/Continuous Deployment (CI/CD) tools may require GNU licensed
+# software to operate effectively.
+# Environment Compatibility: Users must ensure that their testing environments are equipped
+# with the necessary components and licenses to run the testing code. This is akin to a
+# "batteries not included" disclaimer, indicating that additional setup may be required.
+# AS-IS Disclaimer: Please note that the Multicast project is provided "AS-IS," and we do not
+# guarantee compatibility or support for the testing code outside of the specified environments.
+# Users are responsible for ensuring compliance with all applicable licenses and for setting up
+# their environments accordingly.
+###
+# The individual dependencies are owned by their respective copyright holders.
+###
 #python
 # time - builtin - PSF license
 # re - builtin - PSF license?
