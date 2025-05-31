@@ -77,6 +77,7 @@ extensions = [
 	"autodoc2",
 	"sphinx.ext.autosectionlabel",
 	"sphinx.ext.githubpages",
+	"sphinxcontrib.mermaid",
 	"myst_parser",
 	"sphinx_design",
 	"sphinx.ext.autosummary",
