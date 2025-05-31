@@ -103,6 +103,7 @@ templates_path = ["_templates"]
 # The suffix of source filenames.
 source_suffix = {
 	".yml": "yaml",
+	".toml": "toml",
 	".md": "markdown",
 	".txt": "markdown",
 	"Makefile": "makefile",
@@ -197,6 +198,7 @@ highlight_options = {
 	"default": pygments_options,
 	"python": pygments_options,
 	"yaml": pygments_yaml_options,
+	"ini": pygments_yaml_options,
 	"makefile": pygments_options,
 }
 
@@ -291,6 +293,15 @@ html_show_copyright = True
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "multicast_doc"
+
+# -- Options for MyST markdown parser -------------------------------------------
+# see https://github.com/mgaitan/sphinxcontrib-mermaid?tab=readme-ov-file#markdown-support
+
+# GFM style mermaid use zoom
+mermaid_d3_zoom = True
+
+# themes
+mermaid_params = ["--theme", "dark", "--backgroundColor", "transparent"]
 
 # -- Options for MyST markdown parser -------------------------------------------
 # see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html
@@ -444,6 +455,48 @@ intersphinx_mapping = sanitize_intersphinx_mapping(
 
 
 def linkcode_resolve(domain, info):
+	"""
+	Resolves selectivly linking to GitHub source-code for the multicast module.
+
+	See https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html for more details.
+
+	Unit-Testing:
+
+		First set up test fixtures by importing conf.
+
+			>>> import docs.conf as _conf
+			>>>
+
+		Testcase 1: Test function with input.
+
+			>>> _conf.linkcode_resolve is not None
+			True
+			>>> ignored_input = "docs.conf"  # this is unchanged
+			>>> test_text = "docs.conf"  # this is resolved
+			>>> bad_input = False  # this is invalid
+			>>> res_text = _conf.linkcode_resolve("py", info={"module": test_text})
+			>>> res_text is not None
+			True
+			>>> type(res_text) is type(str())
+			True
+			>>> res_text is not test_text
+			True
+			>>> _conf.linkcode_resolve("py", info={"module": test_text,}) is res_text
+			True
+			>>> _conf.linkcode_resolve("py", info={"module": ignored_input,}) is ignored_input
+			True
+			>>> _conf.linkcode_resolve("py", info={"module": bad_input,}) is None
+			True
+			>>> len(res_text) > 0
+			True
+			>>>
+			>>> # cleanup from unit-test
+			>>> del ignored_input
+			>>> del bad_input
+			>>> del test_text
+			>>> del res_text
+			>>>
+	"""
 	if not isinstance(domain, str) or domain != "py":
 		return None
 	if not isinstance(info, dict) or "module" not in info or not info["module"]:
