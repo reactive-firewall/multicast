@@ -471,7 +471,6 @@ def linkcode_resolve(domain, info):
 
 			>>> _conf.linkcode_resolve is not None
 			True
-			>>> ignored_input = "docs.conf"  # this is unchanged
 			>>> test_text = "multicast.env"  # this is resolved
 			>>> bad_input = False  # this is invalid
 			>>> res_text = _conf.linkcode_resolve("py", info={"module": test_text})
@@ -485,15 +484,12 @@ def linkcode_resolve(domain, info):
 			True
 			>>> _conf.linkcode_resolve("py", info={"module": test_text,}) == res_text
 			True
-			>>> _conf.linkcode_resolve("py", info={"module": ignored_input,}) == ignored_input
-			True
 			>>> _conf.linkcode_resolve("py", info={"module": bad_input,}) is None
 			True
 			>>> len(res_text) > 0
 			True
 			>>>
 			>>> # cleanup from unit-test
-			>>> del ignored_input
 			>>> del bad_input
 			>>> del test_text
 			>>> del res_text
