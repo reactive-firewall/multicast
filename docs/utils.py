@@ -17,32 +17,33 @@
 # limitations under the License.
 
 import re
-from urllib.parse import urlparse, urlunparse, quote
+import unicodedata
+from urllib.parse import ParseResult, urlparse, urlunparse, quote
 
 
 # Git reference validation pattern
 # Enforces:
 # - Must start with alphanumeric character
 # - Can contain alphanumeric characters, underscore, hyphen, forward slash, and dot
-GIT_REF_PATTERN = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
+GIT_REF_PATTERN: str = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
 
 
 # URL allowed scheme list
 # Enforces:
 # - URLs Must start with https
-URL_ALLOWED_SCHEMES = frozenset({"https"})
+URL_ALLOWED_SCHEMES: list = frozenset({"https"})
 
 
 # URL allowed domain list
 # Enforces:
 # - URLs Must belong to one of these domains
-URL_ALLOWED_NETLOCS = frozenset({
+URL_ALLOWED_NETLOCS: list = frozenset({
 	"github.com", "gist.github.com", "readthedocs.com", "docs.python.org", "peps.python.org",
 })
 
 
 # Maximum allowed URL length
-MAX_URL_LENGTH = 2048  # Common browser limit
+MAX_URL_LENGTH: int = 2048  # Common browser limit
 """Maximum allowed length for URL validation.
 
 Should be large enough for most URLs but no larger than common browser limits.
@@ -70,7 +71,7 @@ Unit-Testing:
 
 
 # Error messages for URL validation
-INVALID_LENGTH_ERROR = f"URL exceeds maximum length of {MAX_URL_LENGTH} characters."
+INVALID_LENGTH_ERROR: str = f"URL exceeds maximum length of {MAX_URL_LENGTH} characters."
 """Length error message for URL validation.
 
 Unit-Testing:
@@ -91,7 +92,7 @@ Unit-Testing:
 """
 
 
-INVALID_SCHEME_ERROR = "Invalid URL scheme. Only 'https' is allowed."
+INVALID_SCHEME_ERROR: str = "Invalid URL scheme. Only 'https' is allowed."
 """Scheme error message for URL validation.
 
 Unit-Testing:
@@ -112,7 +113,7 @@ Unit-Testing:
 """
 
 
-INVALID_DOMAIN_ERROR = f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed."
+INVALID_DOMAIN_ERROR: str = f"Invalid or untrusted domain. Only {URL_ALLOWED_NETLOCS} are allowed."
 """Domain error message for URL validation.
 
 Unit-Testing:
@@ -229,8 +230,10 @@ def slugify_header(s: str) -> str:
 			>>> slugify_header("[CEP-7] Documentation *Guide*")
 			'cep-7-documentation-guide'
 	"""
-	# First, remove special characters and convert to lowercase
-	text = re.sub(r'[^\w\- ]', "", s).strip().lower()
+	# First Normalize Unicode characters
+	text: str = unicodedata.normalize('NFKC', s)  # added in v2.0.9a6
+	# Then, remove special characters and convert to lowercase
+	text = re.sub(r'[^\w\- ]', "", text).strip().lower()
 	# Then replace consecutive spaces or dashes with a single dash
 	return re.sub(r'[-\s]+', "-", text)
 
@@ -270,20 +273,22 @@ def sanitize_url(url: str) -> str:
 	# Validate length
 	if len(url) > MAX_URL_LENGTH:
 		raise ValueError(INVALID_LENGTH_ERROR)
-	parsed_url = urlparse(url)
+	parsed_url: ParseResult = urlparse(url)
 	# Validate scheme
 	if parsed_url.scheme not in URL_ALLOWED_SCHEMES:
 		raise ValueError(INVALID_SCHEME_ERROR)
 	# Validate netloc
 	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
 		raise ValueError(INVALID_DOMAIN_ERROR)
+	# Normalize netloc
+	sanitized_netloc: str = unicodedata.normalize('NFKC', parsed_url.netloc)  # added in v2.0.9a6
 	# Sanitize path and query - using the safe parameter to preserve URL structure
-	sanitized_path = quote(parsed_url.path, safe="/=")
-	sanitized_query = quote(parsed_url.query, safe="&=")
+	sanitized_path: str = quote(unicodedata.normalize('NFKC', parsed_url.path), safe="/=")
+	sanitized_query: str = quote(parsed_url.query, safe="&=")
 	# Reconstruct the sanitized URL
 	return urlunparse((
 		parsed_url.scheme,
-		parsed_url.netloc,
+		sanitized_netloc,
 		sanitized_path,
 		parsed_url.params,
 		sanitized_query,
