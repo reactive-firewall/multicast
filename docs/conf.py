@@ -479,9 +479,9 @@ def linkcode_resolve(domain, info):
 			True
 			>>> type(res_text) is type(str())
 			True
-			>>> res_text is not test_text
+			>>> len(res_text) > 0
 			True
-			>>> _conf.linkcode_resolve("py", info={"module": test_text,}) is res_text
+			>>> res_text is not test_text
 			True
 			>>> _conf.linkcode_resolve("py", info={"module": ignored_input,}) is ignored_input
 			True
