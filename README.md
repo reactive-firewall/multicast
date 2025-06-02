@@ -238,7 +238,7 @@ Next steps and bug fixes are tracked by the
 ### Copyright (c) 2021-2025, Mr. Walls
 
 The Multicast Python Module is licensed under the MIT License. See the
-[LICENSE.md](https://github.com/reactive-firewall/multicast/tree/stable/LICENSE.md) file for
+[LICENSE.md](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md) file for
 details.
 
-[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md)

@@ -115,4 +115,4 @@ and does not actually update Multicast after import)_
 
 ### Copyright (c) 2024-2025, Mr. Walls
 
-[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md)

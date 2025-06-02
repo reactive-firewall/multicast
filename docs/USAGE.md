@@ -150,4 +150,4 @@ received multicast datagrams.
 
 #### Copyright (c) 2021-2025, Mr. Walls
 
-[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md)

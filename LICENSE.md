@@ -58,7 +58,7 @@ _NO ASSOCIATION._
 Copyright (c) 2017-2022, Python Test Repo Template
 ALSO Licensed under MIT
 You may obtain a copy of the License at
-[MIT License](http://www.github.com/reactive-firewall/python-repo/LICENSE.md)
+[MIT License](https://github.com/reactive-firewall/python-repo/LICENSE.md)
 ***
 
 ### Files: `.github/workflows/markdown-lint.yml`, and `.github/workflows/yaml-lint.yml`
@@ -67,7 +67,20 @@ You may obtain a copy of the License at
 Copyright (c) 2017-2025, Your Mileage May Vary
 ALSO Licensed under MIT
 You may obtain a copy of the License at
-[MIT License](http://www.github.com/reactive-firewall/ymmv/LICENSE.md)
+[MIT License](https://github.com/reactive-firewall/ymmv/LICENSE.md)
+***
+
+### File: `Logo.svg`
+
+***
+Copyright (c) 2024-2025, Multicast Logo by Mr. Walls.
+Source-code (e.g., xml) is under Apache 2.0 License.
+Rastered variants (e.g., when rendered/cached/etc. as an image with descrete dimentions) are
+the Multicast trademark (Namely Multicast's M like symbol and it's likeness), and some
+rights are reserved. See the License for the specific language governing permissions and
+limitations under the License.
+You may obtain a copy of the License at
+[Apache-2.0 License](http://www.apache.org/licenses/LICENSE-2.0)
 ***
 
 ## Third-party Acknowledgments :bow:
