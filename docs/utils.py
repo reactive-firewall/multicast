@@ -31,13 +31,13 @@ GIT_REF_PATTERN: str = r'^[a-zA-Z0-9][a-zA-Z0-9_\-./]*$'
 # URL allowed scheme list
 # Enforces:
 # - URLs Must start with https
-URL_ALLOWED_SCHEMES: list = frozenset({"https"})
+URL_ALLOWED_SCHEMES: frozenset = frozenset({"https"})
 
 
 # URL allowed domain list
 # Enforces:
 # - URLs Must belong to one of these domains
-URL_ALLOWED_NETLOCS: list = frozenset({
+URL_ALLOWED_NETLOCS: frozenset = frozenset({
 	"github.com", "gist.github.com", "readthedocs.com", "docs.python.org", "peps.python.org",
 })
 
@@ -230,7 +230,7 @@ def slugify_header(s: str) -> str:
 			>>> slugify_header("[CEP-7] Documentation *Guide*")
 			'cep-7-documentation-guide'
 	"""
-	# First Normalize Unicode characters
+	# First Normalize Unicode characters to prevent homograph attacks
 	text: str = unicodedata.normalize('NFKC', s)  # added in v2.0.9a6
 	# Then, remove special characters and convert to lowercase
 	text = re.sub(r'[^\w\- ]', "", text).strip().lower()
@@ -280,7 +280,7 @@ def sanitize_url(url: str) -> str:
 	# Validate netloc
 	if parsed_url.netloc not in URL_ALLOWED_NETLOCS:
 		raise ValueError(INVALID_DOMAIN_ERROR)
-	# Normalize netloc
+	# Normalize netloc to prevent homograph attacks
 	sanitized_netloc: str = unicodedata.normalize('NFKC', parsed_url.netloc)  # added in v2.0.9a6
 	# Sanitize path and query - using the safe parameter to preserve URL structure
 	sanitized_path: str = quote(unicodedata.normalize('NFKC', parsed_url.path), safe="/=")
