@@ -169,7 +169,6 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "include LICENSE.md" >>"$@" ;
 	$(QUIET)$(ECHO) "include CHANGES.md" >>"$@" ;
 	$(QUIET)$(ECHO) "include HISTORY.md" >>"$@" ;
-	$(QUIET)$(ECHO) "recursive-include . *.txt" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitignore" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .git_skipList" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitattributes" >>"$@" ;
