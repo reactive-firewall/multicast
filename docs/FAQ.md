@@ -13,15 +13,16 @@
 ### How do I get this running?
 
 To configure your environment for developing with the multicast library, follow the steps in the
-[Install Guide](https://github.com/reactive-firewall/multicast/tree/HEAD/docs/INSTALL.md).
+[Install Guide](./INSTALL.md).
 Key steps include:
 
   1. Ensuring you have a supported version of Python installed.
   2. use pip to install
   3.
-  | _in `Python`_ | _in `bash`_ |
-  |---------------|-------------|
-  | `import multicast` | `python3 -m multicast --help` |
+
+    | _in `Python`_ | _in `bash`_ |
+    |---------------|-------------|
+    | `import multicast` | `python3 -m multicast --help` |
 
 ### How do I use this `multicast` to receive some UDP multicast?
 
@@ -67,14 +68,32 @@ messages, no more than one message at a time.
 
 #### _Develop in `Python`_
 
-
+While the command line interface is useful for prototyping, the Python API is better for
+the rest of the development process. So, once you are ready to proceed to implement a more advanced
+solution in Python, you can import the `multicast' library module with the usual `import multicast`
+logic.
 
 ### How do I use this to send UDP Multicast?
 
 With `multicast` installed and set up, this guide will assume you want to send a message to
 multicast group `224.0.0.1` on the UDP port `59595`.
 
-#### _Prototype in `bash`_
+#### _from the python module_
+
+Sending is similar to listening, you create a sender and pass it the options, except that unlike
+listeners and receivers, senders are always synchronous (e.g., allowing only one message per call).
+
+```python3
+from multicast import send
+
+# Create a multicast sender
+sender = send.McastSAY()
+
+# Send a message
+sender(group='224.0.0.1', port=59595, ttl=1, data='Hello, Multicast!')
+```
+
+#### _from the CLI_
 
 ```bash
 python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
@@ -88,7 +107,7 @@ python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 | `--message` | This specifies the rest of the input is to be the message to transmit. |
 | `"Hello World!"` | This specifies the multicast message content to _transmit_. In this case, it is the greeting "Hello World!" |
 
-##### Steps to Run
+##### Step-by-step
 
   1. Open your terminal.
   2. Ensure you have the multicast module installed and accessible.
@@ -105,6 +124,14 @@ functionality to ensure that messages are being transmitted and received correct
 > implementation (e.g., lacks useful input validation, lacks error handling, etc.)
 
 ```python3
+# Optional setup console logging
+import logging
+multicast_logging_sink = logging.getLogger()
+handler = logging.StreamHandler()
+multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
+handler = logging.StreamHandler()  # example trivial log handler
+multicast_logging_sink.addHandler(handler)
+
 # imports
 from multiprocessing import Process as Process
 import multicast
@@ -113,17 +140,6 @@ import random  # for random port
 # Multicast group address and port
 MCAST_GRP = "224.0.0.1"  # Replace with your multicast group address (use IPv4 dotted notation)
 MCAST_PORT = int(random.SystemRandom().randint(49152, 65535))  # Replace with your multicast port
-
-# Other important settings (Non-Multicast)
-# Multicast does not care about the host IP, but the UDP protocol layer of the Python socket does
-# There are 3 logical choices for the vast majority of users:
-# 1. '0.0.0.0' for Promiscuous mode (Usually needs privileges to use on most Operating Systems)
-# 2. The actual interface IPv4 dot notation address for unprivileged mode
-# 3. MCAST_GRP value, Linux and MacOS implementations can let the system choose by passing the
-#    MCAST_GRP to the Python socket.bind operation (handled by multicast.skt when missing Host IP)
-#    Windows users must use option 1 or 2 for now.
-# This address is per socket (e.g., can be chosen per socket even if on a single interface)
-# HOST_BIND_IP = "0.0.0.0"
 
 # Options for multicast listener
 listener_options = {
@@ -162,11 +178,11 @@ MCAST_PORT = int(random.SystemRandom().randint(49152, 65535))  # Replace with yo
 # There are 3 logical choices for the vast majority of users:
 # 1. '0.0.0.0' for Promiscuous mode (Usually needs privileges to use on most Operating Systems)
 # 2. The actual interface IPv4 dot notation address for unprivileged mode
-# 3. MCAST_GRP value, Linux and MacOS implementations can let the system choose by passing the
+# 3. None, Linux and MacOS implementations can let the system choose by passing the
 #    MCAST_GRP to the Python socket.bind operation (handled by multicast.skt when missing Host IP)
 #    Windows users must use option 1 or 2 for now.
 # This address is per socket (e.g., can be chosen per socket even if on a single interface)
-HOST_BIND_IP = MCAST_GRP
+
 
 # Options for multicast listener
 listener_options = {
@@ -174,7 +190,6 @@ listener_options = {
     "groups": [MCAST_GRP],  # list[str]: multicast group addresses (use IPv4 dotted notation list)
     "port": MCAST_PORT,  # int: UDP port for multicast
     "iface": None,  # str: System specific interface name, or None to let system choose
-    "bind": HOST_BIND_IP,  # str: interface IP address (unnecessary; only included for completeness)
     "group": MCAST_GRP  # str: primary multicast group address (use IPv4 dotted notation)
 }
 
@@ -277,19 +292,17 @@ finally:
 > interprocess communication theory and the standard python `multiprocessing` module and its use.
 > Together these examples demonstrate a trivial message passing IPC using multicast python sockets.
 
-Here is a
-[more CLI focused way to test](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
-as another trivial example of how to use the module.
+See also [USAGE Guide](./USAGE.md)
 
 ### How do I run and interpret the test suite for this project?
 
-To run the test suite, follow the instructions in the [Testing Guide](https://github.com/reactive-firewall/multicast/tree/HEAD/docs/Testing.md).
+To run the test suite, follow the instructions in the [Testing Guide](./Testing.md).
 
 The guide explains test organization, and how to run tests outside CI/CD.
 
 ### How is continuous integration (CI) set up for this repository?
 
-CI is configured as described in the [CI Guide](https://github.com/reactive-firewall/multicast/tree/HEAD/docs/CI.md).
+CI is configured as described in the [CI Guide](./CI.md).
 Key points:
 
 Automated builds and tests are run via GitHub Actions. Each pull request is tested for
@@ -304,7 +317,7 @@ and what to expect when contributing changes.
 > The **default** multicast group address is `224.0.0.1`.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
+[API documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
 > The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
 > on the rational that this group address will be treated as a local-net multicast
 > (caveat: one should use link-local for ipv6).
@@ -326,7 +339,7 @@ From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
 > choice is required to multicast beyond a single network.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
+[API documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
 > A Value of 1 (one TTL) is chosen as per
 > [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1) on the rational that an
 > explicit value that could traverse beyond the local connected network should be
@@ -339,19 +352,19 @@ From the
 > The **default** UDP port used by `multicast` is `59595`.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
+[API documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
 
 While developers and network administrators must consider other factors in real-world deployments,
 it is fair to say any free port in the dynamic or "ephemeral" port range of `49152`-`65535` should
-work as far as this Multicast module is concerned.
+work as far as the `multicast` module is concerned.
 
 * For `SAY` the port refers to the destination port.
 * for `RECV` and `HEAR` the port refers to the port to listen on.
 
 > [!CAUTION]
-> It is best to specify the port in use at this time as the default has yet to be properly
-> assigned ( see related reactive-firewall/multicast#62 )
+> It is best to specify the port in use at this time as the default will not be properly
+> assigned to `multicast` ( see related reactive-firewall/multicast#62 ) by any central authority.
 
 ### CLI exit code meanings
 
