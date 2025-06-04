@@ -20,9 +20,9 @@ Key steps include:
   2. use pip to install
   3.
 
-    | _in `Python`_ | _in `bash`_ |
-    |---------------|-------------|
-    | `import multicast` | `python3 -m multicast --help` |
+  | _in `Python`_ | _in `bash`_ |
+  |---------------|-------------|
+  | `import multicast` | `python3 -m multicast --help` |
 
 ### How do I use this `multicast` to receive some UDP multicast?
 
@@ -70,7 +70,7 @@ messages, no more than one message at a time.
 
 While the command line interface is useful for prototyping, the Python API is better for
 the rest of the development process. So, once you are ready to proceed to implement a more advanced
-solution in Python, you can import the `multicast' library module with the usual `import multicast`
+solution in Python, you can import the `multicast` library module with the usual `import multicast`
 logic.
 
 ### How do I use this to send UDP Multicast?

@@ -124,6 +124,8 @@ finally:
 
 ```
 
+## Advanced Library Usage
+
 ### Custom handlers
 
 > [!TIP]
@@ -141,7 +143,7 @@ finally:
 > [default listener does under-the-hood](https://github.com/reactive-firewall/multicast/blob/v2.0.9a5/multicast/hear.py#L830C4-L832C27)
 > automatically.
 
-### Direct ephemeral receiver with an ad-hoc handler:
+### Direct ephemeral receiver with an ad-hoc handler
 
 In the unusual case where the `multicast.hear.McastServer` provides insufficient control, there is
 still the option of directly handling the ephemeral receiver, before resorting to low-level raw
