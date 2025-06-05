@@ -104,6 +104,7 @@ for running the various tests during the act of testing.
 > Both CI/CD and the Makefile ultimately use the same test runner under the hood.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 graph TD;
     CI["CI/CD"];
 
@@ -197,6 +198,7 @@ the selective test runner. Of course, eventually the process leads back to the n
 testing.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 sequenceDiagram
     actor user as Developer
     participant Make as Makefile
@@ -320,6 +322,7 @@ Here is how `multicast` module logging and code coverage collection are integrat
 whole testing process.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 sequenceDiagram
     actor user as Developer
     participant Make as Makefile

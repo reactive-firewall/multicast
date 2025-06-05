@@ -72,6 +72,7 @@ automated analysis.
 #### How on-`workflow_run` triggers propagate
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 graph TD;
     PUSH-EVENT-->CI-Build.yml;
     CI-Build.yml-->multicast-build-*;
@@ -148,6 +149,7 @@ in a single environment on CircleCI, and typically perform faster.
 #### How `push` triggers propagate on CircleCI
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 graph TD;
   PUSH-EVENT-->config.yml;
   config.yml-->build;
@@ -194,6 +196,7 @@ There are many integrations with various service providers used in the Multicast
 pipeline.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 graph TD;
   PUSH-EVENT["PUSH EVENT"];
   PUSH-EVENT-->CI-Build.yml;
@@ -344,7 +347,7 @@ Most of the linting in CI/CD is performed by GitHub workflows with the exception
 the linter reporting (e.g., anything more than pass/fail status) is from the GitHub linter
 workflows. There are two noteworthy forms of feedback from the various linting automation,
 [code-scanning reports](https://docs.github.com/en/code-security/code-scanning), and
-[GitHub Anotated Messages](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-a-debug-message).
+[GitHub Annotated Messages](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-a-debug-message).
 All linting workflows failures result in alerts that can be reviewed with the relevant
 [PR via GitHub's UI](https://docs.github.com/en/code-security/code-scanning/managing-code-scanning-alerts/triaging-code-scanning-alerts-in-pull-requests#code-scanning-results-check-failures),
 albeit with different levels of details per linter workflow and target branch.
@@ -370,6 +373,7 @@ Logically (e.g., ignoring complexities of concurrency and trigger conditionals, 
 of phases is sequential per single CI/CD linter workflow.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 sequenceDiagram
   participant Repo as Repository
 
@@ -471,6 +475,7 @@ Logically (e.g., ignoring complexities of concurrency and trigger conditionals, 
 linters are all run independently per CI/CD linter workflow.
 
 ```mermaid
+%%{ init: { 'theme': 'base', 'themeVariables': { 'darkMode': true, 'primaryColor': '#3e3e3e', 'background': 'transparent', 'primaryBorderColor': 'Orange', 'lineColor': 'darkOrange', 'secondaryColor': 'transparent', 'tertiaryColor': '#030303' }} }%%
 graph TD;
     PUSH-EVENT-->bandit.yml;
     PUSH-EVENT-->codeql-analysis.yml;

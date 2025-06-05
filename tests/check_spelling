@@ -158,6 +158,7 @@ declare -a SPECIFIC_TYPOS=(
 	"excutable:executable"  # from #130
 	"bassed:based"  # from #415
 	"Historicly:Historically"  # from #415
+	"selectivly:selectively"  # from #426
 )
 
 function cleanup() {

@@ -213,9 +213,11 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
     - name: Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: coverage_tests
+      shell: bash
       env:
         TESTS_USE_PYTEST: 1
-      run: make -f Makefile test || exit 1 ;
+      run: |
+        make -f Makefile test || exit 1
     - name: Upload Python ${{ matrix.python-version }} test coverage to Codecov
       id: coverage-unittests-codecov-upload
       uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24 # v5.4.3
