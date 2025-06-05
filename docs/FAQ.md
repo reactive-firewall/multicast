@@ -26,8 +26,8 @@ To configure your environment for developing with the multicast library, follow 
 Key steps include:
 
   1. Ensuring you have a supported version of Python installed.
-  2. Use pip to install (e.g., `pip install multicast`)
-  3. Verify the installation works:
+  2. Using pip to install (e.g., `pip install multicast`)
+  3. Verifying the installation works:
 
   | _in `Python`_ | _in `bash`_ |
   |---------------|-------------|
@@ -145,8 +145,8 @@ handler = logging.StreamHandler()  # example trivial log handler
 multicast_logging_sink.addHandler(handler)
 
 # imports
-from multiprocessing import Process as Process
 import multicast
+from multiprocessing import Process
 import random  # for random port
 
 # Multicast group address and port
@@ -180,6 +180,7 @@ Low-level with example handler:
 # imports
 import multicast
 import random  # for random port
+import functools  # for decorator func metadata
 
 # Multicast group address and port
 MCAST_GRP = "224.0.0.1"  # Replace with your multicast group address (use IPv4 dotted notation)
@@ -195,7 +196,6 @@ MCAST_PORT = int(random.SystemRandom().randint(49152, 65535))  # Replace with yo
 #    Windows users must use option 1 or 2 for now.
 # This address is per socket (e.g., can be chosen per socket even if on a single interface)
 
-
 # Options for multicast listener
 listener_options = {
     "is_daemon": False,  # bool: enable/disable daemon mode
@@ -207,7 +207,6 @@ listener_options = {
 
 # Example setup for Low-Level use-case
 # Define a decorator to loop until able to print a string result of enough length
-import functools
 
 
 def printLoopStub(func):
@@ -256,8 +255,8 @@ _and elsewhere (e.g., in another module or even on another system); an example f
 
 ```python3
 # imports
-from multiprocessing import Process as Process
 import multicast
+from multiprocessing import Process
 
 # Multicast group address and port
 MCAST_GRP = "224.0.0.1"  # Replace with your multicast group address (use IPv4 dotted notation)
@@ -295,7 +294,7 @@ finally:
     if p:
         p.join() # if not already handled don't forget to join the process and other overhead
     # hint: if you use a loop and need to know the exit code
-    didWork = (p is not None and int(p.exitcode) <= int(0))  # e.g. check for success
+    didWork = (p is not None and p.exitcode <= 0)  # e.g. check for success
 
 ```
 
@@ -305,6 +304,80 @@ finally:
 > Together these examples demonstrate a trivial message passing IPC using multicast python sockets.
 
 See also [USAGE Guide](./USAGE.md)
+
+### Why does multicast module logging require explicit handler setup instead of just basicConfig?
+
+The multicast module uses a null log handler by default as part of its logging architecture. This
+means that simply calling `logging.basicConfig(level=logging.INFO)` is insufficient to display the
+`multicast` module's log records, as there's no active handler to capture and output them.
+
+To see multicast module logging output, you must explicitly add a log handler:
+
+```mermaid
+
+sequenceDiagram
+    participant Python as Your Python Code
+    participant multicast as Multicast Module
+    participant logging as `logging` module
+
+    Python-->>logging: import logging
+    opt setup custom log handler
+      create participant Handler as Your Explicit Log Handler
+      Python-->>Handler: create `logger` object
+      Python-->>logging: add custom log handler
+    end
+    Python-->>multicast: import multicast
+    multicast-->>logging: add default logging.NullHandler log handler
+    multicast-->>logging: logs any multicast module output
+    opt has added custom log handler
+      logging->>Handler: handle logging
+      Handler->>logging: the handler logic
+    end
+    multicast-->>Python: initialized
+    loop main stuff
+      alt doing whatever
+        Python-->>Python: Your Non-multicast logic
+      else using multicast
+        Python-->>multicast: make API call to multicast
+        opt module has log output
+          multicast-->>logging: logs any multicast module output
+          opt has handler
+            logging->>Handler: handle logging
+            Handler->>logging: the handler logic
+          end
+        end
+        multicast-->>Python: reply to API call
+      end
+    end
+    Python-xPython: done
+    opt has custom log handler
+      destroy Handler
+      Python--xHandler: cleanup
+    end
+```
+
+#### Required approach - explicit handler setup
+
+> [!IMPORTANT]
+> `logging` must be setup _before_ importing `multicast` or the `NullHandler` setup by `multicast`
+> will be first and still be-able to intercept the module's `logging.LogRecords` just as it
+> normally would.
+
+```
+import logging
+multicast_logging_sink = logging.getLogger()
+multicast_logging_sink.setLevel(logging.INFO)  # optional, otherwise the module is very quiet
+handler = logging.StreamHandler()  # replace with your explicit handler
+multicast_logging_sink.addHandler(handler)
+```
+
+This explicit setup ensures that:
+
+* The log level is set appropriately (e.g., `logging.INFO`)
+* An active handler (e.g., `StreamHandler`) is added to capture module log records
+* The multicast module's log output becomes visible to users
+* While logging.basicConfig() might seem simpler, it won't work with the multicast module's logging
+  architecture and will result in no visible log output from the library.
 
 ### How do I run and interpret the test suite for this project?
 

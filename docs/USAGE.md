@@ -134,9 +134,10 @@ finally:
 > directly with something like this:
 >
 > ```python3
+> from multicast.hear import McastServer, HearUDPHandler
 > with McastServer((MCAST_GRP, MCAST_PORT), HearUDPHandler) as server:
 >     server_initialized = True
->     server.serve_forever()
+>     server.serve_forever()  # ... use CTL+C (or signal 2) to shutdown the server
 > ```
 >
 > This is essentially what the
