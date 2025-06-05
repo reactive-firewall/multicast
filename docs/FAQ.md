@@ -48,7 +48,7 @@ can then proceed to implement a more advanced solution in Python as necessary.
 python3 -m multicast --daemon --use-std HEAR --port 59595 --group 224.0.0.1
 ```
 
-**Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
+* **Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
 
 | Option | Description |
 |--------|-------------|
@@ -58,7 +58,7 @@ python3 -m multicast --daemon --use-std HEAR --port 59595 --group 224.0.0.1
 | `--port 59595` | This sets the UDP port number to `59595`, which is used to identify/filter the multicast messages that will be accepted. |
 | `--group 224.0.0.1` | This specifies the multicast group address to join. You can replace `224.0.0.1` with your desired multicast group address. |
 
-**Steps to Run**  <!-- Not a header due to repeated usage -->
+* **Steps to Run**  <!-- Not a header due to repeated usage -->
 
   1. Open your terminal.
   2. Ensure you have the multicast module installed and accessible.
@@ -110,7 +110,7 @@ sender(group='224.0.0.1', port=59595, ttl=1, data='Hello, Multicast!')
 python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 ```
 
-**Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
+* **Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
 
 | Option | Description |
 |--------|-------------|
@@ -120,7 +120,7 @@ python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 | `--message` | This specifies the rest of the input is to be the message to transmit. |
 | `"Hello World!"` | This specifies the multicast message content to _transmit_. In this case, it is the greeting "Hello World!" |
 
-**Steps to Run**  <!-- Not a header due to repeated usage -->
+* **Steps to Run**  <!-- Not a header due to repeated usage -->
 
   1. Open your terminal.
   2. Ensure you have the multicast module installed and accessible.
