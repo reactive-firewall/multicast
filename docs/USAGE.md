@@ -2,12 +2,13 @@
 
 ## Basic Library Usage
 
-The API is in a continuous state of improvement, so version pinning is recommended for now.
+> [!NOTE]
+> The API is in a continuous state of improvement, so version pinning is recommended for now.
 
 ### Listening to Multicast
 
 The preferred way to receive multicast messages is to allow the `multicast.hear.McastServer`
-template class handle the ephemeral multicast receivers as a kind of multicast server, allowing
+template class to handle the ephemeral multicast receivers as a kind of multicast server, allowing
 a handler to focus on processing the data.
 
 Here is an example of multicast socket server usage (circa v2.1)
@@ -15,7 +16,7 @@ Here is an example of multicast socket server usage (circa v2.1)
 ```python3
 # imports
 import multicast
-from multiprocessing import Process as Process
+from multiprocessing import Process
 import random  # for random port
 
 # Multicast group address and port
@@ -62,7 +63,6 @@ p.start()
 > # setup console logging as example
 > import logging
 > multicast_logging_sink = logging.getLogger()
-> handler = logging.StreamHandler()
 > multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
 > handler = logging.StreamHandler()  # example trivial log handler
 > multicast_logging_sink.addHandler(handler)
@@ -74,19 +74,19 @@ p.start()
 > listener = hear.McastHEAR()
 >
 > # Listen for messages indefinitely (use control+C to stop)
-> listener(group='224.0.0.1', port=59259, ttl=1)
+> listener(group='224.0.0.1', port=59595, ttl=1)
 > ```
 
 ### Sending Multicast Transmissions
 
 ```python3
 # imports
-from multiprocessing import Process as Process
+from multiprocessing import Process
 import multicast
 
 # Multicast group address and port
 MCAST_GRP = "224.0.0.1"  # Replace with your multicast group address (use IPv4 dotted notation)
-MCAST_PORT = int(59595)  # Replace with your multicast port (use the same port as the listeners)
+MCAST_PORT = 59595  # Replace with your multicast port (use the same port as the listeners)
 
 # Other important settings (Non-Multicast)
 # Multicast does not care about the host IP, but the UDP protocol layer of the Python socket does
@@ -129,7 +129,7 @@ finally:
 ### Custom handlers
 
 > [!TIP]
-> The API for custom handlers currently requires implementing a sub-class
+> The API for custom handlers currently requires implementing a subclass
 > `multicast.hear.HearUDPHandler` and handling the listener's `multicast.hear.McastServer` server
 > directly with something like this:
 >

@@ -4,11 +4,20 @@
 
 ```{toctree}
 :maxdepth: 3
-:Name: Frequently Asked Questions
-
-[Code of Conduct](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CODE_OF_CONDUCT.md)
-[Contributing](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CONTRIBUTING.md)
+:caption: Frequently Asked Questions
 ```
+
+### Where can I find project policies and conventions?
+
+* [LICENSE](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md)
+* [Code of Conduct](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CODE_OF_CONDUCT.md)
+* [Contributing](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CONTRIBUTING.md)
+  * [AI Usage Policy](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/AI_USAGE_POLICY.md)
+  * [Convention Enhancement Proposal No. 4](https://gist.github.com/reactive-firewall/cc041f10aad1d43a5ef15f50a6bbd5a5)
+  * [Convention Enhancement Proposal No. 7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20)
+  * [Convention Enhancement Proposal No. 8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161)
+  * [Convention Enhancement Proposal No. 9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6)
+* [Security](./SECURITY.md)
 
 ### How do I get this running?
 
@@ -17,8 +26,8 @@ To configure your environment for developing with the multicast library, follow 
 Key steps include:
 
   1. Ensuring you have a supported version of Python installed.
-  2. use pip to install
-  3.
+  2. Use pip to install (e.g., `pip install multicast`)
+  3. Verify the installation works:
 
   | _in `Python`_ | _in `bash`_ |
   |---------------|-------------|
@@ -39,15 +48,17 @@ can then proceed to implement a more advanced solution in Python as necessary.
 python3 -m multicast --daemon --use-std HEAR --port 59595 --group 224.0.0.1
 ```
 
-| Explanation of the Command-Line Options | |
-|---------------------|---------------------|
+**Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
+
+| Option | Description |
+|--------|-------------|
 | `--daemon` | This option runs the multicast listener as a background daemon. |
 | `--use-std` | This specifies the action to take when any output is produced. In this case, it uses the standard output to print received messages instead of the default to just log messages. |
 | `HEAR` | This specifies the action to take. In this case, it will _receive_ multicast. |
 | `--port 59595` | This sets the UDP port number to `59595`, which is used to identify/filter the multicast messages that will be accepted. |
 | `--group 224.0.0.1` | This specifies the multicast group address to join. You can replace `224.0.0.1` with your desired multicast group address. |
 
-##### Steps to Run
+**Steps to Run**  <!-- Not a header due to repeated usage -->
 
   1. Open your terminal.
   2. Ensure you have the multicast module installed and accessible.
@@ -99,15 +110,17 @@ sender(group='224.0.0.1', port=59595, ttl=1, data='Hello, Multicast!')
 python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 ```
 
-| Explanation of the Command-Line Options | |
-|---------------------|---------------------|
+**Explanation of the Command-Line Options**  <!-- Not a header due to repeated usage -->
+
+| Option | Description |
+|--------|-------------|
 | `SAY` | This specifies the action to take. In this case, it will _transmit_ multicast. |
 | `--group 224.0.0.1` | This specifies the multicast group address to transmit messages to. You can replace `224.0.0.1` with your desired multicast group address. |
 | `--port 59595` | This sets the UDP port number to `59595`, which is used by other members of the multicast group to help identify/filter the multicast messages to accept. |
 | `--message` | This specifies the rest of the input is to be the message to transmit. |
 | `"Hello World!"` | This specifies the multicast message content to _transmit_. In this case, it is the greeting "Hello World!" |
 
-##### Step-by-step
+**Steps to Run**  <!-- Not a header due to repeated usage -->
 
   1. Open your terminal.
   2. Ensure you have the multicast module installed and accessible.
@@ -127,7 +140,6 @@ functionality to ensure that messages are being transmitted and received correct
 # Optional setup console logging
 import logging
 multicast_logging_sink = logging.getLogger()
-handler = logging.StreamHandler()
 multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
 handler = logging.StreamHandler()  # example trivial log handler
 multicast_logging_sink.addHandler(handler)
