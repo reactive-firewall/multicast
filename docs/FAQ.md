@@ -363,7 +363,7 @@ sequenceDiagram
 > will be first and still be-able to intercept the module's `logging.LogRecords` just as it
 > normally would.
 
-```
+```python3
 import logging
 multicast_logging_sink = logging.getLogger()
 multicast_logging_sink.setLevel(logging.INFO)  # optional, otherwise the module is very quiet
