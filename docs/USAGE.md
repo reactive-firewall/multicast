@@ -81,8 +81,8 @@ p.start()
 
 ```python3
 # imports
-from multiprocessing import Process
 import multicast
+from multiprocessing import Process
 
 # Multicast group address and port
 MCAST_GRP = "224.0.0.1"  # Replace with your multicast group address (use IPv4 dotted notation)
@@ -120,7 +120,7 @@ finally:
     if p:
         p.join() # if not already handled don't forget to join the process and other overhead
     # hint: if you use a loop and need to know the exit code
-    didWork = (p is not None and int(p.exitcode) <= int(0))  # e.g. check for success
+    didWork = (p is not None and p.exitcode <= 0)  # e.g. check for success
 
 ```
 
