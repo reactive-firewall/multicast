@@ -294,7 +294,7 @@ html_show_copyright = True
 # Output file base name for HTML help builder.
 htmlhelp_basename = "multicast_doc"
 
-# -- Options for MyST markdown parser -------------------------------------------
+# -- Options for Mermaid diagrams -----------------------------------------------
 # see https://github.com/mgaitan/sphinxcontrib-mermaid?tab=readme-ov-file#markdown-support
 
 # GFM style mermaid use zoom
@@ -456,7 +456,7 @@ intersphinx_mapping = sanitize_intersphinx_mapping(
 
 def linkcode_resolve(domain, info):
 	"""
-	Resolves selectivly linking to GitHub source-code for the multicast module.
+	Resolves selectively linking to GitHub source-code for the multicast module.
 
 	See https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html for more details.
 

@@ -148,7 +148,7 @@ print('Received:', message)
 
 ### Listening for Multicast Messages
 
-* Depending on what needs to be done with received data each case will be a bit different.
+* Depending on what needs to be done with received data, each case will be a bit different.
 
 ```python3
 # setup console logging as example
