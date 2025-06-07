@@ -41,7 +41,7 @@ automated analysis.
 | Triggers | Workflows |
 |--------|--------|
 | `push` | [`.github/workflows/bandit.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/bandit.yml), [`.github/workflows/CI-BUILD.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-BUILD.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/makefile-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/makefile-lint.yml), [`.github/workflows/markdown-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/markdown-lint.yml), [`.github/workflows/shellcheck.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/shellcheck.yml), [`.github/workflows/yaml-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/yaml-lint.yml) |
-| `workflow_run` | [`.github/workflows/CI-MATs.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml), [`.github/workflows/CI-DOCS.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml), [`.github/workflows/Tests.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml) |
+| `workflow_run` | [`.github/workflows/CI-CHGLOG.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-CHGLOG.yml), [`.github/workflows/CI-MATs.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml), [`.github/workflows/CI-DOCS.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml), [`.github/workflows/Tests.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml) |
 | `pull_request` | [`.github/workflows/bandit.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/bandit.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/makefile-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/makefile-lint.yml), [`.github/workflows/markdown-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/markdown-lint.yml), [`.github/workflows/shellcheck.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/shellcheck.yml), [`.github/workflows/yaml-lint.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/yaml-lint.yml) |
 | `pull_request_target` | [`.github/workflows/Labeler.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Labeler.yml) |
 | `schedule` | [`.github/dependabot.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/dependabot.yml), [`.github/workflows/codeql-analysis.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/codeql-analysis.yml), [`.github/workflows/scorecard.yml`](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/scorecard.yml) |
@@ -78,7 +78,12 @@ graph TD;
     CI-Build.yml-->BUILD-info.txt;
     CI-Build.yml-->Build-Summary-Artifact.txt;
     multicast-build-*-->CI-MATs.yml;
+    multicast-build-*-->CI-CHGLOG.yml;
     BUILD-info.txt-->CI-MATs.yml;
+    BUILD-info.txt-->CI-CHGLOG.yml;
+    CI-CHGLOG.yml-->CHANGELOG.md;
+    CI-CHGLOG.yml-->chglog-info.txt;
+    CI-CHGLOG.yml-->chglog-Summary-Artifact.txt;
     CI-MATs.yml-->multicast-info-*;
     CI-MATs.yml-->MATs-Summary-Artifact.txt;
     multicast-build-*-->CI-Tests.yml;
@@ -104,7 +109,20 @@ The main configuration file for the build process, which generates several artif
     reference, and branch.
   C. Build-Summary-Artifact.txt (BUILD-COMMENT-BODY-`{{ sha }}`): A summary of the build process,
   highlighting key outcomes and metrics.
-3. [CI-MATs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml):
+3. [CI-CHGLOG.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-CHGLOG.yml):
+A configuration file that processes the build info to create:
+  A. CHANGELOG.md (multicast-chglog-`{{ build_sha }}`): The generated CHANGELOG document.
+  B. chglog-info.txt (multicast-chglog-info-`{{ build_sha }}`): Contains all the information from
+  the "Build-Info.txt" along with additional details about the "CI-CHGLOG.yml" workflow run,
+  including:
+    i. CHANGELOG Workflow Run ID: A unique identifier for the MATs workflow run.
+    ii. CHANGELOG Artifact's ID/URL/Name/Digest: Information about the generated CHANGELOG.md
+    artifact, such as its identifier, location, name, and digest for verification.
+    iii. Git Commit Info: Details about the commit associated with the build, including the nearest
+    TAG (e.g., release or pre-release), and the previous release used for comparing changes.
+  C. chglog-Summary-Artifact.txt: A summary of the CHANGELOG generation process, highlighting key
+  outcomes and metrics.
+4. [CI-MATs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-MATs.yml):
 A configuration file that processes the build artifacts to create:
   A. multicast-info.txt (multicast-info-`{{ build_sha }}`): Contains all the information from the
   "Build-Info.txt" along with additional details about the "CI-MATs.yml" workflow run, including:
@@ -112,7 +130,7 @@ A configuration file that processes the build artifacts to create:
     ii. Conclusion Statuses: The outcomes of the Minimal Acceptance Tests.
   B. MATs-Summary-Artifact.txt (MATS-COMMENT-BODY-`{{ build_sha }}`): A summary of the Minimal
   Acceptance Tests conducted.
-4. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml):
+5. [CI-Tests.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/Tests.yml):
 A configuration file for executing tests, which processes the build artifacts to create:
   A. Coverage reports: Uploading various coverage reports for the tests executed to multiple
   services for analysis (e.g., codecov.io, codeclimate.com, app.deepsource.io, etc.).
@@ -122,7 +140,7 @@ A configuration file for executing tests, which processes the build artifacts to
   `python-version`.
   C. Integration-Summary-Artifact.txt (INTEGRATION-COMMENT-BODY-`{{ build_sha }}`): A summary of
   the test results.
-5. [CI-DOCs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml):
+6. [CI-DOCs.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/workflows/CI-DOCS.yml):
 A configuration file for generating documentation, which produces:
   A. Documentation-Artifact.zip (Multicast-Documentation-`{{ build_sha }}`-ALL): A zip file
   containing the generated documentation.
@@ -205,7 +223,15 @@ graph TD;
   Build-Summary-Artifact.txt@{ shape: card };
   CI-Build.yml-->multicast-build-* & BUILD-info.txt & Build-Summary-Artifact.txt;
   multicast-build-*-->CI-MATs.yml;
+  multicast-build-*-->CI-CHGLOG.yml;
   BUILD-info.txt-->CI-MATs.yml;
+  BUILD-info.txt-->CI-CHGLOG.yml;
+  CHANGELOG.md@{ shape: card };
+  chglog-info.txt@{ shape: card };
+  chglog-Summary-Artifact.txt@{ shape: card };
+  CI-CHGLOG.yml-->CHANGELOG.md;
+  CI-CHGLOG.yml-->chglog-info.txt;
+  CI-CHGLOG.yml-->chglog-Summary-Artifact.txt;
   multicast-info-*@{ shape: card };
   MATs-Summary-Artifact.txt@{ shape: card };
   CI-MATs.yml-->multicast-info-* & MATs-Summary-Artifact.txt;
@@ -228,6 +254,8 @@ graph TD;
   end
 
   subgraph "Github Commit Comments"
+  Build-Summary-Artifact.txt-->Comments;
+  chglog-Summary-Artifact.txt-->Comments;
   MATs-Summary-Artifact.txt-->Comments;
   Integration-Summary-Artifact.txt-->Comments;
   DOCUMENTATION-Summary-Artifact.txt-->Comments;
