@@ -149,7 +149,7 @@ jobs:
     defaults:
       run:
         shell: bash
-    timeout-minutes: 15
+    timeout-minutes: 8
     outputs:
       chglog_status: ${{ steps.gen_changelog.outcome || 'cancelled' }}
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
@@ -167,13 +167,13 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.check_build.outputs.sha }}
           sparse-checkout: '.github/actions/checkout-and-rebuild'
-      - name: Checkout repository for chglog with ${{ matrix.python-version }}
+      - name: Checkout repository for chglog
         id: fetch-build
         uses: ./.github/actions/checkout-and-rebuild
         with:
           sha: ${{ needs.check_build.outputs.sha }}
           build-run-id: ${{ needs.check_build.outputs.trigger_id }}
-          python-version: ${{ matrix.python-version }}
+          python-version: "${{ vars.PYTHON_DEFAULT }}"
           path: ${{ github.workspace }}
       - name: "Generate CHANGELOG for ${{ needs.check_build.outputs.sha }}...${{ needs.check_build.outputs.parent_sha }}"
         id: gen_changelog
@@ -219,7 +219,7 @@ jobs:
         id: load_chglog_info
         if: ${{ always() }}
         run: |
-          mv -vf "${{ runner.temp }}/multicast-chglog-${{ needs.check_build.outputs.sha }}"/CHANGELOG.md" "${{ github.workspace }}/CHANGELOG.md" ;
+          mv -vf "${{ runner.temp }}/multicast-chglog-${{ needs.check_build.outputs.sha }}/CHANGELOG.md" "${{ github.workspace }}/CHANGELOG.md" ;
           wait ;
           rmdir -v "${{ runner.temp }}/multicast-chglog-${{ needs.check_build.outputs.sha }}" || : ;  # remove if able
       - name: "Report chglog status"
@@ -269,7 +269,7 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.check_build.outputs.sha }}
           sparse-checkout: '.github/actions/check-control'
-      - name: "Compleate chglog GitHub Check"
+      - name: "Complete chglog GitHub Check"
         id: compleate_chglog
         if: ${{ (github.repository == 'reactive-firewall/multicast') && always() }}
         uses: ./.github/actions/check-control

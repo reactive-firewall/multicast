@@ -102,9 +102,15 @@ check_command uniq ;
 check_command xargs ;
 
 # rest of the script vars
-LOG_FILE="chglog_generation_${PPID}.log"
-ERR_FILE="chglog_generation_errors_${PPID}.log"
-LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.chglog-generation-shell"
+declare cache
+CHGLOG_GIT_LOG_CACHE_FILE="${TMPDIR:-/tmp}/.changelog_git_hist_buffer.txt"
+# shellcheck disable=SC2086
+# LOG_FILE="chglog_generation_${PPID}.log"
+# shellcheck disable=SC2086
+# ERR_FILE="chglog_generation_errors_${PPID}.log"
+# shellcheck disable=SC2086
+# LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.chglog-generation-shell"
+# shellcheck disable=SC2086
 EXIT_CODE=0
 
 # USAGE:
@@ -114,8 +120,18 @@ EXIT_CODE=0
 # Results:
 #	returns the most recent tag associated with the current commit.
 function id_current_tag() {
-	local INPUT_HINT_FOR_CURRENT="${1}"
-	git describe --tags --abbrev=0 ${INPUT_HINT_FOR_CURRENT}
+	local INPUT_HINT_FOR_CURRENT="$1" ;
+	# Define regular expression pattern (copied from the improved regex in GHI #273)
+	local GIT_REF_PATTERN='^[a-zA-Z0-9][-a-zA-Z0-9_\+\./]*$' ;
+	# Validate the input to ensure it matches expected tag patterns
+	if printf "%s\n" "$INPUT_HINT_FOR_CURRENT" | grep -qE -e "$GIT_REF_PATTERN" 2>/dev/null; then
+		# assume input is safe enough to use as a git ref
+		git describe --tags --abbrev=0 "$INPUT_HINT_FOR_CURRENT" 2>/dev/null ;
+	else
+		# assume input is unsafe to use as a git ref an fallback to none,
+		# e.g., same as no input
+		git describe --tags --abbrev=0 2>/dev/null ;
+	fi ;
 }  # end id_current_tag()
 
 # USAGE:
@@ -123,7 +139,8 @@ function id_current_tag() {
 # Results:
 #	returns a list of tags that are ancestors of the current HEAD, excluding the current tag.
 function run_enumerate_tag_history() {
-	local HEAD_TAG=$(id_current_tag HEAD)
+	local HEAD_TAG
+	HEAD_TAG="$(id_current_tag HEAD)"
 	{ git rev-list --tags --ancestry-path "$(git tag --no-contains "${HEAD_TAG}" | sort -V | head -n1)^..HEAD" ; wait ;} | xargs -I{} git tag --points-at "{}" 2>/dev/null ;
 	wait ;
 }  # end run_enumerate_tag_history()
@@ -134,8 +151,12 @@ function run_enumerate_tag_history() {
 #	returns a cached list of tags that are ancestors of the current HEAD, excluding development tags.
 #	If the cache is empty, it populates the cache by calling run_enumerate_tag_history.
 function enumerate_tag_history() {
+	if [[ -z "${cache}" ]] && [[ -r "${CHGLOG_GIT_LOG_CACHE_FILE}" ]]; then
+		cache=$(cat <"${CHGLOG_GIT_LOG_CACHE_FILE}" ; wait;)
+	fi ;
 	if [[ -z "${cache}" ]] ; then
-		cache=$(run_enumerate_tag_history | grep -vE "v?\d+.\d+.\d+-dev" ; wait;)
+		{ run_enumerate_tag_history | grep -vE "v?\d+.\d+.\d+-dev" ; wait ;} >> "${CHGLOG_GIT_LOG_CACHE_FILE}" ; wait ;
+		cache=$(cat <"${CHGLOG_GIT_LOG_CACHE_FILE}" ; wait;)
 	fi ;
 	printf "%s\n" "${cache}" ;
 	wait ;
@@ -148,10 +169,73 @@ function enumerate_tag_history() {
 # Results:
 #	returns the parent tag of the specified input tag or commit.
 function id_parent_tag() {
-	local INPUT="${1}"
-	enumerate_tag_history | grep -A 1 -F -f <(id_current_tag ${INPUT} ) | tail -n1
-	wait ;
+	local INPUT="$1" ;
+	# Define regular expression pattern (copied from the improved regex in GHI #273)
+	local GIT_REF_PATTERN='^[a-zA-Z0-9][-a-zA-Z0-9_\+\./]*$' ;
+	local SANITIZED_TAG_PATTERN='[^-,\.\+_[:alnum:]]' ;
+	# Validate the input to ensure it matches expected tag patterns
+	if printf "%s\n" "$INPUT" | grep -qE -e "${GIT_REF_PATTERN}"; then
+		# Capture the first line of the output from id_current_tag
+		local first_tag ;
+		first_tag=$(id_current_tag "$INPUT" | head -n1) ;
+		local sanitized_tag ;
+		# Sanitize the first_tag to ensure it only contains valid characters
+		sanitized_tag=$(printf "%s\n" "$first_tag" | sed -E "s/$SANITIZED_TAG_PATTERN//g") ;
+		# Check if the sanitized tag starts with "v", "V", "head", or "HEAD" (case insensitive)
+		if printf "%s\n" "$sanitized_tag" | grep -qE -e "$GIT_REF_PATTERN" 2>/dev/null; then
+			enumerate_tag_history | grep -A 1 -F -f <(printf "%s\n" "$sanitized_tag") | tail -n1 ;
+			wait ;
+		fi ;
+	fi ;
 }  # end id_parent_tag()
+
+# USAGE:
+#	~$ format_changes_by_flag FLAG_NAME CHANGELOG_BUFFER_FILE
+# Arguments:
+#	FLAG_NAME (Required) -- The flag type to filter and group (e.g., FEATURE, FIX)
+#	CHANGELOG_BUFFER_FILE (Required) -- Path to the changelog buffer file
+# Results:
+#	outputs formatted changelog entries grouped by the specified flag type
+function format_changes_by_flag() {
+	local FLAG_NAME="${1}"
+	local BUFFER_FILE="${2}"
+
+	# Validate inputs
+	test -z "${FLAG_NAME}" && { printf "Error: FLAG_NAME is required\n" >&2 ; return 64 ; }
+	test -z "${BUFFER_FILE}" && { printf "Error: BUFFER_FILE is required\n" >&2 ; return 64 ; }
+	test -f "${BUFFER_FILE}" || { printf "Error: Buffer file not found\n" >&2 ; return 65 ; }
+	test -r "${BUFFER_FILE}" || { printf "Error: Buffer file not found\n" >&2 ; return 77 ; }
+
+	# Execute the AWK processing
+	awk -v RS='\n' -v ORS='\n\n\n' -v flagname="${FLAG_NAME}" '
+    {
+        # Check if the block contains a valid change-log entry
+        if ($0 ~ /([\[][A-Z]+[]]){1}/ && $0 ~ flagname) {
+            # Ensure that there is no content before the match
+            if ($0 ~ /^[a-f0-9]{7,7}[[:space:]]*(([\[][A-Z]+[]]){1})/) {
+                # Extract the header (first line) and the content
+                header = $0;
+                hash_line = substr(header, 1, 7);  # Get the hash
+                header_line = substr(header, index(header, "[") + 1, (index(header, "]") - index(header, "[")) - 1);  # Get the header
+                if (header_line ~ flagname) {
+                    content = " * " hash_line " --" substr(header, index(header, "]") + 1);  # Get the content after the header
+                    # Combine the header and content
+                    combined[header_line] = (combined[header_line] ? combined[header_line] "\n" : "") content;
+                }
+            }
+        }
+    }
+    END {
+        # Print combined entries
+        for (h in combined) {
+            print h ":\n" combined[h]
+        }
+    }
+' <"${BUFFER_FILE}" | sort -id | uniq | sort -id -k 4
+}  # end format_changes_by_flag()
+
+# Export function for sub-shells
+export -f format_changes_by_flag
 
 # step 1: is designed to determine the current and previous Git tags and
 # then construct a Git range based on these tags. If no argument is provided, it defaults to
@@ -166,6 +250,7 @@ if [[ -z "${1}" ]] ; then
 			"${0}" "${FALLBACK_GIT_RANGE}" || : ; wait ;
 		fi ;
 	done;
+	rm -f "${CHGLOG_GIT_LOG_CACHE_FILE}" || : ;
 	unset FALLBACK_GIT_RANGE 2>/dev/null || : ;
 	unset GIT_PREVIOUS_TAG 2>/dev/null || : ;
 	exit 0 ;
@@ -173,8 +258,8 @@ fi ;
 GIT_RANGE="${1}"
 
 # cache the git full log
-CHANGELOG_BUFFER="${TMPDIR:-/tmp}/.chagelog_buffer.txt"
-cat <(git log "${GIT_RANGE}" --reverse --pretty=format:"COMMIT_START%n%h%n%B%nCOMMIT_END") >"${CHANGELOG_BUFFER}" ; wait ;
+CHANGELOG_BUFFER="${TMPDIR:-/tmp}/.changelog_buffer.txt"
+git log "${GIT_RANGE}" --reverse --pretty=format:"COMMIT_START%n%h%n%B%nCOMMIT_END" >"${CHANGELOG_BUFFER}" ; wait ;
 
 RAW_FLAGS_LIST=$(cat <"${CHANGELOG_BUFFER}" | grep -oE "([\[][A-Z]+[]]){1}" | sort -id | uniq -c | sort -rid | grep -oE "([A-Z]+){1}" | sort -id | uniq | sort -rd ; wait ;)
 
@@ -202,54 +287,26 @@ if [[ ( -n "${RAW_DEL_FILES}" ) ]] ; then
 fi ;
 
 if [[ ( ${VERBOSE_CHANGE_LOG:-0} -gt 0 ) ]] ; then
-# flags sub-header
-printf "\n### Changes by Kind\n" ;
+	# flags sub-header
+	printf "\n### Changes by Kind\n" ;
 
-# cache the git log summaries with hashes
-CHANGELOG_BUFFER_SHORT="${TMPDIR:-/tmp}/.short chagelog_buffer.txt"
-cat <(git log "${GIT_RANGE}" --reverse --grep="([\[][A-Z]+[]]){1}" -E --pretty=format:"COMMIT_START%n%h %s%nCOMMIT_END") >"${CHANGELOG_BUFFER_SHORT}" ; wait ;
+	# cache the git log summaries with hashes
+	CHANGELOG_BUFFER_SHORT="${TMPDIR:-/tmp}/.short_changelog_buffer.txt"
+	git log "${GIT_RANGE}" --reverse --grep="([\[][A-Z]+[]]){1}" -E --pretty=format:"COMMIT_START%n%h %s%nCOMMIT_END" >"${CHANGELOG_BUFFER_SHORT}" ; wait ;
 
-# auto-collect by flags
-for FLAG_ID in $(printf "%s\n" "${RAW_FLAGS_LIST}") ; do
+	# auto-collect by flags
+	for FLAG_ID in $(printf "%s\n" "${RAW_FLAGS_LIST}") ; do
+		if [[ ( -n "$FLAG_ID" ) ]] ; then
+			format_changes_by_flag "${FLAG_ID}" "${CHANGELOG_BUFFER_SHORT}"
+		fi ;
+	done ;
 
-if [[ ( -n "$FLAG_ID" ) ]] ; then
-
-awk -v RS='\n' -v ORS='\n\n\n' -v flagname="$FLAG_ID" '
-    {
-        # Check if the block contains a valid change-log entry
-        if ($0 ~ /([\[][A-Z]+[]]){1}/ && $0 ~ flagname) {
-            # Ensure that there is no content before the match
-            if ($0 ~ /^[a-f0-9]{7,7}[[:space:]]*(([\[][A-Z]+[]]){1})/) {
-                # Extract the header (first line) and the content
-                header = $0;
-                hash_line = substr(header, 1, 7);  # Get the hash
-                header_line = substr(header, index(header, "[") + 1, (index(header, "]") - index(header, "[")) - 1);  # Get the header
-                if (header_line ~ flagname) {
-                    content = " * " hash_line " --" substr(header, index(header, "]") + 1);  # Get the content after the header
-                    # Combine the header and content
-                    combined[header_line] = (combined[header_line] ? combined[header_line] "\n" : "") content;
-                }
-            }
-        }
-    }
-    END {
-        # Print combined entries
-        for (h in combined) {
-            print h ":\n" combined[h]
-        }
-    }
-' <"${CHANGELOG_BUFFER_SHORT}" | sort -id | uniq | sort -id -k 4
-
-fi ;
-
-done ;
-
-rm -f "${CHANGELOG_BUFFER_SHORT}" 2>/dev/null || : ;
-# files sub-header
-printf "\n### Changes by file\n" ;
+	rm -f "${CHANGELOG_BUFFER_SHORT}" 2>/dev/null || : ;
+	# files sub-header
+	printf "\n### Changes by file\n" ;
 else
-# NO sub-headers
-printf "\n\n" ;
+	# NO sub-headers
+	printf "\n\n" ;
 fi ;
 
 # auto-collect gitlog
