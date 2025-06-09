@@ -344,7 +344,7 @@ jobs:
           retention-days: 2
           overwrite: true
 
-  chglog_REPORT:
+  CHGLOG_REPORT:
     permissions:
       actions: read
       contents: write

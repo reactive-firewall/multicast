@@ -96,7 +96,6 @@ check_command head ;
 check_command sed ;
 check_command sort ;
 check_command tail ;
-check_command tee ;
 check_command tr ;
 check_command uniq ;
 check_command xargs ;
@@ -247,7 +246,7 @@ if [[ -z "${1}" ]] ; then
 		GIT_PREVIOUS_TAG=$(id_parent_tag "${EACH_TAG}")
 		if [[ ( -n "${GIT_PREVIOUS_TAG}" ) ]] && [[ ( "${EACH_TAG}" != "${GIT_PREVIOUS_TAG}" ) ]] ; then
 			FALLBACK_GIT_RANGE="${EACH_TAG}...${GIT_PREVIOUS_TAG}"
-			"${0}" "${FALLBACK_GIT_RANGE}" || : ; wait ;
+			"${BASH_SOURCE[0]}" "${FALLBACK_GIT_RANGE}" || : ; wait ;
 		fi ;
 	done;
 	rm -f "${CHGLOG_GIT_LOG_CACHE_FILE}" || : ;
