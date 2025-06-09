@@ -37,7 +37,7 @@ git stash pop # unstash the intended changes
 ## Known Issues and Possible Improvements
 
 For Details on current issues:
-- see [Issues](https://github.com/reactive-firewall/multicast/issues)
+- see [Issues](https://github.com/reactive-firewall-org/multicast/issues)
 
 ### Triaging tickets
 Here is a brief explanation on how I triage incoming tickets to get a better sense of what needs to be done on what end.
@@ -64,7 +64,7 @@ the duplicate.
 
 **Examples**:
 
-[This is an issue. (A good starting point for first person to discover)](https://github.com/reactive-firewall/multicast/issues/412)
+[This is an issue. (A good starting point for first person to discover)](https://github.com/reactive-firewall-org/multicast/issues/412)
 
 
 ##### does not provide enough information
@@ -128,9 +128,9 @@ answered).
 
 Here is a list of links for contributors that are looking to help triage:
 
- * [Untriaged issues](https://github.com/reactive-firewall/multicast/issues?q=is%3Aissue%20sort%3Acomments-asc%20state%3Aopen%20no%3Alabel): Go and triage them!
- * [Good first issues](https://github.com/reactive-firewall/multicast/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22%20sort%3Acomments-asc)
- * [All Open Issues](https://github.com/reactive-firewall/multicast/issues)
+ * [Untriaged issues](https://github.com/reactive-firewall-org/multicast/issues?q=is%3Aissue%20sort%3Acomments-asc%20state%3Aopen%20no%3Alabel): Go and triage them!
+ * [Good first issues](https://github.com/reactive-firewall-org/multicast/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22%20sort%3Acomments-asc)
+ * [All Open Issues](https://github.com/reactive-firewall-org/multicast/issues)
 
 ---
 # Reviewing Checklist:

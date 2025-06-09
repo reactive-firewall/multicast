@@ -65,7 +65,7 @@ runs:
         fetch-depth: 0
         submodules: true
         path: ${{ inputs.path }}
-        repository: reactive-firewall/multicast
+        repository: reactive-firewall-org/multicast
         token: ${{ inputs.token }}
     - name: "Checkout Target Commit by SHA"
       shell: bash
@@ -103,18 +103,18 @@ runs:
       shell: bash
       run: printf "artifact-name=%s\n" multicast-build-${{ steps.output_sha.outputs.sha }} >> "$GITHUB_OUTPUT"
     - name: "Fetch Build Files"
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && success() }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && success() }}
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         path: ${{ inputs.path }}/dist
         pattern: multicast-build-${{ steps.output_sha.outputs.sha }}
         merge-multiple: true
-        repository: reactive-firewall/multicast
+        repository: reactive-firewall-org/multicast
         github-token: ${{ inputs.token }}
         run-id: ${{ inputs.build-run-id }}
     - name: "Enumerate Fetched Files"
       id: output_artifact_files
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && success() }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && success() }}
       env:
         BUILD_MATCH_PATTERN: "dist/multicast-*-*.whl dist/multicast-*.tar.gz"
         SCRIPT_NAME: ".github/actions/checkout-and-rebuild/action.yml"

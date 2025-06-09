@@ -8,7 +8,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/multicast/LICENSE.md
+# https://github.com/reactive-firewall-org/multicast/tree/HEAD/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -169,7 +169,6 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "include LICENSE.md" >>"$@" ;
 	$(QUIET)$(ECHO) "include CHANGES.md" >>"$@" ;
 	$(QUIET)$(ECHO) "include HISTORY.md" >>"$@" ;
-	$(QUIET)$(ECHO) "recursive-include . *.txt" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitignore" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .git_skipList" >>"$@" ;
 	$(QUIET)$(ECHO) "exclude .gitattributes" >>"$@" ;

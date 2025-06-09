@@ -57,11 +57,11 @@ Multicast project to be considered acceptable.
 
 | Trigger | Workflow |
 |---------|----------|
-| `uses: .github/actions/run-minimal-acceptance-tests` | [.github/actions/run-minimal-acceptance-tests/action.yml](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/actions/run-minimal-acceptance-tests/action.yml) |
+| `uses: .github/actions/run-minimal-acceptance-tests` | [.github/actions/run-minimal-acceptance-tests/action.yml](https://github.com/reactive-firewall-org/multicast/tree/HEAD/.github/actions/run-minimal-acceptance-tests/action.yml) |
 
 #### Manual MATs
 
-1. Clone a [development build](https://github.com/reactive-firewall/multicast/tree/patch-readme-docs?tab=readme-ov-file#developer-builds)
+1. Clone a [development build](https://github.com/reactive-firewall-org/multicast/tree/patch-readme-docs?tab=readme-ov-file#developer-builds)
 
 2. Invoke the MATs test target.
 
@@ -76,13 +76,13 @@ Currently, MATs are comprised of the test categories `bootstrap`, `basic`, `buil
 
 | Category | Criteria | _TestSuites_ |
 |----------|----------|--------------|
-| `bootstrap` | Tests the basic function of initializations, exceptions, environment, and the `skt` component | [test_exceptions.ExceptionsTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_exceptions.py) |
-| `basic` | Tests the trivial functions of initializations, exceptions, and environment | [test_basic.BasicTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_basic.py) |
-| `build` | Tests the build and packaging support | [test_build.BuildPEP517TestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_build.py), [test_build.BuildPEP621TestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_build.py), [test_manifest.ManifestInclusionTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_manifest.py), ~[test_install_requires.ParseRequirementsTestSuite](https://github.com/reactive-firewall/multicast/blob/v2.0.8/tests/test_install_requires.py)~ (_removed in v2.0.9a3_) |
-| `doctests` | Tests the doctests found in the `multicast` codebase | [multicast.__docs__](https://github.com/reactive-firewall/multicast/blob/HEAD/multicast) |
-| `say` | Tests focused on `multicast/send.py` | [test_usage.MulticastTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_usage.py) |
-| `hear` | Tests focused on `multicast/recv.py` and `multicast/hear.py` | [test_hear_server.McastServerTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_server.py), [test_hear_server.HearUDPHandlerTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_server.py), [test_hear_server_activate.McastServerActivateTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_server_activate.py), [test_hear_data_processing.RecvDataProcessingTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_data_processing.py), [test_hear_data_processing.HearHandleNoneDataTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_data_processing.py), [test_hear_cleanup.HearCleanupTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_hear_cleanup.py) |
-| `usage` | Tests focused on `multicast/__main__.py` and API use-cases | [test_usage.BasicIntegrationTestSuite](https://github.com/reactive-firewall/multicast/blob/HEAD/tests/test_usage.py) |
+| `bootstrap` | Tests the basic function of initializations, exceptions, environment, and the `skt` component | [test_exceptions.ExceptionsTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_exceptions.py) |
+| `basic` | Tests the trivial functions of initializations, exceptions, and environment | [test_basic.BasicTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_basic.py) |
+| `build` | Tests the build and packaging support | [test_build.BuildPEP517TestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_build.py), [test_build.BuildPEP621TestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_build.py), [test_manifest.ManifestInclusionTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_manifest.py), ~[test_install_requires.ParseRequirementsTestSuite](https://github.com/reactive-firewall-org/multicast/blob/v2.0.8/tests/test_install_requires.py)~ (_removed in v2.0.9a3_) |
+| `doctests` | Tests the doctests found in the `multicast` codebase | [multicast.__docs__](https://github.com/reactive-firewall-org/multicast/blob/HEAD/multicast) |
+| `say` | Tests focused on `multicast/send.py` | [test_usage.MulticastTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_usage.py) |
+| `hear` | Tests focused on `multicast/recv.py` and `multicast/hear.py` | [test_hear_server.McastServerTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_server.py), [test_hear_server.HearUDPHandlerTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_server.py), [test_hear_server_activate.McastServerActivateTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_server_activate.py), [test_hear_data_processing.RecvDataProcessingTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_data_processing.py), [test_hear_data_processing.HearHandleNoneDataTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_data_processing.py), [test_hear_cleanup.HearCleanupTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_hear_cleanup.py) |
+| `usage` | Tests focused on `multicast/__main__.py` and API use-cases | [test_usage.BasicIntegrationTestSuite](https://github.com/reactive-firewall-org/multicast/blob/HEAD/tests/test_usage.py) |
 
 ### Advanced Testing
 
@@ -125,9 +125,9 @@ contributors are instead modifying `multicast`.
 
 Feature development and non-security related bug fixes are done on development branches and
 then merged into the
-[default branch (master)](https://github.com/reactive-firewall/multicast/blob/master/) for further
+[default branch (master)](https://github.com/reactive-firewall-org/multicast/blob/master/) for further
 integration testing. This ensures the
-[release branch (stable)](https://github.com/reactive-firewall/multicast/blob/stable/) remains
+[release branch (stable)](https://github.com/reactive-firewall-org/multicast/blob/stable/) remains
 acceptable for production use.
 
 ```mermaid
@@ -176,8 +176,8 @@ gitGraph:
 ##### Test-Driven Contributors
 
 During the development cycle new features will also need testing (this is mentioned in detail
-by the [Contributing Guidelines](https://github.com/reactive-firewall/multicast/tree/HEAD/.github/CONTRIBUTING.md).
-This is where the otherwise undocumented Selective Test Runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py),
+by the [Contributing Guidelines](https://github.com/reactive-firewall-org/multicast/tree/HEAD/.github/CONTRIBUTING.md).
+This is where the otherwise undocumented Selective Test Runner [`run_selective.py`](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/run_selective.py),
 comes into play. While the test runner is used by much of the project automation to run all kinds
 of tests, it is the most powerful when used to skip tests to save time iteratively developing a
 new feature.
@@ -241,7 +241,7 @@ There is a separate test group for optional fuzz testing aptly named `fuzzing`. 
 
 | Category | Criteria | _TestSuites_ |
 |----------|----------|--------------|
-| `slow` | _Optionally_ tests fuzzing `multicast` while ignoring test performance | [test_fuzz.HypothesisTestSuite](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/test_fuzz.py) _Assuming it is present_ |
+| `slow` | _Optionally_ tests fuzzing `multicast` while ignoring test performance | [test_fuzz.HypothesisTestSuite](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/test_fuzz.py) _Assuming it is present_ |
 
 #### Testing Performance
 
@@ -269,9 +269,9 @@ together under the aptly named group `extra`. The `extra` group contains the cat
 
 | Category | _Intended_ Criteria | _TestSuites_ |
 |----------|---------------------|--------------|
-| `coverage` | Test for covering defensive or debugging code | [test_deps.BuildRequirementsTxtTestSuite](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/test_deps.py), [test_hear_keyboard_interrupt.TestHearKeyboardInterrupt](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/test_hear_keyboard_interrupt.py), [test_recv.McastRECVTestSuite](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/test_recv.py) |
+| `coverage` | Test for covering defensive or debugging code | [test_deps.BuildRequirementsTxtTestSuite](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/test_deps.py), [test_hear_keyboard_interrupt.TestHearKeyboardInterrupt](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/test_hear_keyboard_interrupt.py), [test_recv.McastRECVTestSuite](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/test_recv.py) |
 | `linting` | Tests for code structure and style | _Empty_ |
-| `security` | Tests related to secure coding practices | [test_extra.ExtraDocsUtilsTestSuite](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/test_extra.py) |
+| `security` | Tests related to secure coding practices | [test_extra.ExtraDocsUtilsTestSuite](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/test_extra.py) |
 
 ##### Coverage
 
@@ -308,10 +308,10 @@ See implementation for more details.
 #### Logging and Coverage testing
 
 By default, logging from the `multicast` module is ignored (there is a [default NullHandler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast%20path%3Amulticast%2F*.py%20%22addHandler(logging.NullHandler())%22&type=code)
-). The test-runner [`run_selective.py`](https://github.com/reactive-firewall/multicast/tree/HEAD/tests/run_selective.py)
+). The test-runner [`run_selective.py`](https://github.com/reactive-firewall-org/multicast/tree/HEAD/tests/run_selective.py)
 inserts its own [special log handler](https://github.com/search?q=repo%3Areactive-firewall%2Fmulticast+path%3Atests%2F*.py+ColoredStreamHandler)
 during testing to assist in debugging. Code coverage is only collected when invoking tests via the
-[`Makefile`](https://github.com/reactive-firewall/multicast/tree/HEAD/Makefile) targets that
+[`Makefile`](https://github.com/reactive-firewall-org/multicast/tree/HEAD/Makefile) targets that
 support it (and of course, only if already installed).
 
 > [!TIP]
@@ -402,7 +402,7 @@ sequenceDiagram
 The test code for CI/CD is not included with the built Python module `multicast`. Currently, there
 is no plan to change this. The Python module `tests` does not need to be installed, so there is
 no practical use for including it in build artifacts. Also see relevant "AS-IS" disclaimers in
-[`LICENSE.md`](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md).
+[`LICENSE.md`](https://github.com/reactive-firewall-org/multicast/tree/HEAD/LICENSE.md).
 
 > [!TIP]
 > In a rush to test this module in your own environment? Then you might try this:
@@ -418,6 +418,6 @@ no practical use for including it in build artifacts. Also see relevant "AS-IS" 
 
 #### Copyright (c) 2021-2025, Mr. Walls
 
-[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall-org/multicast/tree/HEAD/LICENSE.md)
 
 _Dependencies NOT included._
