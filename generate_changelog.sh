@@ -255,6 +255,8 @@ if [[ -z "${1}" ]] ; then
 	exit 0 ;
 fi ;
 GIT_RANGE="${1}"
+# validate git range
+printf "%s\n" "$GIT_RANGE" | grep -qE -e "^[a-zA-Z0-9][-a-zA-Z0-9_\+\./]*\.\.\.[a-zA-Z0-9][-a-zA-Z0-9_\+\./]*$" || { printf "%s\n" "Error: Invalid git range format" >&2 ; exit 64 ; } ;
 
 # cache the git full log
 CHANGELOG_BUFFER="${TMPDIR:-/tmp}/.changelog_buffer.txt"
