@@ -231,7 +231,7 @@ jobs:
           CHGLOG_ARTIFACT_NAME: ${{ needs.CHGLOG.outputs.artifact-name }}
           CHGLOG_ARTIFACT_URL: ${{ needs.CHGLOG.outputs.artifact-url }}
         run: |
-          if [[ "${{ needs.chglog.outputs.chglog_status }}" == "success" ]]; then
+          if [[ "${{ needs.CHGLOG.outputs.chglog_status }}" == "success" ]]; then
             printf "%s\n\n" "# :page_facing_up: Changelog Summary" > "${CHGLOG_COMMENT_BODY}"
             printf "%s\n" "  * :ballot_box_with_check: Generating Changelog \`${CHGLOG_ID}\` succeeded with commit [${BUILD_SHA}](https://github.com/reactive-firewall/multicast/commit/${BUILD_SHA})" >> "${CHGLOG_COMMENT_BODY}"
             printf "%s\n" "chglog_success=true" >> "$GITHUB_OUTPUT"
@@ -319,7 +319,7 @@ jobs:
           else
             printf "%s\n" "build_success=false" >> "$GITHUB_OUTPUT"
           fi
-          if [[ "${{ needs.chglog.result }}" == "success" && "${{ needs.check_build.result }}" == "success" ]]; then
+          if [[ "${{ needs.CHGLOG.result }}" == "success" && "${{ needs.check_build.result }}" == "success" ]]; then
             printf "%s\n" "chglog_success=true" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_url=${{ github.api_url }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_ref=${{ needs.check_build.outputs.build_ref }}" >> "$GITHUB_OUTPUT"
