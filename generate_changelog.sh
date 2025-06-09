@@ -261,12 +261,12 @@ GIT_RANGE="${1}"
 CHANGELOG_BUFFER="${TMPDIR:-/tmp}/.changelog_buffer.txt"
 git log "${GIT_RANGE}" --reverse --pretty=format:"COMMIT_START%n%h%n%B%nCOMMIT_END" >"${CHANGELOG_BUFFER}" ; wait ;
 
-RAW_FLAGS_LIST=$(cat <"${CHANGELOG_BUFFER}" | grep -oE "([\[][A-Z]+[]]){1}" | sort -id | uniq -c | sort -rid | grep -oE "([A-Z]+){1}" | sort -id | uniq | sort -rd ; wait ;)
+RAW_FLAGS_LIST=$(grep -oE "([\[][A-Z]+[]]){1}" "${CHANGELOG_BUFFER}" | sort -id | uniq -c | sort -rid | grep -oE "([A-Z]+){1}" | sort -id | uniq | sort -rd ; wait ;)
 
-RAW_IMPACTED_ISSUES=$(cat <"${CHANGELOG_BUFFER}" | grep -oE "([#]\d+){1}\b" | sort -id | uniq | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
+RAW_IMPACTED_ISSUES=$(grep -oE "([#]\d+){1}\b" "${CHANGELOG_BUFFER}" | sort -iV | uniq | sort -V | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
 RAW_FLAGS_USED=$(cat <(printf "%s\n" "${RAW_FLAGS_LIST}") | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
-RAW_NEW_FILES=$(cat <"${CHANGELOG_BUFFER}" | grep -F "Additions with file" | sort -id | cut -d\  -f4- | sort -id | uniq -c | tr -s ' ' ' ' | cut -d\  -f 3- | cut -d: -f 1-1 | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
-RAW_DEL_FILES=$(cat <"${CHANGELOG_BUFFER}" | grep -F "Deletions from file" | sort -id | cut -d\  -f4- | sort -id | uniq -c | tr -s ' ' ' ' | cut -d\  -f 3- | cut -d: -f 1-1 | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
+RAW_NEW_FILES=$(grep -F "Additions with file" "${CHANGELOG_BUFFER}" | sort -id | cut -d\  -f4- | sort -id | uniq -c | tr -s ' ' ' ' | cut -d\  -f 3- | cut -d: -f 1-1 | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
+RAW_DEL_FILES=$(grep -F "Deletions from file" "${CHANGELOG_BUFFER}" | sort -id | cut -d\  -f4- | sort -id | uniq -c | tr -s ' ' ' ' | cut -d\  -f 3- | cut -d: -f 1-1 | xargs -L1 -I{} printf "%s, " "{}" ; wait ;)
 
 
 # header

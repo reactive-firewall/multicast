@@ -270,7 +270,7 @@ jobs:
           ref: ${{ needs.check_build.outputs.sha }}
           sparse-checkout: '.github/actions/check-control'
       - name: "Complete chglog GitHub Check"
-        id: compleate_chglog
+        id: complete_chglog
         if: ${{ (github.repository == 'reactive-firewall/multicast') && always() }}
         uses: ./.github/actions/check-control
         with:
@@ -325,7 +325,7 @@ jobs:
             printf "%s\n" "chglog_ref=${{ needs.check_build.outputs.build_ref }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_sha=${{ needs.check_build.outputs.sha }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_parent_sha=${{ needs.check_build.outputs.parent_sha }}" >> "$GITHUB_OUTPUT"
-            printf "%s\n" "chglog_ref_name=${{ needs.check_build.outputs.branch_ref }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "chglog_ref_name=${{ needs.check_build.outputs.build_ref_name }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_environment=${{ needs.check_build.outputs.build_environment }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "chglog_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           else
