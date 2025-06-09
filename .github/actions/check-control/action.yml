@@ -125,7 +125,7 @@ runs:
       run: |
         printf "check_date=%s\n" $(TZ=UTC date -Iseconds | cut -d+ -f1-1) >> "$GITHUB_OUTPUT"
     - id: output_check_details_url
-      if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+      if: ${{ !cancelled() && (github.repository == 'reactive-firewall-org/multicast') }}
       shell: bash
       run: |
         if [[ "${{ inputs.details-url }}" != "" ]] ; then
@@ -133,11 +133,11 @@ runs:
           printf "::debug:: %s\n" "Check detail url was provided: ${{ inputs.details-url }}" ;
         else
           if [[ "${{ inputs.workflow-run-id }}" != "" ]] ; then
-            printf "details_url=%s\n" 'https://github.com/reactive-firewall/multicast/actions/runs/${{ github.run_id }}' >> "$GITHUB_OUTPUT"
+            printf "details_url=%s\n" 'https://github.com/reactive-firewall-org/multicast/actions/runs/${{ github.run_id }}' >> "$GITHUB_OUTPUT"
             printf "::debug:: %s\n" "Check detail url was created from workflow ${{ inputs.workflow-run-id }}" ;
           else
             if [[ "${{ inputs.check-id }}" != "" ]] ; then
-              printf "details_url=https://github.com/reactive-firewall/multicast/runs/%s\n" ${{ inputs.check-id }} >> "$GITHUB_OUTPUT"
+              printf "details_url=https://github.com/reactive-firewall-org/multicast/runs/%s\n" ${{ inputs.check-id }} >> "$GITHUB_OUTPUT"
               printf "::debug:: %s\n" "Check detail url was created from id given: ${{ inputs.check-id }}" ;
             else
               printf "details_url=null\n" >> "$GITHUB_OUTPUT"
@@ -147,7 +147,7 @@ runs:
         fi
     - name: "Create New Check"
       id: create_new_check
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && (inputs.check-id == '') && (inputs.status != 'completed') }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && (inputs.check-id == '') && (inputs.status != 'completed') }}
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
@@ -156,7 +156,7 @@ runs:
         # GitHub CLI api
         # https://cli.github.com/manual/gh_api
         CHECK_ID=$(gh api --method POST -H "Accept: application/vnd.github+json" \
-        /repos/reactive-firewall/multicast/check-runs \
+        /repos/reactive-firewall-org/multicast/check-runs \
         -f "name=${{ inputs.name }}" -f "head_sha=${{ steps.output_sha.outputs.sha }}" \
         -f "status=${{ inputs.status }}" -f "external_id=${{ steps.output_uuid.outputs.uuid }}" \
         -f "started_at=${{ steps.output_date.outputs.check_date }}Z" \
@@ -167,7 +167,7 @@ runs:
         printf "%s\n" "::endgroup::"
     - name: "Forge New Check"
       id: forge_new_check
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && (inputs.check-id == '') && (inputs.status == 'completed') }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && (inputs.check-id == '') && (inputs.status == 'completed') }}
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
@@ -176,7 +176,7 @@ runs:
         # GitHub CLI api
         # https://cli.github.com/manual/gh_api
         CHECK_ID=$(gh api --method POST -H "Accept: application/vnd.github+json" \
-        /repos/reactive-firewall/multicast/check-runs \
+        /repos/reactive-firewall-org/multicast/check-runs \
         -f "name=${{ inputs.name }}" -f "head_sha=${{ steps.output_sha.outputs.sha }}" \
         -f "status=in_progress" -f "external_id=${{ steps.output_uuid.outputs.uuid }}" \
         -f "started_at=${{ steps.output_date.outputs.check_date }}Z" \
@@ -186,22 +186,22 @@ runs:
         printf "check_id=%s\n" "${CHECK_ID}" >> "$GITHUB_OUTPUT"
         printf "%s\n" "::endgroup::"
     - id: output_check_id
-      if: ${{ !cancelled() && (github.repository == 'reactive-firewall/multicast') }}
+      if: ${{ !cancelled() && (github.repository == 'reactive-firewall-org/multicast') }}
       shell: bash
       run: |
         if [[ "${{ steps.create_new_check.outcome }}" == "success" ]] ; then
           printf "check_id=%s\n" ${{ steps.create_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
-          printf "check_url=https://github.com/reactive-firewall/multicast/runs/%s\n" ${{ steps.create_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
+          printf "check_url=https://github.com/reactive-firewall-org/multicast/runs/%s\n" ${{ steps.create_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
           printf "::debug:: %s\n" "Check id was created as ${{ steps.create_new_check.outputs.check_id }}" ;
         else
           if [[ "${{ steps.forge_new_check.outcome }}" == "success" ]] ; then
             printf "check_id=%s\n" ${{ steps.forge_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
-            printf "check_url=https://github.com/reactive-firewall/multicast/runs/%s\n" ${{ steps.forge_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
+            printf "check_url=https://github.com/reactive-firewall-org/multicast/runs/%s\n" ${{ steps.forge_new_check.outputs.check_id }} >> "$GITHUB_OUTPUT"
             printf "::debug:: %s\n" "Check id is forged as ${{ steps.forge_new_check.outputs.check_id }}" ;
           else
             if [[ "${{ inputs.check-id }}" != "" ]] ; then
               printf "check_id=%s\n" ${{ inputs.check-id }} >> "$GITHUB_OUTPUT"
-              printf "check_url=https://github.com/reactive-firewall/multicast/runs/%s\n" ${{ inputs.check-id }} >> "$GITHUB_OUTPUT"
+              printf "check_url=https://github.com/reactive-firewall-org/multicast/runs/%s\n" ${{ inputs.check-id }} >> "$GITHUB_OUTPUT"
               printf "::debug:: %s\n" "Check id given is ${{ inputs.check-id }}" ;
             else
               printf "check_id=null\n" >> "$GITHUB_OUTPUT"
@@ -211,7 +211,7 @@ runs:
         fi
     - name: "Update Check by ID"
       id: update_check
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && (steps.output_check_id.outputs.check_id != '') && (inputs.status != 'completed') }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && (steps.output_check_id.outputs.check_id != '') && (inputs.status != 'completed') }}
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
@@ -220,7 +220,7 @@ runs:
         # GitHub CLI api
         # https://cli.github.com/manual/gh_api
         gh api --method PATCH -H "Accept: application/vnd.github+json" \
-        /repos/reactive-firewall/multicast/check-runs/${{ steps.output_check_id.outputs.check_id }} \
+        /repos/reactive-firewall-org/multicast/check-runs/${{ steps.output_check_id.outputs.check_id }} \
         -f "name=${{ inputs.name }}" -f "head_sha=${{ steps.output_sha.outputs.sha }}" \
         -f "status=${{ inputs.status }}" \
         -f "details_url=${{ steps.output_check_details_url.outputs.details_url }}" \
@@ -229,7 +229,7 @@ runs:
         printf "%s\n" "::endgroup::"
     - name: "Update Check"
       id: compleate_check
-      if: ${{ (github.repository == 'reactive-firewall/multicast') && (steps.output_check_id.outputs.check_id != '') && (inputs.conclusion != '') }}
+      if: ${{ (github.repository == 'reactive-firewall-org/multicast') && (steps.output_check_id.outputs.check_id != '') && (inputs.conclusion != '') }}
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
@@ -238,7 +238,7 @@ runs:
         # GitHub CLI api
         # https://cli.github.com/manual/gh_api
         gh api --method PATCH -H "Accept: application/vnd.github+json" \
-        /repos/reactive-firewall/multicast/check-runs/${{ steps.output_check_id.outputs.check_id }} \
+        /repos/reactive-firewall-org/multicast/check-runs/${{ steps.output_check_id.outputs.check_id }} \
         -f "name=${{ inputs.name }}" -f "head_sha=${{ steps.output_sha.outputs.sha }}" \
         -f "status=completed" -f "conclusion=${{ inputs.conclusion }}" \
         -f "completed_at=${{ steps.output_date.outputs.check_date }}Z" \
@@ -248,7 +248,7 @@ runs:
         printf "%s\n" "::endgroup::"
     - name: "Report outcome of checks API"
       id: output_check_outcome
-      if: ${{ always() && (github.repository == 'reactive-firewall/multicast') }}
+      if: ${{ always() && (github.repository == 'reactive-firewall-org/multicast') }}
       shell: bash
       run: |
         if [[ "${{ steps.forge_new_check.outcome }}" == "success" ]] ; then

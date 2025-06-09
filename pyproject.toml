@@ -15,10 +15,10 @@ scripts = { "multicast" = "multicast.__main__:cli" }
 version = "v2.0.9a5"
 
 [project.urls]
-"Bug Tracker" = "https://github.com/reactive-firewall/multicast/issues"
-License = "https://raw.githubusercontent.com/reactive-firewall/multicast/HEAD/LICENSE.md"
+"Bug Tracker" = "https://github.com/reactive-firewall-org/multicast/issues"
+License = "https://raw.githubusercontent.com/reactive-firewall-org/multicast/HEAD/LICENSE.md"
 Documentation = "https://reactive-firewallmulticast.readthedocs.io/en/stable"
-Repository = "https://github.com/reactive-firewall/multicast.git"
+Repository = "https://github.com/reactive-firewall-org/multicast.git"
 
 [project.readme]
 file = "README.md"

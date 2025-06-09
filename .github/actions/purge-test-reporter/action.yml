@@ -67,7 +67,7 @@ runs:
         fi
     - name: "Finalize test reporter tools on ${{ runner.os }}"
       id: purge-test-reporter-main
-      if: ${{ !cancelled() && (steps.output_can_purge.outputs.can_purge == 'true') && (runner.os != 'Windows') && (github.repository == 'reactive-firewall/multicast') }}
+      if: ${{ !cancelled() && (steps.output_can_purge.outputs.can_purge == 'true') && (runner.os != 'Windows') && (github.repository == 'reactive-firewall-org/multicast') }}
       shell: bash
       env:
         CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.codeclimate-token || '' }}

@@ -5,8 +5,8 @@
 ```{toctree}
 :maxdepth: 3
 
-[Code of Conduct](https://github.com/reactive-firewall/multicast/blob/master/.github/CODE_OF_CONDUCT.md)
-[Contributing](https://github.com/reactive-firewall/multicast/blob/master/.github/CONTRIBUTING.md)
+[Code of Conduct](https://github.com/reactive-firewall-org/multicast/blob/master/.github/CODE_OF_CONDUCT.md)
+[Contributing](https://github.com/reactive-firewall-org/multicast/blob/master/.github/CONTRIBUTING.md)
 ```
 
 ### How do I get this running?
@@ -16,7 +16,7 @@
 ```bash
 # cd /MY-AWESOME-DEV-PATH
 # Retrieve a copy of the project, for example clone the source repository
-git clone https://github.com/reactive-firewall/multicast.git multicast && cd ./multicast
+git clone https://github.com/reactive-firewall-org/multicast.git multicast && cd ./multicast
 
 # Make sure you are using stable if in production
 git checkout stable
@@ -71,7 +71,7 @@ python3 -m multicast SAY --group 224.0.0.1 --port 59595 --message "Hello World!"
 
 > [!WARNING]
 > Caveat: this module is still a BETA
-[Here is how it is tested right now](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_hear_cleanup.py#L54C2-L96C43)
+[Here is how it is tested right now](https://github.com/reactive-firewall-org/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_hear_cleanup.py#L54C2-L96C43)
 
 ```python3
 import multicast
@@ -151,7 +151,7 @@ finally:
 > the standard python `multiprocessing` module and its use.
 
 Here is a
-[more CLI focused way to test](https://github.com/reactive-firewall/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
+[more CLI focused way to test](https://github.com/reactive-firewall-org/multicast/blob/389c93eb86e012a38edb88b3b81c7d4aa55e843a/tests/test_usage.py#L385C2-L432C43)
 as another example of how to use the module.
 
 ### What are the defaults?
@@ -162,7 +162,7 @@ as another example of how to use the module.
 > The **default** multicast group address is `224.0.0.1`.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
+[documentation](https://github.com/reactive-firewall-org/multicast/blob/v1.4/multicast/__init__.py#L185-L187):
 > The Value of "224.0.0.1" is chosen as a default multicast group as per RFC-5771
 > on the rational that this group address will be treated as a local-net multicast
 > (caveat: one should use link-local for ipv6).
@@ -184,7 +184,7 @@ From [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1)
 > choice is required to multicast beyond a single network.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
+[documentation](https://github.com/reactive-firewall-org/multicast/blob/v1.4/multicast/__init__.py#L214-L217):
 > A Value of 1 (one TTL) is chosen as per
 > [RFC-1112 §6.1](https://www.rfc-editor.org/rfc/rfc1112#section-6.1) on the rational that an
 > explicit value that could traverse beyond the local connected network should be
@@ -197,7 +197,7 @@ From the
 > The **default** UDP port used by `multicast` is `59595`.
 
 From the
-[documentation](https://github.com/reactive-firewall/multicast/blob/v1.4/multicast/__init__.py#L155):
+[documentation](https://github.com/reactive-firewall-org/multicast/blob/v1.4/multicast/__init__.py#L155):
 > Arbitrary port to use by default, though any dynamic and free port would work.
 
 While developers and network administrators must consider other factors in real-world deployments,
@@ -209,7 +209,7 @@ work as far as this Multicast module is concerned.
 
 > [!CAUTION]
 > It is best to specify the port in use at this time as the default has yet to be properly
-> assigned ( see related reactive-firewall/multicast#62 )
+> assigned ( see related reactive-firewall-org/multicast#62 )
 
 ### CLI exit code meanings
 
@@ -259,4 +259,4 @@ work as far as this Multicast module is concerned.
 
 #### Copyright (c) 2021-2025, Mr. Walls
 
-[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall/multicast/tree/HEAD/LICENSE.md)
+[![License - MIT](https://img.shields.io/pypi/l/multicast?cacheSeconds=3600)](https://github.com/reactive-firewall-org/multicast/tree/HEAD/LICENSE.md)
