@@ -345,7 +345,7 @@ fi ;
 done ;
 # diff link
 printf "**Full Changelog**: %s(%s)\n\n***\n\n" "[\`${GIT_RANGE}\`]" \
-"https://github.com/reactive-firewall/multicast/compare/${GIT_RANGE}" ;
+"https://github.com/reactive-firewall-org/multicast/compare/${GIT_RANGE}" ;
 
 # cleanup
 unset RAW_NEW_FILES 2>/dev/null || : ;

@@ -141,7 +141,7 @@ finally:
 > ```
 >
 > This is essentially what the
-> [default listener does under-the-hood](https://github.com/reactive-firewall/multicast/blob/v2.0.9a5/multicast/hear.py#L830C4-L832C27)
+> [default listener does under-the-hood](https://github.com/reactive-firewall-org/multicast/blob/v2.0.9a5/multicast/hear.py#L830C4-L832C27)
 > automatically.
 
 ### Direct ephemeral receiver with an ad-hoc handler

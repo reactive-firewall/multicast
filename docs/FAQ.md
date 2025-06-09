@@ -449,7 +449,8 @@ work as far as the `multicast` module is concerned.
 
 > [!CAUTION]
 > It is best to specify the port in use at this time as the default will not be properly
-> assigned to `multicast` ( see related reactive-firewall/multicast#62 ) by any central authority.
+> assigned to `multicast` ( see related reactive-firewall-org/multicast#62 ) by any central
+> authority.
 
 ### CLI exit code meanings
 

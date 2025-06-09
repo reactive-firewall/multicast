@@ -27,7 +27,7 @@ python3 -m pip install --use-pep517 --break-system-packages --user 'multicast>=2
 
 ```bash
 # clone the multicast source repository
-git clone "https://github.com/reactive-firewall/multicast.git" multicast
+git clone "https://github.com/reactive-firewall-org/multicast.git" multicast
 cd multicast
 # switch to the stable branch
 git checkout stable
@@ -47,7 +47,7 @@ python3 -m multicast --version
 
 ```bash
 # clone the multicast source repository
-git clone https://github.com/reactive-firewall/multicast.git multicast && cd ./multicast
+git clone https://github.com/reactive-firewall-org/multicast.git multicast && cd ./multicast
 # switch to the default "master" branch
 git checkout master
 # build the multicast module
