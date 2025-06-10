@@ -58,7 +58,7 @@ _NO ASSOCIATION._
 Copyright (c) 2017-2022, Python Test Repo Template
 ALSO Licensed under MIT
 You may obtain a copy of the License at
-[MIT License](https://github.com/reactive-firewall/python-repo/LICENSE.md)
+[MIT License](https://github.com/reactive-firewall/python-repo/blob/HEAD/LICENSE.md)
 ***
 
 ### Files: `.github/workflows/markdown-lint.yml`, and `.github/workflows/yaml-lint.yml`
@@ -67,7 +67,7 @@ You may obtain a copy of the License at
 Copyright (c) 2017-2025, Your Mileage May Vary
 ALSO Licensed under MIT
 You may obtain a copy of the License at
-[MIT License](https://github.com/reactive-firewall/ymmv/LICENSE.md)
+[MIT License](https://github.com/reactive-firewall/ymmv/blob/HEAD/LICENSE.md)
 ***
 
 ### File: `Logo.svg`
