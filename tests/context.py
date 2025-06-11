@@ -1086,7 +1086,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 		"""
 		try:
-			self.assertIsNotNone(multicast.__module__, "Version will be efectivly None.")
+			self.assertIsNotNone(multicast.__module__, "Version will be effectively None.")
 			self.assertIsNotNone(multicast.__version__, "Version is not valid.")
 			_raw_version_fixture = multicast.__version__
 			self.assertIsInstance(_raw_version_fixture, str, "Version is not a string.")
