@@ -796,7 +796,7 @@ def cli() -> int:
 			A: Test that the call to the `cli` function returns an int 0-3.
 
 			>>> tst_argv_args = ['''SAY''', '''--port=1234''', '''--message''', '''is required''']
-			>>> sys.argv = tst_argv_args  # normally arguments are aoutomaticly already in argv
+			>>> sys.argv = tst_argv_args  # normally arguments are automatically already in argv
 			>>> test_code = multicast.__main__.cli()
 			>>> test_code is not None
 			True
