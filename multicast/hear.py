@@ -721,24 +721,26 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
 				str(self.client_address[0]), data.strip(),
 			)
-		if data is not None:
-			me = str(sock.getsockname()[0])
-			if __debug__:  # pragma: no cover
-				_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
-				_logger.info(
-					"%s HEAR: [%s SAID %s]",  # lazy formatting to avoid PYL-W1203
-					str(me), str(self.client_address), str(_what),
-				)
-				_logger.info(
-					"%s SAYS [ HEAR [ {%s SAID %s ] from %s ]",  # lazy formatting to avoid PYL-W1203
-					str(me), str(_what), str(self.client_address), str(me),
-				)
-			send.McastSAY()._sayStep(  # skipcq: PYL-W0212 - module ok
-				self.client_address[0], self.client_address[1],
-				f"HEAR [ {data.upper()} SAID {self.client_address} ] from {me}"  # noqa
+		# if data is not None: -- implied
+		me = str(sock.getsockname()[0])
+		_sender: multicast.send.McastSAY = None
+		_sender = send.McastSAY()
+		if __debug__:  # pragma: no cover
+			_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
+			_logger.info(
+				"%s HEAR: [%s SAID %s]",  # lazy formatting to avoid PYL-W1203
+				str(me), str(self.client_address), str(_what),
 			)
-			if "STOP" in str(data):
-				raise multicast.exceptions.ShutdownCommandReceived("SHUTDOWN") from None
+			_logger.info(
+				"%s SAYS [ HEAR [ {%s SAID %s ] from %s ]",  # lazy formatting to avoid PYL-W1203
+				str(me), str(_what), str(self.client_address), str(me),
+			)
+		_sender._sayStep(  # skipcq: PYL-W0212 - module ok
+			self.client_address[0], self.client_address[1],
+			f"HEAR [ {data.upper()} SAID {self.client_address} ] from {me}"  # noqa
+		)
+		if "STOP" in str(data):
+			raise multicast.exceptions.ShutdownCommandReceived("SHUTDOWN") from None
 
 
 class McastHEAR(multicast.mtool):

@@ -153,6 +153,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
+        use-pytest: ["", "1"]  # un/set to dis/enable
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -215,7 +216,7 @@ jobs:
       id: coverage_tests
       shell: bash
       env:
-        TESTS_USE_PYTEST: 1
+        TESTS_USE_PYTEST: ${{ matrix.use-pytest }}
       run: |
         make -f Makefile test || exit 1
     - name: Upload Python ${{ matrix.python-version }} test coverage to Codecov
