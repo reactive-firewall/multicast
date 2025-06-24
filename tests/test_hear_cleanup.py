@@ -49,6 +49,8 @@ try:
 		from context import multicast  # pylint: disable=cyclic-import - skipcq: PYL-R0401
 		from context import unittest
 		from context import Process
+		from unittest.mock import MagicMock
+		import socket
 except ImportError as baton:
 	raise ImportError("[CWE-758] Failed to import test context") from baton
 
@@ -164,6 +166,67 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			context.debugtestError(_cause)
 			self.fail(fail_fixture)
 			theResult = False
+		self.assertTrue(theResult, fail_fixture)
+
+	@staticmethod
+	def get_default_ip() -> str:
+		"""Get the default IP address of the machine.
+
+		Returns:
+			str: The IP address of the default network interface.
+
+		Note:
+			Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance.
+			Port 59095 is chosen as an arbitrary high port number.
+		"""
+		s = None
+		try:
+			# Create a socket connection to an external address
+			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			# Connect to a public non-routable IP
+			s.connect(("203.0.113.1", 59095))
+			# Get the IP address of the default interface
+			ip = s.getsockname()[0]
+		except socket.error as _cause:
+			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from _cause
+		finally:
+			if s is not None:
+				s.close()
+		return ip
+
+	def test_should_invoke_kill_func_when_handle_error_called(self) -> None:
+		"""Test that kill_func calls shutdown on the server instance.
+
+		Verifies that the server properly handles requests without
+		the STOP command and calls the kill_func to free up server resources.
+		"""
+		theResult = False
+		fail_fixture = "Mock(STOP) --> Handler-HEAR --X shutdown"
+		_fixture_port_num = self._the_test_port
+		try:
+			self.assertIsNotNone(_fixture_port_num)
+			self.assertIsInstance(_fixture_port_num, int)
+			# Create an instance of McastServer
+			server_address = ('224.0.0.1', _fixture_port_num)
+			self.server = multicast.hear.McastServer(server_address, None, False)
+			self.server.shutdown = MagicMock()  # Mock the shutdown method
+			client_address = (self.get_default_ip(), _fixture_port_num)
+			# Mock a request not containing "STOP"
+			request = ("STOP message", multicast.genSocket())
+			# Add assertions for initial state
+			self.assertIsNotNone(request[1], "Socket should be created")
+			self.assertIsInstance(request[0], str, "Request should be a string")
+			try:
+				self.server.handle_error(request, client_address)
+				# Assert that the shutdown method was called
+				self.server.shutdown.assert_called_once()
+				theResult = True
+			finally:
+				# Clean up
+				self.server.server_close()
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			self.fail(fail_fixture)
 		self.assertTrue(theResult, fail_fixture)
 
 
