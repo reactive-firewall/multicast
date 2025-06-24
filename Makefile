@@ -204,7 +204,7 @@ branding::
 	$(QUIET)$(ECHO) ""
 
 init: branding
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=80.4" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=25.1.1" "setuptools>=80.9" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
