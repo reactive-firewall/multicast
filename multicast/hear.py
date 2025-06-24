@@ -701,6 +701,20 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			>>>
 			>>> multicast.endSocket(tst_fixture_sock)
 			>>>
+
+			Testcase 4: `handle` raises on valid STOP requests.
+
+			>>> tst_fixture_sock = multicast.genSocket()
+			>>> handler.request = ("The Test is STOP", tst_fixture_sock)
+			>>> handler.client_address = ("224.0.1.3", 54321)
+			>>> try:
+			...     handler.handle()
+			... except multicast.exceptions.ShutdownCommandReceived:
+			...     print('ShutdownCommandReceived raised')
+			ShutdownCommandReceived raised
+			>>>
+			>>> multicast.endSocket(tst_fixture_sock)
+			>>>
 		"""
 		(data, sock) = self.request
 		if data is None or not sock:
