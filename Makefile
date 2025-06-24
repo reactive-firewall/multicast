@@ -278,10 +278,11 @@ just-test: cleanup MANIFEST.in test-reports ## Run all minimum acceptance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m tests.run_selective || $(PYTHON) -m tests.run_selective || DO_FAIL="exit 2" ; \
-		$(QUIET)$(COVERAGE) combine ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
-		$(QUIET)$(COVERAGE) combine --append ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
-		$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_all ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) combine --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
