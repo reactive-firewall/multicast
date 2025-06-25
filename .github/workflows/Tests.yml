@@ -15,8 +15,6 @@ run-name: Extended Testing
 #
 # Required Secrets:
 # - CODECOV_TOKEN: For uploading coverage reports to Codecov
-# - CODECLIMATE_REPO_TOKEN: For integration with Code Climate
-# - CC_TEST_REPORTER_ID: For Code Climate test reporting
 
 on:
   workflow_run:
@@ -153,9 +151,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
+        use-pytest: ["", "1"]  # un/set to dis/enable
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
+      TESTS_USE_PYTEST: ${{ matrix.use-pytest }}
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
       COV_CORE_DATAFILE: ./coverage.xml
@@ -169,7 +169,6 @@ jobs:
       coverage_test_outcome: ${{ steps.coverage_tests.outcome }}
       coverage_upload_unitests_outcome: ${{ steps.coverage-unittests-codecov-upload.outcome }}
       coverage_upload_codecov_outcome: ${{ steps.coverage-project-codecov-upload.outcome }}
-      coverage_upload_codeclimate_outcome: ${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}
       coverage_upload_deepsource_outcome: ${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}
       coverage_upload_artifact_outcome: ${{ steps.upload-test-tools.outputs.coverage_upload_artifact_outcome }}
       coverage_artifact_url: ${{ steps.coverage-reports-upload.outputs.artifact-url }}
@@ -205,8 +204,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Pre-Clean
       id: clean-before-coverage
       if: ${{ !cancelled() }}
@@ -214,8 +211,6 @@ jobs:
     - name: Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: coverage_tests
       shell: bash
-      env:
-        TESTS_USE_PYTEST: 1
       run: |
         make -f Makefile test || exit 1
     - name: Upload Python ${{ matrix.python-version }} test coverage to Codecov
@@ -263,8 +258,6 @@ jobs:
         job_code: ${{ needs.check_mats.outputs.tests_id }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
         codecov-token: ${{ github.server_url == 'https://github.com' && secrets.CODECOV_TOKEN || '' }}
     - name: Finalize coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       id: purge-test-tools
@@ -274,8 +267,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: "Generate Summary Filename"
       id: output_coverage_step_summary
       if: ${{ !cancelled() }}
@@ -308,7 +299,7 @@ jobs:
         else
           THE_RESULT="failure"
         fi
-        for CHECK_VALUE in "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" "${{ steps.coverage-reports-upload.outcome }}" ; do
+        for CHECK_VALUE in "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" "${{ steps.coverage-reports-upload.outcome }}" ; do
           if [[ "${CHECK_VALUE}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
             THE_RESULT="success"
           else
@@ -355,15 +346,6 @@ jobs:
             printf "%s\n" "  * :no_entry: Uploading unit-tests coverage report to CodeCov failed" >> "$COV_STEP_SUMMARY"
           else
             printf "%s\n" "  * ${SKIP_ICON} Uploading unit-tests coverage report to CodeCov was skipped" >> "$COV_STEP_SUMMARY"
-          fi
-        fi
-        if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * ${UPLOAD_ICON} Uploading unit-tests coverage report to codeclimate succeeded" >> "$COV_STEP_SUMMARY"
-        else
-          if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" == "failed" ]] ; then
-            printf "%s\n" "  * :no_entry: Uploading unit-tests coverage report to codeclimate failed" >> "$COV_STEP_SUMMARY"
-          else
-            printf "%s\n" "  * ${SKIP_ICON} Uploading unit-tests coverage report to codeclimate was skipped" >> "$COV_STEP_SUMMARY"
           fi
         fi
         if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" == "success" ]] ; then
@@ -483,8 +465,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: doctests-main
       run: make -f Makefile test-mat-doctests ;
@@ -519,8 +499,6 @@ jobs:
         job_code: ${{ needs.check_mats.outputs.tests_id }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
         codecov-token: ${{ github.server_url == 'https://github.com' && secrets.CODECOV_TOKEN || '' }}
     - name: Finalize coverage tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       id: purge-doctest-test-tools
@@ -530,8 +508,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: "Generate Summary Filename"
       id: output_doctests_step_summary
       if: ${{ !cancelled() }}
@@ -559,7 +535,7 @@ jobs:
         else
           THE_RESULT="failure"
         fi
-        for CHECK_VALUE in "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" "${{ steps.doctests-reports-upload.outcome }}" ; do
+        for CHECK_VALUE in "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" "${{ steps.doctests-reports-upload.outcome }}" ; do
           if [[ "${CHECK_VALUE}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
             THE_RESULT="success"
           else
@@ -597,15 +573,6 @@ jobs:
             printf "%s\n" "  * :no_entry: Uploading Doctests coverage report to CodeCov failed" >> "$DOC_STEP_SUMMARY"
           else
             printf "%s\n" "  * ${SKIP_ICON} Uploading Doctests coverage report to CodeCov was skipped" >> "$DOC_STEP_SUMMARY"
-          fi
-        fi
-        if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * ${UPLOAD_ICON} Uploading Doctests coverage report to codeclimate succeeded" >> "$DOC_STEP_SUMMARY"
-        else
-          if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_codeclimate_outcome }}" == "failed" ]] ; then
-            printf "%s\n" "  * :no_entry: Uploading Doctests coverage report to codeclimate failed" >> "$DOC_STEP_SUMMARY"
-          else
-            printf "%s\n" "  * ${SKIP_ICON} Uploading Doctests coverage report to codeclimate was skipped" >> "$DOC_STEP_SUMMARY"
           fi
         fi
         if [[ "${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}" == "success" ]] ; then
@@ -761,6 +728,7 @@ jobs:
       with:
         build-number: ${{ needs.check_mats.outputs.tests_id }}
         parallel-finished: true
+        git-branch: ${{ needs.check_mats.outputs.build_ref_name }}
         git-commit: ${{ needs.check_mats.outputs.build_sha }}
         allow-empty: true
         fail-on-error: false
@@ -860,7 +828,6 @@ jobs:
       integration_function_outcome: ${{ steps.integration-main.outcome }}
       integration_upload_codecov_test_outcome: ${{ steps.integration-codecov-results-upload.outcome }}
       integration_upload_codecov_coverage_outcome: ${{ steps.integration-codecov-upload.outcome }}
-      integration_upload_codeclimate_outcome: ${{ steps.integration-codeclimate-upload.outcome }}
       integration_upload_deepsource_outcome: ${{ steps.integration-deepsource-upload.outcome }}
       integration_upload_artifact_outcome: ${{ steps.integration-reports-upload.outcome }}
       integration_artifact_url: ${{ steps.integration-reports-upload.outputs.artifact-url }}
@@ -896,8 +863,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: make -j1 -f Makefile user-install || true ;
       if: ${{ success() }}
@@ -937,19 +902,6 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
         overwrite: true
-    - name: code-climate for ${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ !cancelled() && runner.os != 'Windows' }}
-      id: integration-codeclimate-upload
-      shell: bash
-      env:
-        CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-      run: |
-        if [[ "${{ steps.integration-main.outcome }}" == "success" ]] ; then
-          ./cc-test-reporter after-build --exit-code 0 || exit 1 ;
-        else
-          ./cc-test-reporter after-build --exit-code 1 || true ;
-        fi
     - name: deepsource for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       id: integration-deepsource-upload
@@ -978,8 +930,6 @@ jobs:
         token: ${{ github.server_url == 'https://github.com' && github.token || '' }}
         deepsource-dsn: ${{ github.server_url == 'https://github.com' && secrets.DEEPSOURCE_DSN || '' }}
         coveralls-token: ${{ github.server_url == 'https://github.com' && secrets.COVERALLS_REPO_TOKEN || '' }}
-        codeclimate-token: ${{ github.server_url == 'https://github.com' && secrets.CODECLIMATE_REPO_TOKEN || '' }}
-        cc-test-reporter-id: ${{ github.server_url == 'https://github.com' && secrets.CC_TEST_REPORTER_ID || '' }}
     - name: "Generate Summary Filename"
       id: output_integration_step_summary
       if: ${{ !cancelled() }}
@@ -1074,7 +1024,7 @@ jobs:
         else
           THE_RESULT="failure"
         fi
-        for CHECK_VALUE in "${{ steps.integration-codeclimate-upload.outcome }}" "${{ steps.integration-deepsource-upload.outcome }}" "${{ steps.integration-reports-upload.outcome }}" ; do
+        for CHECK_VALUE in "${{ steps.integration-deepsource-upload.outcome }}" "${{ steps.integration-reports-upload.outcome }}" ; do
           if [[ "${CHECK_VALUE}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
             THE_RESULT="success"
           else
@@ -1128,15 +1078,6 @@ jobs:
             printf "%s\n" "  * :no_entry: Uploading integration coverage report to CodeCov failed" >> "$TESTS_STEP_SUMMARY"
           else
             printf "%s\n" "  * ${SKIP_ICON} Uploading integration coverage report to CodeCov was skipped" >> "$TESTS_STEP_SUMMARY"
-          fi
-        fi
-        if [[ "${{ steps.integration-codeclimate-upload.outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * ${UPLOAD_ICON} Uploading integration coverage report to codeclimate succeeded" >> "$TESTS_STEP_SUMMARY"
-        else
-          if [[ "${{ steps.integration-codeclimate-upload.outcome }}" == "failed" ]] ; then
-            printf "%s\n" "  * :no_entry: Uploading integration coverage report to codeclimate failed" >> "$TESTS_STEP_SUMMARY"
-          else
-            printf "%s\n" "  * ${SKIP_ICON} Uploading integration coverage report to codeclimate was skipped" >> "$TESTS_STEP_SUMMARY"
           fi
         fi
         if [[ "${{ steps.integration-deepsource-upload.outcome }}" == "success" ]] ; then
@@ -1389,8 +1330,6 @@ jobs:
     env:
       OS: 'ubuntu-latest'
       PYTHON_VERSION: "${{ vars.PYTHON_DEFAULT }}"
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_REPO_TOKEN }}
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:

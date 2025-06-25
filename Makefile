@@ -204,7 +204,7 @@ branding::
 	$(QUIET)$(ECHO) ""
 
 init: branding
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=80.4" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=25.1.1" "setuptools>=80.9" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -240,21 +240,23 @@ purge: purge-coverage-artifacts purge-test-reports
 	$(QUIET)$(WAIT) ;
 
 test: just-test
+	$(QUIET)$(DO_FAIL) 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-mats: test-mat
 	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) combine --keep ./coverage_* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) combine --append 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
+	$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: build
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
@@ -272,11 +274,16 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 	$(QUIET)$(WAIT) ;
 
 # === Test Group Targets ===
-just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
+just-test: cleanup MANIFEST.in test-reports ## Run all minimum acceptance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_all ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) combine --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
