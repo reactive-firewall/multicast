@@ -809,9 +809,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: ["${{ vars.PYTHON_OLD_MIN }}", "${{ vars.PYTHON_OLD_EXTRA }}", "${{ vars.PYTHON_DEFAULT }}", "${{ vars.PYTHON_EXPERIMENTAL }}"]
+        use-pytest: ["", "1"]  # un/set to dis/enable
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
+      TESTS_USE_PYTEST: ${{ matrix.use-pytest }}
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
       COV_CORE_DATAFILE: .coverage
@@ -869,8 +871,10 @@ jobs:
     - name: Re-Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: integration-pytest
       run: |
-        make -j1 -f Makefile test-pytest ;
-        cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
+        make -j1 -f Makefile test ;
+        if [[ -r ./coverage.xml ]]; then
+          cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
+        fi ;
       shell: bash
     - name: Generate Doctest Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: integration-doctests
@@ -888,7 +892,12 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ needs.check_mats.outputs.build_id }}-${{ github.run_number }}
         override_commit: ${{ needs.check_mats.outputs.build_sha }}
-        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage_doctests.xml,./test-reports/coverage.xml
+        override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
+        override_build_id: ${{ needs.check_mats.outputs.build_id }}
+        override_build_url: ${{ needs.check_mats.outputs.build_url }}
+        report_type: 'coverage'
+        slug: 'reactive-firewall-org/multicast'
+        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage_doctests.xml,./test-reports/coverage_coverage.xml,./test-reports/coverage.xml
         directory: .
         flags: multicast
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}

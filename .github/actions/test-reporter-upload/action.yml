@@ -138,6 +138,13 @@ runs:
           printf "::debug::%s\n" "Identified ${OS}"
         fi
         printf "%s\n" "OS=${OS}" >> "$GITHUB_ENV"
+    - id: output_branch_name
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: |
+        printf "branch-name=%s\n" $(git name-rev --name-only HEAD 2>/dev/null | cut -d~ -f1-1) >> "$GITHUB_OUTPUT"
+        printf "::debug::%s %s\n" "Will report coverage as branch " $(git name-rev --name-only HEAD | cut -d~ -f1-1)
+        printf "BUILD_BRANCH=%s\n" $(git name-rev --name-only HEAD 2>/dev/null | cut -d~ -f1-1) >> "$GITHUB_ENV"
     - name: "Prepare Artifact Name"
       id: output_artifact_name
       if: ${{ !cancelled() }}
@@ -287,6 +294,9 @@ runs:
         token: ${{ inputs.codecov-token }}
         job_code: ${{ inputs.job_code || '' }}
         override_commit: ${{ steps.output_sha.outputs.sha }}
+        override_branch: ${{ steps.output_branch_name.outputs.branch-name }}
+        report_type: 'coverage'
+        slug: 'reactive-firewall-org/multicast'
         files: ./coverage.xml,./test-reports/coverage.xml
         directory: ${{ github.workspace }}
         flags: multicast
