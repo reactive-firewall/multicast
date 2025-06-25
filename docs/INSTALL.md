@@ -67,10 +67,9 @@ python3 -m multicast --version
 pip install -e "git+https://github.com/reactive-firewall/multicast.git#egg=multicast"
 ```
 
----
+***
 
 If all went well, `multicast` is now installed and working :tada:
-
 
 ***
 
