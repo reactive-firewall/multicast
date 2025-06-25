@@ -10,7 +10,7 @@ reviews:
 
     - Ensure the code follows best practices and coding standards.
     - Check for security vulnerabilities and potential issues.
-    - Ensure the code follows the **DRY, AHA, and SOLID** principles.
+    - Ensure the code follows the **DRY, Avoid-Hasty-Abstractions, and SOLID** design principles.
     - Our "Code Review Checklist Guide" is documented in
       [CEP-4](https://gist.github.com/reactive-firewall/cc041f10aad1d43a5ef15f50a6bbd5a5),
       be sure to always consider
@@ -44,7 +44,7 @@ reviews:
     - Verify that minimal acceptance tests (e.g., those run by the workflow CI-MATs) are passing and
       error free, pointing out any failure as below minimal acceptance (i.e. un-acceptable).
     - Ensure that the test coverage meets or exceeds the project's required threshold
-      (e.g., aiming for 100% coverage as per Issue #53).
+      (e.g., aiming for 100% coverage as per GitHub Issue #53).
     - For **test** code, *also* follow
       [CEP-9](https://gist.github.com/reactive-firewall/d840ee9990e65f302ce2a8d78ebe73f6)
 
@@ -57,6 +57,8 @@ reviews:
       not assume a dependency is optional, confirm if it is or is not optional.
     - For **Python** code, consider [PEP 290](https://peps.python.org/pep-0290/) whenever a python
       (e.g., has the extension '.py') file is changed.
+    - Our project's "AI Usage Policy" is documented in
+      [.github/AI_USAGE_POLICY.md](https://github.com/reactive-firewall-org/multicast/tree/master/.github/AI_USAGE_POLICY.md).
   request_changes_workflow: true
   high_level_summary: true
   high_level_summary_placeholder: '@coderabbitai summary'
@@ -77,17 +79,27 @@ reviews:
       instructions: >-
         Apply when the PR/MR contains changes to the file `Makefile` or makefile
         code snippets.
-    - label: Documentation
+    - label: documentation
       instructions: >-
         Apply whenever project documentation (namely markdown source-code) is
         updated by the PR/MR. Also apply when PR contains a commit with a commit
         message prefixed with "[DOCUMENTATION] "
+    - label: CI
+      instructions: >-
+        Apply whenever project CI/CD components (namely GitHub Action source-code) is
+        updated by the PR/MR. Also apply when PR contains a commit with a commit
+        message prefixed with "[CI] "
     - label: Linter
       instructions: >-
         Apply when the purpose of the PR/MR is related to fixing the feedback
         from a linter. Also apply if suggested fixes are used and improve the
-        code's compliance with the PEP-8 standard.
-  path_filters: ['!*.xc*/**', '!node_modules/**', '!dist/**', '!build/**', '!.git/**', '!venv/**', '!__pycache__/**']
+        code's compliance with project conventions or adopted standards.
+    - label: Testing
+      instructions: >-
+        Apply when the purpose of the PR/MR is related to fixing/improving any
+        testing components or test-code. Also apply if suggested fixes are
+        used and improve the project's test-code.
+  path_filters: ['!*.xc*/**', '!node_modules/**', '!dist/**', '!package.json', '!build/**', '!.git/**', '!venv/**', '!__pycache__/**']
   path_instructions:
     - path: README.md
       instructions: >-
@@ -120,7 +132,7 @@ reviews:
            the guidelines set by
            [CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20).
         6. Verify Flake8's configuration file is located at ".flake8.ini". Flake8 is run
-           automaticly by the `flake8-cq` GHA used by the `.github/workflows/flake8.yml` workflow.
+           automatically by the `flake8-cq` GHA used by the `.github/workflows/flake8.yml` workflow.
         7. Verify alignment of any new changes, with the code style advocated in
            [CEP-8](https://gist.github.com/reactive-firewall/b7ee98df9e636a51806e62ef9c4ab161),
            pointing out any introduced deviations.
