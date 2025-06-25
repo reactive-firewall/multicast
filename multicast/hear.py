@@ -735,7 +735,6 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 				"%s SAYS: %s to ALL",  # lazy formatting to avoid PYL-W1203
 				str(self.client_address[0]), data.strip(),
 			)
-		# if data is not None: -- implied
 		me = str(sock.getsockname()[0])
 		_sender: multicast.send.McastSAY = None
 		_sender = send.McastSAY()
