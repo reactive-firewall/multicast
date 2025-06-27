@@ -7,3 +7,7 @@ We prefer that you use the
 Under the
 [main repository's security tab](https://github.com/reactive-firewall-org/multicast/security), click
 "Report a vulnerability" to open the advisory form.
+
+***
+
+<!-- Copyright (c) 2021-2025, Mr. Walls -->
