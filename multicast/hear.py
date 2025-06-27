@@ -645,7 +645,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 
 	"""
 
-	def handle(self):
+	def handle(self) -> None:
 		"""
 		Handles incoming UDP requests in the HEAR functionality.
 
@@ -658,6 +658,15 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			initiate server shutdown.
 			Silently ignores any UnicodeDecodeError when decoding data.
 			Returns early if data or socket is None.
+
+		Args:
+			None
+
+		Returns:
+			None
+
+		Raises:
+			multicast.exceptions.ShutdownCommandReceived: When "STOP" is detected in incoming data.
 
 		Minimal Acceptance Testing:
 
@@ -710,7 +719,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			>>> try:
 			...     handler.handle()
 			... except multicast.exceptions.ShutdownCommandReceived:
-			...     print('ShutdownCommandReceived raised')
+			...     print("ShutdownCommandReceived raised")
 			ShutdownCommandReceived raised
 			>>>
 			>>> multicast.endSocket(tst_fixture_sock)

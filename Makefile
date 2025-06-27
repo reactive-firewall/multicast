@@ -68,6 +68,10 @@ ifeq "$(LINK)" ""
 	LINK=ln -sf
 endif
 
+ifndef PYTHONUTF8
+	PYTHONUTF8 := 1
+endif
+
 ifeq "$(PYTHON)" ""
 	PY_CMD=$(COMMAND) python3
 	ifneq "$(PY_CMD)" ""
@@ -254,9 +258,7 @@ test-mats: test-mat
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: build
-	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)tox -v --stderr-color RESET -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
@@ -280,6 +282,7 @@ just-test: cleanup MANIFEST.in test-reports ## Run all minimum acceptance tests
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(QUIET)$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_all ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) combine --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \

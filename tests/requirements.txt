@@ -63,7 +63,7 @@ virtualenv>=20.26.6
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 # tox - MIT license
-tox>=3.0.0, !=3.16.1
+tox>=4.27.0
 # flake8 - MIT license
 flake8>=7.2.0
 # flake8-comprehensions - MIT License

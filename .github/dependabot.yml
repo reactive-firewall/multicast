@@ -20,15 +20,11 @@ updates:
     groups:
       production-dependencies:
         dependency-type: "production"
-      development-dependencies:
-        dependency-type: "development"
-        exclude-patterns:
-          - "setuptools*"
     allow:
-      - dependency-name: "setuptools"
-        dependency-type: "production"
       - dependency-name: "pip"
         dependency-type: "direct"
+      - dependency-name: "setuptools"
+        dependency-type: "production"
       - dependency-name: "wheel"
         dependency-type: "production"
       - dependency-name: "build"

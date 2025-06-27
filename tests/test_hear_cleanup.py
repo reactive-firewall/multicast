@@ -141,17 +141,20 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			try:
 				sender = multicast.send.McastSAY()
 				self.assertIsNotNone(sender)
-				while p.is_alive():
-					sender(
+				p_tick: int = 0
+				while p.is_alive() and (p_tick <= self.PROCESS_TIMEOUT_SECONDS):
+					(didSend, _) = sender(
 						group=self.TEST_MULTICAST_GROUP, port=_fixture_port_num,
 						ttl=1, data="STOP Test",
 					)
 					p.join(self.STOP_DELAY_SECONDS)
+					p_tick += 1
 				self.assertFalse(p.is_alive())
 			except Exception as _root_cause:
 				p.join(self.KILL_DELAY_SECONDS)
 				if p.is_alive():
 					p.terminate()
+					p.join(self.STOP_DELAY_SECONDS)
 					p.close()
 				raise unittest.SkipTest(fail_fixture) from _root_cause
 			p.join(self.PROCESS_TIMEOUT_SECONDS)
