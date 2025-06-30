@@ -341,10 +341,10 @@ class McastSAY(multicast.mtool):
 		_success = False
 		sock = multicast.genSocket()
 		if __debug__:
-				module_logger.info(
-					"Preparing to send %d",  # lazy formatting to avoid PYL-W1203
-					len(data),
-				)
+			module_logger.info(
+				"Preparing to send %d",  # lazy formatting to avoid PYL-W1203
+				len(data),
+			)
 		try:
 			if __debug__ and module_logger.isEnabledFor(logging.DEBUG):  # pragma: no branch
 				module_logger.debug("Encoding.")

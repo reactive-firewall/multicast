@@ -99,7 +99,7 @@ reviews:
         Apply when the purpose of the PR/MR is related to fixing/improving any
         testing components or test-code. Also apply if suggested fixes are
         used and improve the project's test-code.
-  path_filters: ['!*.xc*/**', '!node_modules/**', '!dist/**', '!package.json', '!build/**', '!.git/**', '!venv/**', '!__pycache__/**']
+  path_filters: ['!*.xc*/**', '!node_modules/**', '!dist/**', '!package.json', '!package-lock.json', '!yarn.lock', '!build/**', '!.git/**', '!venv/**', '!__pycache__/**']
   path_instructions:
     - path: README.md
       instructions: >-

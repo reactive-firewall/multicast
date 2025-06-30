@@ -27,7 +27,6 @@ applications, making it straightforward to work with multicast sockets.
 [![Documentation Status](https://readthedocs.org/projects/reactive-firewallmulticast/badge/?version=master)](https://reactive-firewallmulticast.readthedocs.io/en/latest/?badge=master)
 [![Code Coverage](https://codecov.io/gh/reactive-firewall-org/multicast/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall-org/multicast/branch/master/)
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall-org/multicast/badge.svg)](https://coveralls.io/github/reactive-firewall-org/multicast)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/8a9422860b6a5b6477b5/test_coverage)](https://codeclimate.com/github/reactive-firewall-org/multicast/test_coverage)
 [![Bandit](https://github.com/reactive-firewall-org/multicast/actions/workflows/bandit.yml/badge.svg?branch=master)](https://github.com/reactive-firewall-org/multicast/actions/workflows/bandit.yml)
 [![Style Status](https://github.com/reactive-firewall-org/multicast/actions/workflows/flake8.yml/badge.svg?branch=master&event=push)](https://github.com/reactive-firewall-org/multicast/actions/workflows/flake8.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/reactive-firewall-org/multicast/badge)](https://www.codefactor.io/repository/github/reactive-firewall-org/multicast)
