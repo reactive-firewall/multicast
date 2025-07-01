@@ -92,7 +92,7 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: 'pip'  # caching pip dependencies
       if: ${{ !cancelled() }}
-    - run: ${{ steps.cp313.outputs.python-path }} -m pip install --upgrade pip
+    - run: python -m pip install --upgrade pip
       shell: bash
       if: ${{ !cancelled() && runner.os == 'Windows' }}
     - id: output_python_env
