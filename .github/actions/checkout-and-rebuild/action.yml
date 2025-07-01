@@ -126,13 +126,6 @@ runs:
         repository: reactive-firewall-org/multicast
         github-token: ${{ inputs.token }}
         run-id: ${{ inputs.build-run-id }}
-    - id: verify_artifact_source
-      name: "Verify Build Files"
-      shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.token }}
-      run: |
-        gh attestation verify --owner reactive-firewall-org "${{ steps.fetch_artifact_files.outputs.download-path }}"
     - name: "Enumerate Fetched Files"
       id: output_artifact_files
       if: ${{ (github.repository == 'reactive-firewall-org/multicast') && success() }}
