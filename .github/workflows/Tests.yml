@@ -1358,8 +1358,14 @@ jobs:
         python-version: "${{ vars.PYTHON_DEFAULT }}"
     - name: Prep Testing Tox
       id: prep-tox
-      run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then { sudo apt-get update || true ;} ; wait ; { sudo apt-get install --assume-yes python3.10 python3.11 || echo "::warning file=.github/workflows/Tests.yml,line=1362,endLine=1362,title=SKIPPED::SKIP Enhanced TOX Tests." ;} ; wait ; fi
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      with:
+         python-version: |
+           "${{ vars.PYTHON_OLD_MIN }}"
+           "${{ vars.PYTHON_OLD_EXTRA }}"
+           "${{ vars.PYTHON_EXPERIMENTAL }}"
+           "${{ vars.PYTHON_DEFAULT }}"
+         update-environment: false
     - name: Install dependencies for tox
       id: install-tox-deps
       if: ${{ success() }}
