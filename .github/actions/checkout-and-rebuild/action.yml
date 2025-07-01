@@ -129,6 +129,8 @@ runs:
     - id: verify_artifact_source
       name: "Verify Build Files"
       shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
       run: |
         gh attestation verify --owner reactive-firewall-org "${{ steps.fetch_artifact_files.outputs.download-path }}"
     - name: "Enumerate Fetched Files"

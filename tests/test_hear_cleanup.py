@@ -147,6 +147,8 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 						group=self.TEST_MULTICAST_GROUP, port=_fixture_port_num,
 						ttl=1, data="STOP Test",
 					)
+					if not didSend:  # pragma: no branch
+						raise unittest.SkipTest("Can't test without transmitting") from None
 					p.join(self.STOP_DELAY_SECONDS)
 					p_tick += 1
 				self.assertFalse(p.is_alive())
