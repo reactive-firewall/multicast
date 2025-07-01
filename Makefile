@@ -402,7 +402,7 @@ test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -m flake8 --extend-ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source --extend-exclude=lib/* || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTHON) -m flake8 --extend-ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source --extend-exclude=bin/activate_this.py,lib/* || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)tests/check_spelling || true

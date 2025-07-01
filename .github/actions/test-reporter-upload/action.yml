@@ -42,10 +42,16 @@ inputs:
     required: true
   codeclimate-token:  # deprecated in v2.0.9a7
     description: "UNUSED"
+    deprecationMessage: |
+      This input is deprecated as of v2.0.9a7 and will be removed in a future release.
+      CodeClimate support has been discontinued.
     default: ''
     required: false
   cc-test-reporter-id:  # deprecated in v2.0.9a7
     description: "UNUSED"
+    deprecationMessage: |
+      This input is deprecated as of v2.0.9a7 and will be removed in a future release.
+      CodeClimate support has been discontinued.
     default: ''
     required: false
   deepsource-dsn:

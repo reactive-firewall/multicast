@@ -55,6 +55,7 @@ try:
 except ImportError as baton:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from baton
 
+
 _has_docs: bool = False
 """
 This module optionally provides extra test cases for the docs.utils module, focusing on the
@@ -74,6 +75,7 @@ utils.sanitize_url method for url encoding.
 	python tests (as software), are NOT covered by the same Licensed. Assembly may be required.
 """
 
+
 if not _has_docs:
 	try:
 		import docs.utils
@@ -87,7 +89,7 @@ def onlyIfHasDocs(has_docs: bool) -> callable:
 	Conditionally enable a test suite class based on the availability of the multicast docs library.
 
 	If the provided flag is False, returns a dummy class with a placeholder method that does nothing,
-	allowing tests dependent on hypothesis to be safely bypassed. If the provided flag is True,
+	allowing tests dependent on docs to be safely bypassed. If the provided flag is True,
 	the original class is returned unchanged.
 
 	Arguments:
@@ -95,7 +97,15 @@ def onlyIfHasDocs(has_docs: bool) -> callable:
 
 	Returns:
 		callable: A decorator function that returns either the original class or a dummy class
-		with a placeholder method, depending on the has_hypothesis flag.
+		with a placeholder method, depending on the has_docs flag.
+
+	Meta-Testing:
+
+		>>> @onlyIfHasDocs(has_docs=False)
+		... class TestClass: pass
+		>>> hasattr(TestClass(), 'method')
+		True
+
 	"""
 	def decorator(cls: callable) -> callable:
 		if not has_docs:
@@ -108,7 +118,7 @@ def onlyIfHasDocs(has_docs: bool) -> callable:
 
 
 @context.markWithMetaTag("extra", "security")
-@onlyIfHasDocs(_has_docs)
+@onlyIfHasDocs(has_docs=_has_docs)
 class ExtraDocsUtilsTestSuite(context.BasicUsageTestSuite):
 	"""Test cases for docs.utils module."""
 
