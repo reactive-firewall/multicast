@@ -233,7 +233,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			self.server = multicast.hear.McastServer(server_address, None, False)
 			self.server.shutdown = MagicMock()  # Mock the shutdown method
 			client_address = (self.get_default_ip(), _fixture_port_num)
-			# Mock a request not containing "STOP"
+			# Mock a request containing "STOP"
 			request = ("Any other message with O, P, S, T", multicast.genSocket())
 			# Add assertions for initial state
 			self.assertIsNotNone(request[1], "Socket should be created")
