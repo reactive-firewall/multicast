@@ -207,6 +207,50 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 				s.close()
 		return ip
 
+	def test_should_not_invoke_kill_func_when_handle_error_not_called(self) -> None:
+		"""Test that handle_error only conditionally calls kill_func on stop keyword.
+
+		Verifies that the server properly handles mocked requests without
+		the STOP command and never calls the kill_func to free up server resources early.
+
+		Args:
+			None (self is implicit)
+
+		Returns:
+			None
+
+		Raises:
+			AssertionError: If the test conditions are not met.
+		"""
+		theResult = False
+		fail_fixture = "Mock(MSG) --> Handler-HEAR --> early shutdown"
+		_fixture_port_num = self._the_test_port
+		try:
+			self.assertIsNotNone(_fixture_port_num)
+			self.assertIsInstance(_fixture_port_num, int)
+			# Create an instance of McastServer
+			server_address = (self.TEST_MULTICAST_GROUP, _fixture_port_num)
+			self.server = multicast.hear.McastServer(server_address, None, False)
+			self.server.shutdown = MagicMock()  # Mock the shutdown method
+			client_address = (self.get_default_ip(), _fixture_port_num)
+			# Mock a request not containing "STOP"
+			request = ("Any other message with O, P, S, T", multicast.genSocket())
+			# Add assertions for initial state
+			self.assertIsNotNone(request[1], "Socket should be created")
+			self.assertIsInstance(request[0], str, "Request should be a string")
+			try:
+				self.server.handle_error(request, client_address)
+				# Assert that the shutdown method was called
+				self.server.shutdown.assert_not_called()
+				theResult = True
+			finally:
+				# Clean up
+				self.server.server_close()
+		except Exception as _cause:
+			context.debugtestError(_cause)
+			self.fail(fail_fixture)
+		self.assertTrue(theResult, fail_fixture)
+
 	def test_should_invoke_kill_func_when_handle_error_called(self) -> None:
 		"""Test that kill_func calls shutdown on the server instance.
 
