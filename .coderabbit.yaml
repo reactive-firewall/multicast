@@ -86,7 +86,7 @@ reviews:
         message prefixed with "[DOCUMENTATION] "
     - label: CI
       instructions: >-
-        Apply whenever project CI/CD components (namely GitHub Action source-code) is
+        Apply whenever any project CI/CD components (namely GitHub Action source-code) are
         updated by the PR/MR. Also apply when PR contains a commit with a commit
         message prefixed with "[CI] "
     - label: Linter
@@ -179,8 +179,8 @@ reviews:
         4. Consider these 'requirements.txt' files the records of truth regarding project
            dependencies.
         5. Consider the 'requirements.txt' file in the base of the git repository
-           (e.g., './requirements.txt') the required python dependencies regarding Multicast project
-           dependencies.
+           (e.g., './requirements.txt') the required python dependencies regarding Multicast
+           project dependencies.
     - path: tests/requirements.txt
       instructions: >-
         1. The multicast project's own dependencies are recorded in './requirements.txt'

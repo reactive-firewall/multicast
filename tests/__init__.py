@@ -60,7 +60,7 @@
 		>>> output = _tests.get_test_suite()
 		>>> output is not None
 		True
-		>>> type(output) == type(_unittest.TestSuite())
+		>>> isinstance(output, _unittest.TestSuite)
 		True
 		>>>
 

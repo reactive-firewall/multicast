@@ -56,7 +56,7 @@ except ImportError as baton:  # pragma: no branch
 	raise ImportError("[CWE-758] Failed to import test context") from baton
 
 
-_has_docs: bool = False
+_HAS_DOCS: bool = False
 """
 This module optionally provides extra test cases for the docs.utils module, focusing on the
 utils.sanitize_url method for url encoding.
@@ -76,12 +76,12 @@ utils.sanitize_url method for url encoding.
 """
 
 
-if not _has_docs:
+if not _HAS_DOCS:
 	try:
 		import docs.utils
-		_has_docs = True
+		_HAS_DOCS = True
 	except ImportError:  # pragma: no branch
-		_has_docs = False
+		_HAS_DOCS = False
 
 
 def onlyIfHasDocs(has_docs: bool) -> callable:
@@ -118,7 +118,7 @@ def onlyIfHasDocs(has_docs: bool) -> callable:
 
 
 @context.markWithMetaTag("extra", "security")
-@onlyIfHasDocs(has_docs=_has_docs)
+@onlyIfHasDocs(has_docs=_HAS_DOCS)
 class ExtraDocsUtilsTestSuite(context.BasicUsageTestSuite):
 	"""Test cases for docs.utils module."""
 

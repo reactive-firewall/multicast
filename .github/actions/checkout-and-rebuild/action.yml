@@ -40,22 +40,22 @@ inputs:
     required: true
 outputs:
   branch-name:
-    description: "The name of the branch that was checked-out"
+    description: "The name of the branch that was checked-out."
     value: ${{ steps.output_branch_name.outputs.branch-name || '' }}
   sha:
-    description: "The SHA of the commit checked-out"
+    description: "The SHA of the commit checked-out."
     value: ${{ steps.output_sha.outputs.sha || 'HEAD' }}
   python-version:
     description: "The python version that was used in the run."
     value: ${{ steps.cp313.outputs.python-version || '' }}
   python-path:
-    description: "The python version that was installed in the run"
+    description: "Absolute path to the Python executable installed for the run."
     value: ${{ steps.cp313.outputs.python-path }}
   artifact-name:
     description: "The downloaded artifact-name"
     value: "multicast-build-${{ steps.output_sha.outputs.sha }}.zip"
   artifact-files:
-    description: "The downloaded artifact-files"
+    description: "The downloaded artifact-files."
     value: ${{ steps.output_artifact_files.outputs.files }}
 
 runs:

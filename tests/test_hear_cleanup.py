@@ -177,12 +177,20 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 	def get_default_ip() -> str:
 		"""Get the default IP address of the machine.
 
+		Determines the machine's default IP address by creating a UDP socket connection
+		to a reserved test IP address and retrieving the local socket address.
+
+		Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance. Port 59095 is chosen as an
+		arbitrary high port number.
+
+		Args:
+			None
+
 		Returns:
 			str: The IP address of the default network interface.
 
-		Note:
-			Uses 203.0.113.1 (TEST-NET-3) for RFC 5737 compliance.
-			Port 59095 is chosen as an arbitrary high port number.
+		Raises:
+			CommandExecutionError: If the IP address cannot be determined.
 		"""
 		s = None
 		try:
@@ -192,7 +200,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			s.connect(("203.0.113.1", 59095))
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
-		except socket.error as _cause:
+		except socket.error as _cause:  # pragma: no branch
 			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from _cause
 		finally:
 			if s is not None:
@@ -202,8 +210,17 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 	def test_should_invoke_kill_func_when_handle_error_called(self) -> None:
 		"""Test that kill_func calls shutdown on the server instance.
 
-		Verifies that the server properly handles requests without
+		Verifies that the server properly handles mocked requests with
 		the STOP command and calls the kill_func to free up server resources.
+
+		Args:
+			None (self is implicit)
+
+		Returns:
+			None
+
+		Raises:
+			AssertionError: If the test conditions are not met.
 		"""
 		theResult = False
 		fail_fixture = "Mock(STOP) --> Handler-HEAR --X shutdown"
@@ -212,7 +229,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			self.assertIsNotNone(_fixture_port_num)
 			self.assertIsInstance(_fixture_port_num, int)
 			# Create an instance of McastServer
-			server_address = ('224.0.0.1', _fixture_port_num)
+			server_address = (self.TEST_MULTICAST_GROUP, _fixture_port_num)
 			self.server = multicast.hear.McastServer(server_address, None, False)
 			self.server.shutdown = MagicMock()  # Mock the shutdown method
 			client_address = (self.get_default_ip(), _fixture_port_num)
