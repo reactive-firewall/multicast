@@ -31,9 +31,6 @@ updates:
         dependency-type: "production"
     ignore:
       - dependency-name: "*"
-        dependency-type: "development"
-      - dependency-name: "*"
-        dependency-type: "indirect"
     assignees:
       - "reactive-firewall"
     commit-message:
@@ -100,9 +97,6 @@ updates:
         dependency-type: "development"
     ignore:
       - dependency-name: "*"
-        dependency-type: "direct"
-      - dependency-name: "*"
-        dependency-type: "indirect"
     assignees:
       - "reactive-firewall"
     commit-message:
