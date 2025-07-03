@@ -35,7 +35,7 @@ reviews:
     - Verify that technical documentation includes a "References" section at
       the end of documentation, using the same format as actual RFCs, with
       both "Normative References" and "Informative References". Suggest improvements if unable.
-    - Ensure that that project documentation and comments follow
+    - Ensure that the project documentation and source-code comments follow
       [CEP-7](https://gist.github.com/reactive-firewall/123b8a45f1bdeb064079e0524a29ec20)
 
     # Test Code Review Instructions

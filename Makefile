@@ -261,13 +261,13 @@ test: just-test
 
 test-mats: test-mat
 	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine --keep ./coverage_* 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) combine --append 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) combine --data-file=coverage_mats ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+	$(QUIET)$(COVERAGE) combine --keep --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
 	$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
-	$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-tox: build
+test-tox: ./dist
 	$(QUIET)$(PYTHON) -m tox -v --stderr-color RESET -- ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -414,8 +414,13 @@ must_have_flake:
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
 must_have_pytest: init
-	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
-	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
+		if test $$runner -le 0 ; then \
+			$(ECHO) "No python framework (pytest) found for test." ; \
+			exit 126 ; \
+		fi ; \
+	fi
 
 cleanup-dev-backups::
 	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || :

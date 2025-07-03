@@ -45,6 +45,7 @@ jobs:
       LANG: "en_US.UTF-8"
       BUILD_MATCH_PATTERN: "${{ vars.BUILD_MATCH_PATTERN }}"
     outputs:
+      build_environment: ${{ env.ENVIRONMENT }}
       build_status: ${{ steps.build.outcome }}
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
       artifact-url: ${{ steps.upload.outputs.artifact-url }}
@@ -173,7 +174,7 @@ jobs:
             experimental: false
           - python-version: "${{ vars.PYTHON_EXPERIMENTAL }}"
             lang-var: "en_US.utf-8"
-            experimental: ${{ (needs.BUILD.environment == 'Experimenting') }}
+            experimental: ${{ (needs.BUILD.outputs.build_environment == 'Experimenting') }}
     outputs:
       bootstrap_status: ${{ steps.bootstrap.outcome }}
     env:
@@ -247,7 +248,7 @@ jobs:
       attestations: write
     needs: [BUILD]
     runs-on: ubuntu-latest
-    environment: ${{ needs.BUILD.envs.ENVIRONMENT }}
+    environment: ${{ needs.BUILD.outputs.build_environment }}
     if: ${{ !cancelled() && (github.repository == 'reactive-firewall-org/multicast') }}
     outputs:
       build-artifact-attestation-url: ${{ steps.multicast-build-attest.outputs.attestation-url }}
@@ -286,7 +287,7 @@ jobs:
       pull-requests: read
     needs: [BUILD, BOOTSTRAP, BUILD_ATTEST]
     runs-on: ubuntu-latest
-    environment: ${{ needs.BUILD.envs.ENVIRONMENT }}
+    environment: ${{ needs.BUILD.outputs.build_environment }}
     if: ${{ !cancelled() }}
     outputs:
       didBUILD: ${{ steps.check_status.outputs.build_success }}

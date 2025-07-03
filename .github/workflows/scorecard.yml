@@ -1,5 +1,5 @@
 # .github/workflows/scorecard.yml
-# Referance: https://github.com/ossf/scorecard/blob/main/.github/workflows/scorecard-analysis.yml
+# Reference: https://github.com/ossf/scorecard/blob/main/.github/workflows/scorecard-analysis.yml
 ---
 name: Scorecard analysis workflow
 on:  # yamllint disable-line rule:truthy

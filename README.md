@@ -153,9 +153,8 @@ print('Received:', message)
 # setup console logging as example
 import logging
 multicast_logging_sink = logging.getLogger()
-handler = logging.StreamHandler()
-multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
 handler = logging.StreamHandler()  # example trivial log handler
+multicast_logging_sink.setLevel(logging.INFO)  # increase default logging from multicast module
 multicast_logging_sink.addHandler(handler)
 
 # import multicast

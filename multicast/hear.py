@@ -654,7 +654,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		By default:
 			Processes the incoming data from the client, logs the messages,
 			and sends a response back. If the data contains the
-			keyword "STOP", it raises a `RuntimeError` to
+			keyword "STOP", it raises a `ShutdownCommandReceived` to
 			initiate server shutdown.
 			Silently ignores any UnicodeDecodeError when decoding data.
 			Returns early if data or socket is None.

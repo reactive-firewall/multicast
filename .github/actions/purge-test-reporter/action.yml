@@ -78,7 +78,7 @@ runs:
         DEEPSOURCE_DSN: ${{ github.server_url == 'https://github.com' && inputs.deepsource-dsn || '' }}
       run: |
         ${{ github.workspace }}/.github/tools/fetch-test-reporter/purge-test-reporter || exit $?
-    - name: "Evaluate Fetch Task"
+    - name: "Evaluate Purge Task"
       id: purge_outcome
       if: ${{ !cancelled() }}
       shell: bash
