@@ -57,7 +57,7 @@ automated analysis.
 
 > [!CAUTION]
 > The Appveyor integration is still experimental, as the multicast module is not currently able to
-> support running on Windows.
+> support running on Windows without Python socket support.
 
 | Triggers | Jobs |
 |--------|--------|
@@ -134,7 +134,7 @@ A configuration file that processes the build artifacts to create:
 5. [CI-Tests.yml](https://github.com/reactive-firewall-org/multicast/tree/HEAD/.github/workflows/Tests.yml):
 A configuration file for executing tests, which processes the build artifacts to create:
   A. Coverage reports: Uploading various coverage reports for the tests executed to multiple
-  services for analysis (e.g., codecov.io, codeclimate.com, app.deepsource.io, etc.).
+  services for analysis (e.g., codecov.io, coveralls.io, app.deepsource.io, etc.).
   B. Test-Results-Artifacts
   (`{{ test-group }}`-Test-Report-`{{ matrix.os }}`-`{{ matrix.python-version }}`):
   Contains the results of the tests grouped by `coverage|doctests|integration`, `os` and
@@ -266,10 +266,6 @@ graph TD;
 
   subgraph "3rd-Party Integrations"
 
-  subgraph "CodeClimate service"
-  CodeClimate-->CodeClimate-Metrics;
-  end
-
   subgraph "CodeCov service"
   CodeCov-->CodeCov-Metrics;
   end
@@ -282,7 +278,7 @@ graph TD;
   Coveralls-->Coveralls-Metrics;
   end
 
-  COVERAGE-->CodeClimate & CodeCov & DeepSource & Coveralls;
+  COVERAGE-->CodeCov & DeepSource & Coveralls;
 
   subgraph "GHA Marketplace"
   bandit.yml--oPython-Bandit-Scan;
@@ -308,7 +304,6 @@ graph TD;
   shellcheck.yml-->GH-Checks;
 
   CodeCov-->GH-Checks;
-  CodeClimate-->GH-Checks;
   DeepSource-->GH-Checks;
   end
 

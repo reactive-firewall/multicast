@@ -40,16 +40,20 @@ inputs:
       - Linux
       - Windows
     required: true
-  codeclimate-token:
-    description: |
-      The token used to authenticate when performing codeclimate API operations.
+  codeclimate-token:  # deprecated in v2.0.9a7
+    description: "UNUSED"
+    deprecationMessage: |
+      This input is deprecated as of v2.0.9a7 and will be removed in a future release.
+      CodeClimate support has been discontinued.
     default: ''
-    required: true
-  cc-test-reporter-id:
-    description: |
-      The id used to report tests when performing codeclimate API operations.
+    required: false
+  cc-test-reporter-id:  # deprecated in v2.0.9a7
+    description: "UNUSED"
+    deprecationMessage: |
+      This input is deprecated as of v2.0.9a7 and will be removed in a future release.
+      CodeClimate support has been discontinued.
     default: ''
-    required: true
+    required: false
   deepsource-dsn:
     description: |
       The deepsource DSN when performing deepsource API operations.
@@ -78,9 +82,9 @@ outputs:
   coverage_upload_codecov_outcome:
     description: "The outcome of the CodeCov coverage test reporter action."
     value: ${{ steps.coverage-codecov-upload.outcome || 'cancelled' }}
-  coverage_upload_codeclimate_outcome:
-    description: "The outcome of the CodeClimate coverage test reporter action."
-    value: ${{ steps.coverage-codeclimate-upload.outcome || 'cancelled' }}
+  coverage_upload_codeclimate_outcome:  # deprecated in v2.0.9a7
+    description: "The outcome of the CodeClimate coverage test reporter action. ALWAYS skipped."
+    value: 'skipped'
   coverage_upload_deepsource_outcome:
     description: "The outcome of the DeepSource coverage test reporter action."
     value: ${{ steps.coverage-deepsource-upload.outcome || 'cancelled' }}
@@ -140,6 +144,13 @@ runs:
           printf "::debug::%s\n" "Identified ${OS}"
         fi
         printf "%s\n" "OS=${OS}" >> "$GITHUB_ENV"
+    - id: output_branch_name
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: |
+        printf "branch-name=%s\n" $(git name-rev --name-only HEAD 2>/dev/null | cut -d~ -f1-1) >> "$GITHUB_OUTPUT"
+        printf "::debug::%s %s\n" "Will report coverage as branch " $(git name-rev --name-only HEAD | cut -d~ -f1-1)
+        printf "BUILD_BRANCH=%s\n" $(git name-rev --name-only HEAD 2>/dev/null | cut -d~ -f1-1) >> "$GITHUB_ENV"
     - name: "Prepare Artifact Name"
       id: output_artifact_name
       if: ${{ !cancelled() }}
@@ -161,8 +172,9 @@ runs:
           if [[ -x ${{ github.workspace }}/cc-test-reporter ]] ; then
             printf "can_upload_to_codeclimate=true\n" >> "$GITHUB_OUTPUT"
             printf "::debug::%s\n" "Found ${{ github.workspace }}/cc-test-reporter"
+            printf "::warning title='Unexpected tool':: %s\n" "Can't use cc-test-reporter tool."
           else
-            printf "::warning title='Missing tool':: %s\n" "Can't find cc-test-reporter tool."
+            printf "::debug:: %s\n" "Can't find cc-test-reporter tool. This is normal."
             printf "can_upload_to_codeclimate=false\n" >> "$GITHUB_OUTPUT"
           fi
           LOCALBIN="${{ github.workspace }}/bin"
@@ -249,7 +261,6 @@ runs:
       run: |
         if [[ "${OS}" != "unknown" ]] ; then
           if [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codecov }}" == "true" ]] || \
-             [[ "${{ steps.output_upload_tools.outputs.can_upload_to_codeclimate }}" == "true" ]] || \
              [[ "${{ steps.output_upload_tools.outputs.can_upload_to_coveralls }}" == "true" ]] || \
              [[ "${{ steps.output_upload_tools.outputs.can_upload_to_deepsource }}" == "true" ]] ; then
             THE_RESULT="success"
@@ -289,6 +300,9 @@ runs:
         token: ${{ inputs.codecov-token }}
         job_code: ${{ inputs.job_code || '' }}
         override_commit: ${{ steps.output_sha.outputs.sha }}
+        override_branch: ${{ steps.output_branch_name.outputs.branch-name }}
+        report_type: 'coverage'
+        slug: 'reactive-firewall-org/multicast'
         files: ./coverage.xml,./test-reports/coverage.xml
         directory: ${{ github.workspace }}
         flags: multicast
@@ -306,19 +320,6 @@ runs:
         compression-level: 9
         retention-days: 2
         overwrite: true
-    - name: Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} coverage to code-climate
-      if: ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codeclimate == 'true') && (steps.output_os.outputs.os != 'Windows') && (github.repository == 'reactive-firewall-org/multicast') }}
-      id: coverage-codeclimate-upload
-      shell: bash
-      env:
-        CODECLIMATE_REPO_TOKEN: ${{ github.server_url == 'https://github.com' && inputs.codeclimate-token || '' }}
-        CC_TEST_REPORTER_ID: ${{ github.server_url == 'https://github.com' && inputs.cc-test-reporter-id || '' }}
-      run: |
-        if [[ "${{ inputs.tests-outcome }}" == "success" ]] ; then
-          ./cc-test-reporter after-build --exit-code 0 || exit 1 ;
-        else
-          ./cc-test-reporter after-build --exit-code 1 || exit 1 ;
-        fi
     - name: Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} coverage to deepsource
       if: ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_deepsource == 'true') && (steps.output_os.outputs.os != 'Windows') && (github.repository == 'reactive-firewall-org/multicast') }}
       id: coverage-deepsource-upload

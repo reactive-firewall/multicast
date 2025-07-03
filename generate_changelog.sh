@@ -64,7 +64,9 @@ ulimit -t 1200
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 # shellcheck disable=SC2086
 LANG=${LANG:-"en_US"}
-LC_ALL="${LANG:0:5}.utf-8"
+LC_ALL="${LC_ALL:-en_US.utf-8}"
+LC_CTYPE="${LC_CTYPE:-${LC_ALL:-en_US.utf-8}}"
+LC_COLLATE="${LC_COLLATE:-${LC_ALL:-en_US.utf-8}}"
 umask 137
 
 # Function to check if a command exists.

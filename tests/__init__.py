@@ -46,6 +46,23 @@
 		True
 		>>>
 
+	Testcase 1: Load tests
+
+		>>> import tests as _tests
+		>>> _tests.__module__ is not None
+		True
+		>>> import unittest as _unittest
+		>>> _tests.TEST_GROUPS is not None
+		True
+		>>> _tests.get_test_suite is not None
+		True
+		>>>
+		>>> output = _tests.get_test_suite()
+		>>> output is not None
+		True
+		>>> isinstance(output, _unittest.TestSuite)
+		True
+		>>>
 
 """
 
@@ -261,7 +278,7 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 		>>>
 
 	"""
-	if not module:
+	if not module:  # pragma: no branch
 		return None
 	try:
 		if 'doctest' not in sys.modules:
@@ -274,7 +291,7 @@ def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
 	doc_suite = unittest.TestSuite()
 	try:
 		doc_suite.addTests(doctest.DocTestSuite(module=module, test_finder=finder))
-	except ValueError as _cause:
+	except ValueError as _cause:  # pragma: no branch
 		# ValueError is raised when no tests are found
 		_LOGGER.warning(
 			"No doctests found in %s: %s",  # lazy formatting to avoid PYL-W1203

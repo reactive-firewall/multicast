@@ -68,6 +68,10 @@ ifeq "$(LINK)" ""
 	LINK=ln -sf
 endif
 
+ifndef PYTHONUTF8
+	PYTHONUTF8 := 1
+endif
+
 ifeq "$(PYTHON)" ""
 	PY_CMD=$(COMMAND) python3
 	ifneq "$(PY_CMD)" ""
@@ -101,6 +105,14 @@ ifndef DOCTEST_ARGS
 endif
 
 ifndef PIP_COMMON_FLAGS
+	# Define probable pip install flags based on python command
+	ifneq "$(PY_CMD)" ""
+		# Define probable pip install flags
+		PIP_PREFIX_FLAGS := --python "$(PY_CMD)" --no-input
+	else
+		# Define common pip install flags
+		PIP_PREFIX_FLAGS := --python "$(PYTHON)" --no-input
+	endif
 	# Define common pip install flags
 	PIP_COMMON_FLAGS := --use-pep517 --exists-action s --upgrade --upgrade-strategy eager
 endif
@@ -111,7 +123,8 @@ ifeq ($(shell uname),Darwin)
 	PIP_VERSION := $(shell $(PYTHON) -m pip --version | awk '{print $2}')
 	PIP_MAJOR := $(word 2,$(subst ., ,$(PIP_VERSION)))
 	PIP_MINOR := $(word 3,$(subst ., ,$(PIP_VERSION)))
-	ifeq ($(shell [ $(PIP_MAJOR) -gt 24 ] || { [ $(PIP_MAJOR) -eq 24 ] && [ $(PIP_MINOR) -ge 3 ]; }), 0)
+	# --break-system-packages was added to pip in version 23.0.1 so check for 23.1+
+	ifeq ($(shell [ $(PIP_MAJOR) -ge 24 ] || { [ $(PIP_MAJOR) -eq 23 ] && [ $(PIP_MINOR) -ge 1 ]; } && printf "%d" 1 || printf "%d" 0), 1)
 		PIP_ENV_FLAGS := --break-system-packages
 	else
 		PIP_ENV_FLAGS :=
@@ -192,7 +205,7 @@ MANIFEST.in: init
 	$(QUIET)$(ECHO) "prune docs" >>"$@" ;
 
 build: init ./pyproject.toml MANIFEST.in
-	$(QUIET)$(PYTHON) -W ignore -m build --installer=pip ./ || $(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
+	$(QUIET)$(PYTHON) -W ignore -m build --installer=pip ./ || $(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ || DO_FAIL="exit 125" ;
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
@@ -204,17 +217,19 @@ branding::
 	$(QUIET)$(ECHO) ""
 
 init: branding
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=24.3.1" "setuptools>=80.4" "wheel>=0.45" "build>=1.2.1" 2>$(ERROR_LOG_PATH) || :
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip $(PIP_PREFIX_FLAGS) install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) "pip>=25.1.1" "setuptools>=80.9" "wheel>=0.45" "build>=1.2.1" || DO_FAIL="exit 69" ;  # 69: [pip] Service unavailable - does not exist.
+	$(QUIET)$(DO_FAIL) 2>$(ERROR_LOG_PATH) >>/dev/null ;
+	$(QUIET)$(PYTHON) -m pip $(PIP_PREFIX_FLAGS) install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r requirements.txt 2>$(ERROR_LOG_PATH) || DO_FAIL="exit 69" ;  # 69: [pip] Service unavailable - does not exist.
+	$(QUIET)$(DO_FAIL) 2>$(ERROR_LOG_PATH) >>/dev/null ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: init ./dist
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) dist/multicast-*-py3-*.whl
+	$(QUIET)$(PYTHON) -m pip $(PIP_PREFIX_FLAGS) install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) dist/multicast-*-py3-*.whl
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 $(PIP_ENV_FLAGS) --no-input -y multicast 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(PYTHON) -m pip $(PIP_PREFIX_FLAGS) uninstall --use-pep517 $(PIP_ENV_FLAGS) -y multicast 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -240,26 +255,28 @@ purge: purge-coverage-artifacts purge-test-reports
 	$(QUIET)$(WAIT) ;
 
 test: just-test
-	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(DO_FAIL) 2>$(ERROR_LOG_PATH) >>/dev/null ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-mats: test-mat
 	$(QUIET)$(DO_FAIL) ;
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) combine --data-file=coverage_mats ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+	$(QUIET)$(COVERAGE) combine --keep --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
+	$(QUIET)$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-tox: build
-	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>$(ERROR_LOG_PATH)
-	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+test-tox: ./dist
+	$(QUIET)$(PYTHON) -m tox -v --stderr-color RESET -- ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports:
 	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(BSMARK) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)test -d "$@" || DO_FAIL="exit 77" ;  # 77: Permission denied - can't verify directory.
+	$(QUIET)test -e "$@" || DO_FAIL="exit 69" ;  # 69: [test] Service unavailable - does not exist.
+	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: test-reports init
@@ -272,11 +289,17 @@ docs-reqs: ./docs/ ./docs/requirements.txt init
 	$(QUIET)$(WAIT) ;
 
 # === Test Group Targets ===
-just-test: cleanup MANIFEST.in ## Run all minimum acceptance tests
+just-test: cleanup MANIFEST.in test-reports ## Run all minimum acceptance tests
 	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
 		$(PYTEST) $(COVERAGE_ARGS) || DO_FAIL="exit 2" ; \
 	else \
-		$(COVERAGE) run -p --source=multicast -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ; \
+		$(COVERAGE) run -p --source=multicast -m tests.run_selective || DO_FAIL="exit 2" ; \
+		$(WAIT) ; \
+		$(DO_FAIL) ; \
+		$(COVERAGE) combine --keep --data-file=coverage_all ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) combine --append ./coverage_* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) report -m --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
+		$(COVERAGE) xml  -o test-reports/coverage.xml --include=multicast/* 2>$(ERROR_LOG_PATH) || : ; \
 	fi
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
@@ -292,6 +315,7 @@ test-mat-doctests: test-reports MANIFEST.in ## Run doctests MAT category (doctes
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category doctests || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_doctests ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_doctests.xml --include=multicast/* --data-file=coverage_doctests 2>$(ERROR_LOG_PATH) || : ; \
@@ -305,6 +329,7 @@ test-mat-%: MANIFEST.in ## Run specific MAT category (basic|doctests|say|hear|us
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group mat --category $* || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_$* ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_$*.xml --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
@@ -318,6 +343,7 @@ test-extra: ## Run all extra tests
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_extra ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_extra 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_extra.xml --include=multicast/* --data-file=coverage_extra 2>$(ERROR_LOG_PATH) || : ; \
@@ -331,6 +357,7 @@ test-extra-%: ## Run specific extra test category
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group extra --category $* || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_$* ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_$*.xml --include=multicast/* --data-file=coverage_$* 2>$(ERROR_LOG_PATH) || : ; \
@@ -344,6 +371,7 @@ test-fuzzing: ## Run all fuzzing tests
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group fuzzing || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_fuzzing ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_fuzzing 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_fuzzing.xml --include=multicast/* --data-file=coverage_fuzzing 2>$(ERROR_LOG_PATH) || : ; \
@@ -357,6 +385,7 @@ test-perf: ## Run all performance tests
 	else \
 		$(COVERAGE) run -p --source=multicast -m tests.run_selective --group performance || DO_FAIL="exit 2" ; \
 		$(WAIT) ; \
+		$(DO_FAIL) ; \
 		$(COVERAGE) combine --keep --data-file=coverage_performance ./.coverage.* 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) report -m --include=multicast/* --data-file=coverage_performance 2>$(ERROR_LOG_PATH) || : ; \
 		$(COVERAGE) xml -o test-reports/coverage_performance.xml --include=multicast/* --data-file=coverage_performance 2>$(ERROR_LOG_PATH) || : ; \
@@ -373,7 +402,7 @@ test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup must_have_flake
-	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTHON) -m flake8 --extend-ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source --extend-exclude=bin/activate_this.py,lib/* || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)tests/check_spelling || true
@@ -385,8 +414,13 @@ must_have_flake:
 	if test $$runner -le 0 ; then $(ECHO) "No Linter found for test." ; exit 126 ; fi
 
 must_have_pytest: init
-	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
-	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
+	$(QUIET)if [ -n "$$TESTS_USE_PYTEST" ]; then \
+		runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
+		if test $$runner -le 0 ; then \
+			$(ECHO) "No python framework (pytest) found for test." ; \
+			exit 126 ; \
+		fi ; \
+	fi
 
 cleanup-dev-backups::
 	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || :
