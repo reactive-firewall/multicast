@@ -220,6 +220,9 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ needs.check_mats.outputs.build_id }}-${{ github.run_number }}
         override_commit: ${{ needs.check_mats.outputs.build_sha }}
+        override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
+        override_build: ${{ needs.check_mats.outputs.build_id }}
+        override_build_url: ${{ needs.check_mats.outputs.build_url }}
         files: ./coverage.xml,./test-reports/coverage.xml
         directory: .
         env_vars: PYTHON_VERSION
@@ -234,6 +237,9 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ needs.check_mats.outputs.build_id }}-${{ github.run_number }}
         override_commit: ${{ needs.check_mats.outputs.build_sha }}
+        override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
+        override_build: ${{ needs.check_mats.outputs.build_id }}
+        override_build_url: ${{ needs.check_mats.outputs.build_url }}
         files: ./coverage.xml,./test-reports/coverage.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
@@ -475,6 +481,9 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         job_code: ${{ needs.check_mats.outputs.build_id }}-${{ github.run_number }}
         override_commit: ${{ needs.check_mats.outputs.build_sha }}
+        override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
+        override_build: ${{ needs.check_mats.outputs.build_id }}
+        override_build_url: ${{ needs.check_mats.outputs.build_url }}
         files: ./test-reports/coverage_doctests.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
@@ -871,7 +880,7 @@ jobs:
     - name: Re-Generate Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: integration-pytest
       run: |
-        make -j1 -f Makefile test ;
+        make -j1 -f Makefile test || exit 1 ;
         if [[ -r ./coverage.xml ]]; then
           cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
         fi ;
@@ -882,7 +891,7 @@ jobs:
     - name: Generate Functional Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: integration-main
       run: |
-        hash -p ./.github/tool_shlock_helper.sh shlock ;
+        hash -p ./.github/tools/shlock_helper.sh shlock ;
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} integration coverage to Codecov
@@ -893,7 +902,7 @@ jobs:
         job_code: ${{ needs.check_mats.outputs.build_id }}-${{ github.run_number }}
         override_commit: ${{ needs.check_mats.outputs.build_sha }}
         override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
-        override_build_id: ${{ needs.check_mats.outputs.build_id }}
+        override_build: ${{ needs.check_mats.outputs.build_id }}
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
         report_type: 'coverage'
         slug: 'reactive-firewall-org/multicast'
@@ -950,7 +959,11 @@ jobs:
           printf "integration-artifact-name=%s" multicast-integration-${VCS_COMMIT_ID}-part- >> "$GITHUB_OUTPUT"
           printf "%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n" $RANDOM $RANDOM $RANDOM $(($RANDOM & 0x0fff | 0x4000)) $(($RANDOM & 0x3fff | 0x8000)) $RANDOM $RANDOM $RANDOM >> "$GITHUB_OUTPUT"
         fi
-        printf "%s\n" "TESTS_STEP_SUMMARY=Integration-Summary-Artifact-${{ runner.os }}-${PYTHON_VERSION}.txt" >> "$GITHUB_ENV"
+        if [[ -n "$TESTS_USE_PYTEST" ]] ; then
+          printf "%s\n" "TESTS_STEP_SUMMARY=Integration-Summary-Artifact-${{ runner.os }}-${PYTHON_VERSION}-pytest.txt" >> "$GITHUB_ENV"
+        else
+          printf "%s\n" "TESTS_STEP_SUMMARY=Integration-Summary-Artifact-${{ runner.os }}-${PYTHON_VERSION}.txt" >> "$GITHUB_ENV"
+        fi
     - name: "Evaluate Integration Tests"
       id: integration_tests
       if: ${{ always() }}
@@ -1063,10 +1076,15 @@ jobs:
         else
           printf "%s\n" "  * ${FAIL_ICON} Functional testing failed" >> "$TESTS_STEP_SUMMARY"
         fi
-        if [[ "${{ steps.integration-pytest.outcome }}" == "success" ]] ; then
-          printf "%s\n" "  * ${PASS_ICON} Acceptance testing with \`pytest\` succeeded" >> "$TESTS_STEP_SUMMARY"
+        if [[ -n "$TESTS_USE_PYTEST" ]] ; then
+          WITH_WORD="with" ;
         else
-          printf "%s\n" "  * ${FAIL_ICON} Acceptance testing with \`pytest\` failed" >> "$TESTS_STEP_SUMMARY"
+          WITH_WORD="without" ;
+        fi
+        if [[ "${{ steps.integration-pytest.outcome }}" == "success" ]] ; then
+          printf "%s\n" "  * ${PASS_ICON} Acceptance testing ${WITH_WORD} \`pytest\` succeeded" >> "$TESTS_STEP_SUMMARY"
+        else
+          printf "%s\n" "  * ${FAIL_ICON} Acceptance testing ${WITH_WORD} \`pytest\` failed" >> "$TESTS_STEP_SUMMARY"
         fi
         if [[ "${{ steps.integration-codecov-results-upload.outcome }}" == "success" ]] ; then
           printf "%s\n" "    * ${PASS_ICON} Uploading integration testing reports artifact succeeded" >> "$TESTS_STEP_SUMMARY"
@@ -1181,12 +1199,28 @@ jobs:
             for TYPE_TAG in "Integration" ; do
               printf "\n" >> "${TESTS_COMMENT_BODY}"
               cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_MIN }}.txt" >> "${TESTS_COMMENT_BODY}" || :
+              if [[ -r ./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_MIN }}-pytest.txt" ]] ; then
+                printf "\n" >> "${TESTS_COMMENT_BODY}"
+                cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_MIN }}-pytest.txt" >> "${TESTS_COMMENT_BODY}" || :
+              fi
               printf "\n" >> "${TESTS_COMMENT_BODY}"
               cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_EXTRA }}.txt" >> "${TESTS_COMMENT_BODY}" || :
+              if [[ -r ./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_EXTRA }}-pytest.txt" ]] ; then
+                printf "\n" >> "${TESTS_COMMENT_BODY}"
+                cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_OLD_EXTRA }}-pytest.txt" >> "${TESTS_COMMENT_BODY}" || :
+              fi
               printf "\n" >> "${TESTS_COMMENT_BODY}"
               cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_DEFAULT }}.txt" >> "${TESTS_COMMENT_BODY}" || :
+              if [[ -r ./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_DEFAULT }}-pytest.txt" ]] ; then
+                printf "\n" >> "${TESTS_COMMENT_BODY}"
+                cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_DEFAULT }}-pytest.txt" >> "${TESTS_COMMENT_BODY}" || :
+              fi
               printf "\n" >> "${TESTS_COMMENT_BODY}"
               cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_EXPERIMENTAL }}.txt" >> "${TESTS_COMMENT_BODY}" || :
+              if [[ -r ./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_EXPERIMENTAL }}-pytest.txt" ]] ; then
+                printf "\n" >> "${TESTS_COMMENT_BODY}"
+                cat <./EXTRAS/"${TYPE_TAG}-Summary-Artifact-${OS_TAG}-${{ vars.PYTHON_EXPERIMENTAL }}-pytest.txt" >> "${TESTS_COMMENT_BODY}" || :
+              fi
               printf "\n" >> "${TESTS_COMMENT_BODY}"
             done ;
           done ;
@@ -1361,10 +1395,10 @@ jobs:
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: |
-         "${{ vars.PYTHON_OLD_MIN }}"
-         "${{ vars.PYTHON_OLD_EXTRA }}"
-         "${{ vars.PYTHON_EXPERIMENTAL }}"
-         "${{ vars.PYTHON_DEFAULT }}"
+          ${{ vars.PYTHON_OLD_MIN }}
+          ${{ vars.PYTHON_OLD_EXTRA }}
+          ${{ vars.PYTHON_EXPERIMENTAL }}
+          ${{ vars.PYTHON_DEFAULT }}
         update-environment: false
     - name: Install dependencies for tox
       id: install-tox-deps
