@@ -247,13 +247,6 @@ jobs:
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}-merge
         verbose: true
         fail_ci_if_error: false
-    - name: Upload Python ${{ matrix.python-version }} Artifact
-      id: coverage-reports-upload
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-      with:
-        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./test-reports/
-        if-no-files-found: ignore
     - id: upload-test-tools
       if: ${{ !cancelled() }}
       uses: ./.github/actions/test-reporter-upload
