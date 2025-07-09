@@ -922,7 +922,7 @@ jobs:
       run: |
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
-      if: ${{ !cancelled() && (matrix.use-pytest == "1") }}
+      if: ${{ !cancelled() && (env.TESTS_USE_PYTEST == '1') }}
       id: integration-codecov-results-upload
       uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
       with:
