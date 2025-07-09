@@ -5,13 +5,13 @@ You are here to help the Python Multicast Project? Awesome, feel welcome and rea
 Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
 
-When reporting an issue, please list the version of Python Multicast Library you are using and any relevant information about your software environment (python version, OS type and version, etc). Also avoid vague language like "it doesn't work." Please describe as specifically as you can what behavior you are actually seeing (eg: an error message? a nil return value?).
+When reporting an issue, please list the version of Python Multicast Library you are using and any relevant information about your software environment (python version, OS type and version, etc). Also avoid vague language like "it doesn't work." Please describe as specifically as you can what behavior you are actually seeing (e.g., an error message? a nil return value?).
 
 
 For all contributions, please respect the following guidelines:
 
 Each pull request should implement ONE feature or bugfix. If you want to add or fix more than one thing, submit more than one pull request.
-- Do not commit changes to files that are irrelevant to your feature or bugfix (eg: .gitignore).
+- Do not commit changes to files that are irrelevant to your feature or bugfix (e.g., .gitignore).
   <details><summary>Always use git stash instead</summary>
 
 ```bash
@@ -70,7 +70,7 @@ the duplicate.
 ##### does not provide enough information
 
 Add the label question if the reported issue does not contain enough information to decide if
-it is valid or not and ask (eg. by commenting on the ticket) for the required information to move
+it is valid or not and ask (e.g., by commenting on the ticket) for the required information to move
 forward. We will re-triage all tickets that have the label question assigned. If the original
 reporter left new information we can try to re-categorize the ticket. If the reporter did not come
 back to provide more required information after a long enough time, we will close the ticket
@@ -85,7 +85,7 @@ back to provide more required information after a long enough time, we will clos
 
 ##### is a valid enhancement proposal
 
-If the ticket contains an enhancement proposal (eg. a new feature, an idea to improve an exsisting
+If the ticket contains an enhancement proposal (e.g., a new feature, an idea to improve an existing
 feature, etc.) that aligns with the goals of Multicast, then add the label `Enhancement`. If the
 proposal seems valid but requires further discussion between core contributors because there
 might be different possibilities on how to implement the enhancement, then also add the

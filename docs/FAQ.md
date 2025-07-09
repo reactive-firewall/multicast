@@ -359,9 +359,9 @@ sequenceDiagram
 #### Required approach - explicit handler setup
 
 > [!IMPORTANT]
-> `logging` must be setup _before_ importing `multicast` or the `NullHandler` setup by `multicast`
-> will be first and still be-able to intercept the module's `logging.LogRecords` just as it
-> normally would.
+> `logging` must be set up _before_ importing `multicast` otherwise the `NullHandler` set up by
+> `multicast` will be first and still be-able to intercept the module's `logging.LogRecords` just
+> as it normally would.
 
 ```python3
 import logging
@@ -448,7 +448,7 @@ work as far as the `multicast` module is concerned.
 * for `RECV` and `HEAR` the port refers to the port to listen on.
 
 > [!CAUTION]
-> It is best to specify the port in use at this time as the default will not be properly
+> It is best to specify the port in use at this time, as the default will not be properly
 > assigned to `multicast` ( see related reactive-firewall-org/multicast#62 ) by any central
 > authority.
 

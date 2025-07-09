@@ -51,7 +51,7 @@ inputs:
     required: true
   summary:
     description: |
-      The check's title. See 'https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run'
+      The check's summary. See 'https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#update-a-check-run'
       for documentation.
     default: ''
     required: true
@@ -228,13 +228,13 @@ runs:
         -f 'output[summary]=${{ inputs.summary }}' -f 'output[text]=${{ inputs.text }}'
         printf "%s\n" "::endgroup::"
     - name: "Update Check"
-      id: compleate_check
+      id: complete_check
       if: ${{ (github.repository == 'reactive-firewall-org/multicast') && (steps.output_check_id.outputs.check_id != '') && (inputs.conclusion != '') }}
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
       run: |
-        printf "%s\n" "::group::compleate-check"
+        printf "%s\n" "::group::complete-check"
         # GitHub CLI api
         # https://cli.github.com/manual/gh_api
         gh api --method PATCH -H "Accept: application/vnd.github+json" \
@@ -263,7 +263,7 @@ runs:
             CHECK_CREATED="false"
           fi
         fi
-        if [[ "${{ steps.compleate_check.outcome }}" == "success" ]] ; then
+        if [[ "${{ steps.complete_check.outcome }}" == "success" ]] ; then
           CHECK_UPDATED="true"
           CHECK_CONCLUDED="true"
           CHECK_OPERATION="completed"
@@ -290,7 +290,7 @@ runs:
               printf "check_outcome=failure\n" >> "$GITHUB_OUTPUT"
               CHECK_OPERATION="uncreated"
             else
-              if [[ "${{ steps.compleate_check.outcome }}" == "failure" ]] ; then
+              if [[ "${{ steps.complete_check.outcome }}" == "failure" ]] ; then
                 printf "check_outcome=failure\n" >> "$GITHUB_OUTPUT"
                 CHECK_OPERATION="uncompleted"
               else

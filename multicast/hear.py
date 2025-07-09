@@ -728,7 +728,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		(data, sock) = self.request
 		if data is None or not sock:
 			return  # nothing to do -- fail fast.
-		else:
+		else:  # skipcq: PYL-R1705 -- otherwise try to decode
 			try:
 				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
 			except UnicodeDecodeError:  # pragma: no cover
@@ -823,7 +823,7 @@ class McastHEAR(multicast.mtool):
 	__prologue__ = "Python Multicast Server for multicast input."
 
 	@classmethod
-	def setupArgs(cls, parser):
+	def setupArgs(cls, parser):  # skipcq: PY-D0003
 		pass  # skipcq - Optional abstract method
 
 	def doStep(self, *args, **kwargs):

@@ -75,8 +75,8 @@ You may obtain a copy of the License at
 ***
 Copyright (c) 2024-2025, Multicast Logo by Mr. Walls.
 Source-code (e.g., xml) is under Apache 2.0 License.
-Rastered variants (e.g., when rendered/cached/etc. as an image with discrete dimensions) are
-the Multicast trademark (Namely Multicast's M like symbol and it's likeness), and some
+Rasterized variants (e.g., when rendered/cached/etc. as an image with discrete dimensions) are
+the Multicast trademark (Namely Multicast's M like symbol and its likeness), and some
 rights are reserved. See the License for the specific language governing permissions and
 limitations under the License.
 You may obtain a copy of the License at

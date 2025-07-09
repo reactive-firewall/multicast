@@ -193,7 +193,7 @@ sole configuration file for the CircleCI jobs:
   are ephemeral and not attested)
   B. test: Tests that the Minimal Acceptance tests pass without failure, (albeit the test details
   are discarded, only the logs remain for a while on CircleCI)
-  C. lint: Selectively lints (See Linting for details) the multicast python source (eg.,
+  C. lint: Selectively lints (See Linting for details) the multicast python source (e.g.,
   `multicast/*.py`), failing on any linter flagged issues or passing on none.
   D. pytest: Runs the now deprecated `make test-pytest` target to discover, and then run,
   unittests via the `pytest` testing framework.

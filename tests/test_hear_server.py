@@ -61,7 +61,7 @@ class McastHearTestSuite(context.BasicUsageTestSuite):
 			s.connect(("203.0.113.1", 59095))
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
-		except socket.error as _cause:
+		except OSError as _cause:
 			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from _cause
 		finally:
 			if s is not None:

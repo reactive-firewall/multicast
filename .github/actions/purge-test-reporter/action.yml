@@ -66,7 +66,7 @@ runs:
           printf "can_purge=true\n" >> "$GITHUB_OUTPUT"
           printf "::debug::%s\n" "Found ${{ github.workspace }}/.github/tools/fetch-test-reporter/purge-test-reporter"
         else
-          printf "::warning, title='Missing tool':: %s\n" "Can't find purge-test-reporter tool."
+          printf "::warning title='Missing tool':: %s\n" "Can't find purge-test-reporter tool."
           printf "can_purge=false\n" >> "$GITHUB_OUTPUT"
         fi
     - name: "Finalize test reporter tools on ${{ runner.os }}"

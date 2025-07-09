@@ -74,7 +74,6 @@ try:
 	import sys
 	import os
 	import unittest
-	from unittest import TestSuite as TestSuite
 	import types
 	from typing import Optional
 except ImportError as _cause:  # pragma: no branch
@@ -121,8 +120,8 @@ try:
 					raise ValueError("Invalid log level") from None  # pragma: no cover
 				# Determine color based on whether the output is a terminal
 				if sys.stdout.isatty():
-					colorPrefix = logging_color[loglevel]
-					endColor = ANSIColors.ENDC
+					colorPrefix = logging_color[loglevel]  # skipcq: TCV-002
+					endColor = ANSIColors.ENDC  # skipcq: TCV-002
 				else:
 					colorPrefix = ""
 					endColor = ""
@@ -224,7 +223,7 @@ except ImportError as _cause:  # pragma: no branch
 	raise ImportError("[CWE-440] context Failed to import.") from _cause
 
 
-def loadDocstringsFromModule(module: types.ModuleType) -> TestSuite:
+def loadDocstringsFromModule(module: types.ModuleType) -> unittest.TestSuite:
 	"""
 	Load and return a test suite containing doctests from the specified module.
 
@@ -412,7 +411,10 @@ TEST_GROUPS = {
 }
 
 
-def get_test_suite(group: Optional[str] = None, category: Optional[str] = None) -> TestSuite:
+def get_test_suite(
+	group: Optional[str] = None,
+	category: Optional[str] = None,
+) -> unittest.TestSuite:
 	"""Get a test suite based on group and category.
 
 	Args:

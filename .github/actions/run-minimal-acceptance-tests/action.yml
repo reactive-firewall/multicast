@@ -13,7 +13,7 @@ inputs:
     default: ${{ github.server_url == 'https://github.com' && github.sha || 'HEAD' }}
   token:
     description: |
-      The token used to authenticate when uploading results from the Minimal Accceptance Testing.
+      The token used to authenticate when uploading results from the Minimal Acceptance Testing.
       When running this action on github.com, the default value is sufficient. When running on
       GHES, you can pass a personal access token for github.com if you are experiencing
       rate limiting.

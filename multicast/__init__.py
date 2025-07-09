@@ -616,13 +616,15 @@ if not hasattr(unicodedata, "normalize"):
 
 if not hasattr(socket, "setdefaulttimeout"):
 	raise ModuleNotFoundError("[CWE-440]: we could not import socket. ABORT.") from None
-else:  # pragma: no branch
-	_tmp_mcast_value = int(_MCAST_DEFAULT_TTL)
+
+try:
+	_tmp_mcast_value: int = int(_MCAST_DEFAULT_TTL)
 	logging.getLogger(__module__).debug(
 		"Setting default socket timeout to %d",  # lazy formatting to avoid PYL-W1203
 		_tmp_mcast_value,
 	)
 	socket.setdefaulttimeout(_tmp_mcast_value)
+finally:
 	del _tmp_mcast_value  # skipcq - cleanup any bootstrap/setup leaks early
 
 if not hasattr(struct, "pack"):
@@ -663,11 +665,12 @@ else:  # pragma: no branch
 	global env  # skipcq: PYL-W0604
 	env = sys.modules["multicast.env"]
 
-_config = env.load_config()
+try:
+	_config = env.load_config()
 
-if _config is None:
-	raise ImportError("[CWE-440]: we could not import environment (multicast.env). ABORT.") from None
-else:
+	if _config is None:  # pragma: no branch
+		raise ImportError("[CWE-440]: we could not import environment (multicast.env). ABORT.") from None
+
 	logging.getLogger(__module__).debug("Configuring overrides and defaults.")
 	_MCAST_DEFAULT_PORT = _config["port"]
 	_MCAST_DEFAULT_GROUP = _config["group"]
@@ -685,8 +688,8 @@ else:
 				"\t%s=%s",  # lazy formatting to avoid PYL-W1203
 				key, value,
 			)
-
-del _config  # skipcq - cleanup any bootstrap/setup leaks early
+finally:
+	del _config  # skipcq - cleanup any bootstrap/setup leaks early
 
 
 class mtool(abc.ABC):

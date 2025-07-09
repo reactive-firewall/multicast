@@ -57,6 +57,20 @@ except Exception as _cause:  # pragma: no branch
 
 @context.markWithMetaTag("mat", "build")
 class BuildPEP517TestSuite(BasicUsageTestSuite):
+	"""
+	Test suite for PEP 621 metadata compliance.
+
+	This test suite verifies that the project adheres to PEP 621 standards
+	for project metadata specification in pyproject.toml.
+
+	Meta Testing:
+
+		>>> import tests.test_build
+		>>> tests.test_build.BuildPEP621TestSuite
+		<class 'tests.test_build.BuildPEP621TestSuite'>
+		>>>
+
+	"""
 
 	__module__ = "tests.test_build"
 
@@ -70,6 +84,12 @@ class BuildPEP517TestSuite(BasicUsageTestSuite):
 
 		References:
 		- PEP 517: https://peps.python.org/pep-0517/
+
+		Args:
+			None
+
+		Returns:
+			None
 		"""
 		# Arguments need to clean
 		# Arguments need to build

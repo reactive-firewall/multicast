@@ -191,6 +191,15 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 
 		Raises:
 			CommandExecutionError: If the IP address cannot be determined.
+
+		Meta Testing:
+
+			>>> ip = HearCleanupTestSuite.get_default_ip()
+			>>> isinstance(ip, str)
+			True
+			>>> len(ip.split('.'))
+			4
+
 		"""
 		s = None
 		try:
@@ -200,7 +209,7 @@ class HearCleanupTestSuite(context.BasicUsageTestSuite):
 			s.connect(("203.0.113.1", 59095))
 			# Get the IP address of the default interface
 			ip = s.getsockname()[0]
-		except socket.error as _cause:  # pragma: no branch
+		except OSError as _cause:  # pragma: no branch
 			raise multicast.exceptions.CommandExecutionError("Failed to determine IP", 69) from _cause
 		finally:
 			if s is not None:

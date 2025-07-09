@@ -28,17 +28,17 @@
 *.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
 *.pyc export-ignore diff=python -text
 *.pyi export-ignore text eol=lf diff=python merge=python working-tree-encoding=UTF-8
-multicast/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
-tests/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
-docs/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
-tests/check_* text eol=lf diff=bash merge=bash working-tree-encoding=UTF-8
+
+# May diverge in future
+# multicast/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
+# tests/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
+# docs/*.py text eol=lf diff=python merge=python working-tree-encoding=UTF-8
+# tests/check_* text eol=lf diff=bash merge=bash working-tree-encoding=UTF-8
 
 *.jpg -text
 *.png -text
 *.{svg,[sS][vV][gG]} text eol=lf diff=html merge=html working-tree-encoding=UTF-8
 
-*.{rst,[rR][sS][tT]} text eol=lf working-tree-encoding=UTF-8
-
-# more rules
+# More rules
 .DS_Store export-ignore -text
 Makefile text eol=lf diff=makefile merge=makefile working-tree-encoding=UTF-8

@@ -298,8 +298,8 @@ jobs:
           persist-credentials: false
           ref: ${{ needs.check_build.outputs.sha }}
           sparse-checkout: '.github/actions/check-control'
-      - name: "Compleate MATs GitHub Check"
-        id: compleate_mats
+      - name: "Complete MATs GitHub Check"
+        id: complete_mats
         if: ${{ (github.repository == 'reactive-firewall-org/multicast') && always() }}
         uses: ./.github/actions/check-control
         with:

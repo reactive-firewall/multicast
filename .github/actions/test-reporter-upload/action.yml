@@ -94,6 +94,15 @@ outputs:
   coverage_upload_artifact_outcome:
     description: "The outcome of the coverage test upload action."
     value: ${{ steps.coverage-reports-upload.outcome || 'cancelled' }}
+  coverage_artifact_url:
+    description: "The resulting url for the artifact of the coverage test upload action."
+    value: ${{ steps.coverage-reports-upload.outputs.artifact-url }}
+  coverage_artifact_id:
+    description: "The resulting id for the artifact of the coverage test upload action."
+    value: ${{ steps.coverage-reports-upload.outputs.artifact-id }}
+  coverage_artifact_digest:
+    description: "The resulting digest for the artifact of the coverage test upload action."
+    value: ${{ steps.coverage-reports-upload.outputs.artifact-digest }}
 
 runs:
   using: composite

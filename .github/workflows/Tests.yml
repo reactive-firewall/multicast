@@ -171,9 +171,9 @@ jobs:
       coverage_upload_codecov_outcome: ${{ steps.coverage-project-codecov-upload.outcome }}
       coverage_upload_deepsource_outcome: ${{ steps.upload-test-tools.outputs.coverage_upload_deepsource_outcome }}
       coverage_upload_artifact_outcome: ${{ steps.upload-test-tools.outputs.coverage_upload_artifact_outcome }}
-      coverage_artifact_url: ${{ steps.coverage-reports-upload.outputs.artifact-url }}
-      coverage_artifact_id: ${{ steps.coverage-reports-upload.outputs.artifact-id }}
-      coverage_artifact_digest: ${{ steps.coverage-reports-upload.outputs.artifact-digest }}
+      coverage_artifact_url: ${{ steps.upload-test-tools.outputs.coverage_artifact_url }}
+      coverage_artifact_id: ${{ steps.upload-test-tools.outputs.coverage_artifact_id }}
+      coverage_artifact_digest: ${{ steps.upload-test-tools.outputs.coverage_artifact_digest }}
     steps:
     - name: pre-checkout repository for actions
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -240,7 +240,7 @@ jobs:
         override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
         override_build: ${{ needs.check_mats.outputs.build_id }}
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
-        files: ./coverage.xml,./test-reports/coverage.xml
+        files: ./coverage.xml,./test-reports/coverage.xml,./test-reports/coverage_*.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
         flags: multicast
@@ -884,7 +884,7 @@ jobs:
     - name: Generate Functional Test Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       id: integration-main
       run: |
-        hash -p ./.github/tools/shlock_helper.sh shlock ;
+        hash -p ./.github/tool_shlock_helper.sh shlock ;
         ./tests/check_integration_coverage || echo "::warning file=tests/check_integration_coverage,line=1,endLine=1,title=SKIPPED::SKIP Integration Tests." ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} integration coverage to Codecov
@@ -899,7 +899,7 @@ jobs:
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
         report_type: 'coverage'
         slug: 'reactive-firewall-org/multicast'
-        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage_doctests.xml,./test-reports/coverage_coverage.xml,./test-reports/coverage.xml
+        files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml,./test-reports/coverage_*.xml
         directory: .
         flags: multicast
         name: multicast-github-${{ matrix.os }}-${{ matrix.python-version }}
@@ -922,7 +922,7 @@ jobs:
       run: |
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Upload Python ${{ matrix.python-version }} integration test results to Codecov
-      if: ${{ !cancelled() }}
+      if: ${{ !cancelled() && (matrix.use-pytest == "1") }}
       id: integration-codecov-results-upload
       uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
       with:
