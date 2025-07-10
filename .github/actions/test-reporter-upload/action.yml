@@ -298,7 +298,7 @@ runs:
       if: ${{ !cancelled() && (steps.output_can_upload.outputs.can_upload == 'true') && (steps.output_upload_tools.outputs.can_upload_to_codecov == 'true') }}
       shell: bash
       run: |
-        if [[ "${OS}" != "unknown" ]] ; then
+        if [[ "${OS}" != "unknown" ]] && [[ "${OS}" != "Windows" ]] ; then
           ${{ github.workspace }}/tests/check_codecov || exit 1
         fi  # else just finish with implied success
     - name: Upload ${{ steps.output_os.outputs.os }} Python ${{ steps.output_python.outputs.python-version }} coverage to Codecov
@@ -312,7 +312,7 @@ runs:
         override_branch: ${{ steps.output_branch_name.outputs.branch-name }}
         report_type: 'coverage'
         slug: 'reactive-firewall-org/multicast'
-        files: ./coverage.xml,./test-reports/coverage.xml
+        files: ./coverage.xml,./test-reports/coverage.xml,./test-reports/coverage_*.xml
         directory: ${{ github.workspace }}
         flags: multicast
         name: multicast-github-${{ steps.output_os.outputs.os }}-${{ steps.output_python.outputs.python-version }}-${{ steps.output_sha.outputs.sha }}
