@@ -1009,7 +1009,7 @@ class mtool(abc.ABC):
 
 if "multicast.skt" not in sys.modules:
 	# pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
-	from . import skt as skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
+	from . import skt  # pylint: disable=cyclic-import - skipcq: PYL-R0401, PYL-C0414
 else:  # pragma: no branch
 	global skt  # skipcq: PYL-W0604
 	skt = sys.modules["multicast.skt"]
