@@ -1037,7 +1037,9 @@ jobs:
         if [[ "${{ steps.integration-codecov-results-upload.outcome }}" == "success" && "${THE_RESULT}" == "success" ]] ; then
           THE_RESULT="success"
         else
-          THE_RESULT="failure"
+          if [[ -n "${TESTS_USE_PYTEST}" ]] ; then
+            THE_RESULT="failure"
+          fi ;  # else ignore invalid junit upload outcome
         fi
         for CHECK_VALUE in "${{ steps.integration-deepsource-upload.outcome }}" "${{ steps.integration-reports-upload.outcome }}" ; do
           if [[ "${CHECK_VALUE}" != "failure" && "${THE_RESULT}" == "success" ]] ; then
