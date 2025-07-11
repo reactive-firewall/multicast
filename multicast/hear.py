@@ -726,18 +726,18 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 			>>>
 		"""
 		(data, sock) = self.request
-		if data is None or not sock:
+		if data is None or not sock:  # pragma: no branch
 			return  # nothing to do -- fail fast.
-		else:  # skipcq: PYL-R1705 -- otherwise try to decode
-			try:
-				data = data.decode('utf8') if isinstance(data, bytes) else str(data)
-			except UnicodeDecodeError:  # pragma: no cover
-				if __debug__:
-					module_logger.debug(
-						"Received invalid UTF-8 data from %s",  # lazy formatting to avoid PYL-W1203
-						self.client_address[0],
-					)
-				return  # silently ignore invalid UTF-8 data -- fail quickly.
+		# skipcq: PYL-R1705 -- otherwise can try to decode
+		try:
+			data = data.decode('utf8') if isinstance(data, bytes) else str(data)
+		except UnicodeDecodeError:  # pragma: no cover -- defensive code branch
+			if __debug__:
+				module_logger.debug(
+					"Received invalid UTF-8 data from %s",  # lazy formatting to avoid PYL-W1203
+					self.client_address[0],
+				)
+			return  # silently ignore invalid UTF-8 data -- fail quickly.
 		_logger = logging.getLogger(f"{type(self).__module__}.{type(self).__qualname__}")
 		if __debug__:
 			_logger.info(
@@ -747,7 +747,7 @@ class HearUDPHandler(socketserver.BaseRequestHandler):
 		me = str(sock.getsockname()[0])
 		_sender: multicast.send.McastSAY = None
 		_sender = send.McastSAY()
-		if __debug__:  # pragma: no cover
+		if __debug__:  # pragma: no cover -- defensive code branch
 			_what = data.strip().replace("""\r""", str()).replace("""%""", """%%""")
 			_logger.info(
 				"%s HEAR: [%s SAID %s]",  # lazy formatting to avoid PYL-W1203

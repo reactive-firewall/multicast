@@ -53,6 +53,7 @@ jobs:
       build_artifact_url: ${{ steps.load_build_info.outputs.build_artifact_url }}
       build_artifact_id: ${{ steps.load_build_info.outputs.build_artifact_id }}
       build_artifact_digest: ${{ steps.load_build_info.outputs.build_artifact_digest }}
+      build_pr_number: ${{ steps.load_build_info.outputs.build_pr_number }}
       build_environment: ${{ steps.load_build_info.outputs.build_environment }}
       mats_url: ${{ steps.output_run_id.outputs.mats_url }}
       mats_id: ${{ steps.output_run_id.outputs.mats_id }}
@@ -342,6 +343,7 @@ jobs:
             printf "%s\n" "build_artifact_url=${{ needs.check_build.outputs.build_artifact_url }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "build_artifact_id=${{ needs.check_build.outputs.build_artifact_id }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "build_artifact_digest=${{ needs.check_build.outputs.build_artifact_digest }}" >> "$GITHUB_OUTPUT"
+            printf "%s\n" "build_pr_number=${{ needs.check_build.outputs.build_pr_number }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "build_environment=${{ needs.check_build.outputs.build_environment }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "build_id=${{ needs.check_build.outputs.build_id }}" >> "$GITHUB_OUTPUT"
             cat <"$GITHUB_OUTPUT" >> "BUILD-info.txt"

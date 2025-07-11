@@ -320,6 +320,11 @@ jobs:
             printf "%s\n" "build-artifact-attestation-url=${{ needs.BUILD_ATTEST.outputs.build-artifact-attestation-url }}" >> "$GITHUB_OUTPUT"
             printf "%s\n" "build-artifact-attestation-id=${{ needs.BUILD_ATTEST.outputs.build-artifact-attestation-id }}" >> "$GITHUB_OUTPUT"
           fi
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            printf "%s\n" "build_pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            printf "%s\n" "build_pr_number=null" >> $GITHUB_OUTPUT
+          fi
           printf "%s\n" "build_environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
           printf "%s\n" "build_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
           cat <"$GITHUB_OUTPUT" >> "BUILD-info.txt"

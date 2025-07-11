@@ -63,6 +63,7 @@ jobs:
       build_artifact_url: ${{ steps.load_build_info.outputs.build_artifact_url }}
       build_artifact_id: ${{ steps.load_build_info.outputs.build_artifact_id }}
       build_artifact_digest: ${{ steps.load_build_info.outputs.build_artifact_digest }}
+      build_pr_number: ${{ steps.load_build_info.outputs.build_pr_number }}
       build_environment: ${{ steps.load_build_info.outputs.build_environment }}
       mats_environment: ${{ steps.load_build_info.outputs.mats_environment }}
       mats_id: ${{ steps.load_build_info.outputs.mats_id }}
@@ -240,6 +241,7 @@ jobs:
         override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
         override_build: ${{ needs.check_mats.outputs.build_id }}
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
+        override_pr: ${{ needs.check_mats.outputs.build_pr_number }}
         files: ./coverage.xml,./test-reports/coverage.xml,./test-reports/coverage_*.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
@@ -477,6 +479,7 @@ jobs:
         override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
         override_build: ${{ needs.check_mats.outputs.build_id }}
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
+        override_pr: ${{ needs.check_mats.outputs.build_pr_number }}
         files: ./test-reports/coverage_doctests.xml
         directory: .
         env_vars: OS,PYTHON_VERSION
@@ -897,6 +900,7 @@ jobs:
         override_branch: ${{ needs.check_mats.outputs.build_ref_name }}
         override_build: ${{ needs.check_mats.outputs.build_id }}
         override_build_url: ${{ needs.check_mats.outputs.build_url }}
+        override_pr: ${{ needs.check_mats.outputs.build_pr_number }}
         report_type: 'coverage'
         slug: 'reactive-firewall-org/multicast'
         files: ./test-reports/coverage_supplement.xml,./test-reports/coverage.xml,./test-reports/coverage_*.xml
