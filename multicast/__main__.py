@@ -245,6 +245,24 @@ class McastNope(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser):
+		"""
+		Sets up command-line arguments for the trivial subclass implementation of mtool.
+
+		This method is intended to be overridden by subclasses to define
+		specific command-line arguments. It takes a parser object as an
+		argument, which is typically an instance of `argparse.ArgumentParser`.
+
+		Args:
+			parser (argparse.ArgumentParser): The argument parser to which
+												the arguments should be added.
+
+		Returns:
+			None: This method does not return a value.
+
+		Note:
+			This is trivial implementation make this an optional abstract method. Subclasses may
+			choose to implement it or leave it as a no-op.
+		"""
 		pass  # skipcq: PTC-W0049 - optional abstract method
 
 	@staticmethod
@@ -396,7 +414,14 @@ class McastRecvHearDispatch(mtool):
 		Will attempt to add hear args.
 
 		Both HEAR and RECV use the same arguments, and are differentiated only by the global,
-		'--daemon' argument during dispatch.
+		'--daemon' argument during dispatch. The remaining arguments are:
+
+			| Arguments | Notes |
+			|-----------|------------------------------------------------------------|
+			| --deamon  | Enable use of HEAR, otherwise use RECV if omitted          |
+			| --group   | multicast group (ip address) to bind-to for the udp socket |
+			| --groups  | multicast groups to join (should include the bind group)   |
+			| --port    | The UDP port number to listen/filter on for the udp socket |
 
 		Testing:
 
@@ -582,6 +607,12 @@ class McastDispatch(mtool):
 
 	@classmethod
 	def setupArgs(cls, parser) -> None:
+		"""
+		Will attempt to add each subcomponent's args.
+
+		As the dispatch tool, this is more of a proxy implementation to call the sub-components
+		own setupArgs.
+		"""
 		if parser is not None:  # pragma: no branch
 			for sub_tool in sorted(TASK_OPTIONS.keys()):
 				sub_parser = parser.add_parser(sub_tool, help="...")
@@ -619,12 +650,12 @@ class McastDispatch(mtool):
 			(argz, _) = type(self).parseArgs(*args)
 			service_cmd = argz.cmd_tool
 			argz.__dict__.__delitem__("cmd_tool")
-			_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))
+			_TOOL_MSG = (self.useTool(service_cmd, **argz.__dict__))  # skipcq: PYL-C0325
 			if _TOOL_MSG[0]:
 				_response = (0, _TOOL_MSG)
 			else:
 				_response = (70, _TOOL_MSG)
-				if (sys.stdout.isatty()):  # pragma: no cover
+				if sys.stdout.isatty():  # pragma: no cover
 					print(str(_TOOL_MSG))
 		except Exception as _cause:  # pragma: no branch
 			exit_code = exceptions.get_exit_code_from_exception(_cause)

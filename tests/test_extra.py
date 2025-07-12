@@ -107,7 +107,7 @@ def onlyIfHasDocs(has_docs: bool) -> callable:
 		True
 
 	"""
-	def decorator(cls: callable) -> callable:
+	def decorator(cls: callable) -> callable:  # skipcq: PY-D0003 -- decorator ok
 		if not has_docs:
 			# Create an empty class with a method that returns None
 			return type(cls.__name__, (object,), {

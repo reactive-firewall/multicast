@@ -309,7 +309,7 @@ class MCastClient(object):  # skipcq: PYL-R0205
 		sock.sendto(bytes(msg + "\n", "utf-8"), (address, port))  # pragma: no cover
 		received = str(sock.recv(1024), "utf-8")  # pragma: no cover
 		sp = " " * 4  # pragma: no cover
-		if (sys.stdout.isatty()):  # pragma: no cover
+		if sys.stdout.isatty():  # pragma: no cover
 			print(f"Sent: {sp}{msg}")  # skipcq: PYL-C0209  -  must remain compatible
 			print(f"Received: {received}")  # skipcq: PYL-C0209  -  must remain compatible
 

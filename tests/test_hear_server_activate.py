@@ -65,8 +65,21 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 		# Define a simple request handler
 		class SimpleHandler:
+			"""
+			A simple request handler for processing incoming requests.
 
+			This class serves as a placeholder for handling requests. The
+			actual handling logic is not implemented in this fixture, as
+			the focus is on the server activation.
+			"""
 			def handle(self):
+				"""
+				Handle an incoming request.
+
+				This method is intended to contain the logic for processing
+				a request. In this case, it is just a test fixture and does not
+				perform any actions.
+				"""
 				pass  # Handler logic is not the focus here
 
 		# Create an instance of McastServer
@@ -75,7 +88,17 @@ class McastServerActivateTestSuite(context.BasicUsageTestSuite):
 
 		# Start the server in a separate thread
 
-		def run_server():
+		def run_server() -> None:
+			"""
+			Start the server and run it indefinitely.
+
+			This function activates the server and begins serving requests
+			in a blocking manner. It is intended to be run in a separate
+			thread to allow other operations to continue concurrently.
+
+			Note:
+				This function will not return until the server is stopped.
+			"""
 			server.server_activate()
 			server.serve_forever()
 

@@ -91,7 +91,7 @@ def onlyIfHasHypothesis(has_hypothesis: bool) -> callable:
 		callable: A decorator function that returns either the original class or a dummy class
 		with a placeholder method, depending on the has_hypothesis flag.
 	"""
-	def decorator(cls: callable) -> callable:
+	def decorator(cls: callable) -> callable:  # skipcq: PY-D0003 -- decorator ok
 		if not has_hypothesis:
 			# Create an empty class with a method that returns None
 			return type(cls.__name__, (object,), {

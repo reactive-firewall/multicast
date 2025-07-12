@@ -35,15 +35,15 @@ __all__ = [
 	"""exceptions""",
 	"""exceptions.CommandExecutionError""",  # skipcq: PYL-E0603 -- imports ok
 	"""exceptions.ShutdownCommandReceived""",  # skipcq: PYL-E0603 -- imports ok
-	"""exceptions.get_exit_code_from_exception""",
-	"""exceptions.exit_on_exception""",
+	"""exceptions.get_exit_code_from_exception""",  # skipcq: PYL-E0603 -- imports ok
+	"""exceptions.exit_on_exception""",  # skipcq: PYL-E0603 -- imports ok
 	"""get_exit_code_from_exception""",
 	"""exit_on_exception""",
 	"""env""",
 	"""skt""",
-	"""skt.__package__""",
-	"""skt.__module__""",
-	"""skt.__name__""",
+	"""skt.__package__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""skt.__module__""",  # skipcq: PYL-E0603 -- shadow imports ok
+	"""skt.__name__""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""skt.__file__""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""skt.genSocket""",  # skipcq: PYL-E0603 -- shadow imports ok
 	"""skt.genSocket.__func__""",  # skipcq: PYL-E0603 -- shadow imports ok

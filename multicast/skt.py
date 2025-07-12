@@ -205,7 +205,7 @@ def genSocket() -> _socket.socket:
 	"""
 	sock = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM, _socket.IPPROTO_UDP)
 	sock.setsockopt(_socket.SOL_SOCKET, _socket.SO_REUSEADDR, 1)
-	if (hasattr(_socket, 'IP_MULTICAST_TTL')):  # pragma: no branch
+	if hasattr(_socket, 'IP_MULTICAST_TTL'):  # pragma: no branch
 		sock.setsockopt(_socket.IPPROTO_IP, _socket.IP_MULTICAST_TTL, _MCAST_DEFAULT_TTL)
 	sock.settimeout(_MCAST_DEFAULT_TTL)
 	return sock

@@ -83,6 +83,32 @@ try:
 	import logging
 	try:
 		class ANSIColors:
+			"""
+			A class that defines ANSI color codes for terminal output.
+
+			This class contains ANSI escape sequences for various colors and a
+			mapping of logging levels to their corresponding colors. It also
+			includes a nested class for a colored stream handler that formats
+			log messages with the appropriate colors based on their severity.
+
+			Attributes:
+				BLACK (str): ANSI code for black text.
+				RED (str): ANSI code for red text.
+				GREEN (str): ANSI code for green text.
+				YELLOW (str): ANSI code for yellow text.
+				BLUE (str): ANSI code for blue text.
+				MAGENTA (str): ANSI code for magenta text.
+				CYAN (str): ANSI code for cyan text.
+				GREY (str): ANSI code for grey text.
+				AMBER (str): ANSI code for amber text.
+				REDBG (str): ANSI code for red background.
+				ENDC (str): ANSI code to reset text formatting.
+
+				logging_color (dict): A dictionary mapping logging levels to their
+										corresponding ANSI color codes.
+				logging_level (dict): A dictionary mapping logging levels to their
+										corresponding logging module constants.
+			"""
 			# Define ANSI color codes
 			BLACK = """\033[30m"""
 			RED = """\033[31m"""
@@ -112,7 +138,30 @@ try:
 		}
 
 		class ColoredStreamHandler(logging.StreamHandler):
+			"""
+			A custom logging handler that outputs with color formatting based on the log level.
+
+			This handler checks if the output stream is a terminal and applies
+			the appropriate ANSI color codes to the log messages. If the output
+			is not a terminal, it outputs plain text without color.
+
+			Methods:
+				emit(record: logging.LogRecord) -> None:
+					Formats and writes the log message to the stream with
+					appropriate color based on the log level.
+			"""
+
 			def emit(self, record: logging.LogRecord) -> None:
+				"""
+				Formats and writes the log message to the stream with color.
+
+				Args:
+					record (logging.LogRecord): The log record containing
+												information about the log event.
+
+				Raises:
+					ValueError: If the log level is invalid or not recognized.
+				"""
 				# Get the log level as a string
 				loglevel = record.levelname.lower()
 				# Validate the log level
@@ -429,6 +478,21 @@ def get_test_suite(
 
 	# Helper function to add test cases to suite
 	def add_test_cases(test_cases: list) -> None:
+		"""
+		Adds a list of test cases to the test suite.
+
+		This function iterates over the provided list of test cases. If a test case
+		is an instance of unittest.TestSuite, it adds the entire suite to the
+		main suite. If the test case is a class, it loads the tests from that
+		class and adds them to the main suite.
+
+		Args:
+			test_cases (list): A list of test cases or test suites to be added
+								to the main test suite.
+
+		Returns:
+			None: This function does not return a value.
+		"""
 		for test_case in test_cases:
 			if isinstance(test_case, unittest.TestSuite):
 				# Handle doctests
