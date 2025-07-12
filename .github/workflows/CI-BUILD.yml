@@ -302,6 +302,8 @@ jobs:
       environment: ${{ steps.check_status.outputs.build_environment }}
     steps:
       - id: check_status
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [[ "${{ needs.BUILD.result }}" == "success" && "${{ needs.BOOTSTRAP.result }}" == "success" ]]; then
             printf "%s\n" "build_success=true" >> "$GITHUB_OUTPUT"
@@ -323,7 +325,14 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             printf "%s\n" "build_pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
-            printf "%s\n" "build_pr_number=null" >> $GITHUB_OUTPUT
+            PRS_LIST=$(gh pr list --state open --head "${{ github.repository }}:${{ github.ref_name }}" --json number --jq '.[].number')
+            # Determine the highest pull request number or set to null
+            if [[ -n "${PRS_LIST}" ]]; then
+              highest_pr_number=$(printf "%s\n" "$PRS_LIST" | sort -n | tail -n 1)
+              echo "build_pr_number=$highest_pr_number" >> $GITHUB_OUTPUT
+            else
+              echo "build_pr_number=null" >> $GITHUB_OUTPUT
+            fi
           fi
           printf "%s\n" "build_environment=${ENVIRONMENT}" >> "$GITHUB_OUTPUT"
           printf "%s\n" "build_id=${{ github.run_id }}" >> "$GITHUB_OUTPUT"
