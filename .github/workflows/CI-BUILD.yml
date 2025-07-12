@@ -325,7 +325,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             printf "%s\n" "build_pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           else
-            PRS_LIST=$(gh api --url "${{ github.api_url }}/repos/reactive-firewall-org/multicast/pulls?state=open&head=reactive-firewall-org:${{ github.ref_name }}" --jq '.[].number')
+            PRS_LIST=$(gh api "/repos/reactive-firewall-org/multicast/pulls?state=open&head=reactive-firewall-org:${{ github.ref_name }}" --jq '.[].number')
             # Determine the highest pull request number or set to null
             if [[ -n "${PRS_LIST}" ]]; then
               highest_pr_number=$(printf "%s\n" "$PRS_LIST" | sort -n | tail -n 1)
