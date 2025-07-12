@@ -263,7 +263,7 @@ class McastNope(mtool):
 			This is trivial implementation make this an optional abstract method. Subclasses may
 			choose to implement it or leave it as a no-op.
 		"""
-		pass  # skipcq: PTC-W0049 - optional abstract method
+		pass  # skipcq: PTC-W0049, PYL-W0107 - optional abstract method
 
 	@staticmethod
 	def NoOp(*args, **kwargs):
@@ -663,7 +663,7 @@ class McastDispatch(mtool):
 				1,
 				f"CRITICAL - Attempted '[{__name__}]: {args}' just failed! :: {exit_code} {_cause}" # noqa
 			)
-			if (sys.stderr.isatty()):
+			if sys.stderr.isatty():
 				print(
 					"WARNING - An error occurred while handling the arguments. Refused.",
 					file=sys.stderr,

@@ -1102,10 +1102,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 				len(parsed_version.release) >= 2,
 				"Version must have at least major.minor components."
 			)
-		except ImportError:
+		except Exception:
 			self.fail("Failed to import the multicast package to retrieve version.")
-		finally:
-			return parsed_version
+		return parsed_version
 
 	@unittest.skipUnless(True, "Insanity Test. Good luck debugging.")
 	def test_absolute_truth_and_meaning(self) -> None:

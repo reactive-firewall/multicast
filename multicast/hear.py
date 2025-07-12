@@ -823,7 +823,21 @@ class McastHEAR(multicast.mtool):
 	__prologue__ = "Python Multicast Server for multicast input."
 
 	@classmethod
-	def setupArgs(cls, parser):  # skipcq: PY-D0003
+	def setupArgs(cls, parser):
+		"""
+		Ignored for this subclass of mtool.
+
+		See multicast.__main__.McastRecvHearDispatch.setupArgs instead.
+
+		Args:
+			parser (argparse.ArgumentParser): ignored.
+
+		Returns:
+			None: This method does not return a value.
+
+		Note:
+			This is trivial implementation make this an optional abstract method.
+		"""
 		pass  # skipcq - Optional abstract method
 
 	def doStep(self, *args, **kwargs):
